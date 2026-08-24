@@ -1933,6 +1933,12 @@ The asymmetry is the point: the **carriage** entrance is the one opening that
 spans both levels, because a carriage has to pass under the entresol floor. The
 pedestrian door does not, and neither does a shop window.
 
+> **CORRECTED BY AMENDMENT 18.** The last row of that table is not a reading of
+> either plate — neither 77 nor 120 has a carriage entrance — and 26 rue Bergère
+> shows a porte cochère of 3.474 m under a 3.09 m entresol, stopping at the
+> rez-de-chaussée. The asymmetry is real but it is a lean, not an absolute; it
+> now lives in a rate. The first three rows stand as read.
+
 ## A17.2 — remove the absorbed form
 
 Delete it rather than down-weight it. It is not a rare variant we happen to
@@ -1961,3 +1967,96 @@ checking against my prose rather than against the plate. Where an amendment cite
 a specific plate as its specification, the gate should require the verifier to
 state **what it sees in the plate**, in its own words, before comparing it to the
 render — not to confirm that the render matches the amendment.
+
+---
+
+# Amendment 18 — A17.1's carriage arch was asserted, not read
+
+## The error, and where it came from
+
+A17.1 gave the generic ground floor as a table of four rows, "what both plates
+show". Three of those rows are readings of plates 77 and 120. The fourth is not:
+
+| element | height |
+|---|---|
+| *porte cochère* | **rises to the top of the entresol** — the two-storey arch of A14 |
+
+**Neither 77 nor 120 bd de Sébastopol has a carriage entrance.** Both have a
+*porte piétonne*. So that row could not have been read off the plates it cites;
+it was reasoned from clearance — a carriage has to pass under the entresol floor
+to reach the cour — and then written down in the same table as the three rows
+that were observed.
+
+The reasoning is sound and it is not evidence. It says why a carriage door **may**
+span the floor. It cannot say why every one must, and the corpus says they do not.
+
+## The corpus, with denominators
+
+`daly_measurements.json`, all 17 buildings, entresol against door height:
+
+| | has entresol | of those, two-storey |
+|---|---:|---:|
+| *porte cochère* | 2 of 7 | **1 of 2** |
+| *porte piétonne* | 7 of 10 | 1 of 7 |
+
+The decisive record is **26 rue Bergère**: an entresol of 3.09 m under a porte
+cochère measuring **3.474 m** — a carriage entrance that stops at the
+rez-de-chaussée like any shop door. One measured plate in our own corpus, against
+an amendment that said it could not happen.
+
+The other five carriage entrances (Champs-Élysées 125 and 119, rue de la Paix 3,
+rue de Rivoli 88, avenue de l'Impératrice) stand on entresol-less grand addresses,
+where "two-storey" is not defined. Only **39 rue Neuve des Mathurins** (entresol
+2.40 m, door 5.00 m) supports the tall form.
+
+Note also what this overturns in the opposite direction. `TWO_STOREY_ARCH_RATE`
+called the choice kind-blind because Daly's four tall entrances are "two carriage
+and two pedestrian". That counts numerators. Against the denominators the two
+kinds are **not** alike — 2 of 7 against 2 of 10, and 1 of 2 against 1 of 7 on the
+population where the choice exists at all. A17.1 saw a real asymmetry and then
+recorded it as an absolute.
+
+## A18.1 — Required, and done
+
+One draw for both kinds, at a rate the entrance kind sets. Not a branch, and not
+a single blind rate either:
+
+- `TWO_STOREY_ARCH_RATE` — 0.25, the *porte piétonne*, unchanged
+- `TWO_STOREY_ARCH_RATE_CARRIAGE` — 0.40, the *porte cochère*
+
+0.40 is **INFERRED and calibrated by nothing.** The corpus offers two denominators
+and neither is the right one: 0.286 counts four entresol-less addresses where the
+choice did not exist, and 0.50 is n = 2. The figure sits between them because the
+honest reading is between them.
+
+**Only the ORDERING is contractual, and it is two-sided:** the carriage arch is
+likelier than the pedestrian one, AND it is still the minority of carriage
+entrances. A later measurement pass should expect the number to move and must not
+be able to move it past either bound without saying so.
+
+## A18.2 — what forcing it had already broken
+
+The unconditional form put an arch register on an opening filling its whole slot,
+leaving no stone over the lintel — a curtain wall, which
+`test_the_facade_is_stone_with_holes_in_it_not_a_curtain_wall` exists to forbid.
+Two facade guards were failing on it. This is worth recording because the guards
+caught it and the amendment's own gate did not: the gate asked whether the render
+matched A17.1, and it did.
+
+## A18.3 — the process note A17.4 should have applied to itself
+
+A17.4 says that where an amendment cites a plate as its specification, the gate
+must make the verifier state what it sees in the plate before comparing it to the
+render. A17.1 broke that rule **inside the amendment that wrote it**, by putting
+an asserted row in a table headed "what both plates show".
+
+So the rule needs a second half, about writing rather than checking:
+
+> A table that claims to be a reading of a source may contain only rows that
+> were read from it. A row derived some other way — from physics, from
+> convention, from what must surely be true — belongs in its own paragraph,
+> labelled with what it was derived from, so that a later reader can see which
+> claims have a plate behind them and which have an argument.
+
+The failure mode is not believing something false. It is filing an inference in
+the drawer marked *observation*, where nobody thinks to ask it for a source.

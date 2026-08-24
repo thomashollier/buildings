@@ -596,10 +596,10 @@ def _comble_sprung_from_the_cornice(env, eaves: float) -> Silhouette:
 def test_within_refuses_a_comble_sprung_from_the_cornice_rather_than_the_eaves():
     """The retraction of A2.4, stated as the case it used to get wrong.
 
-    A comfortable 1865 building on a 20 m street stops 1.23 m below the height
-    its street earns. A comble reaching ``env.total_height`` from those eaves
-    is legal *only* if it is inscribed below the 45° diagonal springing from
-    the eaves — i.e. set back by ``setback_at(total_height - eaves)``. Take the
+    A comfortable 1865 building on a 20 m street stops short of the height its
+    street earns. A comble reaching ``env.total_height`` from those eaves is
+    legal *only* if it is inscribed below the 45° diagonal springing from the
+    eaves — i.e. set back by ``setback_at(total_height - eaves)``. Take the
     shallower setback the cornice line would allow and the roof stands in space
     the decree forbids, and ``within`` must say so.
 
@@ -611,9 +611,15 @@ def test_within_refuses_a_comble_sprung_from_the_cornice_rather_than_the_eaves()
     env = grid.envelope
     eaves = grid.built_height
     headroom = env.facade_height - eaves
-    assert headroom == pytest.approx(1.00, abs=0.02), (
-        f"the harness case moved: headroom is now {headroom:.3f} m"
+    # A fixture tripwire, not a claim: this case is only worth running while
+    # the building actually stops short, because that gap IS the difference
+    # between the two anchorings. The figure moved from 1.0028 to 0.7020 when
+    # A16.2 repriced the garret trade from 4.01 m to the band's own height,
+    # and it will move again the next time that price is derived differently.
+    assert headroom == pytest.approx(0.7020, abs=1e-3), (
+        f"the harness case moved: headroom is now {headroom:.4f} m"
     )
+    assert headroom > 0.0
 
     sprung_from_the_cornice = _comble_sprung_from_the_cornice(env, eaves)
     assert sprung_from_the_cornice.ridge_height == pytest.approx(
@@ -729,9 +735,9 @@ def test_the_comble_this_phase_builds_stops_below_the_top_of_the_legal_solid():
     """A8.5, asked of the BUILDING and not of the predicate.
 
     The canonical case is the one the amendments name: a comfortable 1865
-    immeuble on a 20 m boulevard, eaves at 16.32 m against a 17.55 m legal
-    cornice, gabarit topping out at 20.75 m. Its ridge stands at 19.52 m — a
-    metre and a quarter of legal solid it had no use for.
+    immeuble on a 20 m boulevard, eaves at 16.85 m against a 17.55 m legal
+    cornice, gabarit topping out at 20.75 m. Its ridge stands at 20.05 m —
+    0.70 m of legal solid it had no use for.
 
     That gap is the whole of A8.5. The comble used to reach 20.75 m, because
     it was carried up to the ceiling and the ceiling recovers the cornice
@@ -749,15 +755,29 @@ def test_the_comble_this_phase_builds_stops_below_the_top_of_the_legal_solid():
     env = grid.envelope
     eaves = grid.built_height
     headroom = env.facade_height - eaves
-    assert headroom == pytest.approx(1.0028, abs=1e-3), (
+    assert headroom == pytest.approx(0.7020, abs=1e-3), (
         f"the canonical case moved: headroom is now {headroom:.4f} m"
     )
 
     ridge = sil.props["ridge_height"]
     assert ridge == pytest.approx(eaves + env.ridge_height, abs=1e-9)
     # The answer this replaced, named so a regression to it reads as one.
-    assert ridge < env.total_height - 1.0
-    assert grid.comble_height < grid.comble_ceiling - 1.0
+    #
+    # Stated as the exact relation rather than as "short by more than a
+    # metre". The margin used to be 1.0028 m and A16.2 brought it to 0.7020,
+    # which would have taken a crude ``> 1.0`` threshold down with it — and a
+    # threshold that has to be relaxed whenever a price is corrected was never
+    # measuring the claim. The claim is that the roof did NOT recover the
+    # cornice height the facade declined, so what the gabarit has left over
+    # its ridge is exactly the headroom the stone gave up, to the millimetre.
+    assert env.total_height - ridge == pytest.approx(headroom, abs=1e-9), (
+        "the comble grew into the height the facade declined — that is the "
+        "pre-A8.5 behaviour, where every building came out at its ceiling"
+    )
+    assert grid.comble_ceiling - grid.comble_height == pytest.approx(
+        headroom, abs=1e-9
+    )
+    assert ridge < env.total_height
     assert grid.comble_ceiling == pytest.approx(env.ridge_height + headroom, abs=1e-9)
 
     roof = kind(others, "roof")[0]
