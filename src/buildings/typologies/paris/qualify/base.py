@@ -234,6 +234,21 @@ def filant_runs_here(ctx: QualContext) -> bool:
     return ctx.level_above_pavement >= float(ordonnance.min_height) - _EPS
 
 
+def _the_noble_floor_steps_out(ctx: QualContext) -> bool:
+    """Does THIS BUILDING have a balcony on its noble floor at all? (A21.4)
+
+    The 1823 ordonnance's own height gate, asked of the noble floor's level
+    rather than of the storey in hand — which is why the context carries that
+    level. A frontage that clears it steps out onto balconies and its windows
+    are walked through wherever one runs; a frontage that does not has a guard
+    rail along the top of its wall and windows with sills behind it.
+    """
+    ordonnance = balcony_rule(
+        [ctx.principal_level], era_for_year(ctx.year), second_line=False
+    )
+    return ctx.principal_level >= float(ordonnance.min_height) - _EPS
+
+
 def sill_height_for(ctx: QualContext) -> Quantity:
     """Where the underside of an ordinary opening sits above this storey's
     floor.
@@ -248,11 +263,31 @@ def sill_height_for(ctx: QualContext) -> Quantity:
     and a person walks through it. There is no sill to lean on because there
     is no sill. Still ABSOLUTE — what changed is the body's relation to the
     opening, not the building's budget — and still nothing a class may argue
-    with. It applies at the noble floor only: the second filant, along the
-    top of the wall, guards a window rather than carrying a room out onto a
-    terrace (INFERRED).
+    with.
+
+    **A21.4: at EVERY filant, not only the noble floor.** The rank test that
+    used to sit here carried the same INFERRED claim its own comment admitted
+    to — that "the second filant, along the top of the wall, guards a window
+    rather than carrying a room out onto a terrace". Plate 77 shows the upper
+    filant's windows coming down to the balcony floor exactly as the noble
+    floor's do. A balcony nobody can step onto is a railing, and the storeys
+    that have a railing rather than a balcony already draw one.
+
+    The condition was always the filant; the rank was a guess standing next
+    to it, and ``filant_runs_here`` already knows both lines a Paris frontage
+    runs one along.
+
+    **With one bound, which the facade itself imposes.** A building whose noble
+    floor sits below the 1823 threshold has no balcony there — and if the
+    second filant still took its sill away, the TOP storey would carry the
+    tallest openings on the frontage and out-rank the floor the building exists
+    to show off. Measured: window heights by rank came out
+    ``{0: 1.79, 1: 1.58, 2: 1.40, 3: 2.04}`` on a 1862 shop frontage. So the
+    upper filant is stepped out onto where the noble floor's own is; where the
+    noble floor never got a balcony, the rail along the top of the wall is a
+    guard and the window behind it keeps its sill.
     """
-    if ctx.rank_from_principal == 0 and filant_runs_here(ctx):
+    if filant_runs_here(ctx) and _the_noble_floor_steps_out(ctx):
         return Abs(
             0.0,
             "a porte-fenêtre onto the balcon filant is stepped through, not leaned on",
@@ -930,6 +965,25 @@ def the_entresol_register_of_a_tall_arch_is_its_head(
                 if ctx.slot_name == catalogue.ENTRANCE_CARRIAGE
                 else "glazed"
             ),
+            # A20.4: and where it is glazed it carries an IRON GRILLE, which is
+            # what makes an imposte an imposte rather than a blank pane. Daly
+            # draws it at full scale for 87 bd de Sébastopol — the plate's own
+            # panel is captioned "Détail du haut de l'Imposte" and is nothing
+            # but scrollwork in a curved head — and the leaves at 2 et 4 carry
+            # the same ironwork over their glass.
+            #
+            # The COUNT is stated here, from the same ABSOLUTE every balustrade
+            # is measured against, because a renderer choosing a bar spacing is
+            # a renderer deciding (`check_renderer_dumb`). What Daly draws is
+            # scrollwork and this is bars: the honest reduction of an ornament
+            # we cannot source a density for, which is A7's rule.
+            "arch_head_bar_count": (
+                0
+                if ctx.slot_name == catalogue.ENTRANCE_CARRIAGE
+                else catalogue.repeats_across(
+                    arch.clear_width, float(catalogue.balustrade_child_gap_max())
+                )
+            ),
             # **A20.1: and NOTHING else.** Stated as a refusal rather than
             # left to `compose` to decline, because the storey-scope
             # `garde_corps` rule says every light above the base carries one
@@ -1168,18 +1222,35 @@ def noble_floor_steps_out_onto_its_balcon_filant(
     raising the balcony threshold, or taking the mezzanine out and dropping
     the noble floor below 6 m, moves this by itself.
 
-    The noble floor only. The second filant along the top of the wall guards a
-    window rather than carrying a room out onto a terrace, which is INFERRED
-    and is the one part of this a person could argue with.
+    **A21.4: wherever a filant runs, not only on the noble floor.** This used
+    to stop at rank 0, on the reasoning that "the second filant along the top
+    of the wall guards a window rather than carrying a room out onto a
+    terrace" — and that docstring called the restriction INFERRED and "the one
+    part of this a person could argue with". It was argued with, and the plate
+    settles it: at 77 bd de Sébastopol the upper filant's windows come down to
+    the balcony's own floor exactly as the noble floor's do. A balcony you
+    cannot step onto is a railing, and a railing is what the storeys WITHOUT
+    one already carry.
 
-    Applicability: a bay or the strip over the entrance, on rank 0, on a
-    frontage the ordonnance lets a balcony onto. ``SPEC_SLOT_AND_ROLE``, above
-    ``bay_is_a_window``'s plain sill and disjoint from the shopfront (which is
-    never rank 0).
+    The condition was never really the rank; it was the filant. So the rule is
+    now what its own first line always said: where the balcon filant runs, the
+    window is walked through.
+
+    Applicability: a bay or the strip over the entrance, on any storey a filant
+    runs along. ``SPEC_SLOT_AND_ROLE``, above ``bay_is_a_window``'s plain sill
+    and disjoint from the shopfront, which never carries one.
     """
     if ctx.slot_name != "bay" and ctx.slot_name not in catalogue.ENTRANCE_SLOT_NAMES:
         return None
-    if ctx.rank_from_principal != 0 or not filant_runs_here(ctx):
+    # Never the base block. A shopfront is not a porte-fenêtre, and it states
+    # its own threshold (``ground_floor_of_a_shop``) at this same specificity —
+    # so without this the two claim ``opening_sill_height`` together and
+    # ``compose`` refuses the tie, correctly. The old ``rank_from_principal ==
+    # 0`` test excluded the base as a side effect; now that the rank is gone,
+    # the exclusion has to be said.
+    if ctx.stands_in_the_base_block:
+        return None
+    if not filant_runs_here(ctx):
         return None
     return Properties(
         {"opening_sill_height": float(sill_height_for(ctx))},

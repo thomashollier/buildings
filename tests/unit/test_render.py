@@ -252,7 +252,20 @@ def test_the_sill_the_ir_states_is_the_sill_that_gets_drawn():
     from buildings.render.svg import elements as el
     from buildings.typologies.paris import catalogue as _cat
 
-    building = _building()
+    # A21.4 moved this fixture. The default frontage now has TWO storeys whose
+    # windows are portes-fenêtres — the noble floor's filant and the one along
+    # the top of the wall — and both are skipped below, which left a single
+    # sill-bearing storey height and nothing to compare. A taller residential
+    # stack restores the variation the claim needs: five distinct storey
+    # heights still carrying a lean-on sill, 2.77 m to 3.70 m.
+    building = _building(
+        street_width=30.0,
+        parcel_width=14.0,
+        parcel_depth=16.0,
+        klass=BuildingClass.GRAND,
+        ground=GroundProgramme.RESIDENTIAL,
+        seed=5,
+    )
     drawn: list[tuple[float, float, float]] = []
     for storey, bay, opening in _openings_of(building):
         stated = opening.props.get("sill_height")

@@ -141,6 +141,19 @@ def _ctx(**over) -> QualContext:
     # entresol exists exactly when the stack says it does, and the top of the
     # base is where the storeys put it. A caller that means to test the
     # inconsistent case passes them explicitly.
+    # A21.4 (context EXTENSION 6): the noble floor's own level, derived the
+    # same way and for the same reason — a fixture must be internally
+    # consistent about whether THIS building steps out onto balconies. On a
+    # rank-0 fixture that is this storey's own level; otherwise assume the
+    # noble floor sits where a Paris one does, clear of the 1823 threshold,
+    # which is what every fixture here was implicitly relying on before the
+    # field existed. A caller testing the low-noble-floor case passes it.
+    if "principal_level" not in over:
+        fields["principal_level"] = (
+            fields["level_above_pavement"]
+            if fields["rank_from_principal"] == 0
+            else 6.5
+        )
     if "storeys_in_the_base_block" not in over:
         fields["storeys_in_the_base_block"] = (
             2 if fields["role"] is Role.MEZZANINE else 1

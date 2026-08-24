@@ -113,6 +113,9 @@ PROPERTY_KEYS: frozenset[str] = frozenset(
         # crown) or a ``"glazed"`` overlight (the pedestrian form at 2 et 4 bd
         # de Sébastopol). ``None`` on every other opening.
         "arch_head_infill",
+        # A20.4. How many bars the iron grille in a glazed imposte is made of.
+        # ``0`` where the head is a carved tympanum and has no grille.
+        "arch_head_bar_count",
         # A14.1. The leaves' own clear height inside the lower register, in
         # metres -- the SAME height the one-storey door has, because what
         # passes through the gate did not change. What is left between it and
@@ -315,6 +318,23 @@ class QualContext:
     #: itself, with no rule change at all.
     base_block_top: float
 
+    #: EXTENSION 6 — the noble floor's own height above the pavement.
+    #:
+    #: A21.4. A *balcon filant* is stepped out onto, so the window behind it is
+    #: a porte-fenêtre — at every filant and not only the noble floor's. But
+    #: whether a building steps out onto balconies AT ALL is decided by the
+    #: 1823 ordonnance at its noble floor, and a storey cannot ask that about
+    #: itself: on a frontage whose noble floor sits below the threshold there
+    #: is no balcony there, and the second filant along the top of the wall is
+    #: a guard rail rather than a terrace. Without this field the top storey
+    #: would lose its sill on such a building and out-rank the noble floor,
+    #: which inverts the whole facade.
+    #:
+    #: One envelope-level height, read off the roled stack before any rule
+    #: fires, in the same species as ``base_block_top`` — and a LEVEL rather
+    #: than a floor number, so moving the noble floor moves this by itself.
+    principal_level: float
+
     # -- derived readers ----------------------------------------------------
     #
     # Pure functions of the fields above — no new facts, just the phrasings
@@ -510,6 +530,14 @@ def contexts_for(
     ]
     n_comble = sum(1 for flag in in_comble if flag)
     n_storeys = len(roled.storeys)
+    # A21.4: the noble floor's own level, resolved once for the whole frontage
+    # so that a storey five floors up can ask whether this building steps out
+    # onto balconies at all. Falls back to the lowest storey where no floor is
+    # ranked 0, which no Paris stack in this typology produces.
+    principal_level = next(
+        (st.slot.start for st in roled.storeys if st.rank_from_principal == 0),
+        roled.storeys[0].slot.start if roled.storeys else 0.0,
+    )
     # A13.1: the commercial base, read off the roled stack once. The base
     # block is the rez-de-chaussée and the compressed level over it — the two
     # roles phase 2 already derived — and its ceiling is the top of the
@@ -538,6 +566,7 @@ def contexts_for(
                     storey_count=n_storeys,
                     role=st.role,
                     rank_from_principal=st.rank_from_principal,
+                    principal_level=principal_level,
                     bay_index_from_left=i,
                     bay_index_from_centre=i - centre,
                     is_centre_bay=(

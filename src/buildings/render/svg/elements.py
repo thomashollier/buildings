@@ -244,7 +244,11 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         # an overlight there, because a stairhall has to get its light
         # somewhere and a carriage passage does not.
         infill = props.get("head_infill") or "glazed"
-        fill = _C["door"] if infill == "tympanum" else _C["door_glass"]
+        # A20.4: a glazed imposte is glazed in the BUILDING's own glass. It used
+        # to take `door_glass`, a grey-blue that appears nowhere else on the
+        # facade, so the head read as a pale blank panel in a foreign material
+        # rather than as a light over a door.
+        fill = _C["door"] if infill == "tympanum" else _C["window"]
         canvas.rect(
             body_x, y, body_w, max(0.0, springing - y),
             fill, stroke=_C["door_dark"], stroke_w=0.8,
@@ -260,6 +264,25 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         canvas.line(x, springing, x + w, springing, _C["cornice_stroke"], 0.7)
         cx = body_x + body_w / 2.0
         canvas.line(cx, y, cx, springing, _C["door_dark"], 0.8)
+
+        # A20.4: the iron grille across a glazed imposte, radiating from the
+        # springing's mid-point the way a fanlight's bars do. The COUNT is the
+        # IR's (`head_bar_count`); nothing is chosen here.
+        bars = _count(props, "head_bar_count", 0)
+        if infill != "tympanum" and bars > 1 and head_h > 1e-9:
+            import math
+
+            radius = body_w / 2.0
+            for i in range(1, bars):
+                angle = math.pi * i / bars
+                canvas.line(
+                    cx,
+                    springing,
+                    cx - radius * math.cos(angle),
+                    springing + min(head_h, radius) * math.sin(angle),
+                    _C["iron"],
+                    0.5,
+                )
         return
 
     if opening_kind == "pedestrian_entrance":
@@ -722,9 +745,15 @@ def draw_ironwork(canvas: Canvas, x: float, y: float, w: float, h: float, props:
     # the capping rail loses the weight that would otherwise read as a
     # parapet coping rather than a window rail.
     projects = props.get("guards") == "balcon_filant"
-    bar_color = _C["iron"] if projects else _C["iron_light"]
+    # **A21.3: one iron, two weights.** A12.2 gave the garde-corps a lighter
+    # COLOUR as well as lighter lines, which made the same wrought iron read as
+    # two different metals on one facade — a filant in black over windows
+    # railed in grey. What differs between them is depth, not material: a
+    # filant stands on a slab in front of the wall and a garde-corps sits in
+    # the reveal behind it, so the weights stay apart and the colour does not.
+    bar_color = _C["iron"]
     bar_w = 0.8 if projects else 0.4
-    cap_color = "#2A2A2A" if projects else _C["iron_light"]
+    cap_color = "#2A2A2A"
     cap_w = 1.6 if projects else 0.5
     hairline_w = 0.9 if projects else 0.45
     accent_w = 0.7 if projects else 0.35

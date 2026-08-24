@@ -990,6 +990,7 @@ def qualify_from_grid(
                                     ("head_rise", "opening_head_rise"),
                                     ("arch_register", "entrance_arch_register"),
                                     ("head_infill", "arch_head_infill"),
+                                    ("head_bar_count", "arch_head_bar_count"),
                                     ("leaf_height", "entrance_leaf_height"),
                                 )
                                 if res.get(key) is not None

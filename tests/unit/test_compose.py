@@ -349,11 +349,17 @@ def test_the_facade_is_stone_with_holes_in_it_not_a_curtain_wall():
         # that is what going through it means.
         if opening.props["opening_type"] in set(catalogue.ENTRANCE_OPENING_TYPES.values()):
             return True
-        # A porte-fenêtre: the noble floor's own balcon filant runs along this
-        # storey, so the window opens onto a floor you step out on. Read off
-        # the emitted balcony rather than off the sill it produced, so the
-        # exception is tied to its reason and not to its consequence.
-        return int(storey.props["rank_from_principal"]) == 0 and any(
+        # A porte-fenêtre: a balcon filant runs along this storey, so the
+        # window opens onto a floor you step out on. Read off the emitted
+        # balcony rather than off the sill it produced, so the exception is
+        # tied to its reason and not to its consequence.
+        #
+        # **A21.4 dropped the ``rank_from_principal == 0`` that used to stand
+        # beside this.** It was the same redundant guess the production rule
+        # carried: the reason is the balcony, and a storey with a continuous
+        # one is stepped out onto wherever it sits. Keeping the rank here
+        # would have made the test disagree with the rule it checks.
+        return any(
             c.kind == "balcony" and c.props.get("continuous") for c in storey.children
         )
 
@@ -475,20 +481,49 @@ def test_the_ornament_that_frames_an_opening_is_stated_at_the_opening():
 def test_across_a_whole_facade_the_noble_floor_carries_the_tallest_openings():
     """The relation A4.1 asks for, read off the emitted building rather than
     off one rule: ordinary windows shorten as they move up from the floor the
-    building shows off, with no rule counting storeys."""
+    building shows off, with no rule counting storeys.
+
+    **A21.4 split this into the two claims it was always making**, because
+    widening the porte-fenêtre to every filant put a walked-through opening at
+    the top of the wall and the single sequence stopped holding: heights came
+    out ``{0: 2.76, 1: 2.15, 2: 2.48}``, the top storey's window taller than
+    the one below it despite standing in a shorter storey.
+
+    That is not the hierarchy failing — it is two different objects being
+    compared in one list. A porte-fenêtre is not an ordinary window; this
+    module says so everywhere else ("somebody leans on a sill; somebody steps
+    over a threshold"). So:
+
+    * ordinary windows — the ones with a sill to lean on — still fall off
+      upward, which is the taper doing its work; and
+    * the noble floor still carries the TALLEST opening on the facade, which
+      is what this test's own name claims and its body never actually checked.
+
+    Both are asserted below. Neither is weaker than what it replaced.
+    """
     for over in _CORPUS:
         node, _ = qualify_building(_site(**over))
         by_rank: dict[int, float] = {}
+        tallest_at: dict[int, float] = {}
         for storey, _bay, o in _facade_openings(node):
             if o.props["opening_type"] != "window":
                 continue
             rank = int(storey.props["rank_from_principal"])
             if rank < 0:
                 continue  # the base and the entresol are their own programme
-            by_rank.setdefault(rank, float(o.props["h"]))
+            tallest_at[rank] = max(tallest_at.get(rank, 0.0), float(o.props["h"]))
+            # Ordinary windows only: one with no sill is walked through, and a
+            # sequence mixing the two measures a change of kind, not a taper.
+            if float(o.props.get("sill_height") or 0.0) > 1e-9:
+                by_rank.setdefault(rank, float(o.props["h"]))
         heights = [by_rank[r] for r in sorted(by_rank)]
         assert heights == sorted(heights, reverse=True), (
             f"{over}: window heights do not fall off upward: {by_rank}"
+        )
+        assert tallest_at, over
+        assert max(tallest_at, key=lambda r: (tallest_at[r], -r)) == 0, (
+            f"{over}: the noble floor does not carry the tallest opening on the "
+            f"facade: {tallest_at}"
         )
 
 

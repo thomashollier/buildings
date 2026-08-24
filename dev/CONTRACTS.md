@@ -2297,3 +2297,61 @@ light. The second reading is the check, not the source.
 the balcony's own floor, and what is behind it does not change how high a body
 leans on it. The rule states both facts; `compose` uses whichever fits the shape
 it is hanging, because the rule is storey-scope and cannot see the light.
+
+## A21.3 — one iron, two weights
+
+A12.2 gave the garde-corps a lighter **colour** as well as lighter lines, so the
+same wrought iron read as two metals on one facade: a *balcon filant* in black
+over windows railed in grey.
+
+What differs between them is **depth, not material**. A filant stands on a slab
+in front of the wall; a garde-corps sits in the reveal behind it. So the line
+weights stay apart — that is the depth cue, and A12.2 is right about it — and
+the colour does not.
+
+## A21.4 — a filant is stepped out onto wherever it runs
+
+`sill_height_for` and `noble_floor_steps_out_onto_its_balcon_filant` both carried
+a `rank_from_principal == 0` test beside the filant test, with a comment
+admitting it: *"the second filant, along the top of the wall, guards a window
+rather than carrying a room out onto a terrace (INFERRED)"*.
+
+Plate 77 shows the upper filant's windows coming down to the balcony floor
+exactly as the noble floor's do. A balcony nobody can step onto is a railing,
+and the storeys that have a railing rather than a balcony already draw one.
+
+**Required.** The condition is the filant, not the rank.
+
+### The bound the facade imposes
+
+With one exception, which is not a rank test in disguise but a fact about the
+building. A frontage whose **noble floor** sits below the 1823 threshold has no
+balcony there. If the second filant still took its window's sill away, the TOP
+storey would carry the tallest opening on the facade and out-rank the floor the
+building exists to show off — measured, on an 1862 shop frontage:
+
+```
+window heights by rank   {0: 1.79, 1: 1.58, 2: 1.40, 3: 2.04}
+```
+
+So the upper filant is stepped out onto **where the noble floor's own is**.
+Where the noble floor never got a balcony, the rail along the top of the wall is
+a guard and the window behind it keeps its sill.
+
+This needs the noble floor's level to be askable from any storey, which is
+context **EXTENSION 6** (`principal_level`) — an envelope-level height in the
+same species as `base_block_top`, and a LEVEL rather than a floor number, so
+moving the noble floor moves it by itself.
+
+### And what this splits
+
+`test_across_a_whole_facade_the_noble_floor_carries_the_tallest_openings` was
+making two claims in one sequence, and a walked-through opening at the top of
+the wall broke it. A *porte-fenêtre* is not an ordinary window — this codebase
+says so everywhere else — so the two are now asserted separately:
+
+- ordinary windows, the ones with a sill to lean on, fall off upward
+- the noble floor carries the **tallest opening on the facade**, which that
+  test's own name claimed and its body never checked
+
+Neither is weaker than what it replaced, and the second is new.
