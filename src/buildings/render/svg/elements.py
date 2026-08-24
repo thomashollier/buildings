@@ -215,7 +215,9 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         springing = _draw_head(canvas, body_x, y + h, body_w, head_h, head_form, _C["door"])
         if arch_register == "leaves":
             springing = body_top
-            _draw_tympanum(canvas, body_x, body_top, body_w, y + h - body_top)
+            _draw_tympanum(
+                canvas, body_x, body_top, body_w, y + h - body_top, joinery=True
+            )
         cx = body_x + body_w / 2.0
         canvas.line(cx, body_bot, cx, springing, _C["door_dark"], 1.4)
         _draw_door_panels(canvas, body_x, body_bot, body_w, springing - body_bot)
@@ -289,7 +291,9 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         canvas.rect(body_x, body_bot, body_w, body_top - body_bot, _C["door"], stroke=_C["door_dark"], stroke_w=1.0)
         _draw_door_panels(canvas, body_x, body_bot, body_w, body_top - body_bot)
         if arch_register == "leaves":
-            _draw_tympanum(canvas, body_x, body_top, body_w, y + h - body_top)
+            _draw_tympanum(
+                canvas, body_x, body_top, body_w, y + h - body_top, joinery=True
+            )
         elif arched:
             _draw_head(canvas, body_x, y + h, body_w, fan_h, head_form, _C["door_glass"], stroke=_C["door_dark"])
         else:
@@ -366,7 +370,9 @@ def _leaf_top(props: Mapping[str, object], h: float) -> float:
     return min(stated, h)
 
 
-def _draw_tympanum(canvas: Canvas, x: float, y: float, w: float, h: float) -> None:
+def _draw_tympanum(
+    canvas: Canvas, x: float, y: float, w: float, h: float, *, joinery: bool = False
+) -> None:
     """The carved panel standing on the leaves of a two-storey arch (A14.1).
 
     At the Avenue de l'Impératrice this is a band of rosettes between two
@@ -375,17 +381,31 @@ def _draw_tympanum(canvas: Canvas, x: float, y: float, w: float, h: float) -> No
     carved centre — and not as a row of anything: how many rosettes would be
     ornament density, which is a decision, and nothing here is entitled to
     take one.
+
+    **A20.1: on an entrance it is JOINERY, and it is drawn in the leaves' own
+    timber.** It used to take the stone palette everywhere, which put a pale
+    masonry band across the opening between the leaves and the arch — the
+    "masonry piece between the RdC and the entresol" the operator reported, and
+    the reason the door did not read as one door. Both plates draw it as part
+    of the door: at 2 et 4 bd de Sébastopol the carved overpanel above the
+    leaves is wood, inside the same frame and the same tone as them; at 39 rue
+    Neuve des Mathurins the carved tympanum sits inside the archivolt over
+    leaves it is continuous with. Neither is stone, and neither spans anything
+    the door does not.
     """
     if h <= 1e-9 or w <= 1e-9:
         return
-    canvas.rect(x, y, w, h, _C["ornament"], stroke=_C["cornice_stroke"], stroke_w=0.7)
+    field = _C["door"] if joinery else _C["ornament"]
+    centre = _C["door_dark"] if joinery else _C["keystone"]
+    edge = _C["door_dark"] if joinery else _C["cornice_stroke"]
+    canvas.rect(x, y, w, h, field, stroke=edge, stroke_w=0.7)
     inset = min(h * 0.22, w * 0.06)
     canvas.rect(
         x + inset, y + inset, max(0.0, w - 2 * inset), max(0.0, h - 2 * inset),
-        _C["keystone"], stroke=_C["cornice_stroke"], stroke_w=0.4,
+        centre, stroke=edge, stroke_w=0.4,
     )
     cx, cy = x + w / 2.0, y + h / 2.0
-    canvas.circle(cx, cy, max(0.0, min(h, w) * 0.16), _C["ornament"], stroke=_C["cornice_stroke"], stroke_w=0.4)
+    canvas.circle(cx, cy, max(0.0, min(h, w) * 0.16), field, stroke=edge, stroke_w=0.4)
 
 
 def _draw_archivolt(canvas: Canvas, x: float, y_spring: float, w: float, rise: float) -> None:
