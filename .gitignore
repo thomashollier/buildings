@@ -9,3 +9,7 @@ dev/logs/*.log
 # sit beside it are kept.
 dev/logs/**/*.png
 dev/logs/**/*.svg
+# ...and the sprite atlas, which describes an image that is not committed
+# either. Regenerate both with dev/harness/sprite_sheet.py. The measurement
+# JSON elsewhere under dev/logs is NOT generated output and stays tracked.
+dev/logs/tiles/sprites.json
