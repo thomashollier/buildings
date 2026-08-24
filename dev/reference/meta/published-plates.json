@@ -1,0 +1,124 @@
+{
+  "family": "published-plates",
+  "note": "Engraved elevation plates from 19th-century French architectural publications OTHER than Daly. What unites them is that they are measurable: each carries a scale bar, printed dimensions, or a sectional storey ladder. Daly is one publication in one year (1864); these are independent draughtsmen, publishers and dates, which is the only way to tell a Daly convention apart from a Paris fact. Extended by a bounded crawl of archimaps.tumblr.com/search/paris (15 pages, 223 posts). YIELD FOR THE SECOND EMPIRE WAS THIN: that blog's Paris tag runs heavily to monuments, theatres, churches, expositions and interiors, and the immeuble elevations it does carry are mostly 1890s-1900s. The one Second Empire commercial sheet it holds is bd de Sebastopol 72 -- which the operator had already supplied by hand.",
+  "provenance_warning": "All three were supplied by the operator from image reposts (Tumblr, a print reseller). The ENGRAVINGS are long out of copyright; the scans' hosts and rights are not recorded. Treat the drawing as evidence and the attribution as a lead until an original scan is located.",
+  "images": [
+    {
+      "file": "images/published-plates/moniteur-60_pl715_sebastopol-72.jpg",
+      "title": "Maison, boulevard de S\u00e9bastopol n\u00b0 72 \u2014 \u00e9l\u00e9vation",
+      "publication": "Moniteur des Architectes, 60e volume, PL. 715",
+      "author": "Th. Vacquer del.; Lema\u00eetre fils sculp.; Brodard imp.; Paris, Caudrilier \u00e9diteur, Rue St Martin 19",
+      "architect": "M. Rolland",
+      "year": "unrecorded on the sheet \u2014 the Moniteur's 60e volume dates it, and that volume year is not yet established",
+      "shows": "A commercial frontage on the SAME BOULEVARD as six of the Daly anchors (1, 2 et 4, 63, 77, 87, 120), drawn by a different hand for a different publication. Shop ground floor, entresol with cartouches (A\u00b7M and 72), four etages, mansard with segmental lucarnes, a balcon filant at the 2e and another at the 5e.",
+      "printed_dimensions_m": {
+        "cornice_above_pavement": 17.55,
+        "comble_height": 4.87,
+        "band_below_the_comble": 1.6,
+        "facade_width": 16.4
+      },
+      "why_it_matters": "PRINTED DIMENSIONS, not scale-bar readings. 17.55 m is exactly the 1859 reglement's cornice for the 12-20 m street band and exactly what Daly measures at 1 bd de Sebastopol -- an independent publication landing on the same number is the strongest corroboration in the register. It also carries a 10-metre scale bar, so the printed figures can be checked against the drawing.",
+      "quality": "good",
+      "stamp": "Ville de Paris"
+    },
+    {
+      "file": "images/published-plates/1881_pl58_rue-de-rennes.jpg",
+      "title": "Maison \u00e0 Paris, rue de Rennes \u2014 fa\u00e7ade principale",
+      "publication": "unidentified French architectural annual \u2014 \"ANN\u00c9E 1881 / PL. 58\"",
+      "author": "Maurage sc.; Imp. Lemercier et Cie",
+      "architect": "BOUSSARD (partial reading \u2014 the credit line is clipped by the scan's bottom edge)",
+      "year": "1881 (printed on the sheet; a publication date, i.e. a DESIGN date, not a construction date)",
+      "shows": "A dated PRE-1884 commercial frontage, twenty-two years after the 1859 reglement and three years before Alphand -- the long middle of the chronology, which had no plate at all between Daly's 1864 and the 1887 anchor.",
+      "why_it_matters": "Carries a scale bar (0-9 m). The 1887 anchor is a 340px thumbnail: datable but not measurable. This is the only dated AND measurable sheet outside 1864 in the register.",
+      "quality": "good",
+      "open_question": "Bears on the unresolved upper-floor sill (A21): a scale bar separates allege, light and lintel bearing directly, where the Daly reconstruction can only subtract them and comes out noisy (0.21-1.76 m across 32 readings)."
+    },
+    {
+      "file": "images/published-plates/levy-v2_pl36_avenue-duquesne.jpg",
+      "title": "Maison de rapport, petits appartements \u2014 avenue Duquesne, \u00e0 Paris",
+      "publication": "A. L\u00e9vy, \u00e9diteur, r. de Seine 29 \u2014 V.2, PL. 36",
+      "author": "E. Japhet del.; Maurage fils sc.; Imp. Lemercier et Cie",
+      "architect": "M. P. Vigouroux",
+      "year": "unrecorded on the sheet",
+      "shows": "A maison de rapport of PETITS APPARTEMENTS -- a cheaper programme than anything in Daly's selection, which is drawn from a luxury journal and biased toward exemplars.",
+      "printed_cost_francs": "80 897 f 75, non compris le terrain",
+      "why_it_matters": "Two things nothing else in the register has. A PRINTED TOTAL COST, which is the only direct evidence of what a programme actually cost and therefore of what 'class' means in money rather than in ornament. And a VERTICAL SECTION STRIP down the right-hand margin showing every floor slab -- a storey ladder of the kind Daly prints only twice.",
+      "quality": "good",
+      "limits": "No scale bar located on the sheet; the section strip gives storey RATIOS, and an absolute needs one dimension from elsewhere."
+    },
+    {
+      "file": "images/published-plates/plumet_immeuble-39-avenue-victor-hugo.jpg",
+      "title": "Immeuble \u00e0 Paris, 39 avenue Victor-Hugo",
+      "architect": "Ch. Plumet",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "Shop ground floor under five residential storeys, continuous balconies, mansard. A clean full elevation.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/brandon_maison-de-rapport-1-rue-huysmans.jpg",
+      "title": "Maison de rapport, 1 rue Huysmans",
+      "architect": "R. Brandon",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "Corner maison de rapport, full elevation with figures for scale.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/labro_maison-de-rapport-rue-de-labbaye.jpg",
+      "title": "Maison de rapport, 1 rue de l'Abbaye / rue de Furstenberg",
+      "architect": "Charles Labro",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "Elevation WITH TWO FLOOR PLANS on the same sheet \u2014 plan and facade together, which almost nothing else in the register has.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/maison-de-rapport-101-103-rue-de-charenton.jpg",
+      "title": "Maison de rapport, 101 et 103 rue de Charenton",
+      "architect": "NOT ESTABLISHED from the sheet at the resolution available.",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "A large maison de rapport elevation.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/propriete-seovanaise-facade-principale.jpg",
+      "title": "Propri\u00e9t\u00e9 S\u00e9ovanaise \u2014 fa\u00e7ade principale",
+      "architect": "NOT ESTABLISHED from the sheet at the resolution available.",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "Mixed-use frontage: a deep glazed commercial ground floor under residential storeys.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/facade-principale-mixed-use-domed.jpg",
+      "title": "Fa\u00e7ade principale \u2014 mixed-use building with a corner dome",
+      "architect": "NOT ESTABLISHED from the sheet at the resolution available.",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "Mixed-use elevation crowned by a domed corner pavilion.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/chauchat_bow-window-entrance-detail.jpg",
+      "title": "Entrance door and bow window \u2014 large-scale detail",
+      "architect": "signed A. Chauchat; sheet labelled \"BOW-WINDOW\"",
+      "period": "LATE \u2014 the draughtsmanship and ornament read 1890s-1900s (Art Nouveau / Belle Epoque), NOT Second Empire. Filed for the post-1902 end of the chronology; it is not evidence for the 1859-1884 core.",
+      "shows": "An arched entrance filled with an IRON GRILLE, under a bow window. Art Nouveau.",
+      "why_it_matters": "Shows an arched doorway whose head is a grille rather than glass or timber \u2014 but it is c.1900 and is NOT evidence for A20's Second Empire porte coch\u00e8re. Filed against the oriel/bow-window era the chronology dates from 1902.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/maison-montmorency-elevation-section-plans.jpg",
+      "title": "Maison Montmorency \u2014 elevation, section and plans",
+      "architect": "NOT ESTABLISHED from the sheet at the resolution available.",
+      "period": "EARLY \u2014 classical, reads pre-Haussmann. A candidate anchor for the far side of the 1859 r\u00e8glement, which the register has nothing for.",
+      "shows": "Elevation, section AND plans on one sheet, with a scale.",
+      "quality": "good"
+    }
+  ],
+  "crawl": {
+    "source": "https://archimaps.tumblr.com/search/paris",
+    "pages_walked": 15,
+    "posts_seen": 223,
+    "matched_typology": 20,
+    "kept": 7,
+    "why_so_few": "203 of 223 are not Paris apartment-building elevations at all -- they are monuments, churches, palaces, exposition pavilions, fountains, tombs and interiors. Of the 20 that matched, most are interiors, floor plans, photographs or hotels particuliers rather than immeubles.",
+    "rate_limited": "~1 s between page fetches, ~0.6 s between image fetches"
+  }
+}

@@ -163,11 +163,88 @@ construction date and was never used as a proxy. Of the original 94-image corpus
 
 ---
 
-## 6. Dated anchors outside the Daly window
+## 6. Published plates other than Daly
+
+`dev/reference/images/published-plates/`, `meta/published-plates.json`.
+
+Engraved elevation sheets from 19th-century French architectural publications
+that are **not** Daly. What unites them is that they are *measurable*: each
+carries a scale bar, printed dimensions, or a sectional storey ladder. Daly is
+one publication in one year; these are independent draughtsmen, publishers and
+dates, which is the only way to tell a Daly **convention** apart from a Paris
+**fact**.
+
+**The three that matter most:**
+
+| sheet | why |
+|---|---|
+| **bd de Sébastopol n° 72** — Moniteur des Architectes, 60ᵉ vol., pl. 715; Th. Vacquer *del.*, arch. Rolland | **Printed dimensions**: cornice **17.55**, comble **4.87**, width **16.40 m**, plus a 10 m scale bar. Same boulevard as six Daly anchors, different publication — and 17.55 m is exactly the 1859 règlement's cornice for the 12–20 m band *and* exactly Daly's figure at 1 bd de Sébastopol. Independent corroboration of the single most load-bearing number in the model. |
+| **rue de Rennes** — "ANNÉE 1881, PL. 58", Maurage sc., arch. BOUSSARD (partial reading) | Dated **1881** and carries a scale bar: the only sheet in the register that is both dated and measurable outside 1864, and it lands in the long gap between the 1859 règlement and Alphand. |
+| **avenue Duquesne** — A. Lévy éditeur, V.2 pl. 36; E. Japhet *del.*, arch. P. Vigouroux | A *maison de rapport de petits appartements* with a **printed total cost** (80 897 f 75, terrain excluded) and a **vertical section strip** showing every floor slab. The only direct evidence of what a programme cost, against a corpus drawn from a luxury journal. |
+
+### On the archimaps crawl
+
+`archimaps.tumblr.com/search/paris` was walked 15 pages deep, 223 posts, rate
+limited. **The yield for the Second Empire was thin, and that is the finding
+worth recording:** 203 of the 223 are not immeuble elevations at all — monuments,
+churches, palaces, exposition pavilions, fountains, tombs, interiors. Of the 20
+that matched the typology, most were interiors, plans, photographs or *hôtels
+particuliers*. Seven elevations were kept, and **all seven read 1890s–1900s**
+(Plumet, Labro, Chauchat), so they serve the post-1902 end of the chronology and
+are **not** evidence for the 1859–1884 core.
+
+The one Second Empire commercial sheet that blog holds is bd de Sébastopol 72 —
+which the operator had already supplied by hand.
+
+**Provenance is the weak part of this whole family.** These came from image
+reposts, not from institutional scans. The *engravings* are long out of
+copyright; the scans' hosts and rights are not recorded, and two sheets carry no
+year at all. Treat the drawing as evidence and the attribution as a lead until an
+original is located.
+
+## 7. Dated anchors outside the Daly window
 
 Daly is a single year, 1864. These are buildings with a **documented construction
 date** used to give the chronology model something dated to answer to on the far
 side of a decree. `dev/reference/meta/dated-anchors.json`.
+
+### Rue de Rennes, Paris 6e — **1881** (plate)
+
+`images/dated-anchors/1881_rue-de-rennes.jpg`
+
+*Maison à Paris, rue de Rennes — façade principale.* **ANNÉE 1881, PL. 58**,
+printed top left and top right of the sheet. Engraved by **Maurage**, printed by
+**Imp. Lemercier et Cie**. Architect **BOUSSARD** — a partial reading: the credit
+line is clipped by the bottom edge of the scan and the descenders are cut, so the
+letterforms are consistent with it but this is not a citation.
+
+The 1881 is the **publication's** date, not a construction date. That is the
+right kind of date for the chronology model, which asks what a designer would
+draw in a given year.
+
+**Why it earns a place.** Two reasons, and the second is the stronger:
+
+1. It sits **twenty-two years after the 1859 règlement and three years before
+   Alphand**. The register had Daly's single year (1864) and one anchor at 1887,
+   and nothing in the long middle the model runs straight through.
+2. It **carries a scale bar** — 0 to 9 m, printed along the bottom. The 1887
+   anchor is a 340 px thumbnail: datable but not measurable. This is the only
+   dated, measurable plate outside 1864 in the register.
+
+**It bears on an open question.** The upper-floor sill is unresolved (A21, and
+the note below): `sill_lean_height` is INFERRED at 0.90 m, while Daly's measured
+aspects imply 0.21–0.33 m on plate 77 and a noisy 0.21–1.76 m across the corpus,
+because `opening_width_typical` is one figure per building reconstructed against
+per-storey aspects. A scale bar separates the allège, the light and the lintel
+bearing directly instead of by subtraction, which is exactly what that
+reconstruction cannot do.
+
+**Provenance is the weak part.** Supplied by the operator from a Tumblr repost;
+the original scan's host is not recorded and the publication is unidentified —
+"ANNÉE 1881 / PL. 58" with Lemercier printing is a French architectural annual,
+but not Daly's *L'Architecture privée*, whose plates are captioned differently.
+The engraving itself is long out of copyright; the scan's status is unknown.
+Treat the drawing as evidence and the attribution as a lead.
 
 ### 31 rue de la Chaussée d'Antin / 71 rue de Provence, Paris 9e — **1887**
 
