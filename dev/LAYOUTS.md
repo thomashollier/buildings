@@ -121,24 +121,35 @@ both in the base's own bossage. Drawn per frontage on `facade/entresol/head`.
 These are the **discontinuity tests** — the brief's "move the date past a decree
 and the roofline should change shape."
 
-**H · The 1884 pair** — *half built; the post-1884 side is `P`*
-Two presets, identical but for the year. Straight 45° comble against Alphand's
-circular arc, and a storey gained. Nothing else changes.
+**H · The 1884 pair** — *built as `H83` / `H87`*
+`street 20 m · parcel 15×17 m · comfortable · shop · mid-block · seed 1884`
+Two presets, identical in every input but the year, straddling the *Décret du
+23 juillet 1884*. Mid-block on purpose: a corner would add a *pan coupé* and a
+hipped roof, and what is under test is the roof **rule**, not the roof's plan.
 
-`P` is the post-1884 side, at 1887. The matched pre-1884 twin is **not** a
-preset, but the hinge it was written to test does work — run `P`'s own site at
-1883 against 1887 and only the year differs:
-
-| | 1883 | 1887 |
+| | H83 (1883) | H87 (1887) |
 |---|---:|---:|
-| comble profile | 4 points (straight 45° brisé) | 28 points (circular arc) |
-| ridge over eaves | 3.20 m | 7.04 m |
-| storeys | 6 | 7 |
-| cornice built | 19.45 m | 22.48 m |
+| comble inscribed in | a 45° **plane** | a circular **arc** |
+| profile points | 4 | 28 |
+| legal cornice (20 m street) | 17.55 m | **18.00 m** |
+| cornice built | 16.85 m (96 %) | 17.28 m (96 %) |
+| comble allowed | 3.20 m | **7.65 m** |
+| ridge over eaves | 3.20 m | **7.04 m** |
+| storeys | 6 (1 garret) | **7 (2 garret)** |
+| total height | 20.05 m | **24.32 m** |
 
-So the storey **is** gained and the roof **does** change shape, exactly as this
-entry predicted. What is still missing is the pair as a shipped, rendered preset
-so the discontinuity is visible on a contact sheet rather than only in a table.
+The decree raises the stone by 0.43 m and the roof by 3.84 m — it is a *roof*
+decree, and the second garret storey is what the extra roof buys. The letting
+storeys do not change in number, which is the point: nothing here is a
+different building, it is the same building under a different rule.
+
+Checked, not just rendered — `tests/unit/test_layouts.py` asserts that the pair
+differs in nothing but the year, that the profile stops being a plane and
+genuinely bows inside its own chord, and that the roof gains more than the stone
+and spends it on a garret rather than a letting floor.
+
+*(Note: 1886, as this entry originally proposed, gives output identical to 1887;
+the keys are named for the years actually shipped.)*
 
 **I · Post-Bonnier** — *proposed*
 `street 22 m · 1905` — eighth-circle arc continued by a 45° oblique; projections

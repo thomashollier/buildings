@@ -148,3 +148,104 @@ def test_every_layout_that_claims_a_daly_plate_names_a_file_that_exists() -> Non
             token = token.strip(".,;()")
             if token.endswith(".jpg"):
                 assert (ROOT / token).exists(), f"{key} cites a missing plate: {token}"
+
+
+# ---------------------------------------------------------------------------
+# The 1884 hinge — H83 / H87
+# ---------------------------------------------------------------------------
+#
+# The brief's own discontinuity test: "move the date past the 1884 decree and
+# the roofline changes shape." A preset pair is a picture of that; what follows
+# is the claim, so that a regression reads as a failure rather than as a
+# slightly different picture nobody looked at.
+
+
+def _roof(building):
+    for node in building.children:
+        if node.kind == "roof":
+            return node
+    raise AssertionError("this building has no roof node")
+
+
+def _storeys(building):
+    return [n for n in building.children if n.kind == "storey"]
+
+
+def test_the_1884_pair_differs_in_the_year_and_in_nothing_else() -> None:
+    """The control half of the experiment. If the two situations differed in
+    any other input — a metre of street, a seed, a class — then whatever moves
+    between them could be that instead of the decree, and the pair would prove
+    nothing."""
+    a = LAYOUTS.LAYOUTS["H83"].site
+    b = LAYOUTS.LAYOUTS["H87"].site
+    for field in (
+        "street_width", "parcel_width", "parcel_depth",
+        "klass", "ground", "corner", "seed",
+    ):
+        assert getattr(a, field) == getattr(b, field), field
+    assert a.year < 1884 < b.year, "the pair must straddle the decree"
+
+
+def test_past_the_1884_decree_the_comble_stops_being_a_plane() -> None:
+    """A8/A15: before the décret du 23 juillet 1884 the comble is inscribed in
+    a 45° PLANE; after it, in a circular ARC. The section is the place that
+    shows it — a plane needs a handful of points and an arc needs many — so
+    this asserts the shape of the profile, not a height that could move for
+    any number of unrelated reasons."""
+    from buildings.typologies.paris.generate import generate
+
+    before, _ = generate(LAYOUTS.LAYOUTS["H83"].site)
+    after, _ = generate(LAYOUTS.LAYOUTS["H87"].site)
+
+    plane = _roof(before).props["profile"]
+    arc = _roof(after).props["profile"]
+    assert len(plane) <= 6, f"a 45° plane should not need {len(plane)} points"
+    assert len(arc) > 12, f"an arc sampled at {len(arc)} points is not a curve"
+
+    # And the arc genuinely bows INSIDE the chord it would be if it were a
+    # plane: sampled at mid-height, the curve stands further back from the
+    # eaves than a straight line between its own ends would.
+    run_end, rise_end = arc[-2]
+    mid = rise_end / 2.0
+    on_curve = next(x for x, h in arc if h >= mid)
+    on_chord = run_end * (mid / rise_end)
+    assert on_curve < on_chord - 0.05, (
+        f"at half height the profile is at {on_curve:.3f} m against a chord's "
+        f"{on_chord:.3f} m — that is a straight line, not an arc"
+    )
+
+
+def test_the_decree_raises_the_stone_a_little_and_the_roof_a_lot() -> None:
+    """Both halves of what 1884 changed, and their ORDERING, which is the part
+    that is contractual. The cornice a 20 m street earns moves 17.55 -> 18.00 m,
+    a courtesy; the comble allowance moves 3.20 -> 7.65 m, which is what buys
+    the extra garret storey. Asserting the ordering rather than the figures
+    keeps this honest if either table is later recalibrated."""
+    from buildings.typologies.paris.generate import generate
+    from buildings.typologies.paris.structure import solve_structure
+
+    before = solve_structure(LAYOUTS.LAYOUTS["H83"].site)
+    after = solve_structure(LAYOUTS.LAYOUTS["H87"].site)
+
+    stone_gain = float(after.cornice_height) - float(before.cornice_height)
+    roof_gain = after.envelope.ridge_height - before.envelope.ridge_height
+    assert stone_gain > 0.0, "the 1884 cornice table did not rise"
+    assert roof_gain > stone_gain, (
+        f"the roof gained {roof_gain:.2f} m against the stone's {stone_gain:.2f} m — "
+        "1884 is a ROOF decree, and if the stone ever outruns it this pair is "
+        "demonstrating something else"
+    )
+
+    # ...and the storey the roof bought is a garret, not a letting floor.
+    old, _ = generate(LAYOUTS.LAYOUTS["H83"].site)
+    new, _ = generate(LAYOUTS.LAYOUTS["H87"].site)
+    attics_before = [s for s in _storeys(old) if s.props.get("role") == "attic"]
+    attics_after = [s for s in _storeys(new) if s.props.get("role") == "attic"]
+    assert len(attics_after) == len(attics_before) + 1, (
+        f"{len(attics_before)} -> {len(attics_after)} garret storeys"
+    )
+    habitable_before = [s for s in _storeys(old) if s.props.get("role") != "attic"]
+    habitable_after = [s for s in _storeys(new) if s.props.get("role") != "attic"]
+    assert len(habitable_after) == len(habitable_before), (
+        "the decree moved the roof, so it must not have added a letting storey"
+    )

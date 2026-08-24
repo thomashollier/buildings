@@ -159,6 +159,66 @@ LAYOUTS: dict[str, Layout] = {
             "the roofline."
         ),
     ),
+    # ---- the 1884 hinge: one situation, two sides of a decree -----------
+    # A matched PAIR, and the only thing that differs between them is the
+    # year. Same street, same parcel, same class, same programme, same seed —
+    # so every draw on `DecisionStream` lands the same way and anything that
+    # moves, moved because the law moved. Mid-block on purpose: a corner adds
+    # a pan coupe and a hipped roof, and the point here is the roof RULE, not
+    # the roof's plan.
+    "H83": Layout(
+        key="H83",
+        title="Before the 1884 decree — the 45 degree comble",
+        site=SiteContext(
+            street_width=20.0, parcel_width=15.0, parcel_depth=17.0, year=1883,
+            klass=BuildingClass.COMFORTABLE, ground=GroundProgramme.SHOP,
+            corner=False, seed=1884,
+        ),
+        expect="6 storeys, cornice 16.85 m, a 3.20 m comble inscribed in the 45 degree plane",
+        why=(
+            "The 1859 reglement still governs: a 20 m street earns a 17.55 m "
+            "cornice, and over it the comble is inscribed in a plane at 45 "
+            "degrees, which on this frontage is 3.20 m of ridge and room for "
+            "ONE garret storey. Nothing about this building is chosen — it is "
+            "what the two rules leave once a shop has bought its entresol."
+        ),
+        daly=(
+            "Inside the Daly window in rule though not in date: this is the "
+            "same envelope every 1864 plate obeys, which is why the pair works "
+            "as a control. Compare H87, the same situation three years later."
+        ),
+    ),
+    "H87": Layout(
+        key="H87",
+        title="After the 1884 decree — Alphand's circular arc",
+        site=SiteContext(
+            street_width=20.0, parcel_width=15.0, parcel_depth=17.0, year=1887,
+            klass=BuildingClass.COMFORTABLE, ground=GroundProgramme.SHOP,
+            corner=False, seed=1884,
+        ),
+        expect="7 storeys, cornice 17.28 m, a 7.04 m comble inscribed in a circular arc",
+        why=(
+            "H83's situation, moved past the Decret du 23 juillet 1884. Two "
+            "things change and both are the decree's: the cornice a 20 m "
+            "street earns goes from 17.55 to 18.00 m, and the comble is "
+            "inscribed in a CIRCULAR ARC instead of a 45 degree plane, which "
+            "on this frontage allows 7.65 m of roof where the plane allowed "
+            "3.20. The building takes 7.04 of it and puts a SECOND garret "
+            "storey up there.\n\n"
+            "So the stone rises 0.43 m and the roof rises 3.84 m, and the "
+            "whole building goes from 20.05 to 24.32 m — on the same street, "
+            "the same parcel, the same purse and the same seed. This is the "
+            "brief's own test: move the date past a decree and the roofline "
+            "changes shape."
+        ),
+        daly=(
+            "OUTSIDE the Daly corpus by construction — the corpus is 1864 and "
+            "this is the point of it being outside. P is the other post-1884 "
+            "preset, on a corner and anchored to a real address; this one is "
+            "deliberately anchored to nothing but H83."
+        ),
+    ),
+
     # ---- the commercial varieties (dev/LAYOUTS_COMMERCIAL.md) ----------
     # Defined as SITUATIONS, not as fits to a target. The facade/roof split
     # that separates them is a consequence of street width and parcel depth,
