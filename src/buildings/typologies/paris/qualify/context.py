@@ -107,6 +107,12 @@ PROPERTY_KEYS: frozenset[str] = frozenset(
         # that they are one object is stated on both of them, so neither the
         # renderer nor a reader of the IR has to infer it from adjacency.
         "entrance_arch_register",
+        # A20.1. What fills the head of a two-storey entrance: a carved
+        # ``"tympanum"`` in the leaves' own timber (the carriage form at 39 rue
+        # Neuve des Mathurins, where the whole opening is one solid door to the
+        # crown) or a ``"glazed"`` overlight (the pedestrian form at 2 et 4 bd
+        # de Sébastopol). ``None`` on every other opening.
+        "arch_head_infill",
         # A14.1. The leaves' own clear height inside the lower register, in
         # metres -- the SAME height the one-storey door has, because what
         # passes through the gate did not change. What is left between it and
@@ -134,6 +140,13 @@ PROPERTY_KEYS: frozenset[str] = frozenset(
         # drew nothing (A6.6). A rule that emits an element which cannot be
         # seen is a rule putting a lie in the IR.
         "ironwork_height",
+        # A21. Where a light stands on an appui, the appui IS the guard and the
+        # iron across it is a *barre d'appui* guarding the openable sash — so
+        # its height is a share of the LIGHT, not an absolute off the floor.
+        # Stated as the share because the rule that decides it is storey-scope
+        # and reads no horizontal fact; `compose` measures it against the light
+        # it hangs it in. Exactly one of this and `ironwork_height` is ever set.
+        "ironwork_share_of_light",
         # sculpture over the opening
         "keystone_present",
         "keystone_kind",

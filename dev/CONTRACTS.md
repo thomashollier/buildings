@@ -2160,3 +2160,140 @@ claims to be a reading may hold only rows that were read" would have caught it.
 
 **Those two rules apply to every document in `dev/`, not only to amendments.**
 A caption is a claim.
+
+---
+
+# Amendment 20 — the tall entrance is one door, and it is 5 m tall
+
+Reported by the operator from the contact sheet: *"the door itself from ground
+level to the top of the curve should be one solid door. The drawings have a
+masonry piece and a fence between the RdC and the entresol."* Both true, and
+checking them turned up a third fault neither of us had named.
+
+## What the plates show
+
+Two of them draw this object at large scale, and they agree.
+
+**`daly_detail_56` — 2 et 4 bd de Sébastopol, "Porte de l'Entrée N°4"** (Davioud;
+the 5.01 m *porte piétonne*). One joinery assembly inside one frame: two
+panelled leaves with arched glazed heads, a carved overpanel above them, a
+glazed overlight above that, and a carved entablature crowning the whole. A
+guilloche architrave runs unbroken up both sides. **Nothing crosses it** — no
+band, no rail, no masonry.
+
+**`daly_elevation_52` — 39 rue Neuve des Mathurins** (the 5.00 m *porte
+cochère*). Tall panelled leaves running up into a carved tympanum, all inside a
+single archivolt with its rosette-studded moulding. Again nothing crosses it,
+and the arch springs from *below* the rez-de-chaussée ceiling — the arch is a
+head on a door, not a composition spanning two storeys.
+
+## A20.1 — nothing crosses the opening
+
+We draw five things where the plates draw one: leaves, a carved panel, the
+storey's own ledge, **a garde-corps**, and a separate glazed light above it.
+
+The garde-corps is the worst of them, and it came from A14.1's own words — "the
+entresol's opening in that bay is inside the arch — a balconette with ironwork".
+No plate shows it. A rail across a *porte cochère* would also be a rail across
+the way in, which is what the opening is for.
+
+**Required.** The tall entrance is ONE opening: leaves rising to the springing,
+a carved tympanum inside the head, and no band, rail or reveal at the storey
+line. `the_entresol_of_a_tall_arch_is_a_balconette_inside_it` is deleted.
+
+**A14.1's two-REGISTER device stands.** It is not a claim about what is visible:
+it exists because an opening rectangle handed across a storey joint gets painted
+over by the wall of the storey it trespasses into. What goes is everything that
+made the joint show.
+
+## A20.2 — 5.00 m, and it is ABSOLUTE
+
+Neither "to the top of the entresol" (A17.1) nor "to the entresol windows'
+heads" (what we build today) is what the corpus measures.
+
+| building | kind | width | **height** | crown above the RdC |
+|---|---|---:|---:|---|
+| 39 rue Neuve des Mathurins | cochère | 2.57 | **5.00** | 0.90 m — 38 % of the entresol |
+| 2 et 4 bd de Sébastopol | piétonne | 1.74 | **5.01** | 1.59 m — 60 % of the entresol |
+| 87 bd de Sébastopol | piétonne | 1.76 | **5.07** | — |
+| Avenue de l'Impératrice | cochère | 2.62 | 7.30 | — |
+
+**Three of the four agree within 0.07 m**, across two architects and both
+entrance kinds, while their widths differ by 48 %. That is not a proportion of
+anything on the building — it is an absolute, and the tightest one this corpus
+has produced. Ours currently builds **6.08 m**, crowning 78 % up the entresol.
+
+**Required.** The tall entrance's height is ABSOLUTE, ~5.0 m, SOURCED — offered
+only where the base block can carry it, as A14.2 already tests. It does not
+follow the entresol's height, its windows, or its ceiling.
+
+The Impératrice's 7.30 m is **Première Classe** and is left as the exception it
+is; a fourth reading is not a rate. If the grand class is later shown to carry a
+taller arch as a rule, that is a separate finding needing more than n = 1.
+
+## A20.3 — a correction to the operator's own reading
+
+The operator gave the rule as "the curve should match the top of the entresol
+windows". That is what the generator already does — arch crown and entresol
+light head both land at 6.077 m on preset `AC` — and the plates put the crown
+*below* the window heads, not level with them: at Mathurins the lights' heads
+stand at ~6.27 m above the pavement against the arch's ~5.39 m.
+
+So the instinct was right and the diagnosis was better than the rule offered
+with it: the arch is too tall. Recorded because a rule accepted from a correct
+observation is still an unsourced rule, which is the A13 failure exactly.
+
+---
+
+# Amendment 21 — a garde-corps stands in its opening, not on the wall below it
+
+Reported by the operator alongside A20: *"the railings are correct on the étage
+noble where they match the bottom of the windows since they are actually doors
+and balconies and line up with the floor. On the 3rd and 4th floor, it's a
+traditional window and the railing lines up inside the window opening."*
+
+Both halves confirmed, and the second was a fault.
+
+## What we built
+
+| storey | sill above the floor | railing base | |
+|---|---:|---|---|
+| principal | **0.00** — a *porte-fenêtre* | at the opening's foot | correct |
+| 3e / 4e | **0.90** — an ordinary window | **at the storey floor** | wrong |
+
+On every ordinary window the railing was drawn from the floor and stopped
+exactly where the glass began — a rail standing on the blank wall UNDER the
+window, guarding masonry. Nothing can fall through a wall.
+
+## What plate 77 shows
+
+Every railing on that facade crosses its own light. Not one stands on masonry
+beneath a window. The bar sits on the appui, inside the reveal, over the glass.
+
+## A21.1 — one rule, told apart by the opening's own sill
+
+The base of a garde-corps is the **opening's own foot**. On a *porte-fenêtre*
+that is the floor, which is why the noble floor's railing lines up with the
+floor line — not because that storey is special, but because its light comes
+down to it. On a window standing on an appui it is the appui.
+
+One expression, both cases, and the noble floor's answer is unchanged.
+
+## A21.2 — and what stands on an appui is a different object
+
+Where the light comes down to the floor the iron is a **guard**: a body could
+walk through, so it is the full `sill_lean_height`.
+
+Where the light stands on an appui, **the appui IS the guard** — the same
+0.90 m, which is not a coincidence but the same fact about the same body — and
+the iron across it is a *barre d'appui* over the openable lower sash. It is
+therefore a share of the LIGHT and not an absolute off the floor.
+
+`BARRE_D_APPUI_SHARE_OF_LIGHT = 0.40`, **INFERRED from a reading**: measured on
+plate 77 at two storeys independently, where the bar covers 0.40 and 0.42 of its
+light. The second reading is the check, not the source.
+
+**A *balcon filant* keeps the absolute either way.** It is a barrier standing at
+the balcony's own floor, and what is behind it does not change how high a body
+leans on it. The rule states both facts; `compose` uses whichever fits the shape
+it is hanging, because the rule is storey-scope and cannot see the light.

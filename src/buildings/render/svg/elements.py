@@ -234,13 +234,22 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         # the bottom edge, which is what makes two stacked rectangles read as
         # one arch cut through two storeys.
         springing = y + h - head_h
+        # A20.1: read, never chosen here. A carriage arch is filled in the
+        # leaves' own timber, so the opening reads as ONE SOLID DOOR from the
+        # threshold to the crown — which is what 39 rue Neuve des Mathurins
+        # draws, its carved panel standing on the leaves and the arch closing
+        # over both. A pedestrian one is glazed: 2 et 4 bd de Sébastopol puts
+        # an overlight there, because a stairhall has to get its light
+        # somewhere and a carriage passage does not.
+        infill = props.get("head_infill") or "glazed"
+        fill = _C["door"] if infill == "tympanum" else _C["door_glass"]
         canvas.rect(
             body_x, y, body_w, max(0.0, springing - y),
-            _C["door_glass"], stroke=_C["door_dark"], stroke_w=0.8,
+            fill, stroke=_C["door_dark"], stroke_w=0.8,
         )
         _draw_head(
             canvas, body_x, y + h, body_w, head_h, head_form,
-            _C["door_glass"], stroke=_C["door_dark"],
+            fill, stroke=_C["door_dark"],
         )
         _draw_archivolt(canvas, body_x, springing, body_w, head_h)
         # The impost the arch springs from, across the light's own width —

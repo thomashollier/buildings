@@ -2145,21 +2145,23 @@ def test_a_frontage_with_no_entresol_is_never_offered_the_form():
 
 
 def test_the_entresol_of_a_tall_arch_is_inside_the_arch_and_not_beside_it():
-    """A14.1's own words. The entresol cell of that bay carries the arch's
-    upper light with a garde-corps across it — not a separate window standing
-    next to the door."""
+    """A14.1's own words, less the half A20.1 retracted. The entresol cell of
+    that bay carries the arch's own head — not a separate window standing next
+    to the door — and carries NOTHING across it."""
     for over in (_A13_SITE, _A14_PEDESTRIAN_SITE):
         rows = _a14_rows(_a14_two_storey_seed(over), over)
         ctx, res = _a14_entrance_cell(rows, Role.MEZZANINE)
         assert res.get("opening_type") == catalogue.ENTRANCE_ARCH_HEAD_OPENING
         assert res.get("entrance_arch_register") == catalogue.ENTRANCE_ARCH_HEAD
         assert res.get("opening_head") == "round"
-        assert res.get("ironwork_present") is True
-        assert float(res.get("ironwork_height")) > 0.0
-        # A balconette set INSIDE the arch projects nothing over the street,
-        # which is why the form is lawful this far below the 1823 ordonnance's
-        # threshold. So a railing, and no projecting slab.
+        # A20.1: no railing and no balcony. A14.1 asked for "a balconette with
+        # ironwork" here; no plate of this object has one, and a rail across a
+        # porte cochère is a rail across the way in.
+        assert res.get("ironwork_present") is False
         assert not res.get("balcony_present")
+        # A20.1: and what fills the head is stated, because the two plates
+        # differ — carved timber on the carriage form, glazed on the pedestrian.
+        assert res.get("arch_head_infill") in ("tympanum", "glazed")
         # It sits on the imposte band in the register below, so no allège.
         assert float(res.get("opening_sill_height")) == pytest.approx(0.0)
         assert res.get("keystone_present") is True, "no agrafe at the crown"
@@ -2186,47 +2188,39 @@ def test_the_lower_register_leaves_room_over_the_leaves_for_the_tympanum():
         assert float(res.get("opening_width")) == pytest.approx(one_storey.width)
 
 
-def test_the_arch_crown_lands_on_the_line_the_flanking_entresol_heads_do():
-    """A14.1: the arch "springs from the same coursing as the flanking
-    arches". An arch coursed with its neighbours ends on their line as well as
-    starting on it, so both read ``base_entablature_depth`` and the crown
-    stops under the band that crowns the base — never behind it.
+def test_the_arch_crown_is_its_own_rise_and_nothing_else():
+    """**A20.2.** The head of a two-storey entrance is a HEAD, not a light with
+    a head on it.
 
-    **A15.4** adds a third line, and it is the one that binds on the narrow
-    form: an arch may not be carried past ``TALL_ARCH_MOST_SLENDER`` times its
-    own span. Both forms rise through the same entresol, so before this the
-    coursing carried both to the same crown — which is a well-proportioned
-    carriage arch (2.31 spans) and a lanky *porte piétonne* (3.49 spans,
-    against Daly's two at 2.88). The crown is now the LOWEST of the three, and
-    which of them binds is itself the finding: the coursing on the wide form,
-    its own span on the narrow one."""
+    This used to assert that the crown landed on the line the flanking entresol
+    openings' heads do — A14.1's "springs from the same coursing as the flanking
+    arches", read as ending on their line too. The corpus says otherwise: three
+    of Daly's four tall entrances measure 5.00, 5.01 and 5.07 m, crowning 38-60 %
+    of the way up their entresol, where that rule put ours at 78 %.
+
+    So the head register IS the rise, and the curve turns straight off the
+    leaves with no straight register between them. The old bounds still hold —
+    an arch may not be drawn through its own crowning band, nor past
+    ``TALL_ARCH_MOST_SLENDER`` spans — they are simply no longer what decides
+    it."""
     for over in (_A13_SITE, _A14_PEDESTRIAN_SITE):
         rows = _a14_rows(_a14_two_storey_seed(over), over)
         ctx, res = _a14_entrance_cell(rows, Role.MEZZANINE)
-        crown = (
-            ctx.level_above_pavement
-            + float(res.get("opening_sill_height"))
-            + float(res.get("opening_height"))
+        height = float(res.get("opening_height"))
+        rise = float(res.get("opening_head_rise"))
+        assert height == pytest.approx(rise, abs=1e-9), (
+            f"{ctx.slot_name}: a {height:.3f} m head register on a {rise:.3f} m "
+            "rise — that is a straight light under the curve, and no plate has one"
         )
+        crown = ctx.level_above_pavement + float(res.get("opening_sill_height")) + height
         band = ctx.base_block_top - base_layer.base_entablature_depth(ctx)
-        floor = ctx.base_block_top - float(catalogue.lintel_bearing_depth())
         assert crown <= band + 1e-9, (
             f"the arch crown reaches {crown:.3f} m; the band that crowns the base "
             f"starts at {band:.3f} m — an arch drawn through its own cornice"
         )
-        assert crown <= floor + 1e-9, (
-            "the arch left no floor structure to bear over its crown"
-        )
-        # ...and it reaches whichever of the THREE lines is lowest, rather
-        # than stopping short of the coursing it is supposed to be cut in.
-        span = float(res.get("opening_width"))
-        slenderest = catalogue.TALL_ARCH_MOST_SLENDER * span
-        assert crown == pytest.approx(min(band, floor, slenderest), abs=1e-9)
-        assert crown / span <= catalogue.TALL_ARCH_MOST_SLENDER + 1e-9, (
-            f"a {span:.2f} m arch carried to {crown:.2f} m is "
-            f"{crown / span:.2f} spans tall (A15.4)"
-        )
-
+        # ...and it stops well short of the entresol's own ceiling, which is
+        # what A17.1 wrongly had it reach.
+        assert crown < ctx.base_block_top - 1e-9
 
 def test_both_entresol_head_forms_carry_the_tall_arch():
     """A14.2 asked that the tall arch not be keyed to the entresol's form.
@@ -2272,39 +2266,28 @@ def test_the_column_above_the_arch_is_still_ordinary_wall_with_windows_in_it():
 # ===========================================================================
 
 
-def test_the_garde_corps_in_an_arch_never_crosses_the_springing():
-    """**A15.3.** The A14 gate measured it: on 90 of 210 tall arches the
-    0.90 m flat-headed rail stood taller than the straight part of the light
-    below the springing (0.7615 m on layout AC), so its top rail and outer
-    stiles crossed the curve and cut through the archivolt — worst overflow
-    0.138 m, visible at 5000 px.
+def test_an_arch_head_carries_no_railing_at_all():
+    """**A20.1**, which is strictly stronger than the A15.3 bound it replaces.
 
-    A garde-corps inside an arch stands in the reveal, in the same plane as
-    the moulding that follows the curve. It has the straight light and nothing
-    more. Swept over both entrance kinds, because the wide one is where it
-    binds hardest: a round head on a 2.60 m span eats 1.30 m of the register
-    before the rail gets any of it.
-    """
+    A15.3 measured the old defect precisely — on 90 of 210 tall arches a 0.90 m
+    flat-headed rail stood taller than the straight part of the light and cut
+    through the archivolt — and fixed it by shortening the rail to that straight
+    part. A20.2 then removed the straight part entirely, and A20.1 removed the
+    rail: no plate of this object has one.
+
+    So the assertion is no longer "the rail fits under the springing". It is
+    that there is no rail. A bound that can only be satisfied by a zero-height
+    element is a bound on an element that should not be emitted (A6.6)."""
     seen = 0
     for over in (_A13_SITE, _A14_PEDESTRIAN_SITE):
         rows = _a14_rows(_a14_two_storey_seed(over), over)
         ctx, res = _a14_entrance_cell(rows, Role.MEZZANINE)
         assert res.get("entrance_arch_register") == catalogue.ENTRANCE_ARCH_HEAD
-        straight = float(res.get("opening_height")) - float(res.get("opening_head_rise"))
-        rail = float(res.get("ironwork_height"))
-        assert rail > 0.0
-        assert rail <= straight + 1e-9, (
-            f"{ctx.slot_name}: a {rail:.4f} m garde-corps in a light whose straight "
-            f"part is {straight:.4f} m — the top rail crosses the springing and the "
-            f"stiles cut the archivolt by {rail - straight:.4f} m (A15.3)"
+        assert not res.get("ironwork_present"), (
+            f"{ctx.slot_name}: the arch head still states a railing"
         )
-        # ...and never taller than a rail is anyway: what a body leans against
-        # is a fact about the body, so the arched case is the flat-headed rule
-        # with one more bound on it and never a taller answer.
-        assert rail <= float(catalogue.sill_lean_height()) + 1e-9
         seen += 1
     assert seen == 2
-
 
 def test_the_tall_pedestrian_arch_is_shorter_than_the_tall_carriage_arch():
     """**A15.4, asserted as an ORDERING.**

@@ -989,6 +989,7 @@ def qualify_from_grid(
                                 for prop, key in (
                                     ("head_rise", "opening_head_rise"),
                                     ("arch_register", "entrance_arch_register"),
+                                    ("head_infill", "arch_head_infill"),
                                     ("leaf_height", "entrance_leaf_height"),
                                 )
                                 if res.get(key) is not None
@@ -1149,24 +1150,27 @@ def qualify_from_grid(
             # 6 m (the mezzanine's included) arrived with ``h = 0.000`` and
             # drew nothing. An element with no height is not emitted at all:
             # either give it height or do not put it in the IR.
-            rail_h = float(res.get("ironwork_height", 0.0) or 0.0)
+            # A21: a garde-corps at the floor guards a porte-fenêtre; a barre
+            # d'appui stands on the appui inside the light and is a share of
+            # it. The rule states one or the other and never both — it is
+            # storey-scope and cannot see this light — so the measuring
+            # happens here, against the light actually being guarded.
+            rail_absolute = float(res.get("ironwork_height", 0.0) or 0.0)
+            share = res.get("ironwork_share_of_light")
             on_the_filant = bool(
                 res.get("balcony_present") and res.get("balcony_continuous")
             )
-            # A14.1: the entresol register of a two-storey entrance arch is a
-            # balconette with ironwork set INSIDE the arch, so the railing
-            # guards that light exactly as a garde-corps guards a window's.
-            # Named through the catalogue's constant rather than spelled here,
-            # because the string is also the renderer's branch and the
-            # qualification rule's output, and three spellings of one kind is
-            # how the three drift apart.
+            # A20.1: the head of a two-storey entrance takes NO railing. It
+            # used to be in this list, because A14.1 called that register "a
+            # balconette with ironwork"; no plate shows one, and a rail across
+            # a porte cochère is a rail across the way in. It is a head, not a
+            # light — there is nothing behind it to lean out of.
             guards_an_opening = opening in (
                 "window",
                 "narrow_window",
                 "shop_bay",
-                catalogue.ENTRANCE_ARCH_HEAD_OPENING,
             )
-            if res.get("ironwork_present") and rail_h > _EPS and (
+            if res.get("ironwork_present") and rail_absolute > _EPS and (
                 on_the_filant or guards_an_opening
             ):
                 keys = (
@@ -1174,10 +1178,27 @@ def qualify_from_grid(
                     "ironwork_variant",
                     "ironwork_gap_max",
                     "ironwork_height",
+                    "ironwork_share_of_light",
                     "ornament_ironwork_module",
                 )
                 rail_x, rail_w = (
                     (bay.start, bay.width) if on_the_filant else (light[0], light[2])
+                )
+                # A21: and it stands on the LIGHT's own foot, not the storey's
+                # floor. On a porte-fenêtre those are the same line, which is
+                # why the noble floor's railing sits on the floor; on a window
+                # standing on an appui they are 0.90 m apart, and the railing
+                # belongs to the opening, crossing its glass. Drawn at the
+                # floor it stood on the blank wall UNDER the window, guarding
+                # masonry.
+                rail_y = y if on_the_filant else float(light[1])
+                # ...and the barre d'appui is a share of the light it crosses,
+                # while the filant keeps the absolute: what stands behind a
+                # balcony's barrier does not change how high a body leans on it.
+                rail_h = (
+                    rail_absolute
+                    if on_the_filant or share is None
+                    else float(share) * float(light[3])
                 )
                 bay_children.append(
                     IronworkNode(
@@ -1186,7 +1207,7 @@ def qualify_from_grid(
                         trace=_entries(res, ctx, keys),
                         props={
                             "x": rail_x,
-                            "y": y,
+                            "y": rail_y,
                             "w": rail_w,
                             "h": rail_h,
                             # What this length of railing is guarding, which

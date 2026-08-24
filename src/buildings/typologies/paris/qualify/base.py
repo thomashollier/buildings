@@ -850,10 +850,12 @@ def the_entrance_arch_rises_through_the_entresol(
     )
 
 
-def the_entresol_of_a_tall_arch_is_a_balconette_inside_it(
+def the_entresol_register_of_a_tall_arch_is_its_head(
     ctx: QualContext, rng: DecisionStream
 ) -> Properties | None:
-    """The upper register of the same arch (A14.1).
+    """The upper register of the same arch: its round head, and nothing else.
+
+    Renamed by **A20.1**, which removed the balconette this used to put here.
 
     A14.1's own words: "the entresol's opening in that bay is **inside the
     arch** — a balconette with ironwork — not a separate window beside it."
@@ -914,20 +916,42 @@ def the_entresol_of_a_tall_arch_is_a_balconette_inside_it(
             "surround_kind": "none",
             "surround_richness": 0.0,
             "keystone_present": True,
-            "ironwork_present": True,
-            "ironwork_gap_max": float(catalogue.balustrade_child_gap_max()),
-            # A15.3: the straight portion of THIS light, not the flat-headed
-            # default. The rail stands inside the arch, in the same plane as
-            # the archivolt, so the curve is its ceiling.
-            "ironwork_height": float(
-                catalogue.garde_corps_in_an_arched_light(
-                    arch.head_register_height - arch.head_rise
-                )
+            # A20.1: what fills the head, which the two plates disagree about
+            # and so is stated rather than assumed. At 39 rue Neuve des
+            # Mathurins the CARRIAGE arch is filled by a carved tympanum in
+            # the same timber as the leaves — the whole opening reads as one
+            # solid door from the threshold to the crown. At 2 et 4 bd de
+            # Sébastopol the PEDESTRIAN one carries a glazed overlight over
+            # its carved overpanel, which is how a stairhall gets its light.
+            # Keyed to the entrance kind because that is what differs between
+            # the two plates; both are read, neither is inferred.
+            "arch_head_infill": (
+                "tympanum"
+                if ctx.slot_name == catalogue.ENTRANCE_CARRIAGE
+                else "glazed"
             ),
+            # **A20.1: and NOTHING else.** Stated as a refusal rather than
+            # left to `compose` to decline, because the storey-scope
+            # `garde_corps` rule says every light above the base carries one
+            # and this cell is not a light. A cell where qualification says
+            # "railing" and composition quietly draws none is the two-opinions
+            # defect this codebase keeps finding; SPEC_EXACT outranks
+            # SPEC_ROLE, so the answer is settled here, once, in the IR.
+            "ironwork_present": False,
+            # No garde-corps, no balconette, no rail of any kind. A14.1 put one here in its own words — "the
+            # entresol's opening in that bay is inside the arch — a balconette
+            # with ironwork" — and no plate shows it. `daly_detail_56` draws
+            # this object at full scale (2 et 4 bd de Sébastopol, the 5.01 m
+            # entrance) as one joinery assembly in one frame with an unbroken
+            # architrave up both sides; `daly_elevation_52` draws the carriage
+            # form at 39 rue Neuve des Mathurins as leaves running into a
+            # carved tympanum inside a single archivolt. Nothing crosses
+            # either. A rail across a porte cochère would also be a rail
+            # across the way in, which is the one thing the opening is for.
         },
         rule=(
             "paris.qualify.base.opening."
-            "the_entresol_of_a_tall_arch_is_a_balconette_inside_it"
+            "the_entresol_register_of_a_tall_arch_is_its_head"
         ),
         specificity=SPEC_EXACT,
     )
@@ -1379,12 +1403,43 @@ def garde_corps_where_a_body_could_fall(
         return None
     gap = catalogue.balustrade_child_gap_max()  # ABSOLUTE: never scales
     rail = catalogue.sill_lean_height()  # ABSOLUTE: a body leaning on it
+
+    # **A21.** Two railings, one rule, told apart by the opening's own sill.
+    #
+    # Where the light comes down to the floor it is a porte-fenêtre and the
+    # railing is a guard: it stands at the floor, full ``sill_lean_height``,
+    # because a body could otherwise walk straight through. That is the noble
+    # floor, and it is what makes its railing line up with the floor line.
+    #
+    # Where the light stands on an appui, the appui IS the guard — it is the
+    # same 0.90 m, which is not a coincidence but the same fact about a body —
+    # and the iron across it is a *barre d'appui*, guarding the openable lower
+    # sash. It stands INSIDE the opening, on the appui, crossing the glass.
+    # It does NOT stand on the wall underneath, where there is nothing to fall
+    # through: every railing on plate 77 crosses its light, and none stands on
+    # masonry below one.
+    #
+    # ``compose`` hangs it at the light's own foot either way, so this states
+    # only how tall it is; on a porte-fenêtre the two answers coincide, which
+    # is the point of them being one expression.
+    # This rule reads no horizontal fact — that is what lets the filant run
+    # continuous — so it cannot know how TALL a given light is. It states which
+    # of the two railings this storey carries, and ``compose`` measures it
+    # against the light it is hanging it in.
+    # Both facts are stated, and ``compose`` uses whichever fits the shape it
+    # is hanging. A *balcon filant* is a barrier standing at the balcony's own
+    # floor and takes the ABSOLUTE either way — what is behind it does not
+    # change how high a body leans. Only a bar crossing a LIGHT is a share of
+    # that light, and only a light standing on an appui gets one.
+    props: dict[str, object] = {
+        "ironwork_present": True,
+        "ironwork_gap_max": float(gap),
+        "ironwork_height": float(rail),
+    }
+    if float(sill_height_for(ctx)) > _EPS:
+        props["ironwork_share_of_light"] = catalogue.BARRE_D_APPUI_SHARE_OF_LIGHT
     return Properties(
-        {
-            "ironwork_present": True,
-            "ironwork_gap_max": float(gap),
-            "ironwork_height": float(rail),
-        },
+        props,
         rule="paris.qualify.base.ironwork.garde_corps",
         specificity=SPEC_ROLE,
     )
@@ -1658,7 +1713,7 @@ BASE_RULES: tuple[Rule, ...] = (
     entrance_fills_the_door_slot,
     over_the_entrance,
     the_entrance_arch_rises_through_the_entresol,
-    the_entresol_of_a_tall_arch_is_a_balconette_inside_it,
+    the_entresol_register_of_a_tall_arch_is_its_head,
     special_slot_takes_a_narrow_feature,
     ground_floor_of_a_shop,
     entresol_is_arcaded_in_the_base_s_own_stone,

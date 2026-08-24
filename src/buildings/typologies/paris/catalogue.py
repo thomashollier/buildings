@@ -171,7 +171,9 @@ __all__ = [
     "ENTRANCE_ARCH_LEAVES",
     "ENTRANCE_ARCH_HEAD",
     "ENTRANCE_ARCH_HEAD_OPENING",
+    "TWO_STOREY_ENTRANCE_HEIGHT",
     "TWO_STOREY_ARCH_RATE",
+    "BARRE_D_APPUI_SHARE_OF_LIGHT",
     "TWO_STOREY_ARCH_RATE_CARRIAGE",
     "two_storey_arch_rate",
     "round_arch_rise",
@@ -1503,6 +1505,34 @@ ENTRANCE_ARCH_HEAD = "arch_head"
 #: second door. It is the arch's own upper light, and it is named for that.
 ENTRANCE_ARCH_HEAD_OPENING = "entrance_arch_head"
 
+#: The height of a two-storey entrance, pavement to the crown of its head.
+#:
+#: **SOURCED, and the tightest absolute this corpus has produced.** A20.2.
+#: Three of Daly's four tall entrances measure 5.00, 5.01 and 5.07 m — a 0.07 m
+#: spread across two architects (Lesoufacher, Davioud) and BOTH entrance kinds,
+#: while their widths differ by 48 % (1.74 to 2.57 m). A quantity that holds
+#: that still while the thing it might scale with moves by half is not a
+#: proportion of it.
+#:
+#: * 39 rue Neuve des Mathurins -- porte cochere 2.57 x **5.00**
+#: * 2 et 4 bd de Sebastopol -- porte pietonne 1.74 x **5.01**
+#: * 87 bd de Sebastopol -- porte pietonne 1.76 x **5.07**
+#:
+#: The fourth, avenue de l'Imperatrice at 7.30 m, is Premiere Classe and is
+#: left as the exception it is. One reading is not a rate; if the grand class
+#: is later shown to carry a taller arch as a RULE, that needs more than n = 1.
+#:
+#: This replaces two guesses. A17.1 had the arch rise "to the top of the
+#: entresol"; the generator then built it to the entresol's own window heads.
+#: Both put the crown at 78 % of the entresol where the plates put it at
+#: 38-60 %, and neither was measured.
+TWO_STOREY_ENTRANCE_HEIGHT = Abs(
+    5.0,
+    "SOURCED -- Daly 1864: 5.00 / 5.01 / 5.07 m on three tall entrances, two "
+    "architects, both entrance kinds, against widths differing by 48 %. The "
+    "avenue de l'Imperatrice's 7.30 m is Premiere Classe and excluded (A20.2)",
+)
+
 #: How often a *porte pietonne* takes the two-storey arch, where the base
 #: block can carry one.
 #:
@@ -1529,6 +1559,23 @@ ENTRANCE_ARCH_HEAD_OPENING = "entrance_arch_head"
 #: 3.474 m, a carriage entrance that plainly stops at the rez-de-chaussee.
 #: So it is a draw for both kinds, drawn at different rates.
 TWO_STOREY_ARCH_RATE = 0.25
+
+#: How much of a light's own height the *barre d'appui* across it stands.
+#:
+#: **INFERRED, from a reading rather than a calibration.** A21: on an ordinary
+#: window the garde-corps does not stand on the wall under the sill — there is
+#: nothing to fall through there. It stands ON the appui, inside the opening,
+#: crossing the lower part of the glass, which is what every railing on plate
+#: 77 does. Measured on that plate at two storeys independently, the bar covers
+#: 0.40 and 0.42 of its light; 0.40 is taken and the second reading is the
+#: check, not the source.
+#:
+#: A proportion and not an absolute, deliberately: what this bar guards is the
+#: openable lower sash, so it is a fact about the light, and a light that grows
+#: taller carries a taller bar. The ABSOLUTE in this family is the appui the
+#: bar stands on (``sill_lean_height``, a body leaning), and it is already
+#: below.
+BARRE_D_APPUI_SHARE_OF_LIGHT = 0.40
 
 #: The same decision for a *porte cochere*, which leans to the tall form.
 #:
@@ -1702,13 +1749,40 @@ def two_storey_entrance_arch(
     slenderest = TALL_ARCH_MOST_SLENDER * leaves.width - base_storey_h
     head_register = min(head_register, max(0.0, slenderest))
 
-    if head_register < rise + _EPS:
+    # **A20.2 — the head is a HEAD, not a light with a head on it.**
+    #
+    # The head register used to be given whatever the entresol had spare under
+    # its crowning band, and the round head sat at the top of it with a
+    # straight light underneath. No plate shows that light. At 39 rue Neuve
+    # des Mathurins the leaves run up into a carved tympanum and the archivolt
+    # turns straight off them; at 2 et 4 bd de Sebastopol the assembly is
+    # leaves, a carved overpanel and an overlight inside ONE frame, with the
+    # crowning entablature immediately over it. In neither is there a register
+    # of wall or glass between the door and its curve.
+    #
+    # So the head register IS the rise. Nothing is added to reach a line the
+    # entresol happens to offer, which is what carried our crown to 78 % of
+    # the entresol against the 38-60 % the corpus measures.
+    #
+    # The residual is recorded rather than tuned away: this gives a 5.25 m
+    # total on preset AC (3.95 m rez-de-chaussee + a 1.30 m rise on a 2.60 m
+    # span) against the 5.00 / 5.01 / 5.07 m the corpus measures. The
+    # remaining 0.25 m is the springing: at Mathurins the arch springs 0.39 m
+    # BELOW the rez-de-chaussee ceiling, inside the storey, where this model
+    # springs it at the storey line because the IR splits the opening there
+    # (A14.1 -- an opening rectangle handed across a storey joint is painted
+    # over by the storey it trespasses into). Closing that last 0.25 m means
+    # letting the springing fall inside the lower register, which is a change
+    # to the split and not to a number.
+    available = head_register
+
+    if available < rise - _EPS:
         raise EntranceCannotFit(
             f"a {entresol_h:.2f} m entresol cannot carry the head of a two-storey "
             f"{kind}: under the {crown_below:.2f} m band that crowns the base block, "
             f"and under the {TALL_ARCH_MOST_SLENDER:.2f} spans of its own "
             f"{leaves.width:.2f} m width this form may be carried to (A15.4), it "
-            f"leaves {max(0.0, head_register):.2f} m, and a ROUND head on that span "
+            f"leaves {max(0.0, available):.2f} m, and a ROUND head on that span "
             f"rises {rise:.2f} m. Widening the arch to lower its head is not "
             "available -- the width is what a carriage or a body needs (A9.2) -- so "
             "this frontage takes the one-storey door."
@@ -1720,7 +1794,9 @@ def two_storey_entrance_arch(
         offset_x=leaves.offset_x,
         leaves_register_height=base_storey_h,
         leaves_height=leaves.height,
-        head_register_height=head_register,
+        # The head register IS the rise: the curve turns straight off the
+        # leaves, with no straight light between them (A20.2 above).
+        head_register_height=rise,
         head_rise=rise,
     )
 

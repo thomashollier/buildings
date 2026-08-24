@@ -1867,10 +1867,20 @@ def test_the_head_is_round_and_carries_its_rise_into_the_ir():
     assert float(upper.props["head_rise"]) <= float(upper.props["h"]) + 1e-9
 
 
-def test_the_balconette_inside_the_arch_is_the_arch_s_own_width():
-    """A6.5's rule, met by the one element A14 adds. The garde-corps stands in
-    the light it guards, not across the bay: a rail drawn over the two masonry
-    jambs either side would be the same defect A6.5 found on every window."""
+def test_nothing_crosses_the_arch():
+    """**A20.1**, and the exact inverse of what this used to assert.
+
+    A14.1 put a balconette in the arch's upper register, in its own words: "the
+    entresol's opening in that bay is inside the arch — a balconette with
+    ironwork". No plate shows one. ``daly_detail_56`` draws this object at full
+    scale — 2 et 4 bd de Sébastopol, the 5.01 m entrance — as one joinery
+    assembly inside one frame with an unbroken architrave up both sides;
+    ``daly_elevation_52`` draws the carriage form at 39 rue Neuve des Mathurins
+    as leaves running into a carved tympanum inside a single archivolt. Nothing
+    crosses either.
+
+    A rail across a *porte cochère* would also be a rail across the way in.
+    """
     node, _lower, upper = _a14_building(seed=_a14_seed())
     bay = next(
         b
@@ -1878,16 +1888,11 @@ def test_the_balconette_inside_the_arch_is_the_arch_s_own_width():
         for b in s.children if b.kind == "bay"
         and any(c is upper for c in b.children)
     )
-    rails = [c for c in bay.children if c.kind == "ironwork"]
-    assert len(rails) == 1, "the arch's entresol register carries exactly one railing"
-    (rail,) = rails
-    assert rail.props["guards"] == "opening"
-    assert float(rail.props["w"]) == pytest.approx(float(upper.props["w"]), abs=1e-9)
-    assert float(rail.props["x"]) == pytest.approx(float(upper.props["x"]), abs=1e-9)
-    assert float(rail.props["h"]) > 0.0, "a railing with no height is a lie in the IR"
-    # It stands INSIDE the arch, so nothing projects over the street and the
-    # 1823 ordonnance has nothing to say about it at this height.
-    assert not [c for c in bay.children if c.kind == "balcony"]
+    assert [c for c in bay.children if c.kind == "ironwork"] == [], (
+        "the arch's head carries a railing — that is the A14.1 balconette, "
+        "and A20.1 retracted it"
+    )
+    assert [c for c in bay.children if c.kind == "balcony"] == []
 
 
 def test_the_agrafe_stands_at_the_crown_of_the_arch():
