@@ -1,0 +1,1803 @@
+{
+  "meta": {
+    "title": "Daly 1864 reconciled calibration set",
+    "source": "Cesar Daly, L'Architecture privee au XIXme siecle sous Napoleon III, Serie 1, Vol. 1 t.2 (1864); Polona scans, 1920 px wide",
+    "generated": "2026-08-21",
+    "inputs": [
+      "dev/logs/daly_measure_premiere.json",
+      "dev/logs/daly_measure_deuxieme-a.json",
+      "dev/logs/daly_measure_deuxieme-b.json",
+      "dev/logs/daly_measure_troisieme.json",
+      "dev/logs/daly_measure_details.json"
+    ],
+    "unit_of_observation": "BUILDING, not plate. Plate counts overstate the sample: 6 Premiere plates cover 4 buildings (two elevation/section pairs), 11 Deuxieme elevation plates cover 10 buildings (26 rue Bergere was measured twice).",
+    "n_buildings": {
+      "Premiere Classe": 4,
+      "Deuxieme Classe": "10 (+1 door-only)",
+      "Troisieme Classe": 2,
+      "total": 17
+    },
+    "method": "Per-plate scale from the graduated metre bar (1:100 elevations, larger for details); printed dimension callouts preferred over pixel measurement wherever they exist.",
+    "printed_callout_coverage": {
+      "Premiere Classe": "125 Champs-Elysees full storey ladder (section); 119 Champs-Elysees porte cochere plan width 2.600",
+      "Deuxieme Classe": "2-4 Sebastopol door chain 2.950/0.700/1.360; 87 Sebastopol door width 1.760; 9 Conservatoire door width 1.630 and window chain 2.100/1.800/0.800/0.300; 88 Rivoli balcony projection 0.600; 120 Sebastopol console 0.590; 2-4 Sebastopol croisee width 1.300",
+      "Troisieme Classe": "NONE - both plates are scale-bar only"
+    },
+    "duplicate_reading_error": {
+      "subject": "26 rue Bergere, plate daly_elevation_34, measured independently in two work packages",
+      "agreement": {
+        "facade_width": "17.349 vs 17.38 m (0.2%)",
+        "bay_pitch": "2.802 vs 2.81 m (0.3%)",
+        "porte_cochere_height": "3.477 vs 3.47 m (0.2%)",
+        "total_height": "23.528 vs 23.40 m (0.5%)"
+      },
+      "disagreement": {
+        "storey_labelling": "reading A calls the 3.09 m level a low 1er etage, reading B calls it an entresol - same physical band, opposite role",
+        "storey_heights": "up to 0.36 m (9%) on individual storeys",
+        "comble_height": "4.32 vs 5.12 m (19%)",
+        "eaves_height": "19.208 vs 18.28 m (5%)",
+        "porte_cochere_width": "2.754 vs 2.59 m (6%)",
+        "opening_width": "1.15-1.26 vs 1.36 m (up to 15%)"
+      },
+      "conclusion": "Horizontal extents and total heights reproduce to under 1%. The DATUM decisions - where the floor line is, where the cornice ends and the comble begins, what role a storey plays - carry 5-20% error. Every derived proportion inherits that."
+    },
+    "other_internal_conflicts": [
+      "120 Sebastopol door: 1.80 x 3.40 m from the elevation, 1.61 x 3.35 m from its own detail plate 57 (11% on width).",
+      "119 Champs-Elysees porte cochere: 2.99 m measured off the elevation against a PRINTED 2.600 m on the plan - a 15% error in a scale-bar width reading, and the best available bound on that error.",
+      "119 Champs-Elysees storeys: elevation 1er 3.35 / 2e 4.30 versus detail plate 78 sill-to-sill 1er 3.99 / 2e 3.80, which reverses which storey is taller.",
+      "Avenue de l'Imperatrice: elevation and section (plate 61) give irreconcilable floor levels; the source declined to publish street-elevation storey heights."
+    ]
+  },
+  "corpus": {
+    "Premiere Classe": [
+      {
+        "id": "ce125",
+        "address": "No 125, Avenue des Champs-Elysees",
+        "architect": "Levicomte",
+        "plates": [
+          "daly_elevation_75",
+          "daly_coupe_76",
+          "daly_detail_04"
+        ],
+        "evidence": "PRINTED_LADDER",
+        "confidence": "high",
+        "ground_ff": 4.1,
+        "entresol_ff": null,
+        "etages_ff": [
+          3.6,
+          3.87,
+          3.7,
+          3.4
+        ],
+        "principal_ff": 3.87,
+        "facade_width": 18.763,
+        "bay_pitch": 2.391,
+        "cornice_above_pavement": 18.53,
+        "total_height": 22.7,
+        "comble_height": 4.16,
+        "comble_share": 0.183,
+        "cornice_band": null,
+        "door_type": "porte cochere",
+        "door_width": 2.534,
+        "door_height": 3.559,
+        "opening_width_typical": 1.136,
+        "aspect_principal": 2.51,
+        "aspect_uppers": [
+          2.27,
+          2.03
+        ],
+        "balcony_decks": [
+          4.1,
+          7.7,
+          11.57,
+          15.27
+        ],
+        "rail_height": null
+      },
+      {
+        "id": "paix3",
+        "address": "No 3, Rue de la Paix",
+        "architect": "Paul Mesnard",
+        "plates": [
+          "daly_elevation_50"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "low",
+        "ground_ff": 3.7,
+        "entresol_ff": null,
+        "etages_ff": [
+          3.2,
+          4.25,
+          3.55,
+          3.15
+        ],
+        "principal_ff": 4.25,
+        "facade_width": 16.792,
+        "bay_pitch": 2.321,
+        "cornice_above_pavement": 21.05,
+        "total_height": 23.85,
+        "comble_height": 2.8,
+        "comble_share": 0.117,
+        "cornice_band": null,
+        "door_type": "porte cochere",
+        "door_width": 2.41,
+        "door_height": 3.05,
+        "opening_width_typical": 1.141,
+        "aspect_principal": 2.827,
+        "aspect_uppers": [
+          2.12
+        ],
+        "balcony_decks": [],
+        "rail_height": null,
+        "caveat": "Source flags every floor level UNCERTAIN: floor lines are not drawn, datum inferred from balcony rails and entablature bands."
+      },
+      {
+        "id": "ce119",
+        "address": "No 119, Avenue des Champs-Elysees",
+        "architect": "H. Blondel",
+        "plates": [
+          "daly_elevation_49",
+          "daly_detail_05",
+          "daly_detail_78"
+        ],
+        "evidence": "MIXED_PRINTED_WIDTH",
+        "confidence": "medium",
+        "ground_ff": 4.32,
+        "entresol_ff": null,
+        "etages_ff": [
+          3.35,
+          4.3,
+          3.7,
+          3.1
+        ],
+        "principal_ff": 4.3,
+        "facade_width": 14.931,
+        "bay_pitch": 3.488,
+        "cornice_above_pavement": 18.77,
+        "total_height": 21.97,
+        "comble_height": 3.2,
+        "comble_share": 0.146,
+        "cornice_band": null,
+        "door_type": "porte cochere",
+        "door_width": 2.6,
+        "door_width_source": "printed plan callout '2.600'",
+        "door_width_scalebar_reading": 2.99,
+        "door_height": 3.49,
+        "opening_width_typical": 1.275,
+        "aspect_principal": 2.46,
+        "aspect_uppers": [
+          1.99,
+          1.83
+        ],
+        "balcony_decks": [],
+        "rail_height": 1.07,
+        "caveat": "INTERNAL CONFLICT: elevation gives 1er 3.35 / 2e 4.30 f-f; detail plate 78 gives sill-to-sill 1er 3.99 / 2e 3.80, which reverses which storey is taller. Bay pitch also disagrees (3.49 elevation vs 3.79 detail)."
+      },
+      {
+        "id": "imper",
+        "address": "Avenue de l'Imperatrice",
+        "architect": "Raban",
+        "plates": [
+          "daly_elevation_25",
+          "daly_section_61"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "low",
+        "ground_ff": 4.3,
+        "entresol_ff": null,
+        "etages_ff": [
+          3.45,
+          4.2
+        ],
+        "principal_ff": 4.2,
+        "facade_width": 17.313,
+        "bay_pitch": 3.227,
+        "cornice_above_pavement": 19.45,
+        "total_height": 22.4,
+        "comble_height": 2.95,
+        "comble_share": 0.132,
+        "cornice_band": null,
+        "door_type": "porte cochere",
+        "door_width": 2.619,
+        "door_height": 7.3,
+        "door_height_note": "two-storey arched carriage arch; OUTLIER, not a door height in the ordinary sense",
+        "opening_width_typical": 1.105,
+        "aspect_principal": 2.35,
+        "aspect_uppers": [
+          1.94,
+          1.63
+        ],
+        "balcony_decks": [
+          8.45,
+          16.1
+        ],
+        "rail_height": null,
+        "caveat": "Source declined to publish street-elevation storey heights: elevation and companion section (plate 61) cannot be reconciled. Only 2 etage heights, both from the section."
+      }
+    ],
+    "Deuxieme Classe": [
+      {
+        "id": "seb63",
+        "address": "No 63, Boulevard de Sebastopol",
+        "architect": "Garnier et Coulon",
+        "plates": [
+          "daly_elevation_01"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "high",
+        "ground_ff": 3.828,
+        "entresol_ff": 3.121,
+        "etages_ff": [
+          3.793,
+          3.069,
+          2.672,
+          2.914
+        ],
+        "principal_ff": 3.793,
+        "facade_width": 14.448,
+        "bay_pitch": 2.891,
+        "cornice_above_pavement": 19.724,
+        "total_height": 22.414,
+        "comble_height": 2.69,
+        "comble_share": 0.12,
+        "cornice_band": 0.328,
+        "door_type": "porte pietonne",
+        "door_width": 1.776,
+        "door_height": 3.034,
+        "opening_width_typical": 1.155,
+        "aspect_principal": 2.239,
+        "aspect_uppers": [
+          1.984,
+          1.661,
+          2.082
+        ],
+        "balcony_decks": [
+          6.948,
+          16.483
+        ],
+        "rail_height": null
+      },
+      {
+        "id": "seb24",
+        "address": "Nos 2 et 4, Boulevard de Sebastopol",
+        "architect": "Davioud",
+        "plates": [
+          "daly_elevation_02",
+          "daly_detail_56",
+          "daly_detail_80",
+          "daly_detail_81"
+        ],
+        "evidence": "PRINTED_DOOR_CHAIN",
+        "confidence": "high",
+        "ground_ff": 3.422,
+        "entresol_ff": 2.652,
+        "etages_ff": [
+          4.363,
+          3.559,
+          3.524
+        ],
+        "principal_ff": 4.363,
+        "facade_width": 16.407,
+        "bay_pitch": 3.222,
+        "cornice_above_pavement": 17.519,
+        "total_height": 24.517,
+        "comble_height": 6.997,
+        "comble_share": 0.285,
+        "cornice_band": 0.684,
+        "door_type": "porte pietonne",
+        "door_width": 1.74,
+        "door_height": 5.01,
+        "door_height_source": "printed chain 2.950 leaves + 0.700 frieze + 1.360 imposte",
+        "door_leaf_height": 2.95,
+        "opening_width_typical": 1.3,
+        "opening_width_source": "printed callout '1.300' (plate 81)",
+        "aspect_principal": 1.865,
+        "aspect_uppers": [
+          1.808,
+          1.943
+        ],
+        "balcony_decks": [
+          13.995
+        ],
+        "rail_height": 0.97,
+        "caveat": "rez and entresol split is UNCERTAIN (one shopfront frame); their sum, 6.074 m, is MEASURED."
+      },
+      {
+        "id": "seb77",
+        "address": "No 77, Boulevard de Sebastopol",
+        "architect": "Paul Mesnard",
+        "plates": [
+          "daly_elevation_03"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "high",
+        "ground_ff": 4.0,
+        "entresol_ff": 3.096,
+        "etages_ff": [
+          3.478,
+          3.043,
+          2.87,
+          2.991
+        ],
+        "principal_ff": 3.478,
+        "facade_width": 14.748,
+        "bay_pitch": 2.353,
+        "cornice_above_pavement": 19.478,
+        "total_height": 22.817,
+        "comble_height": 3.339,
+        "comble_share": 0.146,
+        "cornice_band": null,
+        "door_type": "porte pietonne",
+        "door_width": 1.609,
+        "door_height": 2.991,
+        "opening_width_typical": 1.27,
+        "aspect_entresol": 1.569,
+        "aspect_principal": 1.89,
+        "aspect_uppers": [
+          1.923,
+          1.761,
+          1.954
+        ],
+        "balcony_decks": [
+          7.096,
+          10.574,
+          13.617,
+          16.487
+        ],
+        "rail_height": null
+      },
+      {
+        "id": "riv88",
+        "address": "No 88, Rue de Rivoli",
+        "architect": "Rolland",
+        "plates": [
+          "daly_elevation_29",
+          "daly_detail_06",
+          "daly_detail_30",
+          "daly_detail_79"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "medium",
+        "ground_ff": 4.849,
+        "entresol_ff": null,
+        "etages_ff": [
+          2.97,
+          3.875,
+          3.086,
+          2.9
+        ],
+        "principal_ff": 3.875,
+        "facade_width": 19.977,
+        "bay_pitch": 2.694,
+        "cornice_above_pavement": 14.78,
+        "total_height": 18.26,
+        "comble_height": 3.132,
+        "comble_share": 0.172,
+        "cornice_band": null,
+        "door_type": "porte cochere",
+        "door_width": 2.575,
+        "door_height": 3.643,
+        "door_width_alt": 2.61,
+        "door_width_alt_source": "detail plate 06, same door, independent reading",
+        "opening_width_typical": 1.22,
+        "aspect_principal": 2.09,
+        "aspect_uppers": [
+          1.934
+        ],
+        "balcony_decks": [
+          15.128
+        ],
+        "rail_height": null,
+        "balcony_projection_printed": 0.6,
+        "caveat": "No mansard and no entresol: masonry attic behind a balustrade. Facade width UNCERTAIN. Lowest cornice in the corpus (14.78 m)."
+      },
+      {
+        "id": "berg26",
+        "address": "No 26, Rue Bergere",
+        "architect": "Lesoufacher",
+        "plates": [
+          "daly_elevation_34 (two independent readings)"
+        ],
+        "evidence": "SCALE_BAR_DUPLICATE",
+        "confidence": "medium",
+        "ground_ff": 4.31,
+        "entresol_ff": 3.09,
+        "etages_ff": [
+          4.29,
+          3.83,
+          2.71
+        ],
+        "principal_ff": 4.29,
+        "facade_width": 17.365,
+        "bay_pitch": 2.806,
+        "cornice_above_pavement": 18.74,
+        "total_height": 23.46,
+        "comble_height": 4.72,
+        "comble_share": 0.202,
+        "cornice_band": 0.65,
+        "door_type": "porte cochere",
+        "door_width": 2.672,
+        "door_height": 3.474,
+        "opening_width_typical": 1.283,
+        "aspect_principal": 2.448,
+        "aspect_uppers": [
+          2.059,
+          1.616
+        ],
+        "balcony_decks": [
+          7.93,
+          12.15,
+          15.9
+        ],
+        "rail_height": null,
+        "caveat": "MEASURED TWICE, independently, in two different work packages. Values above are the mean of the two readings. See meta.duplicate_reading_error for the disagreement, which is the corpus's own error bar."
+      },
+      {
+        "id": "cons9",
+        "address": "No 9, Rue du Conservatoire",
+        "architect": "Amoudru",
+        "plates": [
+          "daly_elevation_40",
+          "daly_detail_09",
+          "daly_detail_83",
+          "daly_detail_84"
+        ],
+        "evidence": "PRINTED_WINDOW_CHAIN+PRINTED_DOOR_WIDTH",
+        "confidence": "high",
+        "ground_ff": 3.42,
+        "entresol_ff": 2.98,
+        "etages_ff": [
+          3.42,
+          2.88,
+          2.85
+        ],
+        "principal_ff": 3.42,
+        "facade_width": 12.63,
+        "bay_pitch": 2.09,
+        "cornice_above_pavement": 18.15,
+        "total_height": 21.0,
+        "comble_height": 2.85,
+        "comble_share": 0.136,
+        "cornice_band": 0.45,
+        "door_type": "porte pietonne",
+        "door_width": 1.63,
+        "door_width_source": "printed plan callout '1.630'",
+        "door_height": 2.72,
+        "opening_width_typical": 1.2,
+        "aspect_entresol": 1.83,
+        "aspect_principal": 1.7,
+        "aspect_uppers": [
+          1.74,
+          1.14
+        ],
+        "printed_window_chain": {
+          "croisee_2e_height": 2.1,
+          "croisee_3e_height": 1.8,
+          "allege": 0.8,
+          "plancher": 0.3
+        },
+        "balcony_decks": [],
+        "rail_height": 0.87,
+        "caveat": "2e etage is a colossal order embracing the etage plus a low mezzanine (5.48 m composite); its split into 2.88 + 2.60 is UNCERTAIN. Bay pitch 2.09 m reflects unusually narrow trumeaux and should not drive bay-pitch calibration."
+      },
+      {
+        "id": "seb120",
+        "address": "No 120, Boulevard de Sebastopol",
+        "architect": "Levicomte",
+        "plates": [
+          "daly_elevation_51",
+          "daly_detail_57"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "high",
+        "ground_ff": 4.0,
+        "entresol_ff": 3.1,
+        "etages_ff": [
+          3.2,
+          3.2,
+          3.2,
+          3.13
+        ],
+        "principal_ff": 3.2,
+        "facade_width": 16.31,
+        "bay_pitch": 2.92,
+        "cornice_above_pavement": 19.98,
+        "total_height": 22.75,
+        "comble_height": 2.77,
+        "comble_share": 0.122,
+        "cornice_band": 0.45,
+        "door_type": "porte pietonne",
+        "door_width": 1.705,
+        "door_height": 3.375,
+        "door_readings": {
+          "elevation": [
+            1.8,
+            3.4
+          ],
+          "detail_57": [
+            1.61,
+            3.35
+          ]
+        },
+        "opening_width_typical": 1.25,
+        "aspect_entresol": 1.52,
+        "aspect_principal": 1.56,
+        "aspect_uppers": [
+          1.56,
+          1.6
+        ],
+        "balcony_decks": [
+          7.8,
+          10.95,
+          14.1,
+          16.9
+        ],
+        "rail_height": 1.03,
+        "balcony_console_printed": 0.59,
+        "caveat": "ZERO STOREY TAPER: 1er, 2e and 3e are exactly 3.20 m, verified three ways. Facade width UNCERTAIN (corner building). Door width disagrees 11% between the elevation and its own detail plate."
+      },
+      {
+        "id": "math39",
+        "address": "No 39, Rue Neuve des Mathurins",
+        "architect": "Lesoufacher",
+        "plates": [
+          "daly_elevation_52"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "high",
+        "ground_ff": 4.1,
+        "entresol_ff": 2.4,
+        "etages_ff": [
+          4.15,
+          3.7,
+          3.15,
+          2.32
+        ],
+        "principal_ff": 4.15,
+        "facade_width": 14.91,
+        "bay_pitch": 3.06,
+        "cornice_above_pavement": 19.82,
+        "total_height": 23.0,
+        "comble_height": 3.18,
+        "comble_share": 0.138,
+        "cornice_band": 0.6,
+        "door_type": "porte cochere",
+        "door_width": 2.57,
+        "door_height": 5.0,
+        "door_leaf": [
+          2.19,
+          3.55
+        ],
+        "opening_width_typical": 1.25,
+        "aspect_entresol": 1.28,
+        "aspect_principal": 2.0,
+        "aspect_uppers": [
+          1.92,
+          1.52,
+          1.44
+        ],
+        "balcony_decks": [
+          6.95,
+          11.55,
+          17.85
+        ],
+        "rail_height": null,
+        "caveat": "Cleanest monotonic taper in the corpus (0.89, 0.85, 0.74). Carriage arch swallows rez AND entresol, hence the 5.00 m height."
+      },
+      {
+        "id": "stg6",
+        "address": "No 6, Boulevard Saint-Germain",
+        "architect": "Chappardon",
+        "plates": [
+          "daly_elevation_53"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "high",
+        "ground_ff": 3.75,
+        "entresol_ff": 2.7,
+        "etages_ff": [
+          3.5,
+          2.95,
+          3.1,
+          3.05
+        ],
+        "principal_ff": 3.5,
+        "facade_width": 11.86,
+        "bay_pitch": 2.93,
+        "cornice_above_pavement": 19.05,
+        "total_height": 22.5,
+        "comble_height": 3.45,
+        "comble_share": 0.153,
+        "cornice_band": 0.45,
+        "door_type": "porte pietonne",
+        "door_width": 1.81,
+        "door_height": 3.0,
+        "opening_width_typical": 1.14,
+        "aspect_entresol": 1.58,
+        "aspect_principal": 2.11,
+        "aspect_uppers": [
+          1.8,
+          1.8,
+          1.49
+        ],
+        "balcony_decks": [
+          6.9,
+          10.4,
+          13.35,
+          16.0
+        ],
+        "rail_height": null
+      },
+      {
+        "id": "seb1",
+        "address": "No 1, Boulevard de Sebastopol",
+        "architect": "Lecomte",
+        "plates": [
+          "daly_elevation_73"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "high",
+        "ground_ff": 3.9,
+        "entresol_ff": 2.55,
+        "etages_ff": [
+          4.2,
+          3.6,
+          3.25
+        ],
+        "principal_ff": 4.2,
+        "facade_width": 16.92,
+        "bay_pitch": 2.233,
+        "cornice_above_pavement": 17.55,
+        "total_height": 24.35,
+        "comble_height": 6.8,
+        "comble_share": 0.279,
+        "cornice_band": 0.35,
+        "door_type": "porte pietonne",
+        "door_width": 1.91,
+        "door_height": 3.13,
+        "opening_width_typical": 1.21,
+        "aspect_entresol": 1.57,
+        "aspect_principal": 2.07,
+        "aspect_uppers": [
+          1.94
+        ],
+        "balcony_decks": [
+          6.55,
+          14.35
+        ],
+        "rail_height": null,
+        "caveat": "Bell-profile mansard holding two levels of accommodation: comble is 28% of total height."
+      },
+      {
+        "id": "seb87",
+        "address": "No 87, Boulevard de Sebastopol",
+        "architect": null,
+        "plates": [
+          "daly_detail_08",
+          "daly_detail_82"
+        ],
+        "evidence": "PRINTED_DOOR_WIDTH",
+        "confidence": "high",
+        "door_only": true,
+        "ground_ff": null,
+        "entresol_ff": null,
+        "etages_ff": [],
+        "principal_ff": null,
+        "facade_width": null,
+        "bay_pitch": null,
+        "cornice_above_pavement": null,
+        "total_height": null,
+        "comble_height": null,
+        "comble_share": null,
+        "cornice_band": null,
+        "door_type": "porte pietonne",
+        "door_width": 1.76,
+        "door_width_source": "printed plan callout '1.760'",
+        "door_height": 5.07,
+        "door_leaf_height": 3.25,
+        "opening_width_typical": null,
+        "aspect_principal": null,
+        "aspect_uppers": [],
+        "balcony_decks": [],
+        "rail_height": null,
+        "caveat": "Detail plates only; no elevation measured. Contributes a door, nothing else."
+      }
+    ],
+    "Troisieme Classe": [
+      {
+        "id": "beau",
+        "address": "Nos 36, 38 et 40, Boulevard Beaumarchais",
+        "architect": "Francois Rolland",
+        "plates": [
+          "daly_elevation_42"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "medium",
+        "ground_ff": 4.01,
+        "entresol_ff": null,
+        "etages_ff": [
+          3.0,
+          3.07,
+          3.0,
+          2.84
+        ],
+        "principal_ff": 3.07,
+        "facade_width": 8.57,
+        "facade_width_note": "per house; three adjoining houses 8.63/8.54/8.53, total composition 25.70 m",
+        "bay_pitch": 2.69,
+        "cornice_above_pavement": 15.93,
+        "total_height": 19.4,
+        "comble_height": 3.47,
+        "comble_share": 0.179,
+        "cornice_band": 0.45,
+        "door_type": "porte pietonne",
+        "door_width": 1.36,
+        "door_height": 3.21,
+        "opening_width_typical": 1.1,
+        "aspect_principal": 1.96,
+        "aspect_uppers": [
+          2.0
+        ],
+        "balcony_decks": [
+          7.01,
+          10.09,
+          13.09
+        ],
+        "rail_height": null,
+        "note": "Neighbour alignment: floor lines, string courses, cornice, both balcons filants and the roof match across all three houses to within 0.05-0.12 m. Bay COUNT differs (3/4/3), levels do not."
+      },
+      {
+        "id": "long",
+        "address": "Rue de Longchamps",
+        "architect": "Bourlier",
+        "plates": [
+          "daly_elevation_74"
+        ],
+        "evidence": "SCALE_BAR",
+        "confidence": "medium",
+        "ground_ff": 3.61,
+        "entresol_ff": null,
+        "etages_ff": [
+          3.0,
+          3.0,
+          2.93,
+          3.11
+        ],
+        "principal_ff": 3.0,
+        "facade_width": 12.27,
+        "bay_pitch": 2.39,
+        "bay_pitch_note": "2-1-2 rhythm: outer gaps 2.21, inner 2.57",
+        "cornice_above_pavement": 15.64,
+        "total_height": 16.66,
+        "comble_height": 1.02,
+        "comble_share": 0.061,
+        "cornice_band": 0.92,
+        "door_type": "porte pietonne",
+        "door_width": 1.36,
+        "door_height": 2.59,
+        "opening_width_typical": 1.04,
+        "aspect_principal": 1.93,
+        "aspect_uppers": [
+          1.89,
+          1.92,
+          1.79
+        ],
+        "balcony_decks": [],
+        "rail_height": null,
+        "note": "No entresol, no dormers, no habitable comble, NO projecting balcony anywhere - flush garde-corps only. Top etage wall height drops to 2.20 m."
+      }
+    ]
+  },
+  "quantities": {
+    "storey_height_ground": {
+      "definition": "Rez-de-chaussee floor-to-floor (shop storey where present).",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 4.2,
+          "min": 3.7,
+          "max": 4.32
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 3.95,
+          "min": 3.42,
+          "max": 4.849
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 3.81,
+          "min": 3.61,
+          "max": 4.01
+        }
+      },
+      "ladder": {
+        "direction": "flat",
+        "monotonic": true,
+        "delta_median_prem_to_trois": -0.39,
+        "verdict": "Falls only 9% across the whole ladder while the ranges overlap almost completely (Deuxieme 3.42-4.85 spans every other class entirely). Treat as class-independent."
+      },
+      "absolute_or_proportional": "ABSOLUTE",
+      "recommendation": "SOURCED (Deuxieme) / WEAK (Premiere, Troisieme)",
+      "notes": "The single most stable absolute in the corpus after the door. 16 buildings, 3.42-4.85 m, median 3.95 m. The one extreme (4.85 m, Rivoli 88) is a deliberate tall-boutique type, not measurement error."
+    },
+    "storey_height_entresol": {
+      "definition": "Entresol floor-to-floor where an entresol exists.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": null,
+        "Deuxieme Classe": {
+          "n": 9,
+          "median": 2.98,
+          "min": 2.4,
+          "max": 3.121
+        },
+        "Troisieme Classe": null
+      },
+      "ladder": {
+        "direction": "n/a",
+        "monotonic": null,
+        "verdict": "Not a ladder quantity: no Premiere or Troisieme building in this corpus has an entresol at all. The PRESENCE of the entresol is the class signal, not its height."
+      },
+      "absolute_or_proportional": "ABSOLUTE",
+      "recommendation": "SOURCED (Deuxieme only) / INSUFFICIENT elsewhere",
+      "notes": "9 of 10 Deuxieme buildings have one; 0 of 4 Premiere and 0 of 2 Troisieme do. Median 2.98 m, range 2.40-3.12 m. Entresol/ground ratio median 0.775 (range 0.585-0.871, n=9)."
+    },
+    "storey_height_compressed_level": {
+      "definition": "Height of the squeezed level between the ground storey and the tallest etage (entresol where one exists, otherwise a low 1er etage).",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 3.4,
+          "min": 3.2,
+          "max": 3.6
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 2.975,
+          "min": 2.4,
+          "max": 3.121
+        },
+        "Troisieme Classe": null
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "Present in 14 of the 16 buildings with measured storeys; absent in BOTH Troisieme buildings. Premiere median 3.40 m (n=4), Deuxieme 2.975 m (n=10), Troisieme none (n=0)."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED as a PATTERN, WEAK as a number",
+      "notes": "STRUCTURAL FINDING: a compressed level sits between the commercial ground storey and the noble floor in every Premiere and Deuxieme building measured. In Premiere it is dressed as a full 1er etage (3.20-3.60 m); in Deuxieme it is an entresol (2.40-3.12 m). Troisieme has no such level and no noble floor. Ratio of noble floor to compressed level: Premiere median 1.25, Deuxieme median 1.30."
+    },
+    "storey_height_principal": {
+      "definition": "Floor-to-floor of the tallest etage (piano nobile).",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 4.225,
+          "min": 3.87,
+          "max": 4.3
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 3.834,
+          "min": 3.2,
+          "max": 4.363
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 3.035,
+          "min": 3.0,
+          "max": 3.07
+        }
+      },
+      "ladder": {
+        "direction": "rises with class rank",
+        "monotonic": true,
+        "ratio_prem_over_trois": 1.39,
+        "verdict": "THE CLEAREST LADDER IN THE CORPUS. 4.23 / 3.83 / 3.04 m. The Premiere-Troisieme gap (1.2 m) is far larger than the duplicate-reading error (0.2 m)."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED for the ORDERING; SOURCED for the Deuxieme distribution; WEAK for Premiere and Troisieme values",
+      "notes": "Premiere n=4 but three of those four have source-flagged uncertain floor lines, so the Premiere median rests effectively on one printed plate. Deuxieme n=10 is solid. Troisieme n=2 but its two values are 3.00 and 3.07 - remarkably tight."
+    },
+    "storey_height_uppers": {
+      "definition": "Floor-to-floor of every etage above the piano nobile (one observation per storey, not per building).",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 6,
+          "median": 3.475,
+          "min": 3.1,
+          "max": 3.7
+        },
+        "Deuxieme Classe": {
+          "n": 25,
+          "median": 3.069,
+          "min": 2.32,
+          "max": 3.83
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 2.92,
+          "min": 2.84,
+          "max": 3.0
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "3.48 / 3.07 / 2.92 m. Monotonic, but Troisieme rests on n=2 storeys from one building and the Deuxieme-Troisieme step (0.15 m) is inside the duplicate-reading error bar."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED (Deuxieme) / WEAK (Premiere) / WEAK (Troisieme)",
+      "notes": "Observation counts are storeys, not buildings: 6 / 25 / 2, and the Troisieme count of 2 comes from a single building (rue de Longchamps has no etage above its tallest, so it contributes none). Treat the Troisieme figure as anecdote. Deuxieme spread is wide (2.32-3.83 m) because the corpus contains both zero-taper facades (120 Sebastopol, three storeys at exactly 3.20 m) and hard-tapering ones (39 Mathurins, 4.15 -> 2.32 m)."
+    },
+    "storey_taper_ratio": {
+      "definition": "Geometric-mean storey-to-storey ratio counted UPWARD FROM the piano nobile (not from the 1er, which is often the compressed level).",
+      "unit": "ratio",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 3,
+          "median": 0.861,
+          "min": 0.849,
+          "max": 0.937
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 0.906,
+          "min": 0.795,
+          "max": 0.993
+        },
+        "Troisieme Classe": {
+          "n": 1,
+          "median": 0.962,
+          "min": 0.962,
+          "max": 0.962
+        }
+      },
+      "ladder": {
+        "direction": "weakens down the class ladder (Premiere tapers hardest)",
+        "monotonic": true,
+        "verdict": "0.861 / 0.906 / 0.962 - but Premiere n=3 and Troisieme n=1. NOT SAFE to calibrate the class dependence."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "WEAK",
+      "notes": "The Deuxieme distribution (n=10, 0.795-0.993, median 0.906) is usable on its own. Two Deuxieme buildings taper essentially not at all (0.993, 0.992) and one tapers hard (0.795): the generator should sample a distribution, not apply a constant. Measured naively from the 1er upward the ratio is meaningless because the 1er is often the shortest storey."
+    },
+    "taper_first_etage_over_ground": {
+      "definition": "Ratio of the first etage above the ground storey to the ground storey.",
+      "unit": "ratio",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 0.834,
+          "min": 0.775,
+          "max": 0.878
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 0.993,
+          "min": 0.612,
+          "max": 1.275
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 0.789,
+          "min": 0.748,
+          "max": 0.831
+        }
+      },
+      "ladder": {
+        "direction": "non-monotonic",
+        "monotonic": false,
+        "verdict": "Premiere 0.834, Deuxieme 0.993, Troisieme 0.789. NOT a ladder - the Deuxieme value is high only because the compressed level has been split off as an entresol."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "WEAK",
+      "notes": "Included as an explicit warning: this is the ratio a naive generator would use, and it inverts."
+    },
+    "bay_pitch": {
+      "definition": "Mean window-axis to window-axis spacing.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 2.809,
+          "min": 2.321,
+          "max": 3.488
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 2.849,
+          "min": 2.09,
+          "max": 3.222
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 2.54,
+          "min": 2.39,
+          "max": 2.69
+        }
+      },
+      "ladder": {
+        "direction": "non-monotonic",
+        "monotonic": false,
+        "verdict": "2.81 / 2.85 / 2.54 m. Deuxieme sits ABOVE Premiere. The class ladder does not exist in this quantity."
+      },
+      "absolute_or_proportional": "ABSOLUTE",
+      "recommendation": "SOURCED as a CORPUS-WIDE RANGE; INSUFFICIENT as a class discriminator",
+      "notes": "Corpus range 2.09-3.49 m over 16 buildings; within-class spread (1.5x in both Premiere and Deuxieme) is larger than any between-class difference. Premiere itself runs 2.32 to 3.49 m - 'Premiere Classe' does not mean one bay rhythm. 9 rue du Conservatoire (2.09 m) is flagged by its own source as unrepresentative."
+    },
+    "facade_width": {
+      "definition": "Party wall to party wall.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 17.053,
+          "min": 14.931,
+          "max": 18.763
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 15.61,
+          "min": 11.86,
+          "max": 19.977
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 10.42,
+          "min": 8.57,
+          "max": 12.27
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "17.05 / 15.61 / 10.42 m. Monotonic, but Premiere and Deuxieme overlap heavily (Deuxieme spans 11.86-19.98 m, containing the whole Premiere range) and Troisieme n=2."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "WEAK",
+      "notes": "The Troisieme drop is real but is partly a plot-width fact rather than a class fact: the Beaumarchais plate is three 8.6 m houses built as one composition."
+    },
+    "opening_width_typical": {
+      "definition": "Typical upper-storey croisee masonry opening width, one representative value per building.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 1.139,
+          "min": 1.105,
+          "max": 1.275
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 1.235,
+          "min": 1.14,
+          "max": 1.3
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 1.07,
+          "min": 1.04,
+          "max": 1.1
+        }
+      },
+      "ladder": {
+        "direction": "non-monotonic",
+        "monotonic": false,
+        "verdict": "1.14 / 1.24 / 1.07 m. Deuxieme is the WIDEST. Corpus-wide 1.04-1.30 m, a 1.25x span across buildings whose facades vary 2.4x in width and whose class rank spans the whole social range."
+      },
+      "absolute_or_proportional": "ABSOLUTE",
+      "recommendation": "SOURCED",
+      "notes": "THE STRONGEST ABSOLUTE AFTER THE DOOR. Window width is set by the croisee (the two-leaf French casement), not by the building's grandeur. One value is a printed callout (1.300 m at 2-4 Sebastopol); a second (1.25 m at 9 rue du Conservatoire) is pixel-read on a plate whose scale is fixed by printed callouts. Both agree with the ordinary scale-bar readings."
+    },
+    "opening_height_principal": {
+      "definition": "Window opening height at the piano nobile.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 2.923,
+          "min": 2.6,
+          "max": 3.2
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 2.236,
+          "min": 1.97,
+          "max": 2.823
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 2.085,
+          "min": 2.01,
+          "max": 2.16
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "2.92 / 2.24 / 2.09 m. Monotonic and the Premiere-Deuxieme step (0.68 m) is large."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED for ordering; WEAK for Troisieme values",
+      "notes": "Because width is near-constant, ALL of the class signal in the window is in its height. This is the cleanest statement of the ABSOLUTE/PROPORTIONAL split in the whole dataset."
+    },
+    "opening_aspect_principal": {
+      "definition": "Opening height/width at the piano nobile.",
+      "unit": "ratio",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 2.485,
+          "min": 2.35,
+          "max": 2.827
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 2.035,
+          "min": 1.56,
+          "max": 2.448
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 1.945,
+          "min": 1.93,
+          "max": 1.96
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "2.49 / 2.04 / 1.95. Monotonic; the Deuxieme-Troisieme step (0.09) is inside the noise, the Premiere-Deuxieme step (0.45) is not."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED for ordering; WEAK for Troisieme",
+      "notes": "Premiere spread 2.35-2.83, Deuxieme 1.56-2.45 (overlapping the Premiere floor), Troisieme 1.93-1.96."
+    },
+    "opening_aspect_uppers": {
+      "definition": "Opening height/width above the piano nobile (one observation per storey).",
+      "unit": "ratio",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 7,
+          "median": 1.99,
+          "min": 1.63,
+          "max": 2.27
+        },
+        "Deuxieme Classe": {
+          "n": 22,
+          "median": 1.8,
+          "min": 1.14,
+          "max": 2.082
+        },
+        "Troisieme Classe": {
+          "n": 4,
+          "median": 1.905,
+          "min": 1.79,
+          "max": 2.0
+        }
+      },
+      "ladder": {
+        "direction": "non-monotonic",
+        "monotonic": false,
+        "verdict": "1.99 / 1.80 / 1.91. Troisieme sits ABOVE Deuxieme. NOT a usable ladder."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "INSUFFICIENT",
+      "notes": "Flagged explicitly per the brief. Within-building variation is larger than between-class variation: 9 Conservatoire runs 1.74 down to 1.14 while 63 Sebastopol runs 1.98 / 1.66 / 2.08 in the wrong order."
+    },
+    "opening_aspect_entresol": {
+      "definition": "Entresol opening height/width.",
+      "unit": "ratio",
+      "by_class": {
+        "Premiere Classe": null,
+        "Deuxieme Classe": {
+          "n": 6,
+          "median": 1.57,
+          "min": 1.28,
+          "max": 1.83
+        },
+        "Troisieme Classe": null
+      },
+      "ladder": {
+        "direction": "n/a",
+        "monotonic": null,
+        "verdict": "Deuxieme only (n=6, 1.28-1.83). No comparison possible."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "INSUFFICIENT",
+      "notes": "Detail plates show the entresol window is not one shape: 120 Sebastopol h/w 1.23 (single squat opening) vs 9 Conservatoire h/w 2.32 per light (paired lights)."
+    },
+    "comble_share": {
+      "definition": "Comble (roof) height divided by total pavement-to-roof-crest height.",
+      "unit": "fraction",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 0.139,
+          "min": 0.117,
+          "max": 0.183
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 0.149,
+          "min": 0.12,
+          "max": 0.285
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 0.12,
+          "min": 0.061,
+          "max": 0.179
+        }
+      },
+      "ladder": {
+        "direction": "non-monotonic",
+        "monotonic": false,
+        "verdict": "0.139 / 0.150 / 0.120. Deuxieme is the highest. Ranges are enormous and overlap completely."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "INSUFFICIENT",
+      "notes": "DO NOT CALIBRATE. Deuxieme runs 0.120 to 0.285 (2.4x) because the corpus mixes plain mansards with combles containing two full storeys (1 Sebastopol 0.279, 2-4 Sebastopol 0.285). Troisieme runs 0.061 to 0.179 on two buildings - one has a habitable mansard, one has a plain low slate roof. The comble is a TYPE choice, not a class-scaled proportion."
+    },
+    "cornice_height_above_pavement": {
+      "definition": "Pavement to the top of the main cornice.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 19.11,
+          "min": 18.53,
+          "max": 21.05
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 18.895,
+          "min": 14.78,
+          "max": 19.98
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 15.785,
+          "min": 15.64,
+          "max": 15.93
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "19.11 / 18.90 / 15.79 m. The Premiere-Deuxieme step is 0.21 m - nothing. The step down to Troisieme is 3.1 m and is real."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED for the Troisieme step; WEAK for the Premiere/Deuxieme step",
+      "notes": "Premiere and Deuxieme are BOTH pressed against the 20 m legal facade maximum of the 1859 decree for wide streets: 6 buildings sit between 19.0 and 20.0 m. That ceiling, not class, is what sets the number. The exception is 88 rue de Rivoli at 14.78 m, which spends its allowance on fewer, taller storeys. Height-to-cornice / facade-width rises down the ladder: 1.19 / 1.27 / 1.57 - the Troisieme facade is proportionally the tallest and narrowest."
+    },
+    "cornice_band_depth": {
+      "definition": "Depth of the crowning cornice moulding itself.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": null,
+        "Deuxieme Classe": {
+          "n": 8,
+          "median": 0.45,
+          "min": 0.328,
+          "max": 0.684
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 0.685,
+          "min": 0.45,
+          "max": 0.92
+        }
+      },
+      "ladder": {
+        "direction": "unknown",
+        "monotonic": null,
+        "verdict": "NO PREMIERE DATA AT ALL (n=0). Deuxieme 0.45 (0.33-0.68, n=8), Troisieme 0.685 (0.45-0.92, n=2). No ladder can be stated."
+      },
+      "absolute_or_proportional": "ABSOLUTE",
+      "recommendation": "INSUFFICIENT",
+      "notes": "Half the Deuxieme values are source-flagged UNCERTAIN (the cornice underside cannot be separated from the window pediments below). The Troisieme value is higher than the Deuxieme, which if anything inverts the expected ladder. Leave inferred."
+    },
+    "total_height": {
+      "definition": "Pavement to roof crest.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 22.55,
+          "min": 21.97,
+          "max": 23.85
+        },
+        "Deuxieme Classe": {
+          "n": 10,
+          "median": 22.784,
+          "min": 18.26,
+          "max": 24.517
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 18.03,
+          "min": 16.66,
+          "max": 19.4
+        }
+      },
+      "ladder": {
+        "direction": "falls, non-monotonic at the top",
+        "monotonic": false,
+        "verdict": "22.55 / 22.78 / 18.03 m. Deuxieme median EXCEEDS Premiere because Deuxieme combles are taller."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "WEAK",
+      "notes": "Another quantity where the 20 m cornice ceiling flattens the two upper classes and only Troisieme separates."
+    },
+    "door_width": {
+      "definition": "Masonry opening width of the principal entrance.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 2.567,
+          "min": 2.41,
+          "max": 2.619
+        },
+        "Deuxieme Classe": {
+          "n": 11,
+          "median": 1.776,
+          "min": 1.609,
+          "max": 2.672
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 1.36,
+          "min": 1.36,
+          "max": 1.36
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "2.57 / 1.78 / 1.36 m across all doors - BUT this ladder is an artefact of door TYPE, see notes."
+      },
+      "absolute_or_proportional": "ABSOLUTE (within door type)",
+      "recommendation": "SOURCED",
+      "notes": "See doors_by_type: the ladder is in WHICH DOOR the class gets, not in how big a given door is."
+    },
+    "door_height": {
+      "definition": "Threshold to the head or arch crown of the principal entrance opening.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 4,
+          "median": 3.525,
+          "min": 3.05,
+          "max": 7.3
+        },
+        "Deuxieme Classe": {
+          "n": 11,
+          "median": 3.375,
+          "min": 2.72,
+          "max": 5.07
+        },
+        "Troisieme Classe": {
+          "n": 2,
+          "median": 2.9,
+          "min": 2.59,
+          "max": 3.21
+        }
+      },
+      "ladder": {
+        "direction": "falls",
+        "monotonic": true,
+        "verdict": "3.53 / 3.38 / 2.90 m. Monotonic but the spread swamps it: Premiere 3.05-7.30, Deuxieme 2.72-5.07."
+      },
+      "absolute_or_proportional": "MIXED",
+      "recommendation": "WEAK",
+      "notes": "Door HEIGHT is not the stable quantity door WIDTH is, because the opening sometimes swallows the entresol (39 Mathurins 5.00 m, 2-4 Sebastopol 5.01 m, 87 Sebastopol 5.07 m) and sometimes stops at a lintel (9 Conservatoire 2.72 m). The height of the LEAVES is far more stable: 2.95 / 3.25 / 3.55 m on the three buildings where it is separately dimensioned, two of them printed."
+    },
+    "balcony_height_above_pavement": {
+      "definition": "Height above pavement of the lowest projecting balcony deck (below 9 m).",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 2,
+          "median": 6.275,
+          "min": 4.1,
+          "max": 8.45
+        },
+        "Deuxieme Classe": {
+          "n": 7,
+          "median": 6.95,
+          "min": 6.55,
+          "max": 7.93
+        },
+        "Troisieme Classe": {
+          "n": 1,
+          "median": 7.01,
+          "min": 7.01,
+          "max": 7.01
+        }
+      },
+      "ladder": {
+        "direction": "cannot be stated",
+        "monotonic": null,
+        "verdict": "Deuxieme n=8, median 6.95 m, range 6.55-7.93 m - very tight. Premiere n=2 (4.10 and 8.45 m, which are not the same storey). Troisieme n=1 (7.01 m)."
+      },
+      "absolute_or_proportional": "PROPORTIONAL",
+      "recommendation": "SOURCED (Deuxieme) / INSUFFICIENT (Premiere, Troisieme)",
+      "notes": "The Deuxieme figure is tight because it is structurally determined: it is ground storey + entresol, i.e. the 1er etage floor. Note the class signal here is PRESENCE, not height: 9 of 10 Deuxieme buildings carry a projecting balcony below 9 m; the rue de Longchamps house has no projecting balcony anywhere on the facade, only flush garde-corps."
+    },
+    "balcony_railing_height": {
+      "definition": "Garde-corps height above the balcony deck.",
+      "unit": "m",
+      "by_class": {
+        "Premiere Classe": {
+          "n": 1,
+          "median": 1.07,
+          "min": 1.07,
+          "max": 1.07
+        },
+        "Deuxieme Classe": {
+          "n": 3,
+          "median": 0.97,
+          "min": 0.87,
+          "max": 1.03
+        },
+        "Troisieme Classe": null
+      },
+      "ladder": {
+        "direction": "flat",
+        "monotonic": null,
+        "verdict": "0.87 / 0.97 / 1.03 / 1.07 m across four buildings in two classes. Median 1.00 m, total spread 0.20 m."
+      },
+      "absolute_or_proportional": "ABSOLUTE",
+      "recommendation": "WEAK (n=4) but a clean absolute candidate",
+      "notes": "Body-scaled like the door. Companion absolute: balcony PROJECTION from the wall face is 0.600 m printed at 88 rue de Rivoli and 0.590 m printed at 120 Sebastopol - two different buildings, two printed callouts, 2% apart."
+    }
+  },
+  "doors_by_type": {
+    "porte cochere": {
+      "Premiere Classe": {
+        "width": {
+          "n": 4,
+          "median": 2.567,
+          "min": 2.41,
+          "max": 2.619
+        },
+        "height": {
+          "n": 4,
+          "median": 3.525,
+          "min": 3.05,
+          "max": 7.3
+        },
+        "values_width": [
+          2.41,
+          2.534,
+          2.6,
+          2.619
+        ],
+        "values_height": [
+          3.05,
+          3.49,
+          3.559,
+          7.3
+        ],
+        "height_excluding_two_storey_arch": {
+          "n": 3,
+          "median": 3.49,
+          "min": 3.05,
+          "max": 3.559
+        }
+      },
+      "Deuxieme Classe": {
+        "width": {
+          "n": 3,
+          "median": 2.575,
+          "min": 2.57,
+          "max": 2.672
+        },
+        "height": {
+          "n": 3,
+          "median": 3.643,
+          "min": 3.474,
+          "max": 5.0
+        },
+        "values_width": [
+          2.57,
+          2.575,
+          2.672
+        ],
+        "values_height": [
+          3.474,
+          3.643,
+          5.0
+        ]
+      },
+      "Troisieme Classe": {
+        "width": null,
+        "height": null,
+        "values_width": [],
+        "values_height": []
+      }
+    },
+    "porte pietonne": {
+      "Premiere Classe": {
+        "width": null,
+        "height": null,
+        "values_width": [],
+        "values_height": []
+      },
+      "Deuxieme Classe": {
+        "width": {
+          "n": 8,
+          "median": 1.75,
+          "min": 1.609,
+          "max": 1.91
+        },
+        "height": {
+          "n": 8,
+          "median": 3.082,
+          "min": 2.72,
+          "max": 5.07
+        },
+        "values_width": [
+          1.609,
+          1.63,
+          1.705,
+          1.74,
+          1.76,
+          1.776,
+          1.81,
+          1.91
+        ],
+        "values_height": [
+          2.72,
+          2.991,
+          3.0,
+          3.034,
+          3.13,
+          3.375,
+          5.01,
+          5.07
+        ]
+      },
+      "Troisieme Classe": {
+        "width": {
+          "n": 2,
+          "median": 1.36,
+          "min": 1.36,
+          "max": 1.36
+        },
+        "height": {
+          "n": 2,
+          "median": 2.9,
+          "min": 2.59,
+          "max": 3.21
+        },
+        "values_width": [
+          1.36,
+          1.36
+        ],
+        "values_height": [
+          2.59,
+          3.21
+        ]
+      }
+    },
+    "_finding": "Carriage doors are the same size in Premiere and Deuxieme Classe: 2.41-2.62 m (n=4) against 2.57-2.67 m (n=3), medians 2.57 and 2.58 m, a 0.4% difference on a 7-building sample spanning the two top classes. Pedestrian doors are 1.61-1.91 m in Deuxieme (n=8) and 1.36 m in both Troisieme buildings. Troisieme Classe has NO carriage door in this corpus and Premiere has no pedestrian door. The apparent door-width class ladder is therefore entirely a ladder of ENTITLEMENT (does the house get a carriage entrance?) and not of scaling."
+  },
+  "absolute_vs_proportional": {
+    "ABSOLUTE_calibrate_as_constants": [
+      {
+        "quantity": "carriage door clear width",
+        "value_m": 2.58,
+        "range_m": [
+          2.41,
+          2.67
+        ],
+        "n": 7,
+        "evidence": "spans Premiere and Deuxieme; one value printed",
+        "recommendation": "SOURCED"
+      },
+      {
+        "quantity": "pedestrian door clear width",
+        "value_m": 1.75,
+        "range_m": [
+          1.61,
+          1.91
+        ],
+        "n": 8,
+        "evidence": "Deuxieme only; two values printed (1.760, 1.630)",
+        "recommendation": "SOURCED for Deuxieme",
+        "caveat": "Troisieme pedestrian doors are 1.36 m on both buildings - narrower than any Deuxieme door. n=2, so WEAK, but the gap is 0.25 m and consistent."
+      },
+      {
+        "quantity": "window opening width",
+        "value_m": 1.2,
+        "range_m": [
+          1.04,
+          1.3
+        ],
+        "n": 16,
+        "evidence": "all three classes; one printed callout plus one reading on a printed-scale plate",
+        "recommendation": "SOURCED"
+      },
+      {
+        "quantity": "balcony garde-corps height",
+        "value_m": 1.0,
+        "range_m": [
+          0.87,
+          1.07
+        ],
+        "n": 4,
+        "evidence": "two classes",
+        "recommendation": "WEAK"
+      },
+      {
+        "quantity": "balcony projection from wall face",
+        "value_m": 0.595,
+        "range_m": [
+          0.59,
+          0.6
+        ],
+        "n": 2,
+        "evidence": "BOTH PRINTED, two different buildings",
+        "recommendation": "SOURCED as a value, WEAK as a distribution"
+      },
+      {
+        "quantity": "floor structure thickness (plancher)",
+        "value_m": 0.3,
+        "range_m": [
+          0.3,
+          0.3
+        ],
+        "n": 2,
+        "evidence": "printed '30' repeated on the 125 Champs-Elysees ladder; printed '0.300' at 9 Conservatoire",
+        "recommendation": "SOURCED"
+      },
+      {
+        "quantity": "rez-de-chaussee floor-to-floor",
+        "value_m": 3.95,
+        "range_m": [
+          3.42,
+          4.85
+        ],
+        "n": 16,
+        "evidence": "class ladder is only 9% end to end and ranges overlap",
+        "recommendation": "SOURCED as class-independent"
+      },
+      {
+        "quantity": "bay pitch",
+        "value_m": 2.8,
+        "range_m": [
+          2.09,
+          3.49
+        ],
+        "n": 16,
+        "evidence": "no class ladder; within-class spread 1.5x",
+        "recommendation": "SOURCED as a corpus-wide distribution, INSUFFICIENT as a class discriminator"
+      }
+    ],
+    "PROPORTIONAL_scale_with_class": [
+      {
+        "quantity": "piano nobile storey height",
+        "medians_m": [
+          4.23,
+          3.83,
+          3.04
+        ],
+        "ratio_prem_over_trois": 1.39,
+        "recommendation": "SOURCED for ordering, WEAK for Premiere and Troisieme values"
+      },
+      {
+        "quantity": "window opening height at the nobile",
+        "medians_m": [
+          2.92,
+          2.24,
+          2.09
+        ],
+        "ratio": 1.4,
+        "recommendation": "SOURCED for ordering"
+      },
+      {
+        "quantity": "opening aspect at the nobile",
+        "medians": [
+          2.49,
+          2.04,
+          1.95
+        ],
+        "recommendation": "SOURCED for ordering, WEAK for the Deuxieme-Troisieme step"
+      },
+      {
+        "quantity": "cornice height above pavement",
+        "medians_m": [
+          19.11,
+          18.9,
+          15.79
+        ],
+        "recommendation": "SOURCED only for the drop to Troisieme; the Premiere/Deuxieme pair is flat because both are pinned to the 20 m legal maximum"
+      },
+      {
+        "quantity": "facade width",
+        "medians_m": [
+          17.05,
+          15.61,
+          10.42
+        ],
+        "recommendation": "WEAK"
+      },
+      {
+        "quantity": "presence of an entresol / of a compressed level below the nobile",
+        "recommendation": "SOURCED as a categorical class marker"
+      },
+      {
+        "quantity": "presence of a carriage entrance",
+        "recommendation": "SOURCED as a categorical class marker"
+      },
+      {
+        "quantity": "presence of projecting balconies",
+        "recommendation": "WEAK as a categorical class marker"
+      }
+    ],
+    "headline": "Everything a body touches is absolute and everything a body looks at is proportional. Door width, window width, garde-corps height, balcony projection and floor thickness do not move with class. Storey height above the ground floor, window HEIGHT, opening slenderness and overall facade height do. The window is the cleanest single demonstration: its width varies 1.25x across 16 buildings spanning the whole social range, while its height at the noble floor varies 1.40x between Premiere and Troisieme alone."
+  },
+  "limits": {
+    "sample_size": "4 / 10 / 2 buildings. Any Troisieme claim rests on two elevations by two architects; most are marked WEAK for that reason alone.",
+    "premiere_is_thinner_than_it_looks": "Of the 4 Premiere buildings, only 125 Champs-Elysees has a printed storey ladder. The other three are source-flagged UNCERTAIN (rue de la Paix: no drawn floor lines), internally contradictory (119 Champs-Elysees), or had their storey heights deliberately withheld (Avenue de l'Imperatrice). Premiere storey-height medians therefore rest on effectively one solid building plus three inferences.",
+    "publication_bias": "These are plates a luxury architectural journal chose to publish as exemplars, with named architects. They are biased toward the grander, more expensively designed and better-built end of each class. Nothing here describes the median Paris building of 1864, and the Troisieme Classe examples in particular are model tenements, not ordinary ones.",
+    "single_date": "Every plate is 1864. No evidence at all about drift over the 1850-1914 span; the 20 m cornice ceiling that flattens the Premiere/Deuxieme difference is the 1859 decree, and would move under the 1884 and 1902 rules.",
+    "geographic_concentration": "7 of the 17 buildings are on the boulevard de Sebastopol or the rue de Rivoli - one Haussmann corridor built to one set of frontage conditions. Treat the Sebastopol group as a cluster, not as 7 independent samples.",
+    "measurement_error": "Printed callouts are exact. Scale-bar readings carry ~0.3% from the bar itself but 5-20% from datum ambiguity - see meta.duplicate_reading_error. The worst documented case is a 15% width error at 119 Champs-Elysees, caught only because a printed value existed to check it against. Assume any un-printed width in this file could be 10% wrong and any storey height 0.2-0.4 m wrong.",
+    "labelling_is_not_stable": "The same physical band was called a low 1er etage by one reader and an entresol by another on the same plate. Storey ROLE assignments in this file are interpretations, not measurements.",
+    "derived_quantities_are_worse": "Comble share, taper ratios and cornice-band depth are all differences of two uncertain datums, so they carry the sum of two errors. That is why they are the quantities marked INSUFFICIENT."
+  },
+  "do_not_calibrate_on": [
+    "comble_share - non-monotonic, 2.4x within-class spread, and the comble is a type choice not a proportion",
+    "cornice_band_depth - zero Premiere observations, half the Deuxieme values source-flagged uncertain, and the Troisieme value inverts the expected ladder",
+    "opening_aspect_uppers - non-monotonic across the classes and dominated by within-building variation",
+    "taper_first_etage_over_ground - inverts; the naive ratio a generator would reach for",
+    "balcony_height_above_pavement in Premiere (n=2, different storeys) or Troisieme (n=1)",
+    "the 7.30 m porte cochere height at Avenue de l'Imperatrice - a two-storey arch, not a door",
+    "any Troisieme Classe absolute value as a distribution - use the two values for ORDERING only",
+    "bay pitch as a class discriminator - it is flat, and 9 rue du Conservatoire (2.09 m) is unrepresentative even within its own class",
+    "storey heights at 3 rue de la Paix, 119 Champs-Elysees and Avenue de l'Imperatrice as if they were measurements"
+  ],
+  "recommendation_summary": {
+    "SOURCED": [
+      "door width by door TYPE",
+      "window opening width",
+      "rez-de-chaussee storey height (as class-independent)",
+      "presence of entresol / compressed level",
+      "piano nobile height ORDERING",
+      "window nobile height ORDERING",
+      "Deuxieme Classe storey-height distribution",
+      "Deuxieme entresol/ground ratio 0.775",
+      "floor structure thickness 0.30 m",
+      "balcony projection ~0.60 m",
+      "cornice height ceiling at 20 m"
+    ],
+    "WEAK": [
+      "storey taper ratio (use for ordering only)",
+      "facade width ladder",
+      "door height",
+      "balcony garde-corps height (n=4)",
+      "all Premiere storey-height values",
+      "all Troisieme values",
+      "opening aspect at the nobile, Deuxieme-to-Troisieme step"
+    ],
+    "INSUFFICIENT": [
+      "comble share",
+      "cornice band depth",
+      "opening aspect at upper storeys",
+      "entresol opening aspect",
+      "balcony height above pavement outside Deuxieme",
+      "bay pitch as a function of class"
+    ]
+  }
+}

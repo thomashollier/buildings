@@ -1,0 +1,1254 @@
+{
+  "group": "Dimensioned details",
+  "source": "César Daly, L'Architecture privée au XIXme siècle sous Napoléon III, Série 1, Vol. 1 t.2 (1864) — detail plates, Polona scans, 1920 px wide",
+  "method_note": "Scale established per plate. Where a graduated scale bar exists its decimetre/metre graduations were located and px/m computed. Where only the textual scale ('Échelle de 0.05 c.m pour mètre') exists, px/m was recovered from printed dimension callouts on the same plate (tick-to-tick pixel span / printed metres). Cross-check: the scanned sheets reproduce at a constant ~56.9 px per cm of paper for portrait plates (1920x~2570) and ~42.7 px/cm for landscape plates (1920x~1430); every scale bar measured on this group agreed with that within 2%. Printed callouts are always preferred over pixel measurement.",
+  "plates": [
+    {
+      "file": "images/daly-1864/daly_detail_04_champs-elysees-125.jpg",
+      "readable": true,
+      "daly_class": "Première Classe",
+      "address": "Avenue des Champs-Élysées, No 125",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "No graduated bar; text 'Échelle de 0.05 cm pr met.' Landscape plate. px/m = 217.4 recovered from the printed 1.260 m callout on the right-hand vertical ladder (tick y=962.6 to y=688.7 = 273.9 px). Predicted from sheet resolution 213.5 — agreement 1.8%.",
+      "absolute_m": [
+        {
+          "what": "porte-cochère passage: dado/lambris height (lower segment of right-hand vertical chain)",
+          "value_m": 1.26,
+          "kind": "MEASURED",
+          "how": "printed callout '1.260' on the right dimension ladder"
+        },
+        {
+          "what": "porte-cochère passage: wall height above the dado (next chain segment)",
+          "value_m": 1.82,
+          "kind": "MEASURED",
+          "how": "printed callout '1.820', continuous with the 1.260 above"
+        },
+        {
+          "what": "porte-cochère passage: floor to top of that chain (1.260+1.820)",
+          "value_m": 3.08,
+          "kind": "DERIVED",
+          "how": "sum of two printed callouts"
+        },
+        {
+          "what": "vestibule door (interior, at the end of the passage): leaf-pair width",
+          "value_m": 0.99,
+          "kind": "UNCERTAIN",
+          "how": "215 px / 217.4 px/m; interior door, edges hard to separate from the architrave"
+        },
+        {
+          "what": "vestibule door: height from passage floor to head",
+          "value_m": 2.5,
+          "kind": "UNCERTAIN",
+          "how": "542.6 px / 217.4 px/m, using the chain datum y=962.6 as floor"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "vestibule door h/w",
+          "value": 2.53,
+          "how": "2.50 / 0.99, both UNCERTAIN"
+        }
+      ],
+      "notes": "This plate is the INTERIOR elevation and plan of the porte-cochère passage, not the street facade. It yields no facade door or window dimension. Low value for the generator; included for completeness."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_05_champs-elysees-119.jpg",
+      "readable": true,
+      "daly_class": "Première Classe",
+      "address": "No 119, Avenue des Champs-Élysées (arch. H. Blondel)",
+      "has_entresol": false,
+      "storey_count": 2,
+      "scale_note": "Text scale 'Échelle de 0.025 mm pour Mètre', portrait plate. px/m = 143.8 confirmed against three printed plan callouts (0.625 -> 143.2; 1.765 -> 144.4; 2.600 -> 143.4).",
+      "absolute_m": [
+        {
+          "what": "porte cochère: clear opening width (plan)",
+          "value_m": 2.6,
+          "kind": "MEASURED",
+          "how": "printed callout '2.600' in the horizontal section/plan under the elevation; ticks at x=830.9 and x=1203.8"
+        },
+        {
+          "what": "masonry pier / jamb block beside the porte cochère (plan)",
+          "value_m": 1.765,
+          "kind": "MEASURED",
+          "how": "printed callout '1.765', adjacent chain segment"
+        },
+        {
+          "what": "outer jamb reveal (plan)",
+          "value_m": 0.625,
+          "kind": "MEASURED",
+          "how": "printed callout '0.625', first chain segment"
+        },
+        {
+          "what": "porte cochère: opening height, threshold to crown of segmental arch",
+          "value_m": 3.49,
+          "kind": "MEASURED",
+          "how": "500 px / 143.8 px/m (threshold y=1817, arch crown y=1317)"
+        },
+        {
+          "what": "ground storey height, pavement to top of the ground-floor cornice",
+          "value_m": 4.01,
+          "kind": "UNCERTAIN",
+          "how": "575 px / 143.8; cornice line read at y=1242"
+        },
+        {
+          "what": "storey above (1er étage), cornice to cornice",
+          "value_m": 3.6,
+          "kind": "UNCERTAIN",
+          "how": "516 px / 143.8; upper cornice read at y=726"
+        },
+        {
+          "what": "balcony railing height above balcony floor (2e étage balcony at top of plate)",
+          "value_m": 1.07,
+          "kind": "UNCERTAIN",
+          "how": "154 px / 143.8; rail top y=556, balcony floor y=710"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "porte cochère h/w (using printed width)",
+          "value": 1.34,
+          "how": "3.49 / 2.600"
+        },
+        {
+          "what": "porte cochère h/w (both measured)",
+          "value": 1.29,
+          "how": "3.49 / 2.706 measured opening incl. reveal"
+        },
+        {
+          "what": "storey taper, 1er étage / ground",
+          "value": 0.9,
+          "how": "3.60 / 4.01, both UNCERTAIN"
+        },
+        {
+          "what": "door width / pier+door module",
+          "value": 0.6,
+          "how": "2.600 / (1.765 + 2.600) from printed plan chain"
+        }
+      ],
+      "notes": "Première Classe carriage entrance. The 2.600 m clear width is a strong, printed ABSOLUTE for a Première Classe porte cochère; contrast with the 1.63–1.76 m simple portes d'entrée of the Deuxième Classe plates. Same building as plate 78."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_06_rue-de-rivoli-88.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "Rue de Rivoli, No 88 (arch. Rolland)",
+      "has_entresol": false,
+      "storey_count": 2,
+      "scale_note": "Graduated 'Échelle de l'Ensemble à 0.025 mil pour mètre' bar read directly: 1 m = 482 displayed px in a 6x crop -> px/m = 144.6. (A second 'Échelle des Détails à 0.10' bar governs the profile sections at left and right, not used here.)",
+      "absolute_m": [
+        {
+          "what": "porte d'entrée: masonry opening width",
+          "value_m": 2.61,
+          "kind": "MEASURED",
+          "how": "378 px / 144.6 px/m (opening x=729 to x=1107) — scale-bar measurement, no printed width on this plate"
+        },
+        {
+          "what": "porte d'entrée: opening height, threshold to crown of segmental arch",
+          "value_m": 3.82,
+          "kind": "MEASURED",
+          "how": "553 px / 144.6 (threshold y=1855, arch crown y=1302)"
+        },
+        {
+          "what": "croisée du 1er étage directly above the door: opening width",
+          "value_m": 1.69,
+          "kind": "MEASURED",
+          "how": "244 px / 144.6 (x=798 to x=1042)"
+        },
+        {
+          "what": "croisée du 1er étage above the door: opening height",
+          "value_m": 2.7,
+          "kind": "MEASURED",
+          "how": "391 px / 144.6 (crown y=756, sill y=1147)"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "porte d'entrée h/w",
+          "value": 1.46,
+          "how": "3.82 / 2.61"
+        },
+        {
+          "what": "croisée above door, opening h/w",
+          "value": 1.6,
+          "how": "2.70 / 1.69"
+        },
+        {
+          "what": "door width / window width in the same bay",
+          "value": 1.54,
+          "how": "2.61 / 1.69"
+        }
+      ],
+      "notes": "The window over the entrance bay is a wide 'special' croisée, not a typical one — compare plate 30 (same building) where a normal bay window measures 1.22 m. Do not take 1.69 m as the generic croisée width for this building."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_07_blvd-sebastopol-63-porte.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 63, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — duplicate subject with plate 31 (same door, No 63 Sébastopol); time budget spent on plates with distinct buildings.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_08_blvd-sebastopol-87-porte.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 87, Boulevart de Sébastopol",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "Graduated bar, 10 décimètres + 1 mètre, both segments 812 displayed px in a 6x crop -> px/m = 284. Independently confirmed: the door leaf width measures 512 px = 1.80 m against the printed 1.760 m of the companion plate 82 (2% agreement).",
+      "absolute_m": [
+        {
+          "what": "porte d'entrée: door-leaf pair width (measured on elevation)",
+          "value_m": 1.8,
+          "kind": "MEASURED",
+          "how": "512.4 px / 284 px/m; printed value on companion plate 82 is 1.760 — prefer 1.760"
+        },
+        {
+          "what": "porte d'entrée: full opening height, threshold to crown of the arched head (leaves + carved tympanum + fanlight)",
+          "value_m": 5.07,
+          "kind": "MEASURED",
+          "how": "1439 px / 284 (threshold y=2107.7, arch soffit crown y=668.5)"
+        },
+        {
+          "what": "porte d'entrée: height of the timber leaves alone",
+          "value_m": 3.25,
+          "kind": "MEASURED",
+          "how": "922 px / 284 (leaf top y=1185)"
+        },
+        {
+          "what": "carved tympanum panel above the leaves",
+          "value_m": 0.57,
+          "kind": "UNCERTAIN",
+          "how": "161 px / 284"
+        },
+        {
+          "what": "arched ironwork fanlight above the tympanum",
+          "value_m": 1.19,
+          "kind": "UNCERTAIN",
+          "how": "339 px / 284"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "full door opening h/w",
+          "value": 2.88,
+          "how": "5.07 / 1.760 (printed width)"
+        },
+        {
+          "what": "door leaf h/w",
+          "value": 1.85,
+          "how": "3.25 / 1.760"
+        },
+        {
+          "what": "leaf height / full opening height",
+          "value": 0.64,
+          "how": "3.25 / 5.07"
+        }
+      ],
+      "notes": "Elevation companion to plate 82 (which carries the printed plan width 1.760). The opening runs through the full ground storey and into the entresol level — the fanlight is at entresol height. This tall-narrow porte d'entrée profile (h/w ~2.9) recurs at No 2-4 Sébastopol (plate 56, h/w 2.87)."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_09_rue-du-conservatoire-9.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 9, Rue du Conservatoire (arch. Amoudru)",
+      "has_entresol": false,
+      "storey_count": 2,
+      "scale_note": "Graduated bar ('Échelle de 0.05 cent pr mètre'): 10d->0 = 858 displayed px, 0->1 Mètre = 887, mean 872 in a 6x crop -> px/m = 283.4. Confirmed by the right-hand ladder: printed 0.300 spans 84.5 px (282) and printed 2.100 spans 603.9 px (287.6). Working value 285.",
+      "absolute_m": [
+        {
+          "what": "croisée du 2me étage: opening height",
+          "value_m": 2.1,
+          "kind": "MEASURED",
+          "how": "printed callout '2.100' on the 'Coupe sur l'axe d'une Croisée' ladder; ticks at y=2057.6 (appui/floor) and y=1453.7 (lintel)"
+        },
+        {
+          "what": "croisée du 3me étage: opening height",
+          "value_m": 1.8,
+          "kind": "MEASURED",
+          "how": "printed callout '1.800'; ticks at y=1221.9 (sill) and y=700.6 (lintel)"
+        },
+        {
+          "what": "allège / spandrel between the 2me lintel and the 3me sill",
+          "value_m": 0.8,
+          "kind": "MEASURED",
+          "how": "printed callout '0.800' between the same two ticks"
+        },
+        {
+          "what": "floor construction / plinth below the 2me étage appui",
+          "value_m": 0.3,
+          "kind": "MEASURED",
+          "how": "printed callout '0.300', lowest segment of the same chain"
+        },
+        {
+          "what": "croisée opening width (both storeys, identical)",
+          "value_m": 1.25,
+          "kind": "MEASURED",
+          "how": "357 px / 285 px/m (opening x=730 to x=1087)"
+        },
+        {
+          "what": "2me étage storey height (sill to sill = 2.100 + 0.800)",
+          "value_m": 2.9,
+          "kind": "DERIVED",
+          "how": "sum of two printed callouts"
+        },
+        {
+          "what": "balcony garde-corps height above the balcony floor (2me étage)",
+          "value_m": 0.87,
+          "kind": "UNCERTAIN",
+          "how": "247 px / 285; rail top y=1753, balcony floor y=2000"
+        },
+        {
+          "what": "trumeau (clear masonry pier) between adjacent croisées",
+          "value_m": 0.55,
+          "kind": "UNCERTAIN",
+          "how": "157 px / 285 (x=1087 to x=1244)"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "window height taper, 3me / 2me étage",
+          "value": 0.857,
+          "how": "1.800 / 2.100 — BOTH PRINTED, so this ratio is independent of any scale error. The single most robust taper number in this group."
+        },
+        {
+          "what": "croisée opening h/w, 2me étage",
+          "value": 1.68,
+          "how": "2.100 (printed) / 1.25 (measured)"
+        },
+        {
+          "what": "croisée opening h/w, 3me étage",
+          "value": 1.44,
+          "how": "1.800 (printed) / 1.25 (measured)"
+        },
+        {
+          "what": "window height / storey height, 2me étage",
+          "value": 0.724,
+          "how": "2.100 / 2.900, both from printed callouts"
+        },
+        {
+          "what": "allège / storey height",
+          "value": 0.276,
+          "how": "0.800 / 2.900, both printed"
+        }
+      ],
+      "notes": "The 'croisées du milieu' of this facade are grouped with unusually narrow piers (~0.55 m clear), so the bay pitch here (~1.8 m) is NOT representative of a normal Paris bay and should not be used for bay-pitch calibration. The vertical chain, by contrast, is fully printed and excellent."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_10_rue-du-conservatoire-9b.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 9, Rue du Conservatoire",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — companion to plate 09 (side-bay croisées of the same house); plate 09's printed vertical chain already captured for this building.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_28_champs-elysees-119-menuiseries.jpg",
+      "readable": false,
+      "daly_class": "Première Classe",
+      "address": "No 119, Avenue des Champs-Élysées",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — joinery (menuiserie) details of No 119 CE; the facade dimensions for this building were taken from plates 05 and 78.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_30_rue-de-rivoli-88-facade.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "Rue de Rivoli, No 88 (arch. Rolland) — 'Travée à côté des pans coupés'",
+      "has_entresol": false,
+      "storey_count": 3,
+      "scale_note": "Graduated 'Échelle de l'Ensemble à 0.025' bar: 1 m = 395 displayed px in a 5x crop -> px/m = 143.8. Cross-checked against printed callouts on the right-hand section (0.720 -> 145.8; 0.304 -> 147). Working value 145.",
+      "absolute_m": [
+        {
+          "what": "storey height, cornice to cornice (middle storey of the three shown)",
+          "value_m": 4.05,
+          "kind": "MEASURED",
+          "how": "587 px / 145 (cornice lines at y=1013 and y=1600)"
+        },
+        {
+          "what": "storey height, upper storey (top cornice to next cornice down)",
+          "value_m": 3.02,
+          "kind": "UNCERTAIN",
+          "how": "438 px / 145 (y=575 to y=1013); the upper 'cornice' may be the main crowning entablature, so this may be an attic storey rather than a full one"
+        },
+        {
+          "what": "bay (travée) width between the flanking pilaster strips",
+          "value_m": 3.45,
+          "kind": "UNCERTAIN",
+          "how": "~500 px / 145; edges of the travée are chamfer-adjacent and not crisply bounded"
+        },
+        {
+          "what": "lower storey croisée: opening width",
+          "value_m": 1.22,
+          "kind": "MEASURED",
+          "how": "177 px / 145 (opening x=758 to x=935)"
+        },
+        {
+          "what": "middle storey croisée: opening width",
+          "value_m": 0.79,
+          "kind": "UNCERTAIN",
+          "how": "114 px / 145 (x=778 to x=892). This is an outlier — half the lower window. I could not resolve whether I read the sash rather than the masonry opening. Treat as unreliable."
+        },
+        {
+          "what": "middle storey croisée: opening height (arch crown to sill)",
+          "value_m": 1.35,
+          "kind": "UNCERTAIN",
+          "how": "195 px / 145 (y=1222 to y=1417)"
+        },
+        {
+          "what": "printed callout on the right-hand section, lowest segment",
+          "value_m": 2.0,
+          "kind": "MEASURED",
+          "how": "printed '2.000'; its lower tick falls below the crop so I could not attach it to a facade feature"
+        },
+        {
+          "what": "printed callout, next segment up",
+          "value_m": 0.72,
+          "kind": "MEASURED",
+          "how": "printed '0.720', ticks y=1688 to y=1583"
+        },
+        {
+          "what": "printed callout, next segment up",
+          "value_m": 0.304,
+          "kind": "MEASURED",
+          "how": "printed '0.304', ticks y=1583 to y=1538.3"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "storey taper, upper / middle",
+          "value": 0.75,
+          "how": "3.02 / 4.05 — UNCERTAIN because the upper reference may be the crowning cornice"
+        },
+        {
+          "what": "middle croisée opening h/w",
+          "value": 1.71,
+          "how": "1.35 / 0.79, both UNCERTAIN"
+        },
+        {
+          "what": "lower croisée width / bay width",
+          "value": 0.354,
+          "how": "1.22 / 3.45"
+        }
+      ],
+      "notes": "This is the bay adjacent to the chamfered corner (pan coupé), which in Rivoli-type blocks is often narrower and differently fenestrated than the standard bay. Use the 4.05 m storey height with moderate confidence; treat the window numbers with caution."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_31_sebastopol-63-porte.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 63, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — No 63 Sébastopol entrance door; no plate for this building was reached within the time budget. This is the most significant gap: it would add a fourth Deuxième Classe door width.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_32_sebastopol-63-facade.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 63, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — moulding profile of a window pediment, No 63 Sébastopol.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_33_sebastopol-63-croisees.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 63, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — 2e/3e étage croisée surrounds, No 63 Sébastopol. Would have given a second printed storey-taper chain; worth revisiting.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_39_sebastopol-77-porte.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 77, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — entrance lintel/cornice ornament only, No 77 Sébastopol; moulding profile rather than opening dimensions.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_54_champs-elysees-119-porte-cochere.jpg",
+      "readable": false,
+      "daly_class": "Première Classe",
+      "address": "No 119, Avenue des Champs-Élysées",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — porte cochère PASSAGE interior elevation (like plate 04), not the street opening.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_55_boulevard-sebastopol-63-porte.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 63, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — door joinery (handles, battement, horizontal sections) at large scale; component rather than opening dimensions.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_56_boulevard-sebastopol-3-4-porte-entree.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "Nos 2 et 4, Boulevart de Sébastopol — 'Porte de l'Entrée No 4' (arch. Davioud)",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "Text scale 'Échelle de l'Ensemble et des Fig 1 à 3-4 à 0.05 mm pr mètre', portrait plate. px/m = 284.9 recovered from the printed 0.700 callout on the right ladder (ticks y=1171 to y=971.6 = 199.4 px). Matches the 284.5 predicted from sheet resolution to 0.1%.",
+      "absolute_m": [
+        {
+          "what": "porte d'entrée: height of the timber leaves, pavement to top of leaves",
+          "value_m": 2.95,
+          "kind": "MEASURED",
+          "how": "printed callout '2.950'; runs from the pavement datum y=2011.5 to y=1171"
+        },
+        {
+          "what": "carved 'dessus de porte' frieze panel above the leaves",
+          "value_m": 0.7,
+          "kind": "MEASURED",
+          "how": "printed callout '0.700', ticks y=1171 to y=971.6"
+        },
+        {
+          "what": "glazed imposte above the frieze panel",
+          "value_m": 1.36,
+          "kind": "MEASURED",
+          "how": "printed callout '1.360', continuing the same chain upward"
+        },
+        {
+          "what": "porte d'entrée: total opening height (2.950 + 0.700 + 1.360)",
+          "value_m": 5.01,
+          "kind": "DERIVED",
+          "how": "sum of three printed callouts"
+        },
+        {
+          "what": "porte d'entrée: door-leaf pair width",
+          "value_m": 1.74,
+          "kind": "MEASURED",
+          "how": "496.5 px / 284.9 px/m (leaves x=614.5 to x=1111); no printed width on this plate"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "full door opening h/w",
+          "value": 2.87,
+          "how": "5.010 (printed sum) / 1.743 (measured)"
+        },
+        {
+          "what": "door leaf h/w",
+          "value": 1.69,
+          "how": "2.950 (printed) / 1.743 (measured)"
+        },
+        {
+          "what": "leaf height / total opening height",
+          "value": 0.589,
+          "how": "2.950 / 5.010, both printed — scale-independent"
+        },
+        {
+          "what": "imposte height / total opening height",
+          "value": 0.271,
+          "how": "1.360 / 5.010, both printed — scale-independent"
+        },
+        {
+          "what": "frieze panel height / total opening height",
+          "value": 0.14,
+          "how": "0.700 / 5.010, both printed — scale-independent"
+        }
+      ],
+      "notes": "The best-dimensioned door in this group: the whole vertical composition of the entrance is printed. The three scale-independent fractions (0.589 / 0.140 / 0.271) are directly usable for a procedural door. Independently corroborated by plate 08 (No 87 Sébastopol): total h/w 2.88 vs 2.87 here."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_57_boulevard-sebastopol-120-facade.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 120, Boulevart de Sébastopol (arch. Levicomte)",
+      "has_entresol": true,
+      "storey_count": 2,
+      "scale_note": "Graduated 'Échelle de l'Ensemble 0.025 cm pr mètre' bar: three consecutive metre intervals of 553/540/540 displayed px in a 7x crop -> px/m = 140.4. Separate 'Échelle des Détails 0.10 cent pour mètre' governs the console/handle details; px/m = 551 recovered there from the printed 0.200 callout.",
+      "absolute_m": [
+        {
+          "what": "porte d'entrée: opening width",
+          "value_m": 1.61,
+          "kind": "MEASURED",
+          "how": "225.5 px / 140.4 px/m (opening x=766.5 to x=992)"
+        },
+        {
+          "what": "porte d'entrée: opening height, pavement to lintel",
+          "value_m": 3.35,
+          "kind": "MEASURED",
+          "how": "470 px / 140.4 (pavement y=2010, lintel y=1540)"
+        },
+        {
+          "what": "croisée de l'entre-sol: opening width",
+          "value_m": 1.6,
+          "kind": "MEASURED",
+          "how": "224 px / 140.4 (x=774.5 to x=998.7)"
+        },
+        {
+          "what": "croisée de l'entre-sol: opening height",
+          "value_m": 1.97,
+          "kind": "MEASURED",
+          "how": "277 px / 140.4 (arched head y=1118, sill y=1395)"
+        },
+        {
+          "what": "ground storey height, pavement to entresol floor line",
+          "value_m": 3.99,
+          "kind": "UNCERTAIN",
+          "how": "560 px / 140.4 (pavement y=2010, ground-floor cornice band read at y=1450)"
+        },
+        {
+          "what": "entresol storey height, entresol floor to 1er étage balcony floor",
+          "value_m": 2.85,
+          "kind": "UNCERTAIN",
+          "how": "400 px / 140.4 (y=1450 to y=1050)"
+        },
+        {
+          "what": "1er étage balcony floor height above pavement",
+          "value_m": 6.85,
+          "kind": "UNCERTAIN",
+          "how": "962 px / 140.4 (y=2010 to y=1048)"
+        },
+        {
+          "what": "balcony railing (garde-corps) height above balcony floor",
+          "value_m": 1.03,
+          "kind": "MEASURED",
+          "how": "145 px / 140.4 (rail top y=900, balcony floor y=1045)"
+        },
+        {
+          "what": "entresol window sill height above the entresol floor line",
+          "value_m": 0.39,
+          "kind": "UNCERTAIN",
+          "how": "55 px / 140.4"
+        },
+        {
+          "what": "balcony console (bracket) projection from the wall face",
+          "value_m": 0.59,
+          "kind": "MEASURED",
+          "how": "printed callout '0.590' on the 'Consoles du Balcon' detail (details scale); the adjoining printed '0.200' is the wall bed behind it"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "entresol storey / ground storey",
+          "value": 0.714,
+          "how": "2.85 / 3.99 — direct evidence for an entresol-height constant"
+        },
+        {
+          "what": "porte d'entrée h/w",
+          "value": 2.08,
+          "how": "3.35 / 1.606"
+        },
+        {
+          "what": "entresol croisée opening h/w",
+          "value": 1.23,
+          "how": "1.97 / 1.60 — the classic squat entresol opening"
+        },
+        {
+          "what": "entresol window width / door width",
+          "value": 0.995,
+          "how": "1.60 / 1.606 — door and entresol window are the same width in this bay"
+        },
+        {
+          "what": "balcony rail height / storey height (entresol)",
+          "value": 0.361,
+          "how": "1.03 / 2.85"
+        },
+        {
+          "what": "console projection / balcony rail height",
+          "value": 0.573,
+          "how": "0.590 / 1.03"
+        }
+      ],
+      "notes": "The single most useful plate in this group for entresol proportions: door, entresol window, entresol/ground storey split and balcony rail all in one dimensioned bay. Note this door (1.61 x 3.35, h/w 2.08) has no imposte fanlight, unlike Nos 87 and 2-4 Sébastopol."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_58_rue-neuve-des-mathurins-39-facade-a.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 39, Rue Neuve des Mathurins",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — window and porte-cochère crown mouldings only, No 39 Rue Neuve des Mathurins.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_59_rue-neuve-des-mathurins-39-facade-b.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 39, Rue Neuve des Mathurins",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — crowning cornice, 2e étage window crown and chimney head profiles. Would have given a main-cornice height; worth revisiting.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_60_boulevard-sebastopol-77-facade.jpg",
+      "readable": false,
+      "daly_class": "Deuxième Classe",
+      "address": "No 77, Boulevart de Sébastopol",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — 1er étage window crown with carved panel, mullion and trumeau sections, No 77 Sébastopol.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_77_champs-elysees-125-cariatides.jpg",
+      "readable": false,
+      "daly_class": "Première Classe",
+      "address": "No 125, Avenue des Champs-Élysées",
+      "scale_note": "not established — plate not opened for measurement",
+      "notes": "Not measured — sculpted atlantes/console detail at large scale, No 125 CE; the printed callouts (0.760, 0.700, 0.680, 0.37x) are console profile dimensions.",
+      "absolute_m": [],
+      "ratios": []
+    },
+    {
+      "file": "images/daly-1864/daly_detail_78_champs-elysees-119-facade.jpg",
+      "readable": true,
+      "daly_class": "Première Classe",
+      "address": "No 119, Avenue des Champs-Élysées (arch. H. Blondel) — 'Croisées des Étages'",
+      "has_entresol": false,
+      "storey_count": 3,
+      "scale_note": "Graduated bar ('Échelle de 0.025 m pr mètre'): 0->1, 1->2, 2->3 Mètres each 405 displayed px in a 6x crop -> px/m = 141.75. Predicted from sheet resolution 142.3.",
+      "absolute_m": [
+        {
+          "what": "1er étage croisée: opening width",
+          "value_m": 1.33,
+          "kind": "MEASURED",
+          "how": "189 px / 141.8"
+        },
+        {
+          "what": "1er étage croisée (porte-fenêtre): opening height incl. panelled apron",
+          "value_m": 2.86,
+          "kind": "MEASURED",
+          "how": "405 px / 141.8 (head y=1630, base y=2035)"
+        },
+        {
+          "what": "2e étage croisée: opening width",
+          "value_m": 1.35,
+          "kind": "MEASURED",
+          "how": "191 px / 141.8 (x=567 to x=758); cross-checked on the right-hand bay as 1.36"
+        },
+        {
+          "what": "2e étage croisée: opening height",
+          "value_m": 2.55,
+          "kind": "MEASURED",
+          "how": "361 px / 141.8 (head y=1108, sill y=1469)"
+        },
+        {
+          "what": "3e étage croisée: opening width",
+          "value_m": 1.33,
+          "kind": "MEASURED",
+          "how": "189 px / 141.8 (x=567 to x=756)"
+        },
+        {
+          "what": "3e étage croisée: opening height",
+          "value_m": 2.43,
+          "kind": "MEASURED",
+          "how": "344 px / 141.8 (head y=586, sill y=930)"
+        },
+        {
+          "what": "bay pitch (window centre to window centre)",
+          "value_m": 3.79,
+          "kind": "MEASURED",
+          "how": "537 px / 141.8 (centres x=666.5 and x=1203.5)"
+        },
+        {
+          "what": "1er étage storey height, 1er sill to 2e sill",
+          "value_m": 3.99,
+          "kind": "MEASURED",
+          "how": "566 px / 141.8 (sills y=2035 and y=1469)"
+        },
+        {
+          "what": "2e étage storey height, 2e sill to 3e sill",
+          "value_m": 3.8,
+          "kind": "MEASURED",
+          "how": "539 px / 141.8 (sills y=1469 and y=930)"
+        },
+        {
+          "what": "printed callout on the right-hand vertical ladder (unassigned)",
+          "value_m": 2.12,
+          "kind": "MEASURED",
+          "how": "printed '2.120'; I could not confidently attach it to a facade feature, so it is recorded but not interpreted"
+        },
+        {
+          "what": "second printed callout on the right-hand ladder (unassigned)",
+          "value_m": 2.2,
+          "kind": "MEASURED",
+          "how": "printed '2.200'; likewise unassigned"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "storey taper, 2e étage / 1er étage (sill-to-sill)",
+          "value": 0.952,
+          "how": "539 px / 566 px — pure pixel ratio, independent of scale-bar error"
+        },
+        {
+          "what": "window height taper, 2e / 1er",
+          "value": 0.891,
+          "how": "361 px / 405 px, pure pixel ratio"
+        },
+        {
+          "what": "window height taper, 3e / 2e",
+          "value": 0.953,
+          "how": "344 px / 361 px, pure pixel ratio"
+        },
+        {
+          "what": "opening h/w, 1er étage",
+          "value": 2.14,
+          "how": "405 / 189 px"
+        },
+        {
+          "what": "opening h/w, 2e étage",
+          "value": 1.89,
+          "how": "361 / 191 px"
+        },
+        {
+          "what": "opening h/w, 3e étage",
+          "value": 1.82,
+          "how": "344 / 189 px"
+        },
+        {
+          "what": "window width / bay pitch",
+          "value": 0.361,
+          "how": "195 px / 537 px, pure pixel ratio"
+        },
+        {
+          "what": "window height / storey height, 1er étage",
+          "value": 0.716,
+          "how": "405 / 566 px"
+        },
+        {
+          "what": "window height / storey height, 2e étage",
+          "value": 0.67,
+          "how": "361 / 539 px"
+        }
+      ],
+      "notes": "Three stacked storeys of a Première Classe facade on one sheet, so the taper ratios are internal pixel ratios and survive any scale error entirely. Note the 1er étage opening includes a panelled apron (porte-fenêtre); its glazed height alone is ~2.55 m, equal to the 2e étage. Same building as plate 05."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_79_rue-de-rivoli-88-corniche-balcon.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 88, Rue de Rivoli (arch. Rolland) — 'Corniche 3me Étage' and 'Balcon 3me Étage'",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "Text scale 'Échelle de 0.10 mt pour mètre' (1:10), portrait plate -> px/m ~569. Confirmed on-plate from printed callouts: 0.160 -> 578, 0.210 -> 560, 0.600 -> 572.",
+      "absolute_m": [
+        {
+          "what": "3me étage balcony slab: projection from the wall face",
+          "value_m": 0.6,
+          "kind": "MEASURED",
+          "how": "printed callout '0.600' on the 'Balcon 3me Étage' section, arrow-to-arrow 343 px at 572 px/m"
+        },
+        {
+          "what": "3me étage cornice (string course): projection from the wall face",
+          "value_m": 0.51,
+          "kind": "UNCERTAIN",
+          "how": "291 px / 569 measured off the hatched section (wall face x=1202 to front x=911); the plate carries a printed 0.510 which I did not isolate to confirm"
+        },
+        {
+          "what": "3me étage cornice: total height of the moulded profile",
+          "value_m": 0.835,
+          "kind": "UNCERTAIN",
+          "how": "475 px / 569 (top y=573, bottom y=1048)"
+        },
+        {
+          "what": "cornice elevation module (modillon/panel repeat)",
+          "value_m": 1.12,
+          "kind": "MEASURED",
+          "how": "printed callout '1.120' on the cornice elevation at left"
+        },
+        {
+          "what": "cornice profile member",
+          "value_m": 0.16,
+          "kind": "MEASURED",
+          "how": "printed callout '0.160' on the cornice section"
+        },
+        {
+          "what": "cornice profile member",
+          "value_m": 0.21,
+          "kind": "MEASURED",
+          "how": "printed callout '0.210' on the cornice section"
+        },
+        {
+          "what": "balcony profile member",
+          "value_m": 0.23,
+          "kind": "MEASURED",
+          "how": "printed callout '0.230' on the balcony section"
+        },
+        {
+          "what": "balcony profile member",
+          "value_m": 0.25,
+          "kind": "MEASURED",
+          "how": "printed callout '0.250' on the balcony section"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "balcony projection / cornice projection",
+          "value": 1.18,
+          "how": "0.600 (printed) / 0.51 (UNCERTAIN)"
+        },
+        {
+          "what": "cornice projection / cornice height",
+          "value": 0.61,
+          "how": "0.51 / 0.835, both UNCERTAIN"
+        }
+      ],
+      "notes": "A pure moulding-profile plate. The 0.600 m balcony projection is a clean printed ABSOLUTE and directly usable. Cross-check with plate 57: a balcony CONSOLE projects 0.590 m at No 120 Sébastopol — the two buildings agree to 2% on how far a balcony steps out."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_80_sebastopol-4-croisee-1er-etage.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 4, Boulevard de Sébastopol (arch. Davioud) — 'Croisée du 1er étage'",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "No graduated bar, only the text 'Échelle de 0.05 cent pr mètre'. px/m = 286.3 recovered from the printed chain on the left ladder: 0.300+0.400+0.150+0.200 = 1.050 m spans y=2119 to y=1818.4 = 300.6 px. Predicted from sheet resolution 284.5.",
+      "absolute_m": [
+        {
+          "what": "croisée du 1er étage: opening width",
+          "value_m": 1.35,
+          "kind": "MEASURED",
+          "how": "387.4 px / 286.3 px/m (opening x=703.6 to x=1091, inside the beaded chambranle)"
+        },
+        {
+          "what": "croisée du 1er étage: opening height",
+          "value_m": 3.03,
+          "kind": "MEASURED",
+          "how": "867.5 px / 286.3 (head y=918, bottom of frame y=1785.5)"
+        },
+        {
+          "what": "plinth chain below the window, segment 1",
+          "value_m": 0.3,
+          "kind": "MEASURED",
+          "how": "printed '0.300' on the left ladder"
+        },
+        {
+          "what": "plinth chain segment 2",
+          "value_m": 0.4,
+          "kind": "MEASURED",
+          "how": "printed '0.400'"
+        },
+        {
+          "what": "plinth chain segment 3",
+          "value_m": 0.15,
+          "kind": "MEASURED",
+          "how": "printed '0.150'"
+        },
+        {
+          "what": "plinth chain segment 4",
+          "value_m": 0.2,
+          "kind": "MEASURED",
+          "how": "printed '0.200'"
+        },
+        {
+          "what": "plinth chain segment 5",
+          "value_m": 0.28,
+          "kind": "MEASURED",
+          "how": "printed '0.280'"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "croisée du 1er étage opening h/w",
+          "value": 2.24,
+          "how": "3.03 / 1.353 — the tallest window aspect measured in this group, a 1er étage piano-nobile opening"
+        }
+      ],
+      "notes": "Same architect (Davioud) and same street as plates 56 and 81. Note how much taller the 1er étage window is (h/w 2.24) than the 2e/3e étage windows of the neighbouring house (plate 81, 3e étage h/w 1.89)."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_81_sebastopol-2-4-croisees-2e-3e-etage.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "Nos 2 et 4, Boulevard de Sébastopol (arch. Davioud) — 'Croisées des 2e et 3e Étages'",
+      "has_entresol": false,
+      "storey_count": 2,
+      "scale_note": "Text scale 'Échelle de l'Ensemble à 0.05 cent pr metre', portrait plate. px/m = 286.8 recovered from the printed 1.300 callout under the elevation (arrows x=696 to x=1068.8 = 372.8 px). Predicted 284.5.",
+      "absolute_m": [
+        {
+          "what": "croisée opening width (2e and 3e étages, identical)",
+          "value_m": 1.3,
+          "kind": "MEASURED",
+          "how": "printed callout '1.300' on the horizontal dimension line below the elevation"
+        },
+        {
+          "what": "croisée du 3e étage: opening height",
+          "value_m": 2.46,
+          "kind": "MEASURED",
+          "how": "705 px / 286.8 (head y=792, appui y=1497)"
+        },
+        {
+          "what": "2e étage storey height (lintel of 2e to lintel of 3e)",
+          "value_m": 3.55,
+          "kind": "MEASURED",
+          "how": "1019 px / 286.8 (opening heads y=1811 and y=792)"
+        },
+        {
+          "what": "garde-corps (window railing) height above the window sill, 3e étage",
+          "value_m": 0.97,
+          "kind": "MEASURED",
+          "how": "277 px / 286.8 (rail top y=1220, sill y=1497)"
+        },
+        {
+          "what": "cheneau/gutter and grand-balcon profile members",
+          "value_m": 0.08,
+          "kind": "MEASURED",
+          "how": "printed '0.080' among the small chain '0.080 / 0.070 / 0.100 / 0.060' on the details scale (0.10 pr metre)"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "croisée opening h/w, 3e étage",
+          "value": 1.89,
+          "how": "2.46 / 1.300 (printed width)"
+        },
+        {
+          "what": "window height / storey height, 3e étage",
+          "value": 0.693,
+          "how": "2.46 / 3.55"
+        },
+        {
+          "what": "garde-corps height / window opening height",
+          "value": 0.394,
+          "how": "0.966 / 2.46"
+        }
+      ],
+      "notes": "Same building as plate 56 (the entrance door). Combining the two: door leaf width 1.74 m vs croisée width 1.300 m -> door/window width ratio 1.34 for this Deuxième Classe house."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_82_sebastopol-87-porte-entree.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 87, Boulevard de Sébastopol",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "Graduated 'Échelle du Plan de la Porte' bar with 20 cm graduations: 1 m = ~855 displayed px in a 6x crop -> px/m = 213.8. Landscape plate; predicted 213.5.",
+      "absolute_m": [
+        {
+          "what": "porte d'entrée: clear opening width between the pieds-droits (horizontal section / plan)",
+          "value_m": 1.76,
+          "kind": "MEASURED",
+          "how": "printed callout '1.760' on the 'Plan de la Porte'; ticks x=748.5 to x=1122 = 373.5 px against 213.8 px/m -> 1.747, agreeing with the printed value to 0.7%"
+        },
+        {
+          "what": "rebate / feuillure each side of the opening (plan)",
+          "value_m": 0.145,
+          "kind": "MEASURED",
+          "how": "printed callout '0.145', repeated on both sides of the 1.760"
+        },
+        {
+          "what": "pied-droit profile member",
+          "value_m": 0.235,
+          "kind": "MEASURED",
+          "how": "printed callout '0.235' on the 'Coupe sur les pieds-droits'"
+        },
+        {
+          "what": "pied-droit profile member",
+          "value_m": 0.17,
+          "kind": "MEASURED",
+          "how": "printed callout '0.170' on the same section"
+        },
+        {
+          "what": "pied-droit profile member",
+          "value_m": 0.2,
+          "kind": "MEASURED",
+          "how": "printed callout '0.200' on the same section"
+        },
+        {
+          "what": "bandeau above the door, profile member",
+          "value_m": 0.365,
+          "kind": "UNCERTAIN",
+          "how": "printed callout read as '0.365' on the 'Bandeau au dessus de la Porte'; the glyphs are small and I would not stake a design on the third digit"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "rebate depth / clear opening width",
+          "value": 0.082,
+          "how": "0.145 / 1.760, both printed"
+        }
+      ],
+      "notes": "Large-scale joinery plate. Its value is the printed 1.760 m clear door width, which calibrates the elevation on plate 08 of the same door."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_83_conservatoire-9-porte-entree.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 9, Rue du Conservatoire (arch. Amoudru) — entrance doors",
+      "has_entresol": false,
+      "storey_count": 1,
+      "scale_note": "Graduated bar ('Échelle de 0.05 c.m pour Mètre'), decimetre graduations at 21.2 px spacing and 0->1 Mètre = 213 px -> px/m = 212.8. Landscape plate; predicted 213.5. Confirmed by the printed 1.630 (346.5 px -> 1.628) and 1.340 (283 px -> 1.330) callouts.",
+      "absolute_m": [
+        {
+          "what": "porte d'entrée: clear opening width between the pieds-droits",
+          "value_m": 1.63,
+          "kind": "MEASURED",
+          "how": "printed callout '1.630' on the bottom chain; ticks x=806 to x=1152.5 = 346.5 px at 212.8 px/m -> 1.628"
+        },
+        {
+          "what": "pied-droit (jamb) width, each side",
+          "value_m": 0.4,
+          "kind": "MEASURED",
+          "how": "printed callout '0.400', appearing on both sides of the 1.630"
+        },
+        {
+          "what": "masonry pier between the door surround and the flanking pilaster",
+          "value_m": 1.34,
+          "kind": "MEASURED",
+          "how": "printed callout '1.340', first segment of the same bottom chain"
+        },
+        {
+          "what": "socle / plinth height above pavement (vertical chain, first segment)",
+          "value_m": 0.39,
+          "kind": "MEASURED",
+          "how": "printed callout '0.390' on the left-hand 'Coupe sur A.B' ladder, from the pavement datum y=1078.6"
+        },
+        {
+          "what": "height from pavement to the top of the door entablature",
+          "value_m": 2.96,
+          "kind": "MEASURED",
+          "how": "printed callout '2.960' on the second line of the same left ladder, pavement y=1078.6 to y=448.6"
+        },
+        {
+          "what": "door opening clear height, threshold to lintel soffit",
+          "value_m": 2.72,
+          "kind": "UNCERTAIN",
+          "how": "578 px / 212.8 (threshold y=1078.6, lintel soffit y=500.6) — measured, not printed"
+        },
+        {
+          "what": "vertical chain segment above the socle (bossage course on the pier)",
+          "value_m": 1.64,
+          "kind": "MEASURED",
+          "how": "printed callout '1.640', ticks y=997 to y=649.6"
+        },
+        {
+          "what": "vertical chain segment (band course)",
+          "value_m": 0.17,
+          "kind": "MEASURED",
+          "how": "printed callout '0.170', ticks y=649.6 to y=611.7"
+        },
+        {
+          "what": "vertical chain segments continuing up the pier",
+          "value_m": 1.03,
+          "kind": "MEASURED",
+          "how": "printed callout '1.030'; further printed segments on the same chain read 0.140, 0.310, 0.180"
+        },
+        {
+          "what": "door cornice profile members",
+          "value_m": 0.33,
+          "kind": "MEASURED",
+          "how": "printed '0.330' on the right-hand ladder; the same chain also prints 0.370, 0.180, 0.490, 0.220"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "door opening h/w (to lintel soffit)",
+          "value": 1.67,
+          "how": "2.72 (UNCERTAIN) / 1.630 (printed)"
+        },
+        {
+          "what": "door bay h/w (pavement to top of entablature, over clear width)",
+          "value": 1.82,
+          "how": "2.960 / 1.630 — BOTH PRINTED, scale-independent"
+        },
+        {
+          "what": "pied-droit width / clear opening width",
+          "value": 0.245,
+          "how": "0.400 / 1.630, both printed"
+        },
+        {
+          "what": "door bay module (pier + jamb + opening + jamb)",
+          "value": 0.464,
+          "how": "1.630 / (1.340 + 0.400 + 1.630 + 0.400) = 1.630/3.770, all printed"
+        },
+        {
+          "what": "socle height / door opening height",
+          "value": 0.143,
+          "how": "0.390 / 2.72"
+        }
+      ],
+      "notes": "This door has no imposte fanlight — the opening is the leaves plus a low grille, so its aspect (1.67) is much squatter than the Sébastopol portes cochères. The 2.960 m 'pavement to top of entablature' recurs verbatim on plate 56 as a chain value, which is suggestive but I did not verify they mean the same thing."
+    },
+    {
+      "file": "images/daly-1864/daly_detail_84_conservatoire-9-croisee-entresol.jpg",
+      "readable": true,
+      "daly_class": "Deuxième Classe",
+      "address": "No 9, Rue du Conservatoire (arch. Amoudru) — 'Croisée de l'entre-sol'",
+      "has_entresol": true,
+      "storey_count": 1,
+      "scale_note": "Text scale 'Échelle de 0.05 cm pr Mètre', landscape plate. px/m = 210 recovered from the printed bottom chain (0.185 -> 211; 0.900 -> 209; 0.370 -> 211). Predicted 213.5.",
+      "absolute_m": [
+        {
+          "what": "entresol croisée, left light: opening width",
+          "value_m": 0.86,
+          "kind": "MEASURED",
+          "how": "180 px / 210 px/m (x=747.5 to x=927.5)"
+        },
+        {
+          "what": "entresol croisée, right light: opening width",
+          "value_m": 0.82,
+          "kind": "MEASURED",
+          "how": "172.5 px / 210 (x=1000 to x=1172.5)"
+        },
+        {
+          "what": "entresol croisée: opening height (arch crown to sill), both lights",
+          "value_m": 1.95,
+          "kind": "MEASURED",
+          "how": "410 px / 210 (crown y=407.5, sill y=817.5)"
+        },
+        {
+          "what": "entresol croisée: overall width of the paired opening",
+          "value_m": 2.05,
+          "kind": "MEASURED",
+          "how": "430 px / 210 (x=747.5 to x=1172.5), i.e. two lights plus the central mullion"
+        },
+        {
+          "what": "printed base-course chain segment",
+          "value_m": 0.9,
+          "kind": "MEASURED",
+          "how": "printed '0.900' on the chain under the elevation; the full printed chain reads 0.400 | 0.185 | 0.900 | 1.435 | 0.150 | 1.200 | 0.370 | 0.490"
+        },
+        {
+          "what": "printed base-course chain segment",
+          "value_m": 1.435,
+          "kind": "MEASURED",
+          "how": "printed '1.435' — I could NOT match this chain to the window openings above (the chain is drawn at the base course, below the window, and measures different elements). Recorded unassigned rather than guessed."
+        },
+        {
+          "what": "printed base-course chain segment",
+          "value_m": 1.2,
+          "kind": "MEASURED",
+          "how": "printed '1.200', likewise unassigned"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "entresol light opening h/w",
+          "value": 2.32,
+          "how": "1.95 / 0.84 (mean of the two lights)"
+        },
+        {
+          "what": "entresol paired opening h/w (overall)",
+          "value": 0.95,
+          "how": "1.95 / 2.05"
+        }
+      ],
+      "notes": "A two-light entresol window flanked by caryatid consoles. Contrast with plate 57 (No 120 Sébastopol) whose entresol window is a single squat opening of h/w 1.23 — entresol windows in this corpus are not one shape."
+    }
+  ]
+}

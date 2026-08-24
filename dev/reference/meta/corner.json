@@ -1,0 +1,151 @@
+{
+  "family": "corner",
+  "saved": 12,
+  "images": [
+    {
+      "file": "images/corner/corner_01_hp-rue-legendre.jpg",
+      "title": "Hotel particulier, angle rue Legendre / rue Leon-Cosnard, Paris XVIIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:HP_angle_rue_Legendre.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Thomon (Wikimedia Commons)",
+      "street": "19 rue Legendre / rue Leon-Cosnard, 17e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Corner treatment on a freestanding hotel particulier: chamfered/angled corner bay in brick-and-stone banding, distinct roofline break (mansard hip turning the corner) and its own fenestration rhythm independent of the two adjoining street facades."
+    },
+    {
+      "file": "images/corner/corner_02_hp-rue-leon-cosnard.jpg",
+      "title": "Hotel particulier corner oriel, rue Leon-Cosnard, Paris XVIIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:HP_angle_rue_L%C3%A9on-Cosnard.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Thomon (Wikimedia Commons)",
+      "street": "rue Leon-Cosnard, 17e arrondissement, Paris",
+      "year": "late 19th century (per Commons description)",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "A polygonal glazed corner bay/oriel forming the rounded prow of the building at the street junction; ground level partly obstructed by construction hoarding and pedestrians."
+    },
+    {
+      "file": "images/corner/corner_03_hp-rue-de-tocqueville.jpg",
+      "title": "Hotel particulier style troubadour, 30 rue de Tocqueville, Paris XVIIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:HP_angle_rue_de_Tocqueville.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Thomon (Wikimedia Commons)",
+      "street": "30 rue de Tocqueville, angle rue Legendre / rue Leon-Cosnard, 17e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Full corner elevation of a freestanding mansion: the chamfered corner reads as its own short facade with a single bay of windows, balconies, and a dedicated mansard/dormer above, distinct in rhythm from the long facades either side."
+    },
+    {
+      "file": "images/corner/corner_04_angle-spontini-longchamp.jpg",
+      "title": "Hotel particulier, angle rue Spontini / rue de Longchamp, Paris XVIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Angle_Spontini_Longchamp.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Thomon (Wikimedia Commons)",
+      "street": "angle rue Spontini / rue de Longchamp, 16e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "A restrained ashlar corner block of a hotel particulier: symmetrical three-bay corner with its own balconies and roofline, clearly a distinct short facade turning the angle between two streets."
+    },
+    {
+      "file": "images/corner/corner_05_1b-av-des-chalets.jpg",
+      "title": "Hotel particulier, 1b avenue des Chalets, Paris XVIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:1b_av_des_Chalets_Paris.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "CVB (Wikimedia Commons)",
+      "street": "1b avenue des Chalets (angle rue de Ranelagh), 16e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "Polygonal corner turret with its own bay window and steep conical roof, rising above the shared eaveline of the two flanking facades; ground floor partly hidden behind an iron gate."
+    },
+    {
+      "file": "images/corner/corner_06_bd-port-royal-rue-broca.jpg",
+      "title": "Immeuble, angle boulevard de Port-Royal / rue Broca, Paris Ve",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bd_de_Port-Royal_angle_rue_Broca.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "VVVCFFrance (Wikimedia Commons)",
+      "street": "46 boulevard de Port-Royal, angle rue Broca, 5e arrondissement, Paris",
+      "year": "1900",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Classic rounded-corner apartment block (rotonde): the curved bay carries its own vertical window/balcony rhythm and a distinct domed roof cap, clearly separate from the straight bays on each street front."
+    },
+    {
+      "file": "images/corner/corner_07_bd-jules-sandeau-rue-labiche.jpg",
+      "title": "Immeuble post-haussmannien, 27 boulevard Jules-Sandeau, Paris XVIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Boulevard_Jules-Sandeau_27_angle_rue_Eug%C3%A8ne_Labiche_immeuble_post-hausssmannien.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "VVVCFFrance (Wikimedia Commons)",
+      "street": "27 boulevard Jules-Sandeau, angle rue Eugene Labiche, 16e arrondissement, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Bowed/rounded corner rotonde with sculpted keystones and its own balcony rail pattern, capped by a domed corner roof that breaks from the mansard lines of the adjoining wings."
+    },
+    {
+      "file": "images/corner/corner_08_rue-marbeau-bd-marbeau-rococo.jpg",
+      "title": "Immeuble rococo, angle rue Marbeau / boulevard Marbeau, Paris XVIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_Marbeau_angle_boulevard_Marbeau_immeuble_rococo.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "VVVCFFrance (Wikimedia Commons)",
+      "street": "angle rue Marbeau / boulevard Marbeau, 16e arrondissement, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "partial",
+      "shows": "Close, upward-angled crop of an ornate corner pier with curved balconies wrapping the chamfer; no ground floor visible and shot from a steep angle, but the corner's independent balcony/window rhythm is clearly legible."
+    },
+    {
+      "file": "images/corner/corner_09_guimard-angle-agar-gros.jpg",
+      "title": "Immeuble Guimard, angle rue Gros / rue de la Fontaine, Paris XVIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_Guimard_angle_Agar-Gros.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Henry SALOME (Wikimedia Commons)",
+      "street": "41 rue Gros, angle rue Agar, 16e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Art Nouveau treatment of a full-height rounded corner tower (Hector Guimard): the curved prow carries continuous stacked balconies and its own turret roof, entirely independent in rhythm from the two straight facades it joins."
+    },
+    {
+      "file": "images/corner/corner_10_st-antoine-beautreillis-1906.jpg",
+      "title": "Maison d'angle, rue Beautreillis, Paris IVe (1906)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fa%C3%A7ades_d%27immeubles,_%C3%A0_l%27angle_de_la_rue_Saint-Antoine_et_de_la_rue_Beautreillis,_4%C3%A8me_arrondissement,_Paris,_PH34247.jpg",
+      "license": "CC0",
+      "author": "Henri Godefroy, photographe (Paris Musees / Commission du Vieux Paris collection)",
+      "street": "angle rue Saint-Antoine / rue Beautreillis, 4e arrondissement, Paris",
+      "year": "1906 (photograph date; building older, pre-Haussmann)",
+      "klass": "modest",
+      "quality": "partial",
+      "shows": "Archival street view of a narrow pre-Haussmann corner house with a sharply chamfered prow between two streets, its own reduced window bay at the point; image is slightly hazy/soft with blurred pedestrians."
+    },
+    {
+      "file": "images/corner/corner_11_renard-st-merri-1895.jpg",
+      "title": "Immeubles, angle rue du Renard / rue Saint-Merri, Paris IVe (c.1895-1899)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeubles,_%C3%A0_l%27angle_de_la_rue_du_Renard_et_des_n%C2%B018-20_rue_Saint-Merri,_4%C3%A8me_arrondissement,_Paris._PH11619.jpg",
+      "license": "CC0",
+      "author": "Union Photographique Francaise (Paris Musees / Commission du Vieux Paris collection)",
+      "street": "angle rue du Renard / 18-20 rue Saint-Merri, 4e arrondissement, Paris",
+      "year": "between 1895 and 1899",
+      "klass": "modest",
+      "quality": "good",
+      "shows": "Archival photograph of an older corner building with a distinct narrow chamfered facade at the street junction, shop signage at ground floor, and a roofline/dormer treatment that reads as its own short facade rather than a repeated module."
+    },
+    {
+      "file": "images/corner/corner_12_monsieur-le-prince-st-michel.jpg",
+      "title": "Immeuble, angle rue Monsieur-le-Prince / boulevard Saint-Michel, Paris VIe",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_75006_rue_Monsieur-le-Prince_-_Bd_Saint-Michel_no_56_Banque_Populaire_20170416.jpg",
+      "license": "CC BY 2.0",
+      "author": "Dale Cruse (Flickr, via Wikimedia Commons)",
+      "street": "56 boulevard Saint-Michel, angle rue Monsieur-le-Prince, 6e arrondissement, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Full-height rounded Haussmannian corner rotonde with its own dormer-ringed dome roof, continuous curved balconies, and ground-floor storefront wrapping the chamfer independently of the two straight wings."
+    }
+  ],
+  "notes": "Two archival Commission du Vieux Paris photos of the Eugene-Manuel/Claude-Chahu corner building (Charles Klein, 1903) were downloaded and rejected: one was a scaffolded construction-phase detail shot, the other a window-bay detail that did not clearly show the corner itself. Mix here deliberately spans two corner typologies relevant to the family: (a) freestanding hotels particuliers with a chamfered/turreted corner as their showpiece (images 01-05, 09), and (b) continuous Haussmannian/post-Haussmannian apartment blocks where the corner rotonde is one bay within a longer run (06, 07, 08, 12). Two pre-Haussmann archival street photos (10, 11) are included for contrast/period range but are lower resolution and slightly soft; use with care. No construction/completion year was given by Commons for most of the modern photographer's shots (Thomon, VVVCFFrance, CVB, Henry Salome) beyond stylistic description, so year is left blank rather than guessed. klass is a rough visual judgement (facade richness/scale), not a documented rating."
+}

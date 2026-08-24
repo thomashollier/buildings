@@ -1,0 +1,1007 @@
+{
+  "group": "Premiere Classe",
+  "plates": [
+    {
+      "file": "images/daly-1864/daly_coupe_76_champs-elysees-125-premiere-classe.jpg",
+      "address": "No 125, Avenue des Champs-Elysees (Levicomte, arch.) - COUPE / section",
+      "daly_class": "Premiere Classe",
+      "readable": true,
+      "scale_note": "Scale bar 'Echelle de 0,01 cent pour metre', 0-10 m graduated. Eleven major ticks detected at x = 611,669,727,786,843,901,959,1017,1075,1133,1191 (y 2158-2178); span 580 px / 10 m = 58.0 px/m, individual intervals 57-59 px. This plate ALSO carries a full printed dimension ladder up the right-hand side, so printed callouts were preferred over my own measurements throughout.",
+      "storey_count": 6,
+      "has_entresol": false,
+      "absolute_m": [
+        {
+          "what": "rez-de-chaussee clear height (floor to ceiling)",
+          "value_m": 3.8,
+          "kind": "MEASURED",
+          "how": "printed callout on the section's dimension ladder, right-hand side; independently confirmed by pixel measurement of the drawn floor bands (3.69 m) at 58.0 px/m"
+        },
+        {
+          "what": "floor structure thickness (plancher), every level",
+          "value_m": 0.3,
+          "kind": "MEASURED",
+          "how": "printed callout '30' repeated between every storey dimension on the ladder"
+        },
+        {
+          "what": "1er etage clear height",
+          "value_m": 3.3,
+          "kind": "MEASURED",
+          "how": "printed callout; pixel check 3.26 m"
+        },
+        {
+          "what": "2e etage clear height",
+          "value_m": 3.57,
+          "kind": "MEASURED",
+          "how": "printed callout '3,57'; pixel check 3.55 m"
+        },
+        {
+          "what": "3e etage clear height",
+          "value_m": 3.4,
+          "kind": "MEASURED",
+          "how": "printed callout; pixel check 3.38 m"
+        },
+        {
+          "what": "4e etage clear height",
+          "value_m": 3.1,
+          "kind": "MEASURED",
+          "how": "printed callout; pixel check 3.05 m"
+        },
+        {
+          "what": "comble (5e/mansard) storey clear height",
+          "value_m": 2.6,
+          "kind": "MEASURED",
+          "how": "printed callout, topmost storey dimension; pixel check 2.64 m"
+        },
+        {
+          "what": "comble ceiling to top of party wall / roof top",
+          "value_m": 1.5,
+          "kind": "MEASURED",
+          "how": "printed callout, topmost ladder dimension; pixel check 1.62 m"
+        },
+        {
+          "what": "floor-to-floor rez-de-chaussee",
+          "value_m": 4.1,
+          "kind": "DERIVED",
+          "how": "3.80 clear + 0.30 plancher (both printed); pixel check floor line 2040->1805 = 4.05 m"
+        },
+        {
+          "what": "floor-to-floor 1er",
+          "value_m": 3.6,
+          "kind": "DERIVED",
+          "how": "3.30 + 0.30; pixel check 3.59 m"
+        },
+        {
+          "what": "floor-to-floor 2e",
+          "value_m": 3.87,
+          "kind": "DERIVED",
+          "how": "3.57 + 0.30; pixel check 3.90 m"
+        },
+        {
+          "what": "floor-to-floor 3e",
+          "value_m": 3.7,
+          "kind": "DERIVED",
+          "how": "3.40 + 0.30; pixel check 3.74 m"
+        },
+        {
+          "what": "floor-to-floor 4e",
+          "value_m": 3.4,
+          "kind": "DERIVED",
+          "how": "3.10 + 0.30; pixel check 3.45 m"
+        },
+        {
+          "what": "floor-to-floor comble storey",
+          "value_m": 2.9,
+          "kind": "DERIVED",
+          "how": "2.60 + 0.30"
+        },
+        {
+          "what": "cornice level (top of masonry) above pavement",
+          "value_m": 18.67,
+          "kind": "DERIVED",
+          "how": "sum of printed ladder dimensions up to and including the plancher over the 4e etage; direct pixel measurement of the cornice top gives 18.83 m"
+        },
+        {
+          "what": "total height pavement to roof top",
+          "value_m": 22.77,
+          "kind": "DERIVED",
+          "how": "sum of all twelve printed ladder dimensions; pixel check ladder span 23.0 m"
+        },
+        {
+          "what": "comble height (cornice to roof top)",
+          "value_m": 4.1,
+          "kind": "DERIVED",
+          "how": "22.77 - 18.67"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "comble / total height",
+          "value": 0.1801,
+          "how": "DERIVED from printed ladder"
+        },
+        {
+          "what": "cornice / total height",
+          "value": 0.8199,
+          "how": "DERIVED from printed ladder"
+        },
+        {
+          "what": "storey taper 1er / rez-de-chaussee (floor-to-floor)",
+          "value": 0.878,
+          "how": "DERIVED"
+        },
+        {
+          "what": "storey taper 2e / 1er",
+          "value": 1.075,
+          "how": "DERIVED - NOTE: >1, the 2e is TALLER than the 1er here"
+        },
+        {
+          "what": "storey taper 3e / 2e",
+          "value": 0.9561,
+          "how": "DERIVED"
+        },
+        {
+          "what": "storey taper 4e / 3e",
+          "value": 0.9189,
+          "how": "DERIVED"
+        },
+        {
+          "what": "storey taper comble / 4e",
+          "value": 0.8529,
+          "how": "DERIVED"
+        },
+        {
+          "what": "1er / ground (floor-to-floor)",
+          "value": 0.878,
+          "how": "DERIVED"
+        },
+        {
+          "what": "2e / ground",
+          "value": 0.9439,
+          "how": "DERIVED"
+        },
+        {
+          "what": "3e / ground",
+          "value": 0.9024,
+          "how": "DERIVED"
+        },
+        {
+          "what": "4e / ground",
+          "value": 0.8293,
+          "how": "DERIVED"
+        },
+        {
+          "what": "comble storey / ground",
+          "value": 0.7073,
+          "how": "DERIVED"
+        },
+        {
+          "what": "plancher thickness / mean floor-to-floor",
+          "value": 0.0833,
+          "how": "DERIVED"
+        }
+      ],
+      "notes": "RICHEST PLATE IN THE GROUP. The right-hand dimension ladder is legible end to end. Read bottom-to-top: 3.80 / 30 / 3.30 / 30 / 3.57 / 30 / 3.40 / 30 / 3.10 / 30 / 2.60 / 1.50. Every clear height was independently confirmed within 0.05 m by measuring the drawn hatched floor bands (detected at y = 954-977, 1154-1175, 1371-1391, 1597-1616, 1805-1826, ground 2040) against the 58.0 px/m scale, so both the reading and the scale are cross-checked. IMPORTANT FINDING for the generator: the taper is NOT monotonic. The 1er etage (3.30 m clear) is SHORTER than the 2e (3.57 m). A simple 'each storey is k times the one below' rule is wrong for this building."
+    },
+    {
+      "file": "images/daly-1864/daly_elevation_75_champs-elysees-125-premiere-classe.jpg",
+      "address": "No 125, Avenue des Champs-Elysees (Levicomte, arch.) - ELEVATION",
+      "daly_class": "Premiere Classe",
+      "readable": true,
+      "scale_note": "Scale bar 'Echelle de 0,01 cent pour metre' 0-10 m; ticks detected at x = 608,667,726,785,844,903,962,1021,1080,1139,1198 on rows 2070-2086; 590 px / 10 m = 59.0 px/m. Ground datum y=1985 fixed where the pavement hatch meets the facade plinth and the porte-cochere threshold.",
+      "storey_count": 6,
+      "has_entresol": false,
+      "absolute_m": [
+        {
+          "what": "facade width",
+          "value_m": 18.763,
+          "kind": "MEASURED",
+          "how": "facade corner lines at x=313 and x=1420 in the ground-floor band, at 59.0 px/m"
+        },
+        {
+          "what": "bay pitch, mean of the 6 intervals between the 7 window centres",
+          "value_m": 2.391,
+          "kind": "MEASURED",
+          "how": "window centres at x = 442, 594.5, 730, 863, 997.5, 1133.5, 1288.5"
+        },
+        {
+          "what": "bay pitch, uniform central 5-bay avant-corps",
+          "value_m": 2.284,
+          "kind": "MEASURED",
+          "how": "intervals 135.5, 133, 134.5, 136 px between the five central windows"
+        },
+        {
+          "what": "porte-cochere opening width",
+          "value_m": 2.534,
+          "kind": "MEASURED",
+          "how": "stone reveal at x=793.5 and x=943 measured on a 40-row band at mid-door height"
+        },
+        {
+          "what": "porte-cochere opening height (pavement to arch soffit crown)",
+          "value_m": 3.559,
+          "kind": "MEASURED",
+          "how": "threshold/pavement y=1985, shallow segmental arch soffit crown y=1775, springing y=1780"
+        },
+        {
+          "what": "window opening width, upper storeys",
+          "value_m": 1.136,
+          "kind": "MEASURED",
+          "how": "shutter-pair span 961-1028 px on the 2e etage; same 65-68 px on 1er/3e/4e"
+        },
+        {
+          "what": "window opening width, rez-de-chaussee",
+          "value_m": 1.068,
+          "kind": "MEASURED",
+          "how": "stone reveal 564-627 px, bay 2"
+        },
+        {
+          "what": "window opening height, rez-de-chaussee",
+          "value_m": 2.22,
+          "kind": "MEASURED",
+          "how": "head y=1786, sill y=1917, bay 5 column profile"
+        },
+        {
+          "what": "window opening height, 1er etage",
+          "value_m": 2.61,
+          "kind": "MEASURED",
+          "how": "head 1546, sill 1700"
+        },
+        {
+          "what": "window opening height, 2e etage",
+          "value_m": 2.847,
+          "kind": "MEASURED",
+          "how": "head 1354, sill 1522"
+        },
+        {
+          "what": "window opening height, 3e etage",
+          "value_m": 2.576,
+          "kind": "MEASURED",
+          "how": "head 1130, sill 1282"
+        },
+        {
+          "what": "window opening height, 4e etage",
+          "value_m": 2.339,
+          "kind": "MEASURED",
+          "how": "head 936, sill 1074"
+        },
+        {
+          "what": "main cornice top above pavement",
+          "value_m": 18.407,
+          "kind": "MEASURED",
+          "how": "crowning line of the modillion cornice at y~899 (dark frieze band 919-936); section plate 76 gives 18.67-18.83 m for the same level"
+        },
+        {
+          "what": "roof top (visible top edge of mansard) above pavement",
+          "value_m": 22.627,
+          "kind": "MEASURED",
+          "how": "top edge of the slated mansard at y~650; full-width dark row detected at y=661"
+        },
+        {
+          "what": "comble height (cornice to roof top)",
+          "value_m": 4.22,
+          "kind": "MEASURED",
+          "how": "252 px"
+        },
+        {
+          "what": "1er etage balcony/floor above pavement",
+          "value_m": 4.1,
+          "kind": "DERIVED",
+          "how": "floor level taken from the printed section (plate 76) ladder"
+        },
+        {
+          "what": "2e etage balcony/floor above pavement",
+          "value_m": 7.7,
+          "kind": "DERIVED",
+          "how": "from plate 76 ladder"
+        },
+        {
+          "what": "3e etage balcony/floor above pavement",
+          "value_m": 11.57,
+          "kind": "DERIVED",
+          "how": "from plate 76 ladder"
+        },
+        {
+          "what": "4e etage balcony/floor above pavement",
+          "value_m": 15.27,
+          "kind": "DERIVED",
+          "how": "from plate 76 ladder"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "comble / total height",
+          "value": 0.1865,
+          "how": "DERIVED"
+        },
+        {
+          "what": "cornice / total height",
+          "value": 0.8135,
+          "how": "DERIVED"
+        },
+        {
+          "what": "bay pitch / facade width",
+          "value": 0.1274,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere width / bay pitch",
+          "value": 1.0597,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere h/w",
+          "value": 1.4047,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, rez-de-chaussee",
+          "value": 2.0794,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 1er",
+          "value": 2.2985,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 2e",
+          "value": 2.5075,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 3e",
+          "value": 2.2687,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 4e",
+          "value": 2.0294,
+          "how": "DERIVED"
+        },
+        {
+          "what": "window opening width / bay pitch (upper storeys)",
+          "value": 0.4749,
+          "how": "DERIVED"
+        }
+      ],
+      "notes": "Pairs with the dimensioned section, plate 76 - same building, so the two are mutually validating. Independent checks that came out right: predicted floor levels from plate 76's printed ladder land within ~0.2 m of every measured sill/head on this plate; total height 22.6 m here vs 22.77 m printed there. Composition: a 5-bay central avant-corps (uniform 2.28 m pitch, continuous balconies, atlantes at 1er) flanked by 1-bay wings set 2.6 m out, giving 7 windows across an 18.8 m facade. The 2e etage has the tallest windows (h/w 2.51), the 4e the squattest (2.03) - opening slenderness tracks storey height."
+    },
+    {
+      "file": "images/daly-1864/daly_elevation_50_rue-de-la-paix-3.jpg",
+      "address": "No 3, Rue de la Paix (Paul Mesnard, arch.) - ELEVATION",
+      "daly_class": "Premiere Classe",
+      "readable": true,
+      "scale_note": "Scale bar 'Echelle de 0,01 cent pour metre' 0-10 m; major ticks at x = 621(0),681,739,796,855,913,972 ... 1201(10) on rows 2138-2152. Intervals 57-60 px, span 580 px / 10 m = 58.0-58.3 px/m; 58.3 adopted. Ground datum y=2023 where the pavement hatch meets the shopfront plinth. All heights read off a 0.5 m grid drawn on the plate from that datum.",
+      "storey_count": 6,
+      "has_entresol": false,
+      "absolute_m": [
+        {
+          "what": "facade width",
+          "value_m": 16.792,
+          "kind": "MEASURED",
+          "how": "facade edges x=404 and x=1383 from a darkness profile over rows 1100-1900"
+        },
+        {
+          "what": "bay pitch, mean of 6 intervals between 7 window centres",
+          "value_m": 2.321,
+          "kind": "MEASURED",
+          "how": "window centres x = 478, 593, 725.5, 890, 1051.5, 1172.5, 1290 (irregular: outer pairs closer, caryatid bays wider)"
+        },
+        {
+          "what": "porte-cochere opening width",
+          "value_m": 2.41,
+          "kind": "MEASURED",
+          "how": "door leaves between the flanking engaged columns, x 819-959.5"
+        },
+        {
+          "what": "porte-cochere opening height (pavement to arch crown)",
+          "value_m": 3.05,
+          "kind": "MEASURED",
+          "how": "read off a 0.2 m grid registered on the scale bar; arch crown 3.05, springing ~2.95, threshold 0.0"
+        },
+        {
+          "what": "window opening width, central bays",
+          "value_m": 1.235,
+          "kind": "MEASURED",
+          "how": "shutter-pair span, 3e etage band"
+        },
+        {
+          "what": "window opening width, outer bays",
+          "value_m": 1.046,
+          "kind": "MEASURED",
+          "how": "shutter-pair span, 3e etage band"
+        },
+        {
+          "what": "main cornice top above pavement",
+          "value_m": 21.05,
+          "kind": "MEASURED",
+          "how": "roof springing / top of the antefix cornice, read on the metre grid"
+        },
+        {
+          "what": "roof top (visible top edge of mansard) above pavement",
+          "value_m": 23.85,
+          "kind": "MEASURED",
+          "how": "top edge of the slated mansard on the metre grid; chimney/pier caps continue to 24.3"
+        },
+        {
+          "what": "comble height (cornice to roof top)",
+          "value_m": 2.8,
+          "kind": "MEASURED",
+          "how": "23.85 - 21.05"
+        },
+        {
+          "what": "shopfront opening head above pavement",
+          "value_m": 3.05,
+          "kind": "MEASURED",
+          "how": "metre grid"
+        },
+        {
+          "what": "1er etage floor level above pavement",
+          "value_m": 3.7,
+          "kind": "UNCERTAIN",
+          "how": "taken as just under the 1er balconette rails (3.80-4.15) and above the shop entablature (3.15-3.65); the actual floor line is not drawn"
+        },
+        {
+          "what": "2e etage floor level above pavement",
+          "value_m": 6.9,
+          "kind": "UNCERTAIN",
+          "how": "balcony floor under the full-width balustrade (6.95-8.05)"
+        },
+        {
+          "what": "3e etage floor level above pavement",
+          "value_m": 11.15,
+          "kind": "UNCERTAIN",
+          "how": "under the 3e balconette rails (11.25-11.95)"
+        },
+        {
+          "what": "4e etage floor level above pavement",
+          "value_m": 14.7,
+          "kind": "UNCERTAIN",
+          "how": "under the 4e balcony rail (14.85-15.60)"
+        },
+        {
+          "what": "5e etage floor level above pavement",
+          "value_m": 17.85,
+          "kind": "UNCERTAIN",
+          "how": "under the rosette balustrade (17.90-18.65)"
+        },
+        {
+          "what": "window opening height, 1er etage",
+          "value_m": 2.1,
+          "kind": "UNCERTAIN",
+          "how": "sill ~4.05 head ~6.15 on the metre grid"
+        },
+        {
+          "what": "window opening height, 2e etage (etage noble)",
+          "value_m": 3.2,
+          "kind": "UNCERTAIN",
+          "how": "head 10.25 read confidently; sill obscured behind the full-width balcony balustrade, assumed at the balcony floor 7.05"
+        },
+        {
+          "what": "window opening height, 3e etage",
+          "value_m": 2.4,
+          "kind": "UNCERTAIN",
+          "how": "head ~13.75, sill ~11.35 behind balconette"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "comble / total height",
+          "value": 0.1174,
+          "how": "DERIVED from measured cornice and roof top"
+        },
+        {
+          "what": "cornice / total height",
+          "value": 0.8826,
+          "how": "DERIVED"
+        },
+        {
+          "what": "bay pitch / facade width",
+          "value": 0.1382,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere width / bay pitch",
+          "value": 1.0382,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere h/w",
+          "value": 1.2656,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 1er (UNCERTAIN inputs)",
+          "value": 1.855,
+          "how": "DERIVED from UNCERTAIN heights; width taken as the 1.13 m mean of the 1.24 m central-bay and 1.05 m outer-bay openings"
+        },
+        {
+          "what": "opening h/w, 2e (UNCERTAIN inputs)",
+          "value": 2.8267,
+          "how": "DERIVED from UNCERTAIN heights; width taken as the 1.13 m mean of the 1.24 m central-bay and 1.05 m outer-bay openings"
+        },
+        {
+          "what": "opening h/w, 3e (UNCERTAIN inputs)",
+          "value": 2.12,
+          "how": "DERIVED from UNCERTAIN heights; width taken as the 1.13 m mean of the 1.24 m central-bay and 1.05 m outer-bay openings"
+        },
+        {
+          "what": "storey taper 1er / rez-de-chaussee",
+          "value": 0.8649,
+          "how": "UNCERTAIN inputs"
+        },
+        {
+          "what": "storey taper 2e / 1er",
+          "value": 1.3281,
+          "how": "UNCERTAIN inputs - again >1"
+        },
+        {
+          "what": "storey taper 3e / 2e",
+          "value": 0.8353,
+          "how": "UNCERTAIN inputs"
+        },
+        {
+          "what": "storey taper 4e / 3e",
+          "value": 0.8873,
+          "how": "UNCERTAIN inputs"
+        }
+      ],
+      "notes": "The plate named in the project brief. Extremely dense engraving - the facade is rusticated and carved edge to edge, so automatic edge detection fails and the interior floor lines are not drawn. Widths, the cornice, the roof top and the porte-cochere are solid; STOREY HEIGHTS ARE UNCERTAIN because the floor datum has to be inferred from balcony rails and entablature bands rather than read off a drawn line. Note the very low comble ratio (0.117) compared with 125 Champs-Elysees (0.180) - roof share is not a constant across Premiere Classe. Ground floor is commercial (two shopfronts flanking a central porte-cochere with caryatids over)."
+    },
+    {
+      "file": "images/daly-1864/daly_elevation_49_champs-elysees-119.jpg",
+      "address": "No 119, Avenue des Champs-Elysees (H. Blondel, arch.) - ELEVATION PRINCIPALE",
+      "daly_class": "Premiere Classe",
+      "readable": true,
+      "scale_note": "Scale bar 'Echelle de 0,01 cent pour metre', 0-5 m; ticks at x = 751(0),810,868,926,984,1042(5) on rows 2000-2014; 291 px / 5 m = 58.2 px/m. CAUTION: the pavement is drawn SLOPING, from about 0.15 m at the left of the facade to 0.60 m at the porte-cochere on the right (a real 3% avenue slope). Grid was hung at y=1938 and a 0.38 m mean correction applied to absolute heights; all differences (storey heights, comble, window heights) are unaffected.",
+      "storey_count": 5,
+      "has_entresol": false,
+      "absolute_m": [
+        {
+          "what": "facade width",
+          "value_m": 14.931,
+          "kind": "MEASURED",
+          "how": "facade edges x=438 and x~1307"
+        },
+        {
+          "what": "bay pitch, mean of 3 intervals between 4 window centres",
+          "value_m": 3.488,
+          "kind": "MEASURED",
+          "how": "window centres x = 562.5, 768, 957, 1171.5"
+        },
+        {
+          "what": "porte-cochere opening width",
+          "value_m": 2.99,
+          "kind": "MEASURED",
+          "how": "stone reveal x 1091-1265"
+        },
+        {
+          "what": "porte-cochere opening height (threshold to arch soffit crown)",
+          "value_m": 3.25,
+          "kind": "MEASURED",
+          "how": "threshold at 0.60 on the grid (local pavement), arch soffit crown 3.85"
+        },
+        {
+          "what": "window opening width, upper storeys",
+          "value_m": 1.22,
+          "kind": "MEASURED",
+          "how": "shutter-pair span 527-598"
+        },
+        {
+          "what": "window opening width, rez-de-chaussee",
+          "value_m": 1.117,
+          "kind": "MEASURED",
+          "how": "528-593"
+        },
+        {
+          "what": "window opening height, rez-de-chaussee",
+          "value_m": 2.75,
+          "kind": "UNCERTAIN",
+          "how": "head 3.85 measured; sill ~1.10 read on the grid, the lower panel is light and does not segment cleanly"
+        },
+        {
+          "what": "window opening height, 1er etage",
+          "value_m": 2.45,
+          "kind": "MEASURED",
+          "how": "head 7.35, sill 4.90 on the metre grid"
+        },
+        {
+          "what": "window opening height, 2e etage",
+          "value_m": 3.0,
+          "kind": "MEASURED",
+          "how": "arched head crown 11.20, sill 8.20 at the balcony floor"
+        },
+        {
+          "what": "window opening height, 3e etage",
+          "value_m": 2.43,
+          "kind": "MEASURED",
+          "how": "head 14.88, sill 12.45"
+        },
+        {
+          "what": "window opening height, 4e etage",
+          "value_m": 2.23,
+          "kind": "MEASURED",
+          "how": "head 18.38, sill 16.15"
+        },
+        {
+          "what": "main cornice top above pavement",
+          "value_m": 18.77,
+          "kind": "MEASURED",
+          "how": "grid reading 19.15 minus the 0.38 m pavement-slope correction"
+        },
+        {
+          "what": "roof top (visible top edge of mansard) above pavement",
+          "value_m": 21.97,
+          "kind": "MEASURED",
+          "how": "grid reading 22.35 minus 0.38"
+        },
+        {
+          "what": "comble height (cornice to roof top)",
+          "value_m": 3.2,
+          "kind": "MEASURED",
+          "how": "unaffected by the pavement-datum correction"
+        },
+        {
+          "what": "floor-to-floor rez-de-chaussee",
+          "value_m": 4.32,
+          "kind": "UNCERTAIN",
+          "how": "floor levels inferred from string course / balcony levels: 0.375, 4.70, 8.05, 12.35, 16.05 on the raw grid"
+        },
+        {
+          "what": "floor-to-floor 1er",
+          "value_m": 3.35,
+          "kind": "UNCERTAIN",
+          "how": "8.05 - 4.70"
+        },
+        {
+          "what": "floor-to-floor 2e",
+          "value_m": 4.3,
+          "kind": "UNCERTAIN",
+          "how": "12.35 - 8.05"
+        },
+        {
+          "what": "floor-to-floor 3e",
+          "value_m": 3.7,
+          "kind": "UNCERTAIN",
+          "how": "16.05 - 12.35"
+        },
+        {
+          "what": "4e floor to cornice top",
+          "value_m": 3.1,
+          "kind": "UNCERTAIN",
+          "how": "19.15 - 16.05"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "comble / total height",
+          "value": 0.1457,
+          "how": "DERIVED"
+        },
+        {
+          "what": "cornice / total height",
+          "value": 0.8543,
+          "how": "DERIVED"
+        },
+        {
+          "what": "bay pitch / facade width",
+          "value": 0.2336,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere width / bay pitch",
+          "value": 0.8571,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere h/w",
+          "value": 1.0871,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, rez-de-chaussee",
+          "value": 2.4623,
+          "how": "DERIVED (height UNCERTAIN)"
+        },
+        {
+          "what": "opening h/w, 1er",
+          "value": 2.0083,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 2e",
+          "value": 2.4592,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 3e",
+          "value": 1.9919,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 4e",
+          "value": 1.828,
+          "how": "DERIVED"
+        },
+        {
+          "what": "storey taper 1er / rez-de-chaussee",
+          "value": 0.7755,
+          "how": "UNCERTAIN inputs"
+        },
+        {
+          "what": "storey taper 2e / 1er",
+          "value": 1.2836,
+          "how": "UNCERTAIN inputs - >1 again"
+        },
+        {
+          "what": "storey taper 3e / 2e",
+          "value": 0.8605,
+          "how": "UNCERTAIN inputs"
+        },
+        {
+          "what": "storey taper 4e / 3e",
+          "value": 0.8378,
+          "how": "UNCERTAIN inputs"
+        },
+        {
+          "what": "window opening width / bay pitch (upper storeys)",
+          "value": 0.3498,
+          "how": "DERIVED"
+        }
+      ],
+      "notes": "The widest bays in the group by a long way: 3.49 m pitch with only 4 windows plus the porte-cochere across a 14.9 m facade (bay pitch / facade width 0.234, versus 0.127 at 125 Champs-Elysees). Openings are correspondingly wide - 1.22 m - and the porte-cochere is ~3.0 m. This is the clearest evidence in the group that 'Premiere Classe' does NOT mean one bay rhythm: pitch across the six plates runs 2.28 to 3.49 m. Same non-monotonic taper as 125 Champs-Elysees: the 1er (3.35 m) is shorter than both the ground floor and the 2e."
+    },
+    {
+      "file": "images/daly-1864/daly_elevation_25_avenue-imperatrice.jpg",
+      "address": "Avenue de l'Imperatrice (Raban, arch.) - ELEVATION",
+      "daly_class": "Premiere Classe",
+      "readable": true,
+      "scale_note": "Scale bar 'Echelle de 0,01 cent p.r metre', 0-10 m; ticks at x = 589(0),648,707,765,824,882,941,1000,1059,1118,1177(10) on rows 2182-2196; 588 px / 10 m = 58.8 px/m. Ground datum y=2022 where the garden/terrace hatch meets the facade plinth and the porte-cochere threshold.",
+      "storey_count": 5,
+      "has_entresol": false,
+      "absolute_m": [
+        {
+          "what": "facade width",
+          "value_m": 17.313,
+          "kind": "MEASURED",
+          "how": "facade edges x=337 and x~1355"
+        },
+        {
+          "what": "bay pitch (uniform)",
+          "value_m": 3.227,
+          "kind": "MEASURED",
+          "how": "window centres x = 464.5, 654, 844, 1033.5, 1223.5; intervals 189.5, 190, 189.5, 190 px - the most regular facade in the group"
+        },
+        {
+          "what": "porte-cochere opening width (inside the architrave)",
+          "value_m": 2.619,
+          "kind": "MEASURED",
+          "how": "moulded reveal x 772-926; the door leaves alone span 774-923 = 2.53 m; the outer archivolt spans 743-953 = 3.57 m"
+        },
+        {
+          "what": "porte-cochere opening height (threshold to arch soffit crown)",
+          "value_m": 7.3,
+          "kind": "MEASURED",
+          "how": "monumental two-storey arch, read on a 0.25 m grid; the timber leaves stop at 4.00 m and a glazed tympanum with balconette fills 5.05-5.55"
+        },
+        {
+          "what": "window opening width",
+          "value_m": 1.105,
+          "kind": "MEASURED",
+          "how": "shutter-pair span 432-497, consistent on all five storeys"
+        },
+        {
+          "what": "window opening height, rez-de-chaussee",
+          "value_m": 3.0,
+          "kind": "MEASURED",
+          "how": "sill 1.35, head 4.35"
+        },
+        {
+          "what": "window opening height, 1er etage",
+          "value_m": 2.45,
+          "kind": "MEASURED",
+          "how": "sill 5.50, arched head crown 7.95"
+        },
+        {
+          "what": "window opening height, 2e etage",
+          "value_m": 2.6,
+          "kind": "MEASURED",
+          "how": "sill 8.50 (behind balustrade), head 11.10"
+        },
+        {
+          "what": "window opening height, 3e etage",
+          "value_m": 2.15,
+          "kind": "MEASURED",
+          "how": "sill 12.20, head 14.35"
+        },
+        {
+          "what": "window opening height, attic storey",
+          "value_m": 1.8,
+          "kind": "MEASURED",
+          "how": "sill 17.20, head 19.00"
+        },
+        {
+          "what": "main cornice top above ground",
+          "value_m": 19.45,
+          "kind": "MEASURED",
+          "how": "metre grid; roof slating starts immediately above"
+        },
+        {
+          "what": "roof top (visible top edge of mansard) above ground",
+          "value_m": 22.4,
+          "kind": "MEASURED",
+          "how": "metre grid; chimneys continue to 23.2"
+        },
+        {
+          "what": "comble height (cornice to roof top)",
+          "value_m": 2.95,
+          "kind": "MEASURED",
+          "how": "22.40 - 19.45"
+        },
+        {
+          "what": "giant-order entablature band, bottom to top",
+          "value_m": 15.1,
+          "kind": "MEASURED",
+          "how": "underside 15.10, top 16.00 - the giant Corinthian order embraces the 2e and 3e etages"
+        },
+        {
+          "what": "balustrade balcony level (2e)",
+          "value_m": 8.45,
+          "kind": "MEASURED",
+          "how": "top of the RdC/1er entablature, floor of the balustraded balcony"
+        },
+        {
+          "what": "balustrade balcony level (attic)",
+          "value_m": 16.1,
+          "kind": "MEASURED",
+          "how": "floor of the balustraded balcony over the giant-order entablature"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "comble / total height",
+          "value": 0.1317,
+          "how": "DERIVED"
+        },
+        {
+          "what": "cornice / total height",
+          "value": 0.8683,
+          "how": "DERIVED"
+        },
+        {
+          "what": "bay pitch / facade width",
+          "value": 0.1864,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere width / bay pitch",
+          "value": 0.8116,
+          "how": "DERIVED"
+        },
+        {
+          "what": "porte-cochere h/w (to arch crown)",
+          "value": 2.7873,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, rez-de-chaussee",
+          "value": 2.7138,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 1er",
+          "value": 2.2163,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 2e",
+          "value": 2.352,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, 3e",
+          "value": 1.9449,
+          "how": "DERIVED"
+        },
+        {
+          "what": "opening h/w, attic",
+          "value": 1.6283,
+          "how": "DERIVED"
+        },
+        {
+          "what": "window opening width / bay pitch",
+          "value": 0.3426,
+          "how": "DERIVED"
+        },
+        {
+          "what": "sill-to-sill 1er->2e / RdC->1er",
+          "value": 0.7229,
+          "how": "DERIVED - sill spacing, a floor-to-floor proxy"
+        },
+        {
+          "what": "sill-to-sill 2e->3e / 1er->2e",
+          "value": 1.2333,
+          "how": "DERIVED"
+        }
+      ],
+      "notes": "The most palatial facade in the group: five bays at a perfectly uniform 3.23 m pitch, a giant Corinthian order embracing the 2e and 3e etages, a two-storey arched porte-cochere 7.3 m to the arch crown. Window height falls monotonically up the facade (3.00, 2.45, 2.60, 2.15, 1.80 m) and so does opening slenderness (h/w 2.65 -> 1.59) - this plate DOES support a monotonic diminution rule for openings even though the storey heights do not follow one. I deliberately did NOT report interior floor-to-floor heights here: the drawn levels (RdC entablature at 4.90-5.35, 1er sills at 5.50) cannot be reconciled with the companion section, plate 61, and I could not decide which is the floor line without inventing it. See plate 61 notes."
+    },
+    {
+      "file": "images/daly-1864/daly_section_61_avenue-imperatrice-coupe.jpg",
+      "address": "Avenue de l'Imperatrice (Raban, arch.) - COUPE GENERALE sur le passage de porte cochere",
+      "daly_class": "Premiere Classe",
+      "readable": true,
+      "scale_note": "Scale bar 'Echelle de 0,01 cent p.r metre', 0-10 m; ticks at x = 766(0),809,852,897,940,982,1027,1070,1113,1157,1200(10) on rows 1040-1052; 434 px / 10 m = 43.4 px/m. NOTE the different px/m from the portrait plates - this is a landscape plate, physically wider, so the same 1:100 drawing scale lands on fewer pixels per metre. Datum taken at the sectioned rez-de-chaussee floor line, y=770.",
+      "storey_count": 3,
+      "has_entresol": false,
+      "absolute_m": [
+        {
+          "what": "rez-de-chaussee (porte-cochere passage) floor-to-floor",
+          "value_m": 4.3,
+          "kind": "MEASURED",
+          "how": "sectioned floor line at the datum y=770, floor structure band 3.85-4.30 m above it, at 43.4 px/m"
+        },
+        {
+          "what": "rez-de-chaussee clear height (passage floor to cornice)",
+          "value_m": 3.45,
+          "kind": "MEASURED",
+          "how": "passage entablature underside 3.45 m above the floor"
+        },
+        {
+          "what": "1er etage ceiling cornice above RdC floor",
+          "value_m": 6.9,
+          "kind": "MEASURED",
+          "how": "cornice band 6.75-7.05 detected on the sectioned wall"
+        },
+        {
+          "what": "2e etage ceiling cornice above RdC floor",
+          "value_m": 11.1,
+          "kind": "MEASURED",
+          "how": "cornice band 11.00-11.20"
+        },
+        {
+          "what": "courtyard-side RdC opening sill above ground",
+          "value_m": 0.9,
+          "kind": "MEASURED",
+          "how": "courtyard elevation, right-hand half of the plate"
+        },
+        {
+          "what": "courtyard-side RdC opening head above ground",
+          "value_m": 3.4,
+          "kind": "MEASURED",
+          "how": "arched head crown"
+        },
+        {
+          "what": "courtyard-side 1er sill / head",
+          "value_m": 4.6,
+          "kind": "MEASURED",
+          "how": "sill 4.60, head 7.10"
+        },
+        {
+          "what": "courtyard-side 2e sill / head",
+          "value_m": 8.3,
+          "kind": "MEASURED",
+          "how": "sill 8.30, head 10.90"
+        },
+        {
+          "what": "basement floor below RdC floor",
+          "value_m": 3.4,
+          "kind": "MEASURED",
+          "how": "cave floor at -3.40 m"
+        }
+      ],
+      "ratios": [
+        {
+          "what": "courtyard sill-to-sill spacing, RdC->1er (m)",
+          "value": 3.7,
+          "how": "MEASURED - a floor-to-floor proxy on the courtyard side"
+        },
+        {
+          "what": "courtyard sill-to-sill spacing, 1er->2e (m)",
+          "value": 3.7,
+          "how": "MEASURED - identical, i.e. no taper on the courtyard side"
+        }
+      ],
+      "notes": "PARTIAL. The plate is a section on the porte-cochere passage: the left half is cut through the passage and two floors of apartments above, the right half is a courtyard elevation seen down the passage. It stops at about 11.5 m - the upper storeys, cornice and roof are not on this plate, so no comble or total-height ratio can be taken from it. UNRESOLVED CONFLICT, recorded rather than papered over: the courtyard elevation here gives an even 3.70 m sill-to-sill spacing on every storey, while the street elevation (plate 25) gives 4.15 / 3.00 / 3.70 m. Both readings are internally consistent and both scale bars check out, so either the courtyard wing has its own floor levels or one of the two elevations is not the front building. I could not settle it, so I have not converted either into an interior floor-to-floor figure for plate 25."
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "family": "restauration",
+  "saved": 9,
+  "images": [
+    {
+      "file": "images/restauration/restauration_01_square-dorleans-facade.jpg",
+      "title": "Façade sur rue et square d'Orléans, 80 rue Taitbout, 9ème arrondissement, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fa%C3%A7ade_sur_rue_et_square_d%27Orl%C3%A9ans,_80_rue_Taitbout,_9%C3%A8me_arrondissement,_Paris._PH10758.jpg",
+      "license": "CC0",
+      "author": "Charles Lansiaux (photographer)",
+      "street": "Square d'Orléans, 80 rue Taitbout, Paris 9e",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "flat plastered street facade with pilasters, wrought-iron balcony railings, and rusticated arched carriage entrance — pre-Haussmann envelope of a grand Restauration-era private residential enclave"
+    },
+    {
+      "file": "images/restauration/restauration_02_square-dorleans-cour.jpg",
+      "title": "Vue de la cour, square d'Orléans, 9ème arrondissement, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fa%C3%A7ade_sur_rue_et_square_d%27Orl%C3%A9ans,_80_rue_Taitbout,_9%C3%A8me_arrondissement,_Paris._PH10759.jpg",
+      "license": "CC0",
+      "author": "Charles Lansiaux (photographer)",
+      "street": "Square d'Orléans, 9e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "colonnaded courtyard facade with Ionic columns and continuous wrought-iron balcony rail — grand Restauration/Louis-Philippe classical detailing"
+    },
+    {
+      "file": "images/restauration/restauration_03_rue-de-la-victoire-84.jpg",
+      "title": "Immeuble, 84 rue de la Victoire, 9ème arrondissement, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble,_84_rue_de_la_Victoire,_9%C3%A8me_arrondissement,_Paris._PH12165.jpg",
+      "license": "CC0",
+      "author": "Union Photographique Française (photographer); archival print, photographed between 1893 and 1898",
+      "street": "84 rue de la Victoire, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "full street row of flat plastered facades with continuous thin wrought-iron balcony railings and shuttered windows above period shopfronts"
+    },
+    {
+      "file": "images/restauration/restauration_04_rue-de-la-victoire-87.jpg",
+      "title": "Immeuble, 87 rue de la Victoire, 9ème arrondissement, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble,_87_rue_de_la_Victoire,_9%C3%A8me_arrondissement,_Paris._PH12093.jpg",
+      "license": "CC0",
+      "author": "Union Photographique Française (photographer); archival print, photographed 1899",
+      "street": "87 rue de la Victoire, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "row of flat plastered facades with shuttered windows, thin iron balcony railings, and carved frieze band above ground-floor shops"
+    },
+    {
+      "file": "images/restauration/restauration_05_tour-des-dames-13-ironwork.jpg",
+      "title": "13 rue de la Tour-des-Dames, Paris 9e",
+      "source_url": "https://commons.wikimedia.org/wiki/File:13_rue_de_la_Tour-des-Dames,_Paris_9e_1.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Polymagou (Wikimedia Commons user)",
+      "street": "13 rue de la Tour-des-Dames, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "close frontal detail of plain plastered facade with thin scrolled/lozenge wrought-iron balcony railings — direct evidence for the family's ironwork motif"
+    },
+    {
+      "file": "images/restauration/restauration_06_tour-des-dames-1-3-corner.jpg",
+      "title": "Rue de la Tour-des-Dames n°1 et 3, Paris 9e",
+      "source_url": "https://commons.wikimedia.org/wiki/File:P1080557_Paris_IX_rue_de_la_Tour-des-Dames_n%C2%B01_et_3_rwk.jpg",
+      "license": "CC BY 3.0",
+      "author": "Mbzt (Wikimedia Commons user)",
+      "street": "1 et 3 rue de la Tour-des-Dames, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "partial",
+      "shows": "flat incised rustication/refends at the corner quoins and window surrounds of a plastered facade; mild oblique angle and parked cars partially obstruct ground floor"
+    },
+    {
+      "file": "images/restauration/restauration_07_tour-des-dames-1-jardin-1919.jpg",
+      "title": "1, rue de la Tour-des-Dames, façade sur jardin, 9ème arrondissement, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:1,_rue_de_la_Tour-des-Dames,_fa%C3%A7ade_sur_jardin,_9%C3%A8me_arrondissement,_Paris._PH27972.jpg",
+      "license": "CC0",
+      "author": "Charles Lansiaux (photographer), 1919",
+      "street": "1 rue de la Tour-des-Dames, Paris 9e",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "arcaded garden facade of an 1820s artist's residence (Nouvelle Athènes neighborhood) with Ionic columns and cross-pattern iron balcony rail; oblique angle, ground floor partly obscured by potted plants"
+    },
+    {
+      "file": "images/restauration/restauration_08_cite-malesherbes-entree.jpg",
+      "title": "Cité Malesherbes, Paris 9e 2-1",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Cit%C3%A9_Malesherbes,_Paris_9e_2-1.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Polymagou (Wikimedia Commons user)",
+      "street": "Cité Malesherbes, accès 59 rue des Martyrs, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "flat plastered facade with decorative panel reliefs and thin scrolled wrought-iron balcony railings above the gated entrance to a Louis-Philippe-era artists' cité"
+    },
+    {
+      "file": "images/restauration/restauration_09_cite-bergere-passage.jpg",
+      "title": "Paris 9 - Cité Bergère -007",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_9_-_Cit%C3%A9_Berg%C3%A8re_-007.JPG",
+      "license": "CC BY 3.0",
+      "author": "MOSSOT (Wikimedia Commons user)",
+      "street": "Cité Bergère, Paris 9e",
+      "year": "",
+      "klass": "unknown",
+      "quality": "partial",
+      "shows": "distant frontal view through the passage archway of a period facade with arched windows and balustrade at the end of Cité Bergère (built 1825); small in frame, street level obstructed by parked motorcycles/cars"
+    }
+  ],
+  "notes": "Focused on the Nouvelle Athenes / quartier Saint-Georges area of the 9th arrondissement (Square d'Orleans, rue de la Tour-des-Dames, Cite Malesherbes, rue de la Victoire, Cite Bergere), which is the classic Restauration/Louis-Philippe-era residential development in Paris and gives the cleanest surviving examples of flat plastered facades, incised refends, and thin lozenge/palmette wrought-iron balcony work from this period. Construction years are NOT stated in any of the source Commons descriptions (only photograph dates are, where given), so 'year' is left blank throughout per instructions rather than guessed; general art-historical knowledge places most of these ensembles in the 1820s-1830s (Square d'Orleans c.1829, Cite Bergere c.1825, rue de la Tour-des-Dames c.1820-1825, Cite Malesherbes c.1830s-40s) but this is NOT recorded per-image as fact since the sources themselves don't state it. Several other candidates were rejected as wrong-period: a brick/stone neo-Louis-XIII revival building at 11 rue de la Tour-des-Dames, and an elaborately sculpted Belle Epoque facade at 10 rue Chaptal (SACEM building), both clearly post-Haussmann in style despite being in the same streets. Two Cite Bergere shopfront-entrance photos and one Cite Malesherbes gardien-door photo were also rejected for being dominated by modern storefronts/hedges rather than legible period facade. Coverage is decent but concentrated in the 9th arrondissement; broader geographic spread (e.g. Marais, Faubourg Saint-Germain Restauration-era buildings) was not found in a legible, correctly-dated form during this search pass."
+}

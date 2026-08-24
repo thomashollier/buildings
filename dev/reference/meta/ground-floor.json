@@ -1,0 +1,139 @@
+{
+  "family": "ground-floor",
+  "saved": 11,
+  "images": [
+    {
+      "file": "images/ground-floor/ground-floor_01_old-bakery-francs-bourgeois.jpg",
+      "title": "Old Bakery - 23 rue des Francs-Bourgeois, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Old_Bakery_-_23_rue_des_Francs-Bourgeois,_Paris.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Poulpy",
+      "year": "",
+      "street": "21 rue de Sévigné / 23 rue des Francs-Bourgeois, 4e arrondissement, Paris",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "corner shopfront with full carved-and-gilded wood boiserie, painted decorative panels, and period boulangerie/patisserie signage still in place under later shop occupancy — frontal, well lit, whole facade legible"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_02_porte-cochere-tombe-issoire.jpg",
+      "title": "Porte cochère du 26 rue de la Tombe-Issoire octobre 2021",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Porte_coch%C3%A8re_du_26_rue_de_la_Tombe-Issoire_octobre_2021.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Artvill",
+      "year": "",
+      "street": "26 rue de la Tombe-Issoire, Paris",
+      "klass": "ordinary",
+      "quality": "good",
+      "shows": "single carriage door (porte cochère), dead-frontal, full height with stone surround and arch, street furniture (wheelie bin, delivery van) beside it giving a legible scale reference for the door as the absolute-scale ruler"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_03_porte-cochere-rue-de-turenne-1902.jpg",
+      "title": "Hôtel particulier, porte cochère, 3ème arrondissement, Paris (PH82110) — annotated print reads \"Hôtel d'Equevilly, 60 rue de Turenne\", Février 1902",
+      "source_url": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_particulier,_porte_coch%C3%A8re,_3%C3%A8me_arrondissement,_Paris,_PH82110.jpg",
+      "license": "CC0",
+      "author": "Jean Barry, photographe (Commission municipale du Vieux Paris)",
+      "year": "1902",
+      "street": "60 rue de Turenne, 3e arrondissement, Paris",
+      "klass": "comfortable",
+      "quality": "partial",
+      "shows": "period (1902) documentary photograph of a pedimented stone porte cochère on a hôtel particulier, with a pedestrian figure for scale; mildly oblique street view and mounted archive print with border/annotations visible, not a clean crop"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_04_devanture-eglomise-panels-detail.jpg",
+      "title": "BoulangerieFB2 — painted/gilded glass (verre églomisé) corner panels of a Marais shopfront",
+      "source_url": "https://commons.wikimedia.org/wiki/File:BoulangerieFB2.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "Oderik",
+      "year": "",
+      "street": "Marais, Paris (exact address not given in source description)",
+      "klass": "comfortable",
+      "quality": "partial",
+      "shows": "close detail of painted-and-gilded decorative glass panels on a shopfront corner pier — good evidence for the surface decoration/lettering feature, but it is a tight detail crop, not the whole facade"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_05_devanture-boulangerie-ordener.jpg",
+      "title": "Devanture Boulangerie 159 rue Ordener",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Devanture_Boulangerie_159_rue_Ordener.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "KoS",
+      "year": "",
+      "street": "159 rue Ordener, 18e arrondissement, Paris",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "full corner boulangerie shopfront, dead-frontal, dark-blue painted woodwork with gilt lettering, painted glass panels, full storefront glazing down to a panelled base — whole facade legible"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_06_devanture-eglomisee-lettering.jpg",
+      "title": "Devanture églomisée 20050917 — Boulangerie, rue de la Roquette corner",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Devanture_%C3%A9glomis%C3%A9e_20050917.jpg",
+      "license": "CC BY-SA 2.0 be",
+      "author": "Roby",
+      "year": "",
+      "street": "corner of rue de la Roquette, Paris",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "corner boulangerie, dead-frontal, green marble-clad base, gilt raised lettering signboard, awning, full storefront glazing — clean full-facade shot"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_07_devanture-hebrard-rue-royale.jpg",
+      "title": "Devanture de la maison Hébrard, 8 rue Royale, 8ème arrondissement, Paris (PH23412)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Devanture_de_la_maison_H%C3%A9brard,_8_rue_Royale,_8%C3%A8me_arrondissement,_Paris._PH23412.jpg",
+      "license": "CC0",
+      "author": "Charles Lansiaux, photographe",
+      "year": "",
+      "street": "8 rue Royale, 8e arrondissement, Paris",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "period photograph of a luxury foundry/gallery shopfront on rue Royale with a sculpted stone lintel relief (Bourdelle) over full-height glazed shop windows and applied bronze lettering — dead-frontal, whole facade legible"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_08_comptoir-brosserie-vaucouleurs.jpg",
+      "title": "Comptoir Général de Brosserie, 6 rue de Vaucouleurs, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Comptoir_G%C3%A9n%C3%A9ral_de_Brosserie,_6_rue_de_Vaucouleurs,_Paris_02.jpg",
+      "license": "CC BY 2.0",
+      "author": "Jeanne Menj",
+      "year": "",
+      "street": "6 rue de Vaucouleurs, Paris",
+      "klass": "modest",
+      "quality": "good",
+      "shows": "plain painted timber shopfront with hand-painted signage and a folding steel security grille pulled across the glazing — good example of a modest, unrestored shopfront with its original ironwork shutter"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_09_old-bakery-charenton.jpg",
+      "title": "Detail of the facade of an old bakery at Emilio-Castelar street and Charenton street in Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Detail_of_the_facade_of_an_old_bakery_at_Emilio-Castelar_street_and_Charenton_street_in_Paris.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Lionel Allorge",
+      "year": "",
+      "street": "corner of rue Emilio-Castelar and rue de Charenton, 12e arrondissement, Paris",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "corner boulangerie shopfront (\"Boulangerie Viennoise\"), dead-frontal, dark marbled base, painted glass corner panels, full storefront glazing and cafe-style outdoor tables — whole facade legible"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_10_brasserie-cyrano-postcard-1912.jpg",
+      "title": "PARIS, Brasserie Cyrano, Boulevard de Clichy — postcard postmarked 1912",
+      "source_url": "https://commons.wikimedia.org/wiki/File:PARIS,_Brasserie_Cyrano,_Boulevard_de_Clichy.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Scanné par LeRapon83 (postcard publisher unattributed)",
+      "year": "1912",
+      "street": "82 Boulevard de Clichy (Place Blanche), 18e arrondissement, Paris",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "period (postmarked 1912) postcard view of a grand brasserie's full ground-floor frontage — glazed arcade, awnings, applied lettering, crowded terrace with period cars/carriages for scale — directly documents the observation-date idea; image is a printed/halftone reproduction rather than a photographic original and is moderately oblique"
+    },
+    {
+      "file": "images/ground-floor/ground-floor_11_passage-du-marche.jpg",
+      "title": "Paris 75010 Passage du Marché - 2016-01-09",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_75010_Passage_du_March%C3%A9_-_2016-01-09.jpg",
+      "license": "CC BY 2.0",
+      "author": "Guilhem Vellut",
+      "year": "",
+      "street": "Passage du Marché, 10e arrondissement, Paris",
+      "klass": "ordinary",
+      "quality": "good",
+      "shows": "row of two adjoining ground-floor shopfronts on a narrow passage — one an ornate red-and-gold \"Confiseur\" boutique, one a plain grilled/shuttered unit — dead-frontal, good comparison of shopfront finish levels side by side"
+    }
+  ],
+  "notes": "Selected 11 of ~240 Commons search results after filtering out interiors, food-display close-ups, night/dark shots, and oblique courtyard views. Porte cochere coverage is 2 images (one modern, one dated 1902 archive photo) rather than the ideal 3-4 clean frontal doors; Commons search for 'porte cochere' alone returned mostly book scans and PDFs. Construction/build years are left blank throughout except where a date is explicitly documented in the source (1902 archive photo caption; 1912 postcard postmark) -- do not treat facade photography dates (e.g. 2005, 2010, 2016) as building construction dates. Two images (04 and 07) are tight details rather than full facades; marked accordingly via quality/shows fields."
+}

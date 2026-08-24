@@ -1,0 +1,2830 @@
+<!doctype html><meta charset="utf-8"><title>VLM reference check</title>
+<style>
+ body { font: 14px/1.5 -apple-system, sans-serif; margin: 2rem; background:#151515; color:#ddd; }
+ h1,h2,h3 { font-weight: 600; }
+ section { border-top: 1px solid #333; padding: 1.2rem 0; }
+ section.detail { opacity: .85; }
+ .badge { font-size: 11px; background:#333; padding:2px 8px; border-radius:9px; }
+ .meta { color:#8a8a8a; }
+ .shows { color:#b9b9b9; max-width: 70ch; }
+ .pair { display:flex; gap:1rem; align-items:flex-start; }
+ .pair img { max-height: 620px; max-width: 46vw; background:#222; }
+ figcaption { color:#777; font-size:12px; }
+ table { font-size:12px; color:#999; border-collapse: collapse; margin-top:.6rem; }
+ td { padding: 2px 10px 2px 0; }
+</style>
+<h1>VLM reference check</h1>
+<p><b>Ground-truth set:</b> operator selection (dev/reference/selection.json, 64 images, generated_by="orchestrator (all quality=='good', the review page's default selection)") — NOTE: 8 scraped families postdate this selection and are not in it: se-comble, se-cornice, se-elevation, se-entrance, se-facade, se-ironwork, se-socle, se-surround; --augment folded in their 63 quality=='good' records, tagged UNSELECTED</p>
+
+<h2>Two limits this sheet does not get to ignore</h2>
+<ol>
+<li><b>A photograph supports qualitative comparison and no measurement at all.</b>
+Unknown camera position, unknown lens, converging verticals, a roof seen from
+below. Every number printed beside a render below came out of the IR. No number
+anywhere on this page was read off a photograph, and none should be.</li>
+<li><b>A visual check is a tripwire, not a passing grade.</b> "That looks wrong"
+is strong evidence something is broken. "That looks right" is weak evidence of
+nothing much. Systematic small error is invisible here by construction and
+belongs to the dimensional assertions.</li>
+</ol>
+<p>The photographs' situations are also partly <i>estimated</i> — the corpus
+records an address, not a street width. Each pair prints the provenance of the
+width it was generated from. A height disagreement on an <code>estimated</code>
+row is a question about this harness's table before it is a question about the
+generator.</p>
+
+
+<section class="facade">
+  <h3>00 · Immeuble, 1 rue Le Peletier, Paris 9e <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 1, rue Le Peletier, Paris 9e (architect Georges Morin-Goustiaux) ·
+     recorded year 1899 · class grand</p>
+  <p class="shows">Full corner facade of an elaborate commercial/insurance building: a tall domed corner tourelle topped with an iron-crested finial, sculptural dormers, and a busy, varied roofline in place of a plain 45-degree attic — a strong example of the post-1884 discontinuity.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_01_rue-le-peletier-1899.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_00_belle-epoque_01_rue-le-peletier-1899_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1899</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>01 · Castel Béranger, 14 rue La Fontaine <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 14, rue La Fontaine, Paris 16e (architect Hector Guimard) ·
+     recorded year 1895-1898 · class grand</p>
+  <p class="shows">Oblique full-facade view of Guimard's Castel Béranger: mixed brick/stone bays, sculptural iron balconies, and an irregular roofline with varied dormer forms.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_02_castel-beranger-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_01_belle-epoque_02_castel-beranger-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1895</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>02 · Immeuble, 31 rue de Fleurus (album Ch. Girault) <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 31, rue de Fleurus, Paris 6e (architect Charles Girault; this print is filed within a Commons album titled "Immeuble avenue Henri Martin" but the photo itself is captioned 31 rue de Fleurus, Paris — the album appears to bundle several of Girault's works) ·
+     recorded year 1896 · class grand</p>
+  <p class="shows">Full corner facade in raking light: a tall, steep mansard/comble roof carrying multiple distinct dormer forms (round-headed, segmental, gabled), tall chimneys, a weathervane, and iron-cresting on the balcony railings — a clean discontinuity-test image.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_03_rue-de-fleurus-girault.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_02_belle-epoque_03_rue-de-fleurus-girault_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1896</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.55, 4.05, 3.8, 4.05, 0.55)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>03 · Castel Béranger, upward facade view <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 14, rue La Fontaine, Paris 16e (architect Hector Guimard) ·
+     recorded year 1895-1898 · class grand</p>
+  <p class="shows">Steep upward-angled view showing the roofline clearly: varied dormers, tall chimneys, and iron cresting along the parapet.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_04_castel-beranger-alt.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_03_belle-epoque_04_castel-beranger-alt_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1895</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>04 · Castel Béranger entrance gate <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">belle-epoque · 14, rue La Fontaine, Paris 16e (architect Hector Guimard) ·
+     recorded year 1895-1898 · class grand</p>
+  <p class="shows">Detail of the whiplash wrought-iron entrance gate and carved stone surround — evidence of the enriched decorative vocabulary of the period, not the roofline itself.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_05_castel-beranger-portail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_04_belle-epoque_05_castel-beranger-portail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1895</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>05 · Immeuble Lavirotte, 29 avenue Rapp <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 29, avenue Rapp, Paris 7e (architect Jules Lavirotte; won the Ville de Paris facade competition) ·
+     recorded year 1900-1901 · class grand</p>
+  <p class="shows">Full frontal facade of Lavirotte's masterpiece: sculpted dormers and iron cresting at the roofline over an exuberant ceramic and stone facade — a textbook discontinuity-test image.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_06_lavirotte-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_05_belle-epoque_06_lavirotte-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1900</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>5 @ (0.55, 4.05, 3.8, 4.05, 0.55)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>06 · 29 avenue Rapp, alternate view <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 29, avenue Rapp, Paris 7e (architect Jules Lavirotte) ·
+     recorded year 1900-1901 · class grand</p>
+  <p class="shows">Alternate full-facade daylight view of the same building, confirming the roofline dormers and cresting from a different angle/lighting.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_07_lavirotte-facade-alt.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_06_belle-epoque_07_lavirotte-facade-alt_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1900</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>5 @ (0.55, 4.05, 3.8, 4.05, 0.55)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>07 · 29 avenue Rapp, roofline detail <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">belle-epoque · 29, avenue Rapp, Paris 7e (architect Jules Lavirotte) ·
+     recorded year 1900-1901 · class grand</p>
+  <p class="shows">Close detail of the upper comble zone: sculpted dormers, cresting figures, and ceramic ornament at the parapet — direct close-up evidence of the elaborated roofline.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_08_lavirotte-comble.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_07_belle-epoque_08_lavirotte-comble_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1900</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>5 @ (0.55, 4.05, 3.8, 4.05, 0.55)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>08 · Immeuble Les Arums, 33 rue du Champ de Mars <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 33, rue du Champ de Mars, Paris 7e (architect Octave Raquin; won the 1902 Ville de Paris facade competition) ·
+     recorded year circa 1900-1902 · class grand</p>
+  <p class="shows">Full oblique facade with bow windows and dense floral art nouveau ornament in stone and iron; upper roofline partially visible at frame edge.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_09_les-arums-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_08_belle-epoque_09_les-arums-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1900</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (1.01, 4.09, 3.8, 4.09, 1.01)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>09 · Immeuble, 130 rue Réaumur <span class="badge">FACADE</span></h3>
+  <p class="meta">belle-epoque · 130, rue Réaumur, Paris 2e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Corner building with a domed corner tourelle and an elaborate mansard/comble roofline carrying multiple dormers and iron-crested balcony railings. Construction date not given in the Commons record; rue Réaumur was cut through in 1897 and most of its buildings date circa 1898-1905, so this is stylistically consistent with the family but the exact year is left blank rather than guessed.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/belle-epoque/belle-epoque_11_rue-reaumur-130.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_09_belle-epoque_11_rue-reaumur-130_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>20.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1893</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>10 · 1-3 Place Saint-Michel <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 1-3 Place Saint-Michel, 5e/6e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Grand corner Haussmannian building on a major place: tall arched shopfronts, wrought-iron balconies at 2nd and top floor, heavily dressed stone bays, steep zinc mansard with dormers -- the 'grand' end of the class range where bays/balconies/cornice are elaborated well beyond a modest building while the ground-floor arcade rhythm still reads as door-scaled openings.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_01_grand-corner-place-st-michel.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_10_class-range_01_grand-corner-place-st-michel_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>17.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.52, 4.05, 3.8, 4.05, 4.05, 0.52)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>11 · 5-7 Place Saint-Michel <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 5-7 Place Saint-Michel, 5e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Second grand corner building on the same place, giving a same-scale comparison pair: full mansard, iron balconies at two levels, arcaded ground floor with awnings -- confirms the grand-end proportions are a type, not a one-off.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_02_grand-place-st-michel-pair.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_11_class-range_02_grand-place-st-michel-pair_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>17.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.52, 4.05, 3.8, 4.05, 4.05, 0.52)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>12 · 16 rue Etienne-Marcel <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 16 rue Etienne-Marcel, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Near-frontal full elevation of a comfortable-tier Haussmannian building: sculpted cartouche/cherub keystone over the entry, two tiers of wrought-iron balconies with carved consoles, pilastered bays -- a clear mid-point between plain modest housing and the palatial grand end, useful for showing door scale staying constant while balcony/window enrichment increases one notch.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_06_comfortable-rue-etienne-marcel.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_12_class-range_06_comfortable-rue-etienne-marcel_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>13 · 53 rue Blanche <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 53 rue Blanche, 9e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Excellent full-elevation frontal shot showing the family's core claim directly: a modestly sized arched double door at ground level, essentially unchanged in scale from a plainer building, below four upper floors of regularly repeated bays with wrought-iron balconies, foliate keystones and a dentillated cornice -- door stays small, everything above it grows more elaborate.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_07_comfortable-rue-blanche.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_13_class-range_07_comfortable-rue-blanche_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>14 · 31 rue Du Sommerard <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 31 rue du Sommerard, 5e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Frontal corner elevation, comfortable tier: pedimented window surrounds on the piano nobile, a balustraded balcony course, plain but generously sized door at grade -- again shows the door holding roughly constant scale while window dressing and balcony ironwork step up in richness going up the facade and up the class range.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_08_comfortable-rue-du-sommerard.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_14_class-range_08_comfortable-rue-du-sommerard_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>9.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 2.0, 3.45, 1.84, 0.86)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>15 · Maison, Faubourg St Antoine 122 (vue prise en 1904) <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 122 rue du Faubourg-Saint-Antoine, 12e arrondissement, Paris (photographed 1904; construction inscribed on mount as 1730, built by the hopital des enfants trouves and the famille d'Aligre) ·
+     recorded year 1730 · class modest</p>
+  <p class="shows">Small plain shopfront house on a faubourg street: narrow bays, unadorned window surrounds, shutters, ground-floor shops crowding a small door -- the plainest, most modest end of the range. NOTE: construction date (1730) predates the 19th-century Haussmann period targeted by this corpus; kept as the clearest legible frontal example of 'modest faubourg' massing found on Commons, flag for operator review.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_09_modest-faubourg-st-antoine-archival.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_15_class-range_09_modest-faubourg-st-antoine-archival_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown (year clamped to typology range))</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1820</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>5</td>
+       <td>bays</td><td>7 @ (0.49, 2.55, 2.0, 2.55, 2.55, 1.36, 0.49)</td>
+       <td>eaves</td><td>12.99 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>16 · Rue St Merri 17-19 (Juin 1913) <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 17-19 rue St Merri, 4e arrondissement, Paris (photographed June 1913 by Henri Godefroy) ·
+     recorded year (none) · class modest</p>
+  <p class="shows">Frontal shot of two narrow, plain apartment buildings on a medieval-pattern street: minimal window dressing, small iron balconettes only at a couple of floors, plain shopfronts and a small round-arched carriage door at grade -- a clean modest-tier reference with door legible and undecorated.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_10_modest-rue-st-merri-archival.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_16_class-range_10_modest-rue-st-merri-archival_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>5</td>
+       <td>bays</td><td>7 @ (0.49, 2.55, 2.0, 2.55, 2.55, 1.36, 0.49)</td>
+       <td>eaves</td><td>12.99 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>17 · 2 boulevard Voltaire <span class="badge">FACADE</span></h3>
+  <p class="meta">class-range · 2 boulevard Voltaire, Paris (photographed 2016) ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">Clean frontal full-elevation shot of a standard, unexceptional Haussmannian building on an ordinary (not grand) boulevard: regular bays, modest balcony ironwork at two floors only, plain door under a red awning at grade, simple dentil cornice -- a useful mid-range anchor between the modest faubourg examples and the ornate comfortable/grand ones.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/class-range/class-range_12_ordinary-boulevard-voltaire.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_17_class-range_12_ordinary-boulevard-voltaire_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>7 @ (0.7, 3.0, 2.0, 3.0, 3.0, 1.6, 0.7)</td>
+       <td>eaves</td><td>17.0 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>18 · Hotel particulier, angle rue Legendre / rue Leon-Cosnard, Paris XVIIe <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · 19 rue Legendre / rue Leon-Cosnard, 17e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Corner treatment on a freestanding hotel particulier: chamfered/angled corner bay in brick-and-stone banding, distinct roofline break (mansard hip turning the corner) and its own fenestration rhythm independent of the two adjoining street facades.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_01_hp-rue-legendre.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_18_corner_01_hp-rue-legendre_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1880</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.49, 3.8, 4.05, 2.16, 0.49)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>19 · Hotel particulier style troubadour, 30 rue de Tocqueville, Paris XVIIe <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · 30 rue de Tocqueville, angle rue Legendre / rue Leon-Cosnard, 17e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Full corner elevation of a freestanding mansion: the chamfered corner reads as its own short facade with a single bay of windows, balconies, and a dedicated mansard/dormer above, distinct in rhythm from the long facades either side.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_03_hp-rue-de-tocqueville.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_19_corner_03_hp-rue-de-tocqueville_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1880</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>20 · Hotel particulier, angle rue Spontini / rue de Longchamp, Paris XVIe <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · angle rue Spontini / rue de Longchamp, 16e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">A restrained ashlar corner block of a hotel particulier: symmetrical three-bay corner with its own balconies and roofline, clearly a distinct short facade turning the angle between two streets.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_04_angle-spontini-longchamp.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_20_corner_04_angle-spontini-longchamp_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>20.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1880</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (1.01, 4.09, 3.8, 4.09, 1.01)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>21 · Immeuble, angle boulevard de Port-Royal / rue Broca, Paris Ve <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · 46 boulevard de Port-Royal, angle rue Broca, 5e arrondissement, Paris ·
+     recorded year 1900 · class comfortable</p>
+  <p class="shows">Classic rounded-corner apartment block (rotonde): the curved bay carries its own vertical window/balcony rhythm and a distinct domed roof cap, clearly separate from the straight bays on each street front.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_06_bd-port-royal-rue-broca.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_21_corner_06_bd-port-royal-rue-broca_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1900</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>22 · Immeuble post-haussmannien, 27 boulevard Jules-Sandeau, Paris XVIe <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · 27 boulevard Jules-Sandeau, angle rue Eugene Labiche, 16e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Bowed/rounded corner rotonde with sculpted keystones and its own balcony rail pattern, capped by a domed corner roof that breaks from the mansard lines of the adjoining wings.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_07_bd-jules-sandeau-rue-labiche.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_22_corner_07_bd-jules-sandeau-rue-labiche_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1880</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 3.74, 3.8, 3.74, 0.86)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>23 · Immeuble Guimard, angle rue Gros / rue de la Fontaine, Paris XVIe <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · 41 rue Gros, angle rue Agar, 16e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Art Nouveau treatment of a full-height rounded corner tower (Hector Guimard): the curved prow carries continuous stacked balconies and its own turret roof, entirely independent in rhythm from the two straight facades it joins.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_09_guimard-angle-agar-gros.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_23_corner_09_guimard-angle-agar-gros_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1880</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.95, 4.05, 2.0, 4.05, 0.95)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>24 · Immeubles, angle rue du Renard / rue Saint-Merri, Paris IVe (c.1895-1899) <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · angle rue du Renard / 18-20 rue Saint-Merri, 4e arrondissement, Paris ·
+     recorded year between 1895 and 1899 · class modest</p>
+  <p class="shows">Archival photograph of an older corner building with a distinct narrow chamfered facade at the street junction, shop signage at ground floor, and a roofline/dormer treatment that reads as its own short facade rather than a repeated module.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_11_renard-st-merri-1895.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_24_corner_11_renard-st-merri-1895_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>8.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>8.0 m</td>
+       <td>year</td><td>1895</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>5</td>
+       <td>bays</td><td>5 @ (0.45, 2.55, 2.0, 2.55, 0.45)</td>
+       <td>eaves</td><td>11.55 m</td>
+       <td>legal ceiling</td><td>15.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>25 · Immeuble, angle rue Monsieur-le-Prince / boulevard Saint-Michel, Paris VIe <span class="badge">FACADE</span></h3>
+  <p class="meta">corner · 56 boulevard Saint-Michel, angle rue Monsieur-le-Prince, 6e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Full-height rounded Haussmannian corner rotonde with its own dormer-ringed dome roof, continuous curved balconies, and ground-floor storefront wrapping the chamfer independently of the two straight wings.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/corner/corner_12_monsieur-le-prince-st-michel.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_25_corner_12_monsieur-le-prince-st-michel_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1880</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>26 · Old Bakery - 23 rue des Francs-Bourgeois, Paris <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · 21 rue de Sévigné / 23 rue des Francs-Bourgeois, 4e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">corner shopfront with full carved-and-gilded wood boiserie, painted decorative panels, and period boulangerie/patisserie signage still in place under later shop occupancy — frontal, well lit, whole facade legible</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_01_old-bakery-francs-bourgeois.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_26_ground-floor_01_old-bakery-francs-bourgeois_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>8.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.4, 2.0, 3.45, 1.75, 0.4)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>27 · Porte cochère du 26 rue de la Tombe-Issoire octobre 2021 <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · 26 rue de la Tombe-Issoire, Paris ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">single carriage door (porte cochère), dead-frontal, full height with stone surround and arch, street furniture (wheelie bin, delivery van) beside it giving a legible scale reference for the door as the absolute-scale ruler</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_02_porte-cochere-tombe-issoire.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_27_ground-floor_02_porte-cochere-tombe-issoire_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>carriage</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.6, 3.0, 3.8, 3.0, 0.6)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>28 · Devanture Boulangerie 159 rue Ordener <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · 159 rue Ordener, 18e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">full corner boulangerie shopfront, dead-frontal, dark-blue painted woodwork with gilt lettering, painted glass panels, full storefront glazing down to a panelled base — whole facade legible</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_05_devanture-boulangerie-ordener.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_28_ground-floor_05_devanture-boulangerie-ordener_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>20.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>29 · Devanture églomisée 20050917 — Boulangerie, rue de la Roquette corner <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · corner of rue de la Roquette, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">corner boulangerie, dead-frontal, green marble-clad base, gilt raised lettering signboard, awning, full storefront glazing — clean full-facade shot</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_06_devanture-eglomisee-lettering.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_29_ground-floor_06_devanture-eglomisee-lettering_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 3.8, 3.64, 1.84, 0.86)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>30 · Devanture de la maison Hébrard, 8 rue Royale, 8ème arrondissement, Paris (PH23412) <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · 8 rue Royale, 8e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">period photograph of a luxury foundry/gallery shopfront on rue Royale with a sculpted stone lintel relief (Bourdelle) over full-height glazed shop windows and applied bronze lettering — dead-frontal, whole facade legible</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_07_devanture-hebrard-rue-royale.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_30_ground-floor_07_devanture-hebrard-rue-royale_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>25.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>5 @ (1.01, 4.09, 3.8, 4.09, 1.01)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>31 · Comptoir Général de Brosserie, 6 rue de Vaucouleurs, Paris <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · 6 rue de Vaucouleurs, Paris ·
+     recorded year (none) · class modest</p>
+  <p class="shows">plain painted timber shopfront with hand-painted signage and a folding steel security grille pulled across the glazing — good example of a modest, unrestored shopfront with its original ironwork shutter</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_08_comptoir-brosserie-vaucouleurs.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_31_ground-floor_08_comptoir-brosserie-vaucouleurs_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>8.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>5</td>
+       <td>bays</td><td>5 @ (0.45, 2.55, 2.0, 2.55, 0.45)</td>
+       <td>eaves</td><td>12.99 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>32 · Detail of the facade of an old bakery at Emilio-Castelar street and Charenton street in Paris <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · corner of rue Emilio-Castelar and rue de Charenton, 12e arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">corner boulangerie shopfront ("Boulangerie Viennoise"), dead-frontal, dark marbled base, painted glass corner panels, full storefront glazing and cafe-style outdoor tables — whole facade legible</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_09_old-bakery-charenton.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_32_ground-floor_09_old-bakery-charenton_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>10.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.46, 3.8, 3.45, 1.84, 0.46)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>33 · Paris 75010 Passage du Marché - 2016-01-09 <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">ground-floor · Passage du Marché, 10e arrondissement, Paris ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">row of two adjoining ground-floor shopfronts on a narrow passage — one an ornate red-and-gold "Confiseur" boutique, one a plain grilled/shuttered unit — dead-frontal, good comparison of shopfront finish levels side by side</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/ground-floor/ground-floor_11_passage-du-marche.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_33_ground-floor_11_passage-du-marche_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.7, 1.6, 3.0, 2.0, 3.0, 0.7)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>34 · Portail d'entrée du Castel Béranger (Hector Guimard) <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">post-1902 · 14 rue La Fontaine, 16e arrondissement, Paris ·
+     recorded year 1897-1898 · class grand</p>
+  <p class="shows">Guimard whiplash wrought-iron entrance gate (copper + blue-green iron) with sculpted stone surround -- the canonical Art Nouveau ironwork reference</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/post-1902/post-1902_01_castel-beranger-portail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_34_post-1902_01_castel-beranger-portail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1897</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>35 · Édicule Guimard, Metro Porte Dauphine canopy <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">post-1902 · Place du Maréchal-de-Lattre-de-Tassigny (Porte Dauphine), 16e arrondissement, Paris ·
+     recorded year 1900 · class unknown</p>
+  <p class="shows">Guimard's cast-iron whiplash canopy structure with amber glass panels -- the definitive Art Nouveau ironwork motif in built form</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/post-1902/post-1902_03_metro-porte-dauphine.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_35_post-1902_03_metro-porte-dauphine_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1900</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 3.74, 3.8, 3.74, 0.86)</td>
+       <td>eaves</td><td>16.74 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>circular_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>36 · Hôtel Mezzara (Hector Guimard) <span class="badge">FACADE</span></h3>
+  <p class="meta">post-1902 · 60 rue Jean-de-La-Fontaine, 16e arrondissement, Paris ·
+     recorded year 1911 · class grand</p>
+  <p class="shows">Frontal townhouse facade with a full-height projecting central bay carried up past the cornice into a curved gable, plus a whiplash wrought-iron balcony rail</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/post-1902/post-1902_05_hotel-mezzara.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_36_post-1902_05_hotel-mezzara_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown (year clamped to typology range))</i></td>
+       <td>parcel</td><td>13.0 m</td>
+       <td>year</td><td>1902</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.55, 4.05, 3.8, 4.05, 0.55)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>eighth_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>37 · 26 rue Vavin (Henri Sauvage) <span class="badge">FACADE</span></h3>
+  <p class="meta">post-1902 · 26 rue Vavin, 6e arrondissement, Paris ·
+     recorded year 1912 · class grand</p>
+  <p class="shows">The canonical Sauvage rue Vavin stepped ('à gradins') facade in white ceramic tile, terraces set back above the lower floors -- clean frontal view</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/post-1902/post-1902_08_sauvage-26-rue-vavin.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_37_post-1902_08_sauvage-26-rue-vavin_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(measured (year clamped to typology range))</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1902</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.49, 3.8, 4.05, 2.16, 0.49)</td>
+       <td>eaves</td><td>17.82 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>eighth_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>38 · Immeuble d'angle, 1 rue Boulard <span class="badge">FACADE</span></h3>
+  <p class="meta">post-1902 · 1 rue Boulard (angle 11 rue Froidevaux), 14e arrondissement, Paris ·
+     recorded year 1903-1904 · class comfortable</p>
+  <p class="shows">Corner Art Nouveau apartment building (architect Léon Boucher) with continuous stacked curved balconies/oriels projecting from the facade up to and past the cornice</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/post-1902/post-1902_11_rue-boulard-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_38_post-1902_11_rue-boulard-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated (year clamped to typology range))</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1902</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 3.8, 3.64, 1.84, 0.86)</td>
+       <td>eaves</td><td>16.74 m</td>
+       <td>legal ceiling</td><td>18.0 m</td>
+       <td>envelope</td><td>eighth_arc</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>39 · Façade sur rue et square d'Orléans, 80 rue Taitbout, 9ème arrondissement, Paris <span class="badge">FACADE</span></h3>
+  <p class="meta">restauration · Square d'Orléans, 80 rue Taitbout, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">flat plastered street facade with pilasters, wrought-iron balcony railings, and rusticated arched carriage entrance — pre-Haussmann envelope of a grand Restauration-era private residential enclave</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/restauration/restauration_01_square-dorleans-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_39_restauration_01_square-dorleans-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1835</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (1.01, 4.09, 3.8, 4.09, 1.01)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>40 · Vue de la cour, square d'Orléans, 9ème arrondissement, Paris <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">restauration · Square d'Orléans, 9e arrondissement, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">colonnaded courtyard facade with Ionic columns and continuous wrought-iron balcony rail — grand Restauration/Louis-Philippe classical detailing</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/restauration/restauration_02_square-dorleans-cour.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_40_restauration_02_square-dorleans-cour_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1835</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (1.01, 4.09, 3.8, 4.09, 1.01)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>41 · Immeuble, 84 rue de la Victoire, 9ème arrondissement, Paris <span class="badge">FACADE</span></h3>
+  <p class="meta">restauration · 84 rue de la Victoire, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">full street row of flat plastered facades with continuous thin wrought-iron balcony railings and shuttered windows above period shopfronts</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/restauration/restauration_03_rue-de-la-victoire-84.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_41_restauration_03_rue-de-la-victoire-84_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1835</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>42 · Immeuble, 87 rue de la Victoire, 9ème arrondissement, Paris <span class="badge">FACADE</span></h3>
+  <p class="meta">restauration · 87 rue de la Victoire, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">row of flat plastered facades with shuttered windows, thin iron balcony railings, and carved frieze band above ground-floor shops</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/restauration/restauration_04_rue-de-la-victoire-87.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_42_restauration_04_rue-de-la-victoire-87_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1835</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>43 · 13 rue de la Tour-des-Dames, Paris 9e <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">restauration · 13 rue de la Tour-des-Dames, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">close frontal detail of plain plastered facade with thin scrolled/lozenge wrought-iron balcony railings — direct evidence for the family's ironwork motif</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/restauration/restauration_05_tour-des-dames-13-ironwork.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_43_restauration_05_tour-des-dames-13-ironwork_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1835</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.63, 1.84, 3.45, 2.0, 3.45, 0.63)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>44 · Cité Malesherbes, Paris 9e 2-1 <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">restauration · Cité Malesherbes, accès 59 rue des Martyrs, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">flat plastered facade with decorative panel reliefs and thin scrolled wrought-iron balcony railings above the gated entrance to a Louis-Philippe-era artists' cité</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/restauration/restauration_08_cite-malesherbes-entree.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_44_restauration_08_cite-malesherbes-entree_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>11.0 m</td>
+       <td>year</td><td>1835</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 3.64, 2.0, 3.64, 0.86)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>45 · 1-3 Place Saint-Michel <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · 1-3 Place Saint-Michel, 6e/5e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Corner block: 45-degree mansard comble with round dormers, bossage-rusticated ground-floor arcades, continuous balcon filant with sculpted balustrade at 2nd floor and plain ironwork balcon filant at top (5th/6th) floor, strict cornice-line unity across the block.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_01_place-saint-michel-1-3.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_45_second-empire_01_place-saint-michel-1-3_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>17.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.52, 4.05, 3.8, 4.05, 4.05, 0.52)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>46 · 1-7 Place Saint-Michel <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · 1-7 Place Saint-Michel, 6e/5e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Two adjacent Second Empire buildings sharing identical cornice, mansard-roof, and balcon-filant lines across the parcel boundary -- clean evidence of strict block unity.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_02_place-saint-michel-1-7.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_46_second-empire_02_place-saint-michel-1-7_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>17.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.52, 4.05, 3.8, 4.05, 4.05, 0.52)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>47 · Avenue de l'Opéra no. 38 <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · 38 Avenue de l'Opéra, 1er/2e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Near-frontal full facade: sculpted balcon filant with scrollwork balustrade at 2nd floor, plainer continuous balcon filant at top floor just under the comble, dormers with round pediments, giving a clean read of the two-balcon-band rule.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_05_avenue-opera-no38.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_47_second-empire_05_avenue-opera-no38_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>18.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (1.01, 4.06, 3.8, 4.06, 4.06, 1.01)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>48 · 50 Boulevard Magenta, caryatid detail <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">second-empire · 50 Boulevard Magenta, 10e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Close detail of a sculpted caryatid (by Charles Gauthier) supporting the 2nd-floor balcon filant, with the wrought-iron balustrade of the floor above visible -- clean evidence of the ornamental treatment at the balcon-filant floor.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_06_bd-magenta-50-caryatide.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_48_second-empire_06_bd-magenta-50-caryatide_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>49 · 56 Boulevard Magenta, atlas figures <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">second-empire · 56 Boulevard Magenta, 10e arr. ·
+     recorded year 1866-1867 · class grand</p>
+  <p class="shows">Close detail of paired sculpted atlas figures (by Sébastien Delarue) framing a window below a continuous ironwork balcon filant -- dated facade (1866-1867), squarely inside the canonical Second Empire window.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_07_bd-magenta-56-atlas.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_49_second-empire_07_bd-magenta-56-atlas_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>16.0 m</td>
+       <td>year</td><td>1866</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.97, 2.16, 4.05, 3.8, 4.05, 0.97)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>50 · Boulevard de Sébastopol corner <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · Boulevard de Sébastopol ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Corner building on one of Haussmann's first pierced boulevards: mansard comble, continuous balcon filant at 2nd floor and dormer-level balustrade at top floor, ground-floor shopfronts under a rusticated base.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_08_boulevard-sebastopol.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_50_second-empire_08_boulevard-sebastopol_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>51 · Haussmannian building with corner dome <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · Paris (exact address not recorded on Commons) ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Corner pavilion with a domed roof and a row of near-identical Haussmannian buildings receding down the block, each with matching balcon-filant bands -- good block-unity evidence, oblique/receding framing.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_09_immeuble-dome.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_51_second-empire_09_immeuble-dome_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>22.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>52 · 105 & 107 Rue de Rennes <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · 105 & 107 Rue de Rennes, 6e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Near-frontal facade with full-height sculpted caryatids flanking the ground-floor shopfronts, a decorated balcon filant at 2nd floor immediately above them, and a plainer continuous balcon filant at the top floor below the comble.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_10_rue-de-rennes-105-107.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_52_second-empire_10_rue-de-rennes-105-107_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>22.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>53 · Rue Halévy dormers and comble detail <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">second-empire · Rue Halévy, 9e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Close, upward-angled detail of the mansard comble: a run of pedimented dormer windows above a continuous wrought-iron balcon filant and Corinthian-capped pilasters -- clean evidence of the roof/comble geometry and top-floor balcony band.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_11_rue-halevy-dormers-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_53_second-empire_11_rue-halevy-dormers-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>54 · 12 Rue Halévy <span class="badge">FACADE</span></h3>
+  <p class="meta">second-empire · 12 Rue Halévy, 9e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Full, near-frontal corner facade: rusticated bossage ground floor with round-arched openings, continuous balcon filant at 2nd floor, plain ironwork balcon filant at top floor just under the mansard comble -- one of the cleanest single-image reads of the whole family's defining stack.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/second-empire/second-empire_12_rue-halevy-12.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_54_second-empire_12_rue-halevy-12_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1865</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>55 · 16 rue Etienne-Marcel <span class="badge">FACADE</span></h3>
+  <p class="meta">third-republic · 16 rue Etienne-Marcel, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">whole facade: mascaron heads under balcony console brackets, richly molded window surrounds with alternating pediments, wrought-iron balconies -- textbook Third Republic ornament density</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_01_16-rue-etienne-marcel.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_55_third-republic_01_16-rue-etienne-marcel_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>20.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.73, 1.84, 3.45, 3.8, 3.45, 0.73)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>56 · 53 rue Blanche <span class="badge">FACADE</span></h3>
+  <p class="meta">third-republic · 53 rue Blanche, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">whole facade, frontal: carved sculpted keystones/roundels above two window bands and an arched porte-cochere with carved surround -- 45-degree-comble roofline visible above</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_02_53-rue-blanche.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_56_third-republic_02_53-rue-blanche_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>57 · Immeuble haussmannien (corner facade detail) <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · (street unrecorded) ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">close, mildly oblique crop of a corner facade: repeated carved lintel roundels above windows, dense wrought-iron balcony rows across two floor bands</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_04_corner-facade-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_57_third-republic_04_corner-facade-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>20.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.73, 1.84, 3.45, 3.8, 3.45, 0.73)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>58 · 105 rue de Rennes, caryatids flanking window <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · 105 rue de Rennes, Paris 6e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">frontal detail: full-figure sculpted caryatids flanking a piano-nobile window in place of a plain console -- an extreme, dated example of window treatment becoming sculptural rather than just corniced</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_05_105-rue-de-rennes-caryatids.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_58_third-republic_05_105-rue-de-rennes-caryatids_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>22.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>59 · 107 rue de Rennes, caryatids flanking window <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · 107 rue de Rennes, Paris 6e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">frontal detail, the neighbouring building's matching pair of sculpted caryatids at a window -- same treatment as 105 rue de Rennes, confirms it as a deliberate facade-wide scheme rather than a one-off</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_06_107-rue-de-rennes-caryatids.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_59_third-republic_06_107-rue-de-rennes-caryatids_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>22.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>60 · 1 bis place de l'Alma, mascaron over porte-cochere <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · 1 bis place de l'Alma, Paris ·
+     recorded year (none) · class grand</p>
+  <p class="shows">sharp frontal close-up of a smiling female mascaron set in a foliate surround above a wrought-iron porte-cochere -- clean example of mascaron-as-standard-ornament over an entrance</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_07_place-alma-mascaron.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_60_third-republic_07_place-alma-mascaron_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>residential</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>61 · 14 boulevard Saint-Michel, window pediment with mascaron <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · 14 boulevard Saint-Michel, Paris 6e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">sharp frontal close-up of a broken-scroll window pediment with a mascaron head at the centre flanked by fruit swags -- textbook combination of the richening pediment and the mascaron becoming standard vocabulary</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_08_blvd-saint-michel-pediment-mascaron.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_61_third-republic_08_blvd-saint-michel-pediment-mascaron_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>62 · Mascaron detail, Paris <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · (street unrecorded) ·
+     recorded year (none) · class unknown</p>
+  <p class="shows">very sharp frontal close-up of a bearded male mascaron keystone -- good clean reference for carving style even though the source building/address is not recorded</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_09_mascaron-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_62_third-republic_09_mascaron-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>20.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.73, 1.84, 3.45, 3.8, 3.45, 0.73)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>63 · 47 rue du Faubourg Montmartre, mascaron keystone over door <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">third-republic · 47 rue du Faubourg Montmartre, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">sharp frontal close-up of a bearded mascaron keystone over a carved segmental-arch door pediment with fruit swags -- another clean pediment+mascaron pairing</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/third-republic/third-republic_10_rue-faubourg-montmartre-mascaron.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_63_third-republic_10_rue-faubourg-montmartre-mascaron_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>10.0 m</td>
+       <td>year</td><td>1878</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.46, 3.8, 3.45, 1.84, 0.46)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>64 · Paris zinc roofs with dormers and chimney stacks <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-comble · (street unrecorded) ·
+     recorded year (none) · class unknown</p>
+  <p class="shows">close-up of zinc standing-seam (tasseaux) roofing texture on a straight comble, two box dormers with white sashes, souches (chimney stacks) with multiple flues and cowls, a roof hatch and a tabatiere (slope skylight)</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_02_zinc-standing-seam-souches.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_64_se-comble_02_zinc-standing-seam-souches_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>65 · Mansard roof with pedimented dormers, Paris <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-comble · (street unrecorded) ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">textbook comble a la Mansart profile: slate brisis (steep lower slope) meeting a near-flat zinc terrasson at the ridge, four evenly spaced pedimented (triangular-fronton) dormers each with a small cast-iron balustrade, souche at right, cornice with anthemion antefixes below</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_03_brisis-terrasson-pedimented-dormers.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_65_se-comble_03_brisis-terrasson-pedimented-dormers_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>66 · Rue d'Alger roofline and balcony <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-comble · rue d'Alger, Paris 1er ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">straight 45-degree zinc comble with three box dormers directly above a continuous balcon filant (top-floor running balcony) with a geometric cast-iron railing, persiennes (louvered shutters) on the floor below, souche at center</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_04_rue-dalger-dormers-balcon-filant.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_66_se-comble_04_rue-dalger-dormers-balcon-filant_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>67 · Haussmannian roofline, Rue Halevy <span class="badge">FACADE</span></h3>
+  <p class="meta">se-comble · rue Halevy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">low-angle view of a cornice line with six evenly spaced pedimented dormers on a straight comble, a balcon filant with dense symmetrical cast-iron scrollwork at the floor below the cornice, foliated console brackets over the windows</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_05_rue-halevy-dormer-row-cornice-balcon.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_67_se-comble_05_rue-halevy-dormer-row-cornice-balcon_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>68 · Haussmannian immeuble roofline <span class="badge">FACADE</span></h3>
+  <p class="meta">se-comble · (street unrecorded) ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">roofline continuity across two adjoining party-wall buildings: straight slate/zinc combles with box (lucarne rentrante) dormers, continuous cornice, souches with terracotta chimney pots, and a top-floor balcony with cast-iron railing at the corner</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_06_roofline-continuity-block.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_68_se-comble_06_roofline-continuity-block_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>69 · 53 Rue Blanche facade <span class="badge">FACADE</span></h3>
+  <p class="meta">se-comble · 53 rue Blanche, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">complete canonical elevation: ashlar (pierre de taille) facade with carriage-door arch, a balcon filant at the 2nd floor and a second balcon filant at the 5th (top) floor exactly as the family brief describes, straight zinc comble with box dormers and souches above</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_07_rue-blanche-full-elevation-two-balcons.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_69_se-comble_07_rue-blanche-full-elevation-two-balcons_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>70 · Roofscape from Boulevard Malesherbes <span class="badge">FACADE</span></h3>
+  <p class="meta">se-comble · boulevard Malesherbes, Paris 8e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">elevated quarter view of straight 45-degree combles lining up across a block, row of oval-topped dormers along one ridge, souches punctuating the skyline, balcon filant band on the facade below, Eiffel Tower on the horizon for scale/orientation</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_08_malesherbes-quarter-roofscape.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_70_se-comble_08_malesherbes-quarter-roofscape_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>71 · Chimney stacks over Paris roofs <span class="badge">FACADE</span></h3>
+  <p class="meta">se-comble · (street unrecorded) ·
+     recorded year (none) · class unknown</p>
+  <p class="shows">dense field of souches (party-wall chimney stacks) each capped with multiple terracotta chimney pots, stepping back across successive roof ridges; straight zinc combles visible lower right and center</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_10_souches-chimney-stack-forest.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_71_se-comble_10_souches-chimney-stack-forest_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>72 · Rooftops of Rue Danielle Casanova <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-comble · rue Danielle Casanova, Paris 2e ·
+     recorded year (none) · class modest</p>
+  <p class="shows">straight zinc comble with three small hipped/pyramidal-roofed dormers (chien-assis type, plainer than a pedimented lucarne) sitting directly above a balcon filant with simple iron railings, souches with terracotta pots on the flanking party walls</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-comble/se-comble_11_chien-assis-dormers-danielle-casanova.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_72_se-comble_11_chien-assis-dormers-danielle-casanova_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>5</td>
+       <td>bays</td><td>7 @ (0.49, 2.55, 2.0, 2.55, 2.55, 1.36, 0.49)</td>
+       <td>eaves</td><td>12.99 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>73 · Boulevard de Sebastopol <span class="badge">FACADE</span></h3>
+  <p class="meta">se-cornice · Boulevard de Sebastopol, Paris ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">unbroken cornice/balcony line running at consistent height across a long row of separate buildings down Boulevard de Sebastopol — the clearest single piece of evidence in this set for the 1855 circulaire's block-alignment requirement; straight 45-degree mansard roofs throughout, no curved combles or corner domes</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_01_boulevard-sebastopol-row.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_73_se-cornice_01_boulevard-sebastopol-row_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>7 @ (0.5, 3.0, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>17.0 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>74 · Cornice and Dormers, Rue Halevy <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-cornice · Rue Halevy, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">tight, well-lit crop of the main roof cornice with closely spaced block modillions and dentils, straight-sided pedimented dormers set into a true 45-degree slate mansard, and a dense cast-scrollwork running balcony immediately below — the canonical Second Empire cornice profile</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_02_rue-halevy-modillions.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_74_se-cornice_02_rue-halevy-modillions_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>75 · Bandeau and Cornice Detail, Rue Halevy <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-cornice · Rue Halevy, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">two stacked horizontal members on the same facade in one frame: a plain corniced bandeau/string-course marking a storey division, and above it the deeper main roof cornice with sculpted console-modillions and dentils, plus a dense cast-iron scrollwork balustrade and straight pedimented dormers</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_03_rue-halevy-bandeau-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_75_se-cornice_03_rue-halevy-bandeau-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>76 · 12 Rue Halevy Corner Elevation <span class="badge">FACADE</span></h3>
+  <p class="meta">se-cornice · 12, Rue Halevy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">full corner elevation with the main cornice and two intermediate bandeaux running unbroken around the curved corner bay at identical height on both street facades, dense wrought-iron balconies at the 2nd and 5th floors, and rusticated (bossage) ground floor with round-arched openings</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_04_rue-halevy-12-corner.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_76_se-cornice_04_rue-halevy-12-corner_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>77 · 16 Rue Berthollet Facade <span class="badge">FACADE</span></h3>
+  <p class="meta">se-cornice · 16 Rue Berthollet, Paris 5e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">full ashlar facade with a plain corniced string course under the top-floor balcony and a deeper modillioned cornice with paired console brackets under the 2nd-floor balcony, pedimented window surrounds at the piano nobile, dense scrollwork balcon filant at 2nd and top floors, and the next building visible at matching cornice height to the right</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_05_rue-berthollet-16.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_77_se-cornice_05_rue-berthollet-16_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>78 · Avenue de l'Opera Enfilade <span class="badge">FACADE</span></h3>
+  <p class="meta">se-cornice · Avenue de l'Opera, Paris 1er ·
+     recorded year (none) · class unknown</p>
+  <p class="shows">long raking view down a full block showing the roof cornice, modillion band, and running balcony continuing unbroken at identical height across many distinct building facades receding into the distance — the single most legible illustration of the 1855 circulaire's mandated horizontal continuity across party walls in this set, though the exact construction date of this stretch of the avenue (built in stages 1864-1879) could not be confirmed as pre-1870</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_06_avenue-opera-enfilade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_78_se-cornice_06_avenue-opera-enfilade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>18.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>7 @ (0.86, 3.54, 3.8, 3.54, 3.54, 1.84, 0.86)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>79 · Typical Haussmannian Facade <span class="badge">FACADE</span></h3>
+  <p class="meta">se-cornice · 7th arrondissement, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">full elevation with a block-modillioned main cornice under a straight 45-degree slate mansard, a plain bandeau string course marking the 2nd-floor division, dense cast-iron balcon filant, and flat ashlar wall plane with minimal relief; a second, differently detailed building is visible immediately adjoining at left for comparison</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-cornice/se-cornice_07_typical-paris-apartment.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_79_se-cornice_07_typical-paris-apartment_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>80 · Hôtel privé, 8 rue de Valois-du-Roule — élévation principale <span class="badge">FACADE</span></h3>
+  <p class="meta">se-elevation · 8, rue de Valois-du-Roule, Paris ·
+     recorded year 1864 · class grand</p>
+  <p class="shows">Full principal elevation, 'Hôtel privé, Première Classe': straight 45° mansard comble with pedimented dormers and cresting, running wrought-iron balconies at two floors, rusticated ground floor, flat wall plane in pierre de taille, printed metric scale bar for direct measurement.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_01_hotel-prive-rue-valois-du-roule.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_80_se-elevation_01_hotel-prive-rue-valois-du-roule_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>81 · Hôtel privé, 8 rue de Turin — croisées du rez-de-chaussée (détail mesuré) <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-elevation · 8, rue de Turin, Paris ·
+     recorded year 1864 · class grand</p>
+  <p class="shows">Large-scale measured detail of a ground-floor window bay with full dimension callouts in metres: bossage coursing on the socle, wrought-iron balcon-garde-corps scrollwork, entablature and pediment mouldings — a plate answerable to exact proportions rather than a photograph's estimate.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_02_hotel-prive-rue-de-turin-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_81_se-elevation_02_hotel-prive-rue-de-turin-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>82 · Hôtel privé, 17 rue Vanneau — élévation principale <span class="badge">FACADE</span></h3>
+  <p class="meta">se-elevation · 17, rue Vanneau, Paris ·
+     recorded year 1864 · class comfortable</p>
+  <p class="shows">Textbook narrow street-front elevation, 'Deuxième Classe': straight comble with three pedimented dormers, continuous cast-iron balconies at two floors, flat unadorned ashlar wall plane, ground-floor door and barred windows — the canonical narrow haussmannien house front with printed metric scale.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_03_hotel-prive-rue-vanneau-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_82_se-elevation_03_hotel-prive-rue-vanneau-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>83 · Hôtel privé, 17 rue Vanneau — élévation postérieure (façade sur cour) <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-elevation · 17, rue Vanneau, Paris ·
+     recorded year 1864 · class comfortable</p>
+  <p class="shows">Companion rear/courtyard elevation of the same house: plainer treatment than the street front, still with balconies and a straight comble at every floor, showing how the classical street facade contrasts with the working courtyard face of an identical structure.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_04_hotel-prive-rue-vanneau-arriere.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_83_se-elevation_04_hotel-prive-rue-vanneau-arriere_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>84 · Maison à loyer, avenue de l'Impératrice — coupe générale <span class="badge">FACADE</span></h3>
+  <p class="meta">se-elevation · avenue de l'Impératrice (today avenue Foch), Paris ·
+     recorded year 1864 · class grand</p>
+  <p class="shows">Full building section ('coupe générale') cut through the porte-cochère passage: interior room heights and decor at left against the exterior street elevation at right, courtyard, and rear service wing — the single plate type in this family that reveals true floor-to-floor heights rather than only the outward face.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_05_maison-a-loyer-avenue-imperatrice-coupe.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_84_se-elevation_05_maison-a-loyer-avenue-imperatrice-coupe_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>85 · Maison à loyer, 3 rue de la Paix — élévation <span class="badge">FACADE</span></h3>
+  <p class="meta">se-elevation · 3, rue de la Paix, Paris ·
+     recorded year 1864 · class grand</p>
+  <p class="shows">A 'Première Classe' rental building (the standard haussmannien maison à loyer type): ground-floor shopfronts, two full-width running iron balconies (2nd and 5th-floor pattern), straight mansard comble with pedimented dormers, and a flat symmetrical facade plane — the clearest single-plate demonstration of the balcon filant rule.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_06_maison-a-loyer-rue-de-la-paix.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_85_se-elevation_06_maison-a-loyer-rue-de-la-paix_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>86 · Maison à loyer, 120 boulevard de Sébastopol — détails de la façade <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-elevation · 120, boulevard de Sébastopol, Paris ·
+     recorded year 1864 · class comfortable</p>
+  <p class="shows">Fully measured entrance-bay detail on the flagship percée boulevard: entresol window and door surround with dimensioned mouldings, balcony-console profile with metric callouts, door hardware — usable for exact proportions of the rez-de-chaussée treatment that a photograph could not supply.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_07_maison-a-loyer-boulevard-sebastopol-120-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_86_se-elevation_07_maison-a-loyer-boulevard-sebastopol-120-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>87 · Maison à loyer, 9 rue du Conservatoire — détail de la façade <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-elevation · 9, rue du Conservatoire, Paris ·
+     recorded year 1864 · class comfortable</p>
+  <p class="shows">Two stacked measured window bays with cast-iron balcon-filant railings, floral rosette bandeau, and dimensioned mouldings/reveals in metres and centimetres — a second independent source for exact balcony and window proportions.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_08_maison-a-loyer-rue-conservatoire-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_87_se-elevation_08_maison-a-loyer-rue-conservatoire-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>88 · Maison à loyer, 63 boulevard de Sébastopol — détail de la façade <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-elevation · 63, boulevard de Sébastopol, Paris ·
+     recorded year 1864 · class comfortable</p>
+  <p class="shows">Measured door/window-pediment detail with a full dimension ladder in the margin: cartouche carving, bossage coursing either side of the opening, and an arched porte-cochère lintel below — another exact-proportions source for ground-floor surrounds on the same boulevard.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-elevation/se-elevation_09_maison-a-loyer-boulevard-sebastopol-63-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_88_se-elevation_09_maison-a-loyer-boulevard-sebastopol-63-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1864</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>89 · Immeuble rue Halévy -- élévation type du décret de 1860 <span class="badge">FACADE</span></h3>
+  <p class="meta">se-entrance · rue Halévy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Round-arched pedestrian entrance with a single mascaron keystone set directly beside a full cast-iron-framed shopfront (now Zara) at the same ground-floor datum, with the complete balcon-filant / pedimented-dormer comble stack above -- Commons' own title calls this the model elevation prescribed by the 1860 decree.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-entrance/se-entrance_02_rue-halevy-elevation-type-1860.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_89_se-entrance_02_rue-halevy-elevation-type-1860_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>90 · Le Grand Hôtel, boulevard des Capucines <span class="badge">FACADE</span></h3>
+  <p class="meta">se-entrance · 15 boulevard des Capucines, Paris 9e ·
+     recorded year 1861-1862 · class grand</p>
+  <p class="shows">The Grand Hôtel's arcaded former main entrance and flanking shop bays, each round arch fitted with a dense wrought-iron scrolled grille, directly beside contemporary shopfronts at street level -- Commons dates the Jules Cavelier atlantes on the facade above the arcade to 'vers 1861/1862', an independently sourced construction date rather than a photo-capture date.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-entrance/se-entrance_03_grand-hotel-capucines-arcade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_90_se-entrance_03_grand-hotel-capucines-arcade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1861</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>91 · 27, rue Saint-Lazare <span class="badge">FACADE</span></h3>
+  <p class="meta">se-entrance · 27 rue Saint-Lazare, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">A paired entrance bay: a full carriage-height round-arched porte cochère (iron gate visible through the opening) beside a matching pedestrian door, both set under an ornamented cast-iron fanlight grille with a carved cartouche between them -- an unusually clean read of a genuine two-door Second Empire entrance and its ironwork.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-entrance/se-entrance_04_rue-saint-lazare-27-twin-arches.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_91_se-entrance_04_rue-saint-lazare-27-twin-arches_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>92 · 2, place d'Estienne d'Orves <span class="badge">FACADE</span></h3>
+  <p class="meta">se-entrance · 2 place d'Estienne d'Orves / 60 rue de Châteaudun, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">A deep-red double-leaf porte cochère flanked by carved telamon figures, standing directly beside a café-brasserie awning on one side and a bank shopfront on the other -- a strong side-by-side contrast between the entrance's height and the shopfronts' more modest scale on the same ground floor.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-entrance/se-entrance_05_place-estienne-dorves-corner.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_92_se-entrance_05_place-estienne-dorves-corner_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>93 · 2, boulevard Voltaire <span class="badge">FACADE</span></h3>
+  <p class="meta">se-entrance · 2 boulevard Voltaire, Paris 11e ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">A plain, unornamented wood double-leaf porte cochère beside a rolled-steel shop shutter and a restaurant awning -- the one 'ordinary register' entrance kept in the set, a counterweight to the grand corner buildings that otherwise dominate what Commons has catalogued for this feature.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-entrance/se-entrance_06_boulevard-voltaire-2-plain-door.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_93_se-entrance_06_boulevard-voltaire-2-plain-door_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>7 @ (0.7, 3.0, 2.0, 3.0, 3.0, 1.6, 0.7)</td>
+       <td>eaves</td><td>17.0 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>94 · 53, rue Blanche <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-entrance · 53 rue Blanche, Paris 9e ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">A tall arched pale-green painted wood porte cochère with a plain moulded surround, directly beside a real-estate-agency shopfront -- full facade above shows the plain window surrounds, small pediments and continuous wrought-iron balconies of a restrained mid-register building; also used in the se-comble family for its roofline.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-entrance/se-entrance_07_rue-blanche-53-porte-cochere.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_94_se-entrance_07_rue-blanche-53-porte-cochere_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>95 · Boulevard Malesherbes, du Boulevard de Courcelles <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-facade · Boulevard Malesherbes (8e), Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Genuine period photograph (Commons dates it ca.1853-70, taken by the City of Paris's official photographer during construction of the boulevard itself). Near-frontal view of the corner block: unbroken cornice line across party walls, continuous balcon filant at 2nd floor running the full block, straight-pitch mansard with regular dormers, flat unbroken wall plane -- the textbook block-unity effect the 1855 circulaire was written to produce.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-facade/se-facade_01_marville-malesherbes-courcelles.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_95_se-facade_01_marville-malesherbes-courcelles_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>96 · Boulevard Sebastopol <span class="badge">FACADE</span></h3>
+  <p class="meta">se-facade · Boulevard de Sebastopol, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Genuine period photograph, corner building pavement-to-ridge in near-frontal view: straight 45-degree comble roof with segmental-pedimented dormers, continuous balcon filant at 2nd floor across the whole block, ground-floor shopfronts under a classical pilastered corner surround ('Pygmalion' sign). One of the cleanest period-authentic references for the roof/balcony/cornice relationship.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-facade/se-facade_02_marville-sebastopol.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_96_se-facade_02_marville-sebastopol_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>97 · Rue de Turbigo <span class="badge">FACADE</span></h3>
+  <p class="meta">se-facade · Rue de Turbigo, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Genuine period photograph of the corner building on rue de Turbigo (pierced 1854-1868), near-frontal, full height visible: ground-floor shopfronts, fenestration rhythm and pilaster articulation across 4-5 storeys, balconies at multiple levels, mansard partially visible at top. A sculpted corner figure is a single accent piece, not the near-universal caryatid escalation of the 1880s-90s.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-facade/se-facade_03_marville-turbigo.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_97_se-facade_03_marville-turbigo_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>98 · Boulevard de Sebastopol (modern) <span class="badge">FACADE</span></h3>
+  <p class="meta">se-facade · Boulevard de Sebastopol, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Modern mild-oblique photo of a corner immeuble on boulevard de Sebastopol (pierced 1855-58): full elevation pavement-to-ridge, straight comble, two levels of continuous balcon filant, corner chamfer. Direct present-day counterpart to the Marville photographs of the same street.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-facade/se-facade_05_boulevard-sebastopol-modern.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_98_se-facade_05_boulevard-sebastopol-modern_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>99 · 2 boulevard Voltaire <span class="badge">FACADE</span></h3>
+  <p class="meta">se-facade · 2 boulevard Voltaire, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Dead-frontal, textbook canonical elevation: straight 45-degree comble with regularly spaced pedimented dormers, continuous balcon filant at both the 2nd floor and the top floor, flat unornamented wall plane, symmetrical window bays. Ground-floor bossage is partly masked by a shop awning but the storey stack and roof are fully legible -- probably the single best reference image in this set for the cornice-to-comble relationship.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-facade/se-facade_06_boulevard-voltaire.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_99_se-facade_06_boulevard-voltaire_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>35.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>14.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.73, 1.84, 3.45, 3.8, 3.45, 0.73)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>100 · 53 rue Blanche <span class="badge">FACADE</span></h3>
+  <p class="meta">se-facade · 53 rue Blanche, Paris ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Dead-frontal full elevation, pavement to ridge: straight-pitch mansard with regular dormers, arched carriage-entry door with keystone on axis, individual balconies at most floors plus continuous filant bands at two levels, flat minimal-relief wall plane. One of the clearest single-building references in the set for the overall storey stack.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-facade/se-facade_07_rue-blanche-53.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_100_se-facade_07_rue-blanche-53_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>101 · 3 place Saint-Michel, balcon, toit <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · 3 place Saint-Michel, Paris 5e/6e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Tight upward-angled crop of the corner mansard and the floor just below it: a dense, symmetrical cast-iron balcon-filant balustrade (fine interlocking scrollwork, no whiplash asymmetry) running along the whole visible bay, plus small matching wrought-iron balconettes on the dormer windows in the zinc comble itself. A rule about the standard haussmannien scrollwork pattern, or about ironwork repeating at the attic-storey dormers, is directly answerable to this image.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_01_place-st-michel-balcon-toit.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_101_se-ironwork_01_place-st-michel-balcon-toit_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>17.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.52, 4.05, 3.8, 4.05, 4.05, 0.52)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>102 · 23, avenue de l'Opéra (1916) <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · avenue de l'Opéra, Paris 1er/2e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Long raking street view down the full enfilade: a continuous balcon filant carried across ten-plus separate party-wall bays at a consistent floor line, exactly the block-wide horizontal continuity the 1855 circulaire was written to force. Photograph itself dates to 1916 (irrelevant photo-capture date, not used as a construction date) but the ironwork and stone are photographed close enough to their construction to be undisturbed by later renovation.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_02_avenue-opera-1916-enfilade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_102_se-ironwork_02_avenue-opera-1916-enfilade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>18.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (1.01, 4.06, 3.8, 4.06, 4.06, 1.01)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>103 · Boulevard de Sébastopol, street elevation <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · boulevard de Sébastopol, Paris 3e/4e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Clear daylight street view with buildings on both sides showing matching balcon-filant bands at consistent floor heights running the length of the visible block. Boulevard de Sébastopol was pierced 1855-1858, among the very first Second Empire percées, so this street is safely inside the 1853-1870 window.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_05_bd-sebastopol-street.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_103_se-ironwork_05_bd-sebastopol-street_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>104 · Corner building dated 1858, boulevard de Sébastopol <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · boulevard de Sébastopol, Paris (exact house number not recorded on Commons) ·
+     recorded year 1858 · class comfortable</p>
+  <p class="shows">Upward corner view with dense, rich cast-iron scrollwork balconies at two consecutive floors, foliage partly overhanging the top-left corner but the ironwork itself fully legible. A construction date, '1858', is cut directly into the stone pier at the corner and clearly visible in the photograph (not a Commons photo-capture date) -- a rare case in this corpus of an on-facade date within the strict 1853-1870 window.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_06_bd-sebastopol-1858.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_104_se-ironwork_06_bd-sebastopol-1858_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1858</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>105 · Fontaine Saint-Michel and adjoining block <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · place Saint-Michel, Paris 5e/6e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Wide panorama of the whole place: on the right, an unbroken run of matching balcon filant and matching 45-degree combles across the full block from the corner around to the side street, visibly the same design repeated building to building -- the clearest 'enforced block unity' composition in this set, even though individual railing patterns read smaller than in the tight crops.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_07_place-st-michel-panorama.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_105_se-ironwork_07_place-st-michel-panorama_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>17.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.52, 4.05, 3.8, 4.05, 4.05, 0.52)</td>
+       <td>eaves</td><td>19.8 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>106 · Immeuble, rue Halévy <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · rue Halévy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Full, near-frontal facade in even light: two bands of dense symmetrical cast-iron balcon filant (2nd floor and 5th floor under the straight comble), Corinthian-pilaster window surrounds, a mascaron keystone over the ground-floor arch, and pedimented dormers. A clean, unobstructed reference for how the two balcony bands sit relative to the whole elevation.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_08_rue-halevy-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_106_se-ironwork_08_rue-halevy-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>107 · Rue Halévy, dormer and balustrade detail <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · rue Halévy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Tight upward crop pairing two pedimented dormers on a straight comble with the dense cast-iron balustrade of the balcon filant directly below -- a good answerable image for how the roofline dormer rhythm and the ironwork band relate vertically on the same facade.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_09_rue-halevy-dormer-balustrade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_107_se-ironwork_09_rue-halevy-dormer-balustrade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>108 · Boulevard de Sébastopol, sidewalk enfilade <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-ironwork · boulevard de Sébastopol, Paris 2e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Street-level view down a long stretch of sidewalk: a continuous line of cast-iron balconies at matching floor heights recurs down the whole visible block on the right, receding into the distance -- direct visual evidence of the 1855 circulaire's block-wide alignment rule holding over many buildings, not just two.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-ironwork/se-ironwork_10_bd-sebastopol-enfilade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_108_se-ironwork_10_bd-sebastopol-enfilade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>30.0 m <i>(measured)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>7</td>
+       <td>bays</td><td>6 @ (0.42, 3.45, 3.8, 3.45, 3.45, 0.43)</td>
+       <td>eaves</td><td>18.6 m</td>
+       <td>legal ceiling</td><td>20.0 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>109 · 3 Boulevard Malesherbes, ground-floor arcade <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 3 Boulevard Malesherbes, 8e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Four arched ground-floor bays with regular raised bossage: each pier and voussoir band is built from cleanly coursed ashlar blocks with deep, evenly-spaced horizontal and radiating joints -- the coursing module is constant across all four bays, giving a clean real-world course-height figure. Boulevard Malesherbes was pierced 1861-1870, squarely inside the target period. Cropped to exclude the tour bus that partly blocked the original frame.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_01_boulevard-malesherbes-3-arcade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_109_se-socle_01_boulevard-malesherbes-3-arcade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>110 · 84 Boulevard Malesherbes, porte-cochère surround <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 84 Boulevard Malesherbes, 8e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Ground-floor socle in regular coursed ashlar with drafted-margin joints framing the arched porte-cochère and flanking windows -- clean, unbroken horizontal coursing from the pavement to the first-floor cornice, giving a legible course-height dimension. Parked cars intrude only at the very bottom of frame.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_03_boulevard-malesherbes-84-porte.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_110_se-socle_03_boulevard-malesherbes-84-porte_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>111 · 86 Boulevard Malesherbes, porte-cochère surround <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 86 Boulevard Malesherbes, 8e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Same coursed-ashlar socle module as its neighbours at 84 and 88 -- useful as a repeat confirming the course height is a fixed design dimension along this stretch of the boulevard, not a one-off. Tree shadow falls across the stone but does not obscure the joint lines.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_04_boulevard-malesherbes-86-porte.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_111_se-socle_04_boulevard-malesherbes-86-porte_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>112 · 88 Boulevard Malesherbes, porte-cochère surround <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 88 Boulevard Malesherbes, 8e arr. ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Third repeat of the same coursed-ashlar ground-floor socle module seen at 84 and 86 Boulevard Malesherbes -- door surround and window jambs built from regular drafted-margin blocks, clean and well lit, minimal obstruction.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_05_boulevard-malesherbes-88-porte.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_112_se-socle_05_boulevard-malesherbes-88-porte_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>113 · 62 rue de Malte, door and entresol <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 62 rue de Malte, 11e arr. ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">French Wikipedia's own bossage article captions this exact photo as an example of 'bossage a refend continu en tables' -- the flat-panelled, continuously-jointed variant of bossage, visible here as the shallow horizontal banding on the pale entresol wall between the carved door surround and the window above. Sharp, unobstructed, full vertical bay in frame. Note this is the flatter table-bossage variant, not deep cushioned rustication -- record it as such rather than over-claiming.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_06_rue-de-malte-62-entresol.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_113_se-socle_06_rue-de-malte-62-entresol_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>114 · 16 Avenue Victoria, dated pilaster panel <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 16 Avenue Victoria, 1er arr. ·
+     recorded year 1860 · class comfortable</p>
+  <p class="shows">Ground-floor pilaster panel between two shopfronts, carved with 'A. HUGUET ARCHITECTE 1860' directly on the stone -- a rare case where the construction year is stated on the building itself rather than inferred. Flat recessed-panel treatment (refend-style) rather than raised bossage, bordered by grooved reveals; shop signage crops in at both edges but the dated panel itself is fully legible.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_07_avenue-victoria-16-dated-1860.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_114_se-socle_07_avenue-victoria-16-dated-1860_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1860</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>115 · 133 Boulevard Haussmann, dated porte-cochère <span class="badge">FACADE</span></h3>
+  <p class="meta">se-socle · 133 Boulevard Haussmann, 8e arr. ·
+     recorded year 1868 · class grand</p>
+  <p class="shows">Porte-cochère lintel carved 'MONGE ARCH[itec]te 1868' plus the house number 133 -- another on-stone dated example, squarely in the target window. Flanking pilasters show flat sunken ashlar panels (refend treatment) rather than deep bossage; included for the secure date and clean coursing rather than as a bossage exemplar.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-socle/se-socle_08_boulevard-haussmann-133-dated-1868.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_115_se-socle_08_boulevard-haussmann-133-dated-1868_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1868</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>116 · 34 rue Jean-Baptiste-Pigalle, window detail 05 <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-surround · 34 rue Jean-Baptiste-Pigalle, Paris 9e ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">Moulded architrave and plain cornice over a window with simple balcon filant ironwork below -- the canonical restrained Second Empire surround with no mascaron.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_01_rue-jean-baptiste-pigalle-fenetre-05.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_116_se-surround_01_rue-jean-baptiste-pigalle-fenetre-05_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>117 · 34 rue Jean-Baptiste-Pigalle, window detail 06 <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-surround · 34 rue Jean-Baptiste-Pigalle, Paris 9e ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">An upper-floor window with a small triangular fronton and a modest acanthus-and-rosette relief in the tympanum, plain shutters, no balcony -- direct evidence of ornament diminishing on higher floors versus the piano-nobile treatment.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_02_rue-jean-baptiste-pigalle-fenetre-06.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_117_se-surround_02_rue-jean-baptiste-pigalle-fenetre-06_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>118 · Balcon d'un immeuble parisien <span class="badge">FACADE</span></h3>
+  <p class="meta">se-surround · unidentified Paris street ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Full window opening: triangular pediment with a shell cartouche in the tympanum on console brackets, dentilled cornice, moulded architrave, and a dense cast-iron balcon filant with heart/quatrefoil scrollwork below -- a textbook console-and-fronton-over-balcon assembly.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_03_balcon-immeuble-parisien.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_118_se-surround_03_balcon-immeuble-parisien_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>119 · 31 rue Du Sommerard <span class="badge">FACADE</span></h3>
+  <p class="meta">se-surround · 31 rue Du Sommerard, Paris 5e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Whole corner facade showing the diminution rule end to end: pedimented 2nd-floor windows over a balustraded balcon filant, plainer moulded surrounds at 3rd floor, simple surrounds above, bossage/rustication at the arcaded ground floor shopfront, and a straight 45-degree comble with pedimented dormers on top.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_04_rue-du-sommerard-31-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_119_se-surround_04_rue-du-sommerard-31-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>10.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>9.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.86, 2.0, 3.45, 1.84, 0.86)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>120 · 53 rue Blanche <span class="badge">FACADE</span></h3>
+  <p class="meta">se-surround · 53 rue Blanche, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Full flat-plane facade across five floors: small plain rosette medallions (not full mascaron faces) at the spandrels of the two main floors, continuous cast-iron balconies at multiple levels, and visibly plainer top-floor windows -- ornament kept sparing and diminishing rather than dense.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_05_rue-blanche-53-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_120_se-surround_05_rue-blanche-53-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>12.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>121 · 50-52 rue Notre-Dame-de-Lorette, window detail <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-surround · 50-52 rue Notre-Dame-de-Lorette, Paris 9e ·
+     recorded year (none) · class unknown</p>
+  <p class="shows">Complete window opening in one frame: triangular pediment on console brackets, egg-and-dart and dentil moulding, full architrave with sill/appui, cast-iron balcon filant below the sash, and a plainer shuttered window above it showing the upper-floor diminution. Kept for how completely it frames the opening even though the building's exact construction date could not be confirmed (klass left unknown).</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_06_notre-dame-de-lorette-50-52-fenetre.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_121_se-surround_06_notre-dame-de-lorette-50-52-fenetre_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>122 · Paris windows and dormer windows, haussmannian facade <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-surround · unidentified Paris street ·
+     recorded year (none) · class ordinary</p>
+  <p class="shows">Straight 45-degree comble with plain rectangular dormers above a balcon filant, and below it Corinthian-capital console brackets crowning plain window surrounds -- the roofline-to-window relationship the diminution rule depends on.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_07_dormer-and-window-detail.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_122_se-surround_07_dormer-and-window-detail_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.5, 3.0, 2.0, 3.0, 3.0, 0.5)</td>
+       <td>eaves</td><td>14.92 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>123 · Rue Halevy, 12 <span class="badge">FACADE</span></h3>
+  <p class="meta">se-surround · 12 rue Halevy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Whole corner block facade near the Opera quarter: straight mansard roofline, arcaded rusticated ground floor with voussoired arches, continuous balcon filant at two levels, pilastered piano nobile, and consistent floor-to-floor treatment continuing across the party wall to the left -- good context shot for how the window-surround programme sits inside the whole elevation.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_08_rue-halevy-12-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_123_se-surround_08_rue-halevy-12-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>True</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="detail">
+  <h3>124 · Rue Halevy 069 <span class="badge">DETAIL — one feature only</span></h3>
+  <p class="meta">se-surround · rue Halevy, Paris 9e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Close view straight up the facade: two dormers with plain straight triangular pediments (not curved -- the pre-1884 comble type) sitting above a dense cast-iron balcon filant with rosette/heart motifs and a modillion cornice.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_09_rue-halevy-dormers-balcon.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_124_se-surround_09_rue-halevy-dormers-balcon_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>18.0 m <i>(estimated)</i></td>
+       <td>parcel</td><td>15.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>6 @ (0.47, 2.15, 4.05, 3.8, 4.05, 0.47)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>125 · 19 rue Auber <span class="badge">FACADE</span></h3>
+  <p class="meta">se-surround · 19 rue Auber, Paris 9e ·
+     recorded year (none) · class comfortable</p>
+  <p class="shows">Two windows with matching triangular frontons on console brackets and a palmette-frieze architrave over a shared balcon filant, plus a single restrained male-mask keystone over the arched ground-floor entry below -- shows mascarons used sparingly (one, at the door) rather than on every opening.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_10_rue-auber-19-frontons.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_125_se-surround_10_rue-auber-19-frontons_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.65, 3.45, 3.8, 3.45, 0.65)</td>
+       <td>eaves</td><td>16.32 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>
+<section class="facade">
+  <h3>126 · 164 rue du Faubourg-Saint-Honore <span class="badge">FACADE</span></h3>
+  <p class="meta">se-surround · 164 rue du Faubourg-Saint-Honore, Paris 8e ·
+     recorded year (none) · class grand</p>
+  <p class="shows">Multi-floor facade with cartouche-topped pediments and a full balustrade balcon filant at the 2nd floor, a simpler cartouche treatment at the 3rd, and plain surrounds with small console brackets at the 4th -- a clean four-floor progression of diminishing ornament over a scrolled-console entry arch.</p>
+  <div class="pair">
+    <figure><img src="../../reference/images/se-surround/se-surround_11_faubourg-saint-honore-164-facade.jpg"><figcaption>reference photograph</figcaption></figure>
+    <figure><img src="pair_126_se-surround_11_faubourg-saint-honore-164-facade_gen.png"><figcaption>generated</figcaption></figure>
+  </div>
+  <table>
+   <tr><td>street width</td><td>15.0 m <i>(unknown)</i></td>
+       <td>parcel</td><td>12.0 m</td>
+       <td>year</td><td>1875</td>
+       <td>corner</td><td>False</td>
+       <td>ground</td><td>shop</td></tr>
+   <tr><td>storeys</td><td>6</td>
+       <td>bays</td><td>5 @ (0.99, 3.8, 4.05, 2.16, 1.0)</td>
+       <td>eaves</td><td>17.37 m</td>
+       <td>legal ceiling</td><td>17.55 m</td>
+       <td>envelope</td><td>diagonal_45</td></tr>
+  </table>
+</section>

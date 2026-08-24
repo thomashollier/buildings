@@ -1,0 +1,108 @@
+{
+  "family": "se-cornice",
+  "saved": 8,
+  "rejected": 9,
+  "notes": "Rejected as period-off despite Commons 'haussmannien' tagging, per the strict curved-comble/corner-dome/atlantes tells: Angle rue Christiani + rue de Clignancourt (rounded corner turret with a domed roof — corner rotonde), Rue de la Glacière x Léon-Maurice Normann (domed corner turret, heavy academic ornament), Rue Monge corner 'Editions Casteilla' building (curved zinc dome over the corner bay, flanking atlante-like figures at the door), and all three 2018 Place Saint-Michel views (the whole block there carries a bombé/curved-profile mansard, which is exactly the 1884-decree tell even though the square itself dates to the Haussmann percee of the Boulevard Saint-Michel — kept out on the 'reject even when Commons calls it haussmannien' instruction rather than trust an undocumented construction date). Also dropped: 50/52/56 boulevard Magenta (52's door surround is a rocaille cartouche with bare-chested putti, 56 has full atlante figures carrying the cornice — both are the 'elaborate near-universal mascarons/atlantes ramp through 1870s-90s' tell, not the plain modillion-and-dentil cornice this family needs even though the buildings' own dated plaques put them at 1866-69); 105/107 rue de Rennes (caryatid facade, undocumented build year, Rue de Rennes' southern reaches were only finished well after 1870 so the risk wasn't worth it); Bd Richard Lenoir 48 and 78 (explicitly captioned as 1905-1910 post-Haussmannian/Art Nouveau transitional builds); and an aerial Tour Saint-Jacques view of Rue de Rivoli no.88 (too distant/oblique to read the cornice line, and the buildings flanking it are visibly mismatched in height and era). Kept but flagged: Avenue de l'Opera no.14 (se-cornice_06) is the best 'unbroken cornice across many party walls' evidence in the set, but the avenue was built in stages 1864-1879 and I could not confirm this specific stretch predates 1870, so year/klass are left unknown rather than guessed — treat as illustrative of the block-alignment principle, not as a dated exemplar. Rue Halevy 12 and the two Rue Halevy detail crops (02, 03) are very likely the same or adjacent buildings on a street cut through in the early-to-mid 1860s for the new Opera; again no firm construction date found, so left unknown. Angle rue de Navarre/rue Monge (08) is honest 'partial' quality — a lively PD streetscape with cornices and mansards on two adjoining but visibly different-height buildings; useful for general balcon-filant/mansard context but is not a clean unbroken-cornice case, so don't cite it for the party-wall-continuity rule specifically. Overall this family was hard to source directly: Commons file search for corniche/modillon terms returns almost entirely book-scan PDFs and non-Parisian (often Romanesque-church) cornice photos, so the working set was built by walking Category:Haussmannian architecture in Paris and Category:Balconies in Paris and screening each candidate by eye for period tells rather than by keyword.",
+  "images": [
+    {
+      "file": "images/se-cornice/se-cornice_01_boulevard-sebastopol-row.jpg",
+      "title": "Boulevard de Sebastopol",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Boulevard-sebastopol.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Thierry Bezecourt",
+      "shows": "unbroken cornice/balcony line running at consistent height across a long row of separate buildings down Boulevard de Sebastopol — the clearest single piece of evidence in this set for the 1855 circulaire's block-alignment requirement; straight 45-degree mansard roofs throughout, no curved combles or corner domes",
+      "quality": "good",
+      "klass": "ordinary",
+      "year": "",
+      "street": "Boulevard de Sebastopol, Paris",
+      "corner": true
+    },
+    {
+      "file": "images/se-cornice/se-cornice_02_rue-halevy-modillions.jpg",
+      "title": "Cornice and Dormers, Rue Halevy",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_windows_and_dormer_windows,_haussmannian_facade.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Vania Teofilo",
+      "shows": "tight, well-lit crop of the main roof cornice with closely spaced block modillions and dentils, straight-sided pedimented dormers set into a true 45-degree slate mansard, and a dense cast-scrollwork running balcony immediately below — the canonical Second Empire cornice profile",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": "Rue Halevy, Paris 9e"
+    },
+    {
+      "file": "images/se-cornice/se-cornice_03_rue-halevy-bandeau-detail.jpg",
+      "title": "Bandeau and Cornice Detail, Rue Halevy",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_Hal%C3%A9vy_069.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Vania Teofilo",
+      "shows": "two stacked horizontal members on the same facade in one frame: a plain corniced bandeau/string-course marking a storey division, and above it the deeper main roof cornice with sculpted console-modillions and dentils, plus a dense cast-iron scrollwork balustrade and straight pedimented dormers",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": "Rue Halevy, Paris 9e"
+    },
+    {
+      "file": "images/se-cornice/se-cornice_04_rue-halevy-12-corner.jpg",
+      "title": "12 Rue Halevy Corner Elevation",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_Halevy,_12.jpg",
+      "license": "Public domain",
+      "author": "Tangopaso",
+      "shows": "full corner elevation with the main cornice and two intermediate bandeaux running unbroken around the curved corner bay at identical height on both street facades, dense wrought-iron balconies at the 2nd and 5th floors, and rusticated (bossage) ground floor with round-arched openings",
+      "quality": "good",
+      "klass": "grand",
+      "year": "",
+      "street": "12, Rue Halevy, Paris 9e",
+      "corner": true
+    },
+    {
+      "file": "images/se-cornice/se-cornice_05_rue-berthollet-16.jpg",
+      "title": "16 Rue Berthollet Facade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_Berthollet_16.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "VVVCFFrance",
+      "shows": "full ashlar facade with a plain corniced string course under the top-floor balcony and a deeper modillioned cornice with paired console brackets under the 2nd-floor balcony, pedimented window surrounds at the piano nobile, dense scrollwork balcon filant at 2nd and top floors, and the next building visible at matching cornice height to the right",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": "16 Rue Berthollet, Paris 5e"
+    },
+    {
+      "file": "images/se-cornice/se-cornice_06_avenue-opera-enfilade.jpg",
+      "title": "Avenue de l'Opera Enfilade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_75001_Avenue_de_l%27Op%C3%A9ra_no_14_et_suivants_20140102.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Lawrence W.K. Ho",
+      "shows": "long raking view down a full block showing the roof cornice, modillion band, and running balcony continuing unbroken at identical height across many distinct building facades receding into the distance — the single most legible illustration of the 1855 circulaire's mandated horizontal continuity across party walls in this set, though the exact construction date of this stretch of the avenue (built in stages 1864-1879) could not be confirmed as pre-1870",
+      "quality": "good",
+      "klass": "unknown",
+      "year": "",
+      "street": "Avenue de l'Opera, Paris 1er",
+      "corner": false
+    },
+    {
+      "file": "images/se-cornice/se-cornice_07_typical-paris-apartment.jpg",
+      "title": "Typical Haussmannian Facade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Typical_Paris_Apartment.jpg",
+      "license": "CC BY 3.0",
+      "author": "Joseph Plotz",
+      "shows": "full elevation with a block-modillioned main cornice under a straight 45-degree slate mansard, a plain bandeau string course marking the 2nd-floor division, dense cast-iron balcon filant, and flat ashlar wall plane with minimal relief; a second, differently detailed building is visible immediately adjoining at left for comparison",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": "7th arrondissement, Paris"
+    },
+    {
+      "file": "images/se-cornice/se-cornice_08_angle-navarre-monge.jpg",
+      "title": "Corner at Rue de Navarre and Rue Monge",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Angle_de_la_rue_de_Navarre_avec_la_rue_Monge,_Paris_2007.jpg",
+      "license": "Public domain",
+      "author": "Luctor IV",
+      "shows": "general corner streetscape with straight 45-degree mansard roofs, dentiled cornices, and cast-iron balconies on two adjoining but visibly different-height Haussmannian buildings — useful for mansard/balcony context but the two cornice lines do not run continuous across the corner, so this is not a clean party-wall-continuity example",
+      "quality": "poor",
+      "klass": "ordinary",
+      "year": "",
+      "street": "Rue de Navarre / Rue Monge, Paris 5e",
+      "corner": true
+    }
+  ]
+}

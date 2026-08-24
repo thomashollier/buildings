@@ -1,0 +1,116 @@
+{
+  "family": "se-elevation",
+  "saved": 9,
+  "rejected": 9,
+  "images": [
+    {
+      "file": "images/se-elevation/se-elevation_01_hotel-prive-rue-valois-du-roule.jpg",
+      "title": "Hôtel privé, 8 rue de Valois-du-Roule — élévation principale",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t._1_1864_(125746593).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architects Nolau et Convents; engraver J. Penel",
+      "street": "8, rue de Valois-du-Roule, Paris",
+      "year": "1864",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Full principal elevation, 'Hôtel privé, Première Classe': straight 45° mansard comble with pedimented dormers and cresting, running wrought-iron balconies at two floors, rusticated ground floor, flat wall plane in pierre de taille, printed metric scale bar for direct measurement."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_02_hotel-prive-rue-de-turin-detail.jpg",
+      "title": "Hôtel privé, 8 rue de Turin — croisées du rez-de-chaussée (détail mesuré)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t._1_1864_(125747287).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. Brouty; engraver Sulpis",
+      "street": "8, rue de Turin, Paris",
+      "year": "1864",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Large-scale measured detail of a ground-floor window bay with full dimension callouts in metres: bossage coursing on the socle, wrought-iron balcon-garde-corps scrollwork, entablature and pediment mouldings — a plate answerable to exact proportions rather than a photograph's estimate."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_03_hotel-prive-rue-vanneau-facade.jpg",
+      "title": "Hôtel privé, 17 rue Vanneau — élévation principale",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t._1_1864_(125747309).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. E. Petit; engraver Lebel",
+      "street": "17, rue Vanneau, Paris",
+      "year": "1864",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Textbook narrow street-front elevation, 'Deuxième Classe': straight comble with three pedimented dormers, continuous cast-iron balconies at two floors, flat unadorned ashlar wall plane, ground-floor door and barred windows — the canonical narrow haussmannien house front with printed metric scale."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_04_hotel-prive-rue-vanneau-arriere.jpg",
+      "title": "Hôtel privé, 17 rue Vanneau — élévation postérieure (façade sur cour)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t._1_1864_(125747315).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. E. Petit; engraver Lebel",
+      "street": "17, rue Vanneau, Paris",
+      "year": "1864",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Companion rear/courtyard elevation of the same house: plainer treatment than the street front, still with balconies and a straight comble at every floor, showing how the classical street facade contrasts with the working courtyard face of an identical structure."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_05_maison-a-loyer-avenue-imperatrice-coupe.jpg",
+      "title": "Maison à loyer, avenue de l'Impératrice — coupe générale",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t_2_1864_(132703727).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. Raban; engraver Bordet",
+      "street": "avenue de l'Impératrice (today avenue Foch), Paris",
+      "year": "1864",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Full building section ('coupe générale') cut through the porte-cochère passage: interior room heights and decor at left against the exterior street elevation at right, courtyard, and rear service wing — the single plate type in this family that reveals true floor-to-floor heights rather than only the outward face."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_06_maison-a-loyer-rue-de-la-paix.jpg",
+      "title": "Maison à loyer, 3 rue de la Paix — élévation",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t_2_1864_(132703757).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. Paul Mesnard; engraver J. Penel",
+      "street": "3, rue de la Paix, Paris",
+      "year": "1864",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "A 'Première Classe' rental building (the standard haussmannien maison à loyer type): ground-floor shopfronts, two full-width running iron balconies (2nd and 5th-floor pattern), straight mansard comble with pedimented dormers, and a flat symmetrical facade plane — the clearest single-plate demonstration of the balcon filant rule."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_07_maison-a-loyer-boulevard-sebastopol-120-detail.jpg",
+      "title": "Maison à loyer, 120 boulevard de Sébastopol — détails de la façade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t_2_1864_(132703826).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. Levicomte; engraver J. Penel",
+      "street": "120, boulevard de Sébastopol, Paris",
+      "year": "1864",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Fully measured entrance-bay detail on the flagship percée boulevard: entresol window and door surround with dimensioned mouldings, balcony-console profile with metric callouts, door hardware — usable for exact proportions of the rez-de-chaussée treatment that a photograph could not supply."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_08_maison-a-loyer-rue-conservatoire-detail.jpg",
+      "title": "Maison à loyer, 9 rue du Conservatoire — détail de la façade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t_2_1864_(132703960).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architect M. Amoudru; engraver Sulpis",
+      "street": "9, rue du Conservatoire, Paris",
+      "year": "1864",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Two stacked measured window bays with cast-iron balcon-filant railings, floral rosette bandeau, and dimensioned mouldings/reveals in metres and centimetres — a second independent source for exact balcony and window proportions."
+    },
+    {
+      "file": "images/se-elevation/se-elevation_09_maison-a-loyer-boulevard-sebastopol-63-detail.jpg",
+      "title": "Maison à loyer, 63 boulevard de Sébastopol — détail de la façade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27architecture_privee_au_XIXe_siecle_sous_Napoleon_III._Ser._1_Vol._1_t_2_1864_(132703788).jpg",
+      "license": "Public domain",
+      "author": "César Daly (publisher); architects MM. Garnier et Coulon; engraver Sulpis",
+      "street": "63, boulevard de Sébastopol, Paris",
+      "year": "1864",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Measured door/window-pediment detail with a full dimension ladder in the margin: cartouche carving, bossage coursing either side of the opening, and an arched porte-cochère lintel below — another exact-proportions source for ground-floor surrounds on the same boulevard."
+    }
+  ],
+  "notes": "All 9 kept images come from César Daly's 'L'Architecture privée au XIXe siècle sous Napoléon III' (Paris: A. Morel, 1864), Série 1, Volume 1 — individually-scanned page images from an Internet Archive copy, uploaded to Commons under a Flickr-Commons-style batch and confirmed Public Domain via extmetadata. This is the exact source named in the brief and it delivers precisely the material requested: fully dimensioned elevations and one section ('coupe générale'), each captioned with address, architect, and building class (Première/Deuxième/Troisième Classe) by the publisher in 1864 — inside the 1853-1870 window with no dating inferred by us. Two building types recur: 'Hôtel privé' (private townhouse) and 'Maison à loyer' (rental apartment building, the literal haussmannien immeuble); both show the canonical features — straight 45° combles with pedimented dormers, running cast-iron balconies at upper floors, flat ashlar wall planes, and ground-floor bossage — with no bow windows, curved combles, or post-1880s ornament anywhere in the set. Rejects (9): the same Commons search/category surfaced (a) plan-only plates for maisons at 77 and 87 Boulevard de Sébastopol and cellar/sous-sol plans at 88 rue de Rivoli — dropped per brief (plans are out of scope for an ELEVATION family); (b) a door-joinery profile detail (87 Bd Sébastopol) too narrow in subject for this family; (c) Daly's Série 2 Vol. 2 ('Villas, chalets, jardins') and Vol. 3 ('Décorations intérieures') — both confirmed via extmetadata to be villas/interiors, not Paris street immeubles, so skipped wholesale; (d) 'Hôtels privés, 10 et 12 rue Balzac' — grand freestanding townhouses with individual exterior perron staircases, judged too individualised/detached from block-front unity to serve as the canonical example, kept only as a considered pass; (e) several pre-1853 Paris Musées/Gallica hôtel-particulier elevations (Barré, Lecointe, Haudebourt — dated 1735-1835) surfaced by 'Category:Architectural elevations of Paris' were rejected on period grounds before download. Coverage gap: no competition or permit drawing was found meeting both period and legibility bars in the time available — everything here is published-plate material (Daly/Morel), not an administrative permit set; a further pass could search Archives de Paris permis de construire scans specifically. No image required an inferred construction year — all dates are the publisher's own 1864 imprint, and 'grand'/'comfortable' klass calls follow the plates' own Première/Deuxième Classe captions, not a guess."
+}

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+dev/logs/*.log
+.DS_Store
+
+# Rendered verification output under dev/logs is regenerable by dev/harness/*
+# and runs to ~750 MB. The verifier scripts, reports and measurement JSON that
+# sit beside it are kept.
+dev/logs/**/*.png
+dev/logs/**/*.svg

@@ -1,0 +1,104 @@
+{
+  "family": "se-socle",
+  "saved": 8,
+  "images": [
+    {
+      "file": "images/se-socle/se-socle_01_boulevard-malesherbes-3-arcade.jpg",
+      "title": "3 Boulevard Malesherbes, ground-floor arcade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bd_Malesherbes,_3.jpg",
+      "license": "Public domain",
+      "author": "Tangopaso",
+      "street": "3 Boulevard Malesherbes, 8e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Four arched ground-floor bays with regular raised bossage: each pier and voussoir band is built from cleanly coursed ashlar blocks with deep, evenly-spaced horizontal and radiating joints -- the coursing module is constant across all four bays, giving a clean real-world course-height figure. Boulevard Malesherbes was pierced 1861-1870, squarely inside the target period. Cropped to exclude the tour bus that partly blocked the original frame."
+    },
+    {
+      "file": "images/se-socle/se-socle_02_boulevard-malesherbes-5-arcade.jpg",
+      "title": "5 Boulevard Malesherbes, ground-floor arcade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bd_Malesherbes,_5.jpg",
+      "license": "Public domain",
+      "author": "Tangopaso",
+      "street": "5 Boulevard Malesherbes, 8e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "Same arcaded bossage treatment as its neighbour at no. 3 -- regular coursed voussoirs and piers -- confirming the coursing module repeats along the block. Street trees and parked cars obscure the lower third of several bays, hence partial rather than good."
+    },
+    {
+      "file": "images/se-socle/se-socle_03_boulevard-malesherbes-84-porte.jpg",
+      "title": "84 Boulevard Malesherbes, porte-cochère surround",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble,_84_boulevard_Malesherbes,_Paris_2012.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "kenobi75",
+      "street": "84 Boulevard Malesherbes, 8e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Ground-floor socle in regular coursed ashlar with drafted-margin joints framing the arched porte-cochère and flanking windows -- clean, unbroken horizontal coursing from the pavement to the first-floor cornice, giving a legible course-height dimension. Parked cars intrude only at the very bottom of frame."
+    },
+    {
+      "file": "images/se-socle/se-socle_04_boulevard-malesherbes-86-porte.jpg",
+      "title": "86 Boulevard Malesherbes, porte-cochère surround",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble,_86_boulevard_Malesherbes,_Paris_2012.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "kenobi75",
+      "street": "86 Boulevard Malesherbes, 8e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Same coursed-ashlar socle module as its neighbours at 84 and 88 -- useful as a repeat confirming the course height is a fixed design dimension along this stretch of the boulevard, not a one-off. Tree shadow falls across the stone but does not obscure the joint lines."
+    },
+    {
+      "file": "images/se-socle/se-socle_05_boulevard-malesherbes-88-porte.jpg",
+      "title": "88 Boulevard Malesherbes, porte-cochère surround",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble,_88_boulevard_Malesherbes,_Paris_2012.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "kenobi75",
+      "street": "88 Boulevard Malesherbes, 8e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Third repeat of the same coursed-ashlar ground-floor socle module seen at 84 and 86 Boulevard Malesherbes -- door surround and window jambs built from regular drafted-margin blocks, clean and well lit, minimal obstruction."
+    },
+    {
+      "file": "images/se-socle/se-socle_06_rue-de-malte-62-entresol.jpg",
+      "title": "62 rue de Malte, door and entresol",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_de_Malte_(Paris),_num%C3%A9ro_62,_porte_01.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Coyau",
+      "street": "62 rue de Malte, 11e arr.",
+      "year": "",
+      "klass": "ordinary",
+      "quality": "good",
+      "shows": "French Wikipedia's own bossage article captions this exact photo as an example of 'bossage a refend continu en tables' -- the flat-panelled, continuously-jointed variant of bossage, visible here as the shallow horizontal banding on the pale entresol wall between the carved door surround and the window above. Sharp, unobstructed, full vertical bay in frame. Note this is the flatter table-bossage variant, not deep cushioned rustication -- record it as such rather than over-claiming."
+    },
+    {
+      "file": "images/se-socle/se-socle_07_avenue-victoria-16-dated-1860.jpg",
+      "title": "16 Avenue Victoria, dated pilaster panel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_1er_16_Avenue_Victoria_370.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "Reinhardhauke",
+      "street": "16 Avenue Victoria, 1er arr.",
+      "year": "1860",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Ground-floor pilaster panel between two shopfronts, carved with 'A. HUGUET ARCHITECTE 1860' directly on the stone -- a rare case where the construction year is stated on the building itself rather than inferred. Flat recessed-panel treatment (refend-style) rather than raised bossage, bordered by grooved reveals; shop signage crops in at both edges but the dated panel itself is fully legible."
+    },
+    {
+      "file": "images/se-socle/se-socle_08_boulevard-haussmann-133-dated-1868.jpg",
+      "title": "133 Boulevard Haussmann, dated porte-cochère",
+      "source_url": "https://commons.wikimedia.org/wiki/File:133_Boulevard_Haussmann,_Paris_(01).jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Neoclassicism Enthusiast",
+      "street": "133 Boulevard Haussmann, 8e arr.",
+      "year": "1868",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Porte-cochère lintel carved 'MONGE ARCH[itec]te 1868' plus the house number 133 -- another on-stone dated example, squarely in the target window. Flanking pilasters show flat sunken ashlar panels (refend treatment) rather than deep bossage; included for the secure date and clean coursing rather than as a bossage exemplar."
+    }
+  ],
+  "rejected": 21,
+  "notes": "Bossage proved harder to find well-photographed at street level than expected: most 'Haussmannian doors in Paris' Commons category photos turned out to be either (a) Belle Epoque / Third Republic ornamental doorways with mascarons, garlands and neo-Renaissance carving mis-tagged as haussmannien, or (b) flat smooth ashlar with no visible rustication at all. Rejected: 135 Boulevard Haussmann (undated, heavy lion mascaron, likely too late); rue de Rivoli 1er-arrondissement arcades (numbers below ~90) are Napoleon-I-era (1810s) despite being visually near-identical to the genuinely Second Empire 1852-55 extension east of the Hotel de Ville, so excluded on period grounds even though several nice arcade-detail photos exist; 31 rue Du Sommerard and 84 Boulevard de Port-Royal show flat incised refends with no raised coursing, i.e. the earlier-period treatment this family should NOT show; Hotel de la Paiva (1866, Champs-Elysees) is period-correct but was rejected as an individualised private hotel facade rather than the canonical repeated immeuble bossage the family calls for; the Grand Hotel Paris (1862) ground floor is now entirely modern shopfront glazing with no stone visible. Coverage gap: I could not find a clean, unobstructed photo of deep cushioned/pillow-faced bossage (the boldest 3D variant) at a standard residential immeuble -- the Boulevard Malesherbes examples (images 1-5) are the closest, showing a moderate-relief coursed-ashlar variant with clear drafted margins, which is well documented for 1861-1870 Malesherbes but is flatter than the most dramatic bossage seen on institutional buildings of the same years. All eight images are Second Empire in period; five come from the same boulevard (Malesherbes) since it gave the most repeatable, legible, unobstructed coursing -- a rule tuned only on these could overfit to that one street's block height, so the two dated 1860/1868 examples and the rue de Malte example were kept deliberately even though their bossage is the flatter table/refend variant, for source diversity."
+}

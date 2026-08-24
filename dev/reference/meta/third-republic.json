@@ -1,0 +1,163 @@
+{
+  "family": "third-republic",
+  "saved": 13,
+  "images": [
+    {
+      "file": "images/third-republic/third-republic_01_16-rue-etienne-marcel.jpg",
+      "title": "16 rue Etienne-Marcel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:16_rue_Etienne-Marcel.jpg",
+      "license": "CC0",
+      "author": "VVVCFFrance",
+      "street": "16 rue Etienne-Marcel, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "whole facade: mascaron heads under balcony console brackets, richly molded window surrounds with alternating pediments, wrought-iron balconies -- textbook Third Republic ornament density",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_02_53-rue-blanche.jpg",
+      "title": "53 rue Blanche",
+      "source_url": "https://commons.wikimedia.org/wiki/File:53_rue_Blanche_P1050933.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "Pline",
+      "street": "53 rue Blanche, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "whole facade, frontal: carved sculpted keystones/roundels above two window bands and an arched porte-cochere with carved surround -- 45-degree-comble roofline visible above",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_03_angle-rue-christiani.jpg",
+      "title": "Angle rue Christiani, rue de Clignancourt",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Angle_rue_Christiani,_rue_de_Clignancourt,_Paris_2015.jpg",
+      "license": "CC BY 2.0",
+      "author": "Jeanne Menjoulet",
+      "street": "Angle rue Christiani / rue de Clignancourt, Paris 18e",
+      "year": "",
+      "klass": "grand",
+      "shows": "corner building with domed corner turret, columned window surrounds and continuous wrought-iron balconies -- shot from below at a raking upward angle and partly screened by street trees at ground level",
+      "quality": "partial"
+    },
+    {
+      "file": "images/third-republic/third-republic_04_corner-facade-detail.jpg",
+      "title": "Immeuble haussmannien (corner facade detail)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble_haussmannien_(34321494015).jpg",
+      "license": "CC BY 2.0",
+      "author": "Dale Cruse",
+      "street": "",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "close, mildly oblique crop of a corner facade: repeated carved lintel roundels above windows, dense wrought-iron balcony rows across two floor bands",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_05_105-rue-de-rennes-caryatids.jpg",
+      "title": "105 rue de Rennes, caryatids flanking window",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble_haussmannien,_105,_rue_de_Rennes_(48098368707).jpg",
+      "license": "CC BY 2.0",
+      "author": "Fred Romero",
+      "street": "105 rue de Rennes, Paris 6e",
+      "year": "",
+      "klass": "grand",
+      "shows": "frontal detail: full-figure sculpted caryatids flanking a piano-nobile window in place of a plain console -- an extreme, dated example of window treatment becoming sculptural rather than just corniced",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_06_107-rue-de-rennes-caryatids.jpg",
+      "title": "107 rue de Rennes, caryatids flanking window",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble_haussmannien,_107,_rue_de_Rennes_(48098368587).jpg",
+      "license": "CC BY 2.0",
+      "author": "Fred Romero",
+      "street": "107 rue de Rennes, Paris 6e",
+      "year": "",
+      "klass": "grand",
+      "shows": "frontal detail, the neighbouring building's matching pair of sculpted caryatids at a window -- same treatment as 105 rue de Rennes, confirms it as a deliberate facade-wide scheme rather than a one-off",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_07_place-alma-mascaron.jpg",
+      "title": "1 bis place de l'Alma, mascaron over porte-cochere",
+      "source_url": "https://commons.wikimedia.org/wiki/File:1_bis_place_de_l%27Alma_(Paris).jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Neoclassicism Enthusiast",
+      "street": "1 bis place de l'Alma, Paris",
+      "year": "",
+      "klass": "grand",
+      "shows": "sharp frontal close-up of a smiling female mascaron set in a foliate surround above a wrought-iron porte-cochere -- clean example of mascaron-as-standard-ornament over an entrance",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_08_blvd-saint-michel-pediment-mascaron.jpg",
+      "title": "14 boulevard Saint-Michel, window pediment with mascaron",
+      "source_url": "https://commons.wikimedia.org/wiki/File:14_boulevard_Saint-Michel,_Paris_6e.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Polymagou",
+      "street": "14 boulevard Saint-Michel, Paris 6e",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "sharp frontal close-up of a broken-scroll window pediment with a mascaron head at the centre flanked by fruit swags -- textbook combination of the richening pediment and the mascaron becoming standard vocabulary",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_09_mascaron-detail.jpg",
+      "title": "Mascaron detail, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2021-05-29_13-24-42_mascaron-Paris.jpg",
+      "license": "CC BY 4.0",
+      "author": "Thomas Bresson (ComputerHotline)",
+      "street": "",
+      "year": "",
+      "klass": "unknown",
+      "shows": "very sharp frontal close-up of a bearded male mascaron keystone -- good clean reference for carving style even though the source building/address is not recorded",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_10_rue-faubourg-montmartre-mascaron.jpg",
+      "title": "47 rue du Faubourg Montmartre, mascaron keystone over door",
+      "source_url": "https://commons.wikimedia.org/wiki/File:47_Rue_du_Faubourg_Montmartre,_Paris_(01).jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Neoclassicism Enthusiast",
+      "street": "47 rue du Faubourg Montmartre, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "sharp frontal close-up of a bearded mascaron keystone over a carved segmental-arch door pediment with fruit swags -- another clean pediment+mascaron pairing",
+      "quality": "good"
+    },
+    {
+      "file": "images/third-republic/third-republic_11_avenue-de-lopera-no38.jpg",
+      "title": "Avenue de l'Opera, no. 38 and neighbours",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_Avenue_de_l%27Op%C3%A9ra_no_038.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Freepenguin",
+      "street": "Avenue de l'Opera (near no. 38), Paris 1e/2e",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "whole facade run along a street cut through and built up in the late 1870s-1880s: continuous cornices, alternating triangular/segmental window pediments on the upper floors -- ground floor is cluttered with shopfront signage and a tour bus roofline crosses the bottom",
+      "quality": "partial"
+    },
+    {
+      "file": "images/third-republic/third-republic_12_chaussee-dantin-columns.jpg",
+      "title": "Rue de la Chaussee-d'Antin, column capitals before/after cleaning",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Refreshed_columns.jpg",
+      "license": "Public domain",
+      "author": "Tangopaso",
+      "street": "rue de la Chaussee-d'Antin, Paris 9e",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "close frontal detail of two adjacent richly carved Corinthian-order pilaster capitals, one still soot-blackened and one cleaned -- useful for carving depth/style reference; a scaffold pole partly crosses the left capital",
+      "quality": "partial"
+    },
+    {
+      "file": "images/third-republic/third-republic_13_rue-arbalete-villa-medicis.jpg",
+      "title": "Rue de l'Arbalete, immeuble Villa Medicis",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_de_l%27Arbal%C3%A8te_immeuble_%22Villa_M%C3%A9dicis%22.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "VVVCFFrance",
+      "street": "rue de l'Arbalete, Paris 5e",
+      "year": "",
+      "klass": "comfortable",
+      "shows": "whole facade, shot from below at a moderate upward angle: applied cast floral appliques between windows, a sculpted mascaron and carved console brackets over the porte-cochere, an architect's name plaque (partly legible) set into the facade",
+      "quality": "partial"
+    }
+  ],
+  "notes": "Commons metadata almost never records a construction year for these buildings, so `year` is left blank throughout per the no-guessing rule; addresses/arrondissements are recorded where the filename or description gave them. Several strong-looking Commons hits were rejected during review: Avenue Adrien-Hebrard and 35 boulevard Haussmann (Galeries Lafayette) read as later Belle Epoque work, not 1870-1884; 41 rue de Rivoli was too plain/undecorated to evidence this family's richening-ornament claim; two Avenue de l'Opera frames and 51 rue Montorgueil were dropped for a tour-bus obstruction and an interior painted panel respectively; one frame was a night shot. The two rue de Rennes caryatid images are of neighbouring doors on what is very likely the same building elevation -- kept as a pair since it strengthens rather than duplicates the evidence that the sculptural window treatment was a deliberate scheme, not a single showcase feature. Coverage skews toward ornament detail shots (mascarons, pediments, caryatids) over full elevations, which suits the brief (mascarons/pediments) but means roofline (45-degree comble) evidence is thinner -- only images 01, 02, 03 and 21(dropped) showed usable roofline."
+}

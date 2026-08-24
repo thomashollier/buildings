@@ -1,0 +1,26 @@
+{
+  "family": "dated-anchors",
+  "note": "Buildings with a DOCUMENTED construction date, used to anchor periods the Daly 1864 corpus cannot reach. Daly is a single year; these give the chronology model something dated to answer to on either side of a decree.",
+  "images": [
+    {
+      "file": "images/dated-anchors/1887_chaussee-antin-31_provence-71.jpg",
+      "title": "Immeuble d'angle, 31 rue de la Chaussée d'Antin / 71 rue de Provence, Paris 9e",
+      "source_url": "https://www.pss-archi.eu/immeubles/FR-75056-81353.html",
+      "license": "© Q_DC via PSS-archi — thumbnail retained for internal reference only, not redistributable",
+      "author": "Q_DC (PSS-archi)",
+      "year": "1887",
+      "year_evidence": "CARVED — the date 1887 is cut into the escutcheon on the facade, reported by the operator from the building itself. Corroborating documents: permit filed 13 February 1886 (Bulletin municipal officiel, 14 Feb 1886); PSS estimates completion c.1888. The carved date sits between the two and outranks the estimate.",
+      "architect": "Alfred Leroux",
+      "klass": "comfortable",
+      "corner": true,
+      "street": "31 rue de la Chaussée d'Antin / 71 rue de Provence (current tenant: Onyx)",
+      "levels": "R+5",
+      "height_estimate_m": 20.0,
+      "parcel_area_m2": 421,
+      "shows": "A dated POST-1884 commercial corner. Built three years after the Alphand decree of 23 July 1884, so designed under the arc-comble regime rather than the 45° one, yet reads as a classic haussmannien corner to most eyes. The strongest available argument for date-window chronology over a period enum, and the only dated anchor outside Daly's 1864 window. Also the pan coupé case.",
+      "quality": "partial",
+      "quality_note": "340x255 thumbnail — enough to establish massing and corner form, too small to judge the roofline or read the escutcheon.",
+      "open_question": "Is the comble the post-1884 arc or a straight 45°? Not resolvable at this resolution."
+    }
+  ]
+}

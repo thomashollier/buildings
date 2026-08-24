@@ -1,0 +1,1137 @@
+{
+ "group": "Deuxième Classe (first half) — Daly 1864, Serie 1 Vol 1 t.2",
+ "plates": [
+  {
+   "file": "images/daly-1864/daly_elevation_01_blvd-sebastopol-63.jpg",
+   "readable": true,
+   "daly_class": "Deuxième Classe",
+   "address": "No 63, Boulevard de Sébastopol (MM. Garnier et Coulon, archtes)",
+   "storey_count": 6,
+   "has_entresol": true,
+   "scale_note": "MEASURED. Scale bar 'Echelle de 0.01 c/m pour metre' (1:100). Tick centroids found by column-darkness scan of the tick band (y 2136-2149): 0 m at x=613.0, 1 m 672.0, 2 m 730.0, 3 m 789.0, terminal 10 m tick at x=1193.0. (1193.0-613.0)/10 = 58.0 px per metre; the 1 m sub-divided decimetre section (554->613 = 59 px) agrees. Independent sanity check: pavement-to-cornice comes out 19.7 m against the 20 m legal maximum for a >20 m-wide street, which boulevard de Sebastopol is.",
+   "absolute_m": [
+    {
+     "what": "rez-de-chaussee (boutique) floor-to-floor",
+     "value_m": 3.828,
+     "kind": "MEASURED",
+     "how": "pavement y=2000 to top of shop entablature / entresol floor y=1778; 222 px @58.0"
+    },
+    {
+     "what": "entresol floor-to-floor",
+     "value_m": 3.121,
+     "kind": "MEASURED",
+     "how": "entresol floor y=1778 to 1er-etage balcony floor/cornice y=1597; 181 px"
+    },
+    {
+     "what": "1er etage floor-to-floor",
+     "value_m": 3.793,
+     "kind": "MEASURED",
+     "how": "1597 to 1377; 1377 derived from window-opening-bottom spacing (bay 3 bottoms 1585->1365) cross-checked against the sill/console band"
+    },
+    {
+     "what": "2e etage floor-to-floor",
+     "value_m": 3.069,
+     "kind": "MEASURED",
+     "how": "1377 to 1199 (window bottoms 1365->1187)"
+    },
+    {
+     "what": "3e etage floor-to-floor",
+     "value_m": 2.672,
+     "kind": "MEASURED",
+     "how": "1199 to 1044 (window bottoms 1187->1032); 1044 confirmed independently as the drawn balcony slab / string course at y=1043-1055"
+    },
+    {
+     "what": "4e etage floor to underside of main cornice",
+     "value_m": 2.914,
+     "kind": "MEASURED",
+     "how": "balcony slab 1044 to cornice bed 875"
+    },
+    {
+     "what": "pavement to top of main cornice",
+     "value_m": 19.724,
+     "kind": "MEASURED",
+     "how": "y 2000 -> 856 (brick/slate of comble starts at 856 in a plain-wall column profile)"
+    },
+    {
+     "what": "pavement to top of roof (faitage of brisis)",
+     "value_m": 22.414,
+     "kind": "MEASURED",
+     "how": "y 2000 -> 700"
+    },
+    {
+     "what": "comble (mansard) height",
+     "value_m": 2.69,
+     "kind": "MEASURED",
+     "how": "cornice top 856 -> roof crest 700"
+    },
+    {
+     "what": "main cornice band height",
+     "value_m": 0.328,
+     "kind": "UNCERTAIN",
+     "how": "y 856->875; this facade has a shallow cornice and the lower edge is hard to separate from the frieze"
+    },
+    {
+     "what": "facade width (party wall to party wall)",
+     "value_m": 14.448,
+     "kind": "MEASURED",
+     "how": "wall face x 442 -> 1280 measured at three heights (y=1200,1400,1650); drawing is rotated ~0.5 deg so edges shift ~6 px over the height"
+    },
+    {
+     "what": "mean bay pitch (window axes)",
+     "value_m": 2.891,
+     "kind": "MEASURED",
+     "how": "axes 604.5 / 783.0 / 924.0 / 1107.5 from dark-run analysis at four storeys; individual pitches 178.5, 141.0, 183.5 px - the bays are NOT equal on this facade"
+    },
+    {
+     "what": "entrance door opening width",
+     "value_m": 1.776,
+     "kind": "MEASURED",
+     "how": "masonry reveal x 878 -> 981 at 4.5x zoom; the two leaves alone are 93 px = 1.60 m"
+    },
+    {
+     "what": "entrance door opening height",
+     "value_m": 3.034,
+     "kind": "MEASURED",
+     "how": "segmental arch crown y=1822 to threshold y=1998"
+    },
+    {
+     "what": "1er etage window opening height",
+     "value_m": 2.586,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1435-1585 (opening runs down behind the balcony rail)"
+    },
+    {
+     "what": "1er etage window opening width",
+     "value_m": 1.155,
+     "kind": "MEASURED",
+     "how": "bay 3, x 891-957 (glazed sash pair; masonry reveal ~4 px wider)"
+    },
+    {
+     "what": "2e etage window opening height",
+     "value_m": 2.121,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1242-1365"
+    },
+    {
+     "what": "3e etage window opening height",
+     "value_m": 1.776,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1084-1187"
+    },
+    {
+     "what": "4e etage window opening height",
+     "value_m": 2.19,
+     "kind": "MEASURED",
+     "how": "bay 3, y 904-1032; continuous dark run, the balcony rail at 984-1013 is in front of the opening"
+    },
+    {
+     "what": "dormer opening width",
+     "value_m": 0.793,
+     "kind": "MEASURED",
+     "how": "roof dormer, x 751-797"
+    },
+    {
+     "what": "dormer opening height",
+     "value_m": 1.19,
+     "kind": "MEASURED",
+     "how": "y 743-812"
+    },
+    {
+     "what": "1er etage balcony floor above pavement",
+     "value_m": 6.948,
+     "kind": "MEASURED",
+     "how": "continuous balcon filant, y 1597"
+    },
+    {
+     "what": "4e etage balcony floor above pavement",
+     "value_m": 16.483,
+     "kind": "MEASURED",
+     "how": "continuous balcon filant, y 1044"
+    }
+   ],
+   "ratios": [
+    {
+     "what": "entresol / rez-de-chaussee storey height",
+     "value": 0.815,
+     "how": "DERIVED from the two measured storey heights"
+    },
+    {
+     "what": "1er / rez-de-chaussee storey height",
+     "value": 0.991,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e / 1er storey height (taper)",
+     "value": 0.809,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e / 2e storey height (taper)",
+     "value": 0.871,
+     "how": "DERIVED"
+    },
+    {
+     "what": "4e / 3e storey height (taper, 4e taken to cornice bed)",
+     "value": 1.09,
+     "how": "DERIVED - note this is >1: the top storey under the cornice is TALLER than the 3e on this facade"
+    },
+    {
+     "what": "comble / total height to roof crest",
+     "value": 0.12,
+     "how": "DERIVED"
+    },
+    {
+     "what": "comble / height to cornice",
+     "value": 0.136,
+     "how": "DERIVED"
+    },
+    {
+     "what": "main cornice band / total height",
+     "value": 0.015,
+     "how": "DERIVED (cornice band itself is UNCERTAIN)"
+    },
+    {
+     "what": "1er etage opening h/w",
+     "value": 2.239,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e etage opening h/w",
+     "value": 1.984,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e etage opening h/w",
+     "value": 1.661,
+     "how": "DERIVED"
+    },
+    {
+     "what": "4e etage opening h/w",
+     "value": 2.082,
+     "how": "DERIVED"
+    },
+    {
+     "what": "dormer opening h/w",
+     "value": 1.5,
+     "how": "DERIVED"
+    },
+    {
+     "what": "mean bay pitch / facade width",
+     "value": 0.2,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / mean bay pitch",
+     "value": 0.614,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / facade width",
+     "value": 0.123,
+     "how": "DERIVED"
+    },
+    {
+     "what": "height to cornice / facade width",
+     "value": 1.365,
+     "how": "DERIVED"
+    }
+   ],
+   "notes": "5 storeys of masonry above a boutique rez-de-chaussee: rez + entresol + 1er..4e, then a slate mansard with 3 dormers. 4 window bays, DELIBERATELY UNEQUAL (178.5 / 141 / 183.5 px pitch): the entrance door sits on the axis of bay 3, not on the facade centre. Balcons filants at the 1er and the 4e. STOREY TAPER IS NOT MONOTONIC: 3.79 / 3.07 / 2.67 / 2.91 m for 1er/2e/3e/4e - the top storey under the cornice is given back ~0.25 m and a full-width balcony. Height to cornice 19.7 m sits right on the 20 m legal maximum, which is a strong independent check on the scale."
+  },
+  {
+   "file": "images/daly-1864/daly_elevation_02_blvd-sebastopol-2-4.jpg",
+   "readable": true,
+   "daly_class": "Deuxième Classe",
+   "address": "Nos 2 et 4, Boulevard de Sébastopol (M. Davioud, archte)",
+   "storey_count": 5,
+   "has_entresol": true,
+   "scale_note": "MEASURED. Scale bar 'Echelle de 0.01 cent pr metre' (1:100). The bar is tilted ~1.2 deg so ticks were found by following the baseline per column: major ticks at 0 m x=626.5, 5 m x=918.0, 10 m x=1211.0. (1211.0-626.5)/10 = 58.45 px/m; the 0-5 m half gives 58.30 px/m. Minor ticks too faint to resolve individually.",
+   "absolute_m": [
+    {
+     "what": "rez-de-chaussee (boutique) floor-to-floor",
+     "value_m": 3.422,
+     "kind": "UNCERTAIN",
+     "how": "pavement y=1990 to the shopfront transom band y=1790; the shopfront is one continuous frame and the entresol floor is read from the moulded transom, not from a masonry line"
+    },
+    {
+     "what": "entresol floor-to-floor",
+     "value_m": 2.652,
+     "kind": "UNCERTAIN",
+     "how": "1790 to the rosette cornice at the 1er floor y=1635; same caveat"
+    },
+    {
+     "what": "rez + entresol combined (pavement to 1er floor)",
+     "value_m": 6.074,
+     "kind": "MEASURED",
+     "how": "pavement 1990 to 1er-etage cornice 1635 - this pair is reliable even though the split between them is not"
+    },
+    {
+     "what": "1er etage floor-to-floor",
+     "value_m": 4.363,
+     "kind": "MEASURED",
+     "how": "1635 to 1380 (window-opening bottoms bay 3: 1615 -> 1361; console/sill band confirms 1380)"
+    },
+    {
+     "what": "2e etage floor-to-floor",
+     "value_m": 3.559,
+     "kind": "MEASURED",
+     "how": "1380 to 1172, the balcon-filant cornice"
+    },
+    {
+     "what": "3e etage floor-to-floor",
+     "value_m": 3.524,
+     "kind": "MEASURED",
+     "how": "1172 to 966, the main cornice top"
+    },
+    {
+     "what": "pavement to top of main cornice",
+     "value_m": 17.519,
+     "kind": "MEASURED",
+     "how": "y 1990 -> 966; 966 is where the stone cornice meets the brick-faced comble in a column profile (brick texture ~150-180 grey above, stone 190-235 below)"
+    },
+    {
+     "what": "pavement to top of roof",
+     "value_m": 24.517,
+     "kind": "MEASURED",
+     "how": "y 1990 -> 557"
+    },
+    {
+     "what": "comble height",
+     "value_m": 6.997,
+     "kind": "MEASURED",
+     "how": "cornice 966 -> roof top 557. This comble contains TWO levels: a full mansard storey with stone-dressed windows plus an attic of small square windows"
+    },
+    {
+     "what": "main cornice band height",
+     "value_m": 0.684,
+     "kind": "MEASURED",
+     "how": "y 966 -> 1006"
+    },
+    {
+     "what": "facade width",
+     "value_m": 16.407,
+     "kind": "MEASURED",
+     "how": "x 400 -> 1359 at y=1250; consistent within 5 px at y=870 and y=1470"
+    },
+    {
+     "what": "bay pitch (window axes)",
+     "value_m": 3.222,
+     "kind": "MEASURED",
+     "how": "5 bays, axes 503.5 / 693.0 / 881.5 / 1069.5 / 1256.5; individual pitches 189.5, 188.0, 188.0, 188.0 px - very regular"
+    },
+    {
+     "what": "entrance door opening width",
+     "value_m": 1.677,
+     "kind": "MEASURED",
+     "how": "masonry reveal x 654 -> 752 at 3.2x zoom (leaves alone 90 px = 1.54 m)"
+    },
+    {
+     "what": "entrance door leaf height",
+     "value_m": 3.011,
+     "kind": "MEASURED",
+     "how": "door head y=1812 to threshold y=1988"
+    },
+    {
+     "what": "entrance aperture full height (door + overlight/entresol window)",
+     "value_m": 4.927,
+     "kind": "MEASURED",
+     "how": "cartouche head y=1700 to threshold 1988; the entrance bay is one tall opening"
+    },
+    {
+     "what": "1er etage window opening height",
+     "value_m": 2.361,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1477-1615"
+    },
+    {
+     "what": "1er etage window opening width",
+     "value_m": 1.266,
+     "kind": "MEASURED",
+     "how": "bay 3, x 845-920"
+    },
+    {
+     "what": "2e etage window opening height",
+     "value_m": 2.258,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1229-1361"
+    },
+    {
+     "what": "3e etage window opening height",
+     "value_m": 2.327,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1020-1156"
+    },
+    {
+     "what": "mansard-storey window opening height",
+     "value_m": 2.156,
+     "kind": "MEASURED",
+     "how": "bay 3, y 839-965"
+    },
+    {
+     "what": "3e etage balcony floor above pavement",
+     "value_m": 13.995,
+     "kind": "MEASURED",
+     "how": "balcon filant y=1172"
+    }
+   ],
+   "ratios": [
+    {
+     "what": "entresol / rez storey height",
+     "value": 0.775,
+     "how": "DERIVED (both components UNCERTAIN)"
+    },
+    {
+     "what": "1er / rez storey height",
+     "value": 1.275,
+     "how": "DERIVED - >1 because the 'rez' here is only the lower half of a two-level shopfront"
+    },
+    {
+     "what": "1er / (rez+entresol)",
+     "value": 0.718,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e / 1er storey height (taper)",
+     "value": 0.816,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e / 2e storey height (taper)",
+     "value": 0.99,
+     "how": "DERIVED - essentially no taper between the top two masonry storeys"
+    },
+    {
+     "what": "comble / total height",
+     "value": 0.285,
+     "how": "DERIVED"
+    },
+    {
+     "what": "comble / height to cornice",
+     "value": 0.399,
+     "how": "DERIVED"
+    },
+    {
+     "what": "main cornice / total height",
+     "value": 0.028,
+     "how": "DERIVED"
+    },
+    {
+     "what": "1er etage opening h/w",
+     "value": 1.865,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e etage opening h/w",
+     "value": 1.808,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e etage opening h/w",
+     "value": 1.943,
+     "how": "DERIVED"
+    },
+    {
+     "what": "mansard-storey opening h/w",
+     "value": 1.853,
+     "how": "DERIVED"
+    },
+    {
+     "what": "bay pitch / facade width",
+     "value": 0.196,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / bay pitch",
+     "value": 0.52,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / facade width",
+     "value": 0.102,
+     "how": "DERIVED"
+    },
+    {
+     "what": "height to cornice / facade width",
+     "value": 1.068,
+     "how": "DERIVED"
+    }
+   ],
+   "notes": "Davioud's block at the Seine end of the boulevard. 5 regular bays, very even pitch (3.22 m). Masonry facade is rez + entresol (both inside one shopfront frame) + 1er + 2e + 3e; above the cornice a brick-faced comble carrying a FULL storey of stone-dressed windows with iron garde-corps plus an attic band of small square windows. That comble is 7.0 m - 28.5% of total height - which is the largest comble fraction in this group by a wide margin and is the number to look at if the generator's comble-fill constant is being calibrated. Window aspect is remarkably constant across storeys (h/w 1.81-1.94) even as storey height falls. Two entrances (Nos 2 and 4); the left/major one was measured."
+  },
+  {
+   "file": "images/daly-1864/daly_elevation_03_blvd-sebastopol-77.jpg",
+   "readable": true,
+   "daly_class": "Deuxième Classe",
+   "address": "No 77, Boulevard de Sébastopol (M. Paul Mesnard, archte)",
+   "storey_count": 6,
+   "has_entresol": true,
+   "scale_note": "MEASURED. Scale bar 'Echelle de 0.01 cent pr metre' (1:100), tilted, ticks found by per-column baseline following: 0 m x=615.0, 2 m x=730.0, 3 m x=785.6, 4 m x=842.0, 5 m x=902.5. Both (902.5-615)/5 and (902.5-730)/3 give 57.5 px/m. Cross-check: pavement-to-cornice 19.5 m against the 20 m limit for the boulevard.",
+   "absolute_m": [
+    {
+     "what": "rez-de-chaussee (boutique) floor-to-floor",
+     "value_m": 4.0,
+     "kind": "MEASURED",
+     "how": "pavement y=1933 to the shop entablature / entresol floor y=1703"
+    },
+    {
+     "what": "entresol floor-to-floor",
+     "value_m": 3.096,
+     "kind": "MEASURED",
+     "how": "1703 to 1525 (window-opening bottoms 1700 -> 1522)"
+    },
+    {
+     "what": "1er etage floor-to-floor",
+     "value_m": 3.478,
+     "kind": "MEASURED",
+     "how": "1525 to 1325 (window bottoms 1522 -> 1325); balcon-filant slab visible at both"
+    },
+    {
+     "what": "2e etage floor-to-floor",
+     "value_m": 3.043,
+     "kind": "MEASURED",
+     "how": "1325 to 1150"
+    },
+    {
+     "what": "3e etage floor-to-floor",
+     "value_m": 2.87,
+     "kind": "MEASURED",
+     "how": "1150 to 985"
+    },
+    {
+     "what": "4e etage floor to top of main cornice",
+     "value_m": 2.991,
+     "kind": "MEASURED",
+     "how": "985 to 813 - includes the (thin) entablature, so slightly overstates the clear storey"
+    },
+    {
+     "what": "pavement to top of main cornice",
+     "value_m": 19.478,
+     "kind": "MEASURED",
+     "how": "y 1933 -> 813; the sum of the six storey heights closes to within 3 px"
+    },
+    {
+     "what": "pavement to top of roof",
+     "value_m": 22.817,
+     "kind": "MEASURED",
+     "how": "y 1933 -> 621 (top of the crowning band of the mansard)"
+    },
+    {
+     "what": "comble height",
+     "value_m": 3.339,
+     "kind": "MEASURED",
+     "how": "cornice 813 -> roof top 621; slate begins at 665, the band 621-665 is the roof's crowning cornice"
+    },
+    {
+     "what": "facade width",
+     "value_m": 14.748,
+     "kind": "MEASURED",
+     "how": "x 455 -> 1303 at y=1220"
+    },
+    {
+     "what": "bay pitch (window axes)",
+     "value_m": 2.353,
+     "kind": "MEASURED",
+     "how": "6 bays, axes 541.5 / 676.5 / 813.5 / 950.5 / 1083.5 / 1218.0; individual pitches 135, 137, 137, 133, 134.5 px"
+    },
+    {
+     "what": "entrance door opening width",
+     "value_m": 1.609,
+     "kind": "MEASURED",
+     "how": "x 767.5 -> 860 at 4x zoom"
+    },
+    {
+     "what": "entrance door opening height",
+     "value_m": 2.991,
+     "kind": "MEASURED",
+     "how": "lintel y=1758 to threshold y=1930"
+    },
+    {
+     "what": "entresol window opening height",
+     "value_m": 1.965,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1587-1700"
+    },
+    {
+     "what": "entresol window opening width",
+     "value_m": 1.252,
+     "kind": "MEASURED",
+     "how": "row scan y 1590-1640, bay 1 x 504-576"
+    },
+    {
+     "what": "1er etage window opening height",
+     "value_m": 2.4,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1382-1520"
+    },
+    {
+     "what": "1er etage window opening width",
+     "value_m": 1.27,
+     "kind": "MEASURED",
+     "how": "row scan y 1380-1440"
+    },
+    {
+     "what": "2e etage window opening height",
+     "value_m": 2.174,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1195-1320"
+    },
+    {
+     "what": "3e etage window opening height",
+     "value_m": 2.052,
+     "kind": "MEASURED",
+     "how": "bay 3, y 1027-1145"
+    },
+    {
+     "what": "4e etage window opening height",
+     "value_m": 2.209,
+     "kind": "MEASURED",
+     "how": "bay 3, y 858-985"
+    },
+    {
+     "what": "1er etage balcony floor above pavement",
+     "value_m": 7.096,
+     "kind": "MEASURED",
+     "how": "balcon filant y=1525"
+    },
+    {
+     "what": "2e etage balcony floor above pavement",
+     "value_m": 10.574,
+     "kind": "MEASURED",
+     "how": "balcon filant y=1325"
+    },
+    {
+     "what": "3e etage balcony floor above pavement",
+     "value_m": 13.617,
+     "kind": "MEASURED",
+     "how": "balcon filant y=1150"
+    },
+    {
+     "what": "4e etage balcony floor above pavement",
+     "value_m": 16.487,
+     "kind": "MEASURED",
+     "how": "balcon filant y=985"
+    }
+   ],
+   "ratios": [
+    {
+     "what": "entresol / rez storey height",
+     "value": 0.774,
+     "how": "DERIVED"
+    },
+    {
+     "what": "1er / rez storey height",
+     "value": 0.87,
+     "how": "DERIVED"
+    },
+    {
+     "what": "1er / entresol storey height",
+     "value": 1.124,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e / 1er storey height (taper)",
+     "value": 0.875,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e / 2e storey height (taper)",
+     "value": 0.943,
+     "how": "DERIVED"
+    },
+    {
+     "what": "4e / 3e storey height (taper, 4e incl. entablature)",
+     "value": 1.042,
+     "how": "DERIVED"
+    },
+    {
+     "what": "comble / total height",
+     "value": 0.146,
+     "how": "DERIVED"
+    },
+    {
+     "what": "comble / height to cornice",
+     "value": 0.171,
+     "how": "DERIVED"
+    },
+    {
+     "what": "entresol opening h/w",
+     "value": 1.569,
+     "how": "DERIVED"
+    },
+    {
+     "what": "1er etage opening h/w",
+     "value": 1.89,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e etage opening h/w",
+     "value": 1.923,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e etage opening h/w",
+     "value": 1.761,
+     "how": "DERIVED"
+    },
+    {
+     "what": "4e etage opening h/w",
+     "value": 1.954,
+     "how": "DERIVED"
+    },
+    {
+     "what": "bay pitch / facade width",
+     "value": 0.16,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / bay pitch",
+     "value": 0.684,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / facade width",
+     "value": 0.109,
+     "how": "DERIVED"
+    },
+    {
+     "what": "height to cornice / facade width",
+     "value": 1.321,
+     "how": "DERIVED"
+    }
+   ],
+   "notes": "The tightest-grained facade in the group: SIX bays on 14.75 m, so a bay pitch of only 2.35 m (pitch/width 0.16). Balcons filants at every one of the four upper storeys - this is a facade whose ironwork does the decorative work. Storey taper 1er->2e->3e is clean and monotonic (3.48 / 3.04 / 2.87 m) but the 4e recovers to 2.99 m, the same non-monotonic top-storey behaviour seen on plate 01. The cornice band itself is very shallow here and I could not separate its lower edge from the window pediments below, so the top storey height is quoted to cornice TOP and is ~0.15-0.3 m generous."
+  },
+  {
+   "file": "images/daly-1864/daly_elevation_29_rue-de-rivoli-88.jpg",
+   "readable": true,
+   "daly_class": "Deuxième Classe",
+   "address": "Rue de Rivoli, No 88 (M. Rolland, archte)",
+   "storey_count": 5,
+   "has_entresol": false,
+   "scale_note": "MEASURED. Scale bar 'Echelle de 0.01 cent pour Metre' (1:100). This plate is landscape and drawn smaller than the rest, so px/m is about 3/4 of the others. Tick centroids: 0 m x=744, 1 m 787, 2 m 829.5, 3 m 874, 4 m 915.5, 5 m 959.5, ... 10 m ~1175. (1175-744)/10 = 43.1 px/m; the 1-5 m span gives 43.1 px/m too.",
+   "absolute_m": [
+    {
+     "what": "rez-de-chaussee (boutique) floor-to-floor",
+     "value_m": 4.849,
+     "kind": "MEASURED",
+     "how": "pavement y=1062 to top of shop entablature y=853"
+    },
+    {
+     "what": "1er etage floor-to-floor",
+     "value_m": 2.97,
+     "kind": "MEASURED",
+     "how": "853 to 725 (band at 727-739 in the bay column profile); the 1er has round-arched windows and a notably low storey"
+    },
+    {
+     "what": "2e etage floor-to-floor",
+     "value_m": 3.875,
+     "kind": "MEASURED",
+     "how": "725 to 558; window-opening bottoms 847 -> 712 -> 550 corroborate"
+    },
+    {
+     "what": "3e etage floor-to-floor",
+     "value_m": 3.086,
+     "kind": "MEASURED",
+     "how": "558 to 425 (bed of the main modillion cornice)"
+    },
+    {
+     "what": "attic storey floor-to-ceiling",
+     "value_m": 2.9,
+     "kind": "MEASURED",
+     "how": "attic floor at the cornice top y=410 to the attic entablature y=285"
+    },
+    {
+     "what": "pavement to top of main cornice",
+     "value_m": 14.78,
+     "kind": "MEASURED",
+     "how": "y 1062 -> 425; sum of the four storeys closes exactly"
+    },
+    {
+     "what": "pavement to top of attic / roof line",
+     "value_m": 18.26,
+     "kind": "MEASURED",
+     "how": "y 1062 -> 275"
+    },
+    {
+     "what": "attic zone above main cornice",
+     "value_m": 3.132,
+     "kind": "MEASURED",
+     "how": "410 -> 275. NOTE: this is a masonry attic storey behind a balcon filant and a roof balustrade, NOT a slate mansard - there is no visible comble on this facade"
+    },
+    {
+     "what": "facade width",
+     "value_m": 19.977,
+     "kind": "UNCERTAIN",
+     "how": "x ~495 -> ~1356. The plate shows the neighbours as well; the subject is identified by its symmetry axis at x=925.5 (5 main bays plus the two small flanking oculi/niche windows at 556.5 and 1294.5 are symmetric about it) and by vertical joint lines. Edge positions are read from those joints, +/- ~10 px"
+    },
+    {
+     "what": "bay pitch (window axes)",
+     "value_m": 2.694,
+     "kind": "MEASURED",
+     "how": "5 bays, axes 693 / 809 / 925 / 1040.5 / 1157.5; pitches 116, 116, 115.5, 117 px"
+    },
+    {
+     "what": "porte cochere opening width",
+     "value_m": 2.575,
+     "kind": "MEASURED",
+     "how": "masonry reveal x 872 -> 983 at 4.5x zoom"
+    },
+    {
+     "what": "porte cochere opening height",
+     "value_m": 3.643,
+     "kind": "MEASURED",
+     "how": "segmental arch crown y=903 to threshold y=1060"
+    },
+    {
+     "what": "1er etage window opening height",
+     "value_m": 2.483,
+     "kind": "MEASURED",
+     "how": "bay 3, y 740-847 (arched heads)"
+    },
+    {
+     "what": "1er etage window opening width",
+     "value_m": 1.555,
+     "kind": "MEASURED",
+     "how": "row scan y 780-830; the arched 1er windows are wider than those above"
+    },
+    {
+     "what": "2e etage window opening height",
+     "value_m": 2.599,
+     "kind": "MEASURED",
+     "how": "bay 3, y 600-712"
+    },
+    {
+     "what": "2e etage window opening width",
+     "value_m": 1.244,
+     "kind": "MEASURED",
+     "how": "row scan y 610-660, five bays averaged"
+    },
+    {
+     "what": "3e etage window opening height",
+     "value_m": 2.297,
+     "kind": "MEASURED",
+     "how": "bay 3, y 451-550"
+    },
+    {
+     "what": "3e etage window opening width",
+     "value_m": 1.188,
+     "kind": "MEASURED",
+     "how": "row scan y 460-510"
+    },
+    {
+     "what": "attic window opening height",
+     "value_m": 1.276,
+     "kind": "UNCERTAIN",
+     "how": "y ~300-355; louvered shutters make the reveal hard to fix"
+    },
+    {
+     "what": "attic balcony (balcon filant on main cornice) above pavement",
+     "value_m": 15.128,
+     "kind": "MEASURED",
+     "how": "y 410"
+    }
+   ],
+   "ratios": [
+    {
+     "what": "1er / rez storey height",
+     "value": 0.612,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e / 1er storey height",
+     "value": 1.305,
+     "how": "DERIVED - >1: on this facade the 1er is a low arched storey and the 2e is the piano nobile"
+    },
+    {
+     "what": "3e / 2e storey height (taper)",
+     "value": 0.796,
+     "how": "DERIVED"
+    },
+    {
+     "what": "attic / 3e storey height",
+     "value": 0.94,
+     "how": "DERIVED"
+    },
+    {
+     "what": "attic zone / total height",
+     "value": 0.172,
+     "how": "DERIVED"
+    },
+    {
+     "what": "attic zone / height to cornice",
+     "value": 0.212,
+     "how": "DERIVED"
+    },
+    {
+     "what": "1er etage opening h/w",
+     "value": 1.597,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e etage opening h/w",
+     "value": 2.09,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e etage opening h/w",
+     "value": 1.934,
+     "how": "DERIVED"
+    },
+    {
+     "what": "bay pitch / facade width",
+     "value": 0.135,
+     "how": "DERIVED (facade width UNCERTAIN)"
+    },
+    {
+     "what": "door width / bay pitch",
+     "value": 0.956,
+     "how": "DERIVED - the porte cochere is almost exactly one bay wide here"
+    },
+    {
+     "what": "door width / facade width",
+     "value": 0.129,
+     "how": "DERIVED"
+    },
+    {
+     "what": "height to cornice / facade width",
+     "value": 0.74,
+     "how": "DERIVED"
+    }
+   ],
+   "notes": "The rue de Rivoli type and the outlier of the group: NO mansard. The roof is flat/concealed behind a balustrade and the storey above the main cornice is a masonry attic with louvered shutters fronted by a balcon filant. Only 4.85 m of very tall boutique rez, then a LOW arched 1er (2.97 m) under a tall 2e piano nobile (3.87 m) - the taper is inverted between those two, exactly as at plate 34. Also the only porte cochere in the group that reaches a full bay width (2.58 m x 3.64 m). Height to cornice is only 14.8 m, well under the legal maximum: this building spends its allowance on fewer, taller storeys. Facade extent is UNCERTAIN because the plate draws the flanking neighbours; the symmetry axis at x=925.5 is however unambiguous."
+  },
+  {
+   "file": "images/daly-1864/daly_elevation_34_rue-bergere-26.jpg",
+   "readable": true,
+   "daly_class": "Deuxième Classe",
+   "address": "No 26, Rue Bergère (M. Lesoufacher, arch.)",
+   "storey_count": 5,
+   "has_entresol": false,
+   "scale_note": "MEASURED. Scale bar 'Echelle de 0.01 cent pr metre' (1:100). Tick centroids by per-column baseline following: 0 m x=633.0, 2 m x=749.5, 3 m x=807.5, 4 m x=864.0, 5 m x=923.5. (923.5-633)/5 = 58.1 px/m; (749.5-633)/2 = 58.25 px/m.",
+   "absolute_m": [
+    {
+     "what": "rez-de-chaussee (boutique) floor-to-floor",
+     "value_m": 4.2,
+     "kind": "MEASURED",
+     "how": "pavement y=1928 to the shop entablature / 1er floor y=1684 (full-width dark band 1681-1687)"
+    },
+    {
+     "what": "1er etage floor-to-floor",
+     "value_m": 3.098,
+     "kind": "MEASURED",
+     "how": "1684 to 1504 (full-width band 1502-1506); this is the low rusticated storey"
+    },
+    {
+     "what": "2e etage floor-to-floor",
+     "value_m": 4.286,
+     "kind": "MEASURED",
+     "how": "1504 to 1255 (full-width bracketed cornice 1251-1258)"
+    },
+    {
+     "what": "3e etage floor-to-floor",
+     "value_m": 3.701,
+     "kind": "MEASURED",
+     "how": "1255 to 1040 (full-width dentil cornice 1032-1048)"
+    },
+    {
+     "what": "4e etage floor to underside of main cornice",
+     "value_m": 2.892,
+     "kind": "MEASURED",
+     "how": "balcon-filant slab 1040 to cornice bed 872"
+    },
+    {
+     "what": "4e etage floor to top of main cornice",
+     "value_m": 3.924,
+     "kind": "MEASURED",
+     "how": "1040 to 812"
+    },
+    {
+     "what": "pavement to top of main cornice",
+     "value_m": 19.208,
+     "kind": "MEASURED",
+     "how": "y 1928 -> 812; the five storey heights sum to 1116 px exactly"
+    },
+    {
+     "what": "pavement to top of roof",
+     "value_m": 23.528,
+     "kind": "MEASURED",
+     "how": "y 1928 -> 561 (background/slate boundary in a column profile)"
+    },
+    {
+     "what": "comble (mansard) height",
+     "value_m": 4.32,
+     "kind": "MEASURED",
+     "how": "cornice top 812 -> roof top 561"
+    },
+    {
+     "what": "main cornice band height",
+     "value_m": 1.033,
+     "kind": "MEASURED",
+     "how": "y 812 -> 872"
+    },
+    {
+     "what": "facade width",
+     "value_m": 17.349,
+     "kind": "MEASURED",
+     "how": "x 384 -> 1392, consistent within 2 px at y=880, 1100, 1550"
+    },
+    {
+     "what": "mean bay pitch (window axes)",
+     "value_m": 2.802,
+     "kind": "MEASURED",
+     "how": "6 bays, axes 473.5 / 626.0 / 796.5 / 970.5 / 1137.5 / 1287.5; individual pitches 152.5, 170.5, 174, 167, 150 px - the outer bays are pulled in"
+    },
+    {
+     "what": "porte cochere opening width",
+     "value_m": 2.754,
+     "kind": "MEASURED",
+     "how": "masonry reveal x 718 -> 878 at 3.2x zoom"
+    },
+    {
+     "what": "porte cochere opening height",
+     "value_m": 3.477,
+     "kind": "MEASURED",
+     "how": "segmental arch crown y=1723 to threshold y=1925"
+    },
+    {
+     "what": "1er etage window opening height",
+     "value_m": 2.289,
+     "kind": "MEASURED",
+     "how": "bay 2, y 1525-1658"
+    },
+    {
+     "what": "1er etage window opening width",
+     "value_m": 1.205,
+     "kind": "MEASURED",
+     "how": "row scan y 1520-1600"
+    },
+    {
+     "what": "2e etage window opening height",
+     "value_m": 2.823,
+     "kind": "MEASURED",
+     "how": "bay 2, y 1296-1460 (includes the length behind the balconet)"
+    },
+    {
+     "what": "2e etage window opening width",
+     "value_m": 1.153,
+     "kind": "MEASURED",
+     "how": "row scan y 1300-1380"
+    },
+    {
+     "what": "3e etage window opening height",
+     "value_m": 2.41,
+     "kind": "MEASURED",
+     "how": "bay 2, y 1075-1215"
+    },
+    {
+     "what": "3e etage window opening width",
+     "value_m": 1.17,
+     "kind": "MEASURED",
+     "how": "row scan y 1080-1140"
+    },
+    {
+     "what": "4e etage window opening height",
+     "value_m": 2.031,
+     "kind": "MEASURED",
+     "how": "bay 2, y 886-1004"
+    },
+    {
+     "what": "4e etage window opening width",
+     "value_m": 1.256,
+     "kind": "MEASURED",
+     "how": "row scan y 870-930 - the top-storey windows are the WIDEST on the facade"
+    },
+    {
+     "what": "dormer opening height",
+     "value_m": 1.222,
+     "kind": "MEASURED",
+     "how": "bay 2 column, y 688-759"
+    },
+    {
+     "what": "4e etage balcony floor above pavement",
+     "value_m": 15.284,
+     "kind": "MEASURED",
+     "how": "balcon filant y=1040"
+    }
+   ],
+   "ratios": [
+    {
+     "what": "1er / rez storey height",
+     "value": 0.738,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e / 1er storey height",
+     "value": 1.383,
+     "how": "DERIVED - >1: the 1er is a low rusticated storey, the 2e is the piano nobile"
+    },
+    {
+     "what": "3e / 2e storey height (taper)",
+     "value": 0.863,
+     "how": "DERIVED"
+    },
+    {
+     "what": "4e / 3e storey height (taper, 4e to cornice bed)",
+     "value": 0.781,
+     "how": "DERIVED"
+    },
+    {
+     "what": "comble / total height",
+     "value": 0.184,
+     "how": "DERIVED"
+    },
+    {
+     "what": "comble / height to cornice",
+     "value": 0.225,
+     "how": "DERIVED"
+    },
+    {
+     "what": "main cornice / total height",
+     "value": 0.044,
+     "how": "DERIVED"
+    },
+    {
+     "what": "1er etage opening h/w",
+     "value": 1.9,
+     "how": "DERIVED"
+    },
+    {
+     "what": "2e etage opening h/w",
+     "value": 2.448,
+     "how": "DERIVED"
+    },
+    {
+     "what": "3e etage opening h/w",
+     "value": 2.059,
+     "how": "DERIVED"
+    },
+    {
+     "what": "4e etage opening h/w",
+     "value": 1.616,
+     "how": "DERIVED"
+    },
+    {
+     "what": "mean bay pitch / facade width",
+     "value": 0.162,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / mean bay pitch",
+     "value": 0.983,
+     "how": "DERIVED"
+    },
+    {
+     "what": "door width / facade width",
+     "value": 0.159,
+     "how": "DERIVED"
+    },
+    {
+     "what": "height to cornice / facade width",
+     "value": 1.107,
+     "how": "DERIVED"
+    }
+   ],
+   "notes": "Six bays on 17.35 m. Composition: tall boutique rez (4.20 m), a LOW rusticated 1er (3.10 m), then the piano nobile 2e (4.29 m) with the richest window frames, then a monotonic taper 3.70 / 2.89 m. Balcon filant only at the 4e; balconets elsewhere. Opening aspect ratio tracks the hierarchy strongly here - h/w runs 1.90 / 2.45 / 2.06 / 1.62 from 1er to 4e, i.e. the noble floor's windows are markedly the most slender and the top floor's the squattest and WIDEST in plan. Comble 4.32 m = 18.4% of total. Height to cornice 19.2 m, again close to the 20 m maximum."
+  }
+ ]
+}

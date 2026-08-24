@@ -1,0 +1,140 @@
+{
+  "family": "se-comble",
+  "saved": 11,
+  "rejected": 9,
+  "images": [
+    {
+      "file": "images/se-comble/se-comble_01_boulevard-saint-michel-oeil-de-boeuf-dormers.jpg",
+      "title": "1 Boulevard Saint-Michel, roof detail",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Boulevard_Saint-Michel_(Paris),_num%C3%A9ro_1,_toit.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Coyau",
+      "shows": "CURVED / bombe zinc comble (convex profile, NOT a straight 45-degree comble) with two oeil-de-boeuf dormers in heavy scrolled zinc volute surrounds, and a top-floor balcony with plain vertical-bar railing. Post-1884 tell: the roof profile is arced. Retained as a NEGATIVE example only - do not use as canonical 1853-1870 comble evidence.",
+      "quality": "poor",
+      "klass": "comfortable",
+      "year": "",
+      "street": "1 boulevard Saint-Michel, Paris 5e"
+    },
+    {
+      "file": "images/se-comble/se-comble_02_zinc-standing-seam-souches.jpg",
+      "title": "Paris zinc roofs with dormers and chimney stacks",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fameux_toits_en_zinc_de_Paris.jpg",
+      "license": "CC BY 2.0",
+      "author": "besopha",
+      "shows": "close-up of zinc standing-seam (tasseaux) roofing texture on a straight comble, two box dormers with white sashes, souches (chimney stacks) with multiple flues and cowls, a roof hatch and a tabatiere (slope skylight)",
+      "quality": "good",
+      "klass": "unknown",
+      "year": "",
+      "street": ""
+    },
+    {
+      "file": "images/se-comble/se-comble_03_brisis-terrasson-pedimented-dormers.jpg",
+      "title": "Mansard roof with pedimented dormers, Paris",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Dormer_windows_in_Paris,_September_26,_2011.jpg",
+      "license": "CC BY 2.0",
+      "author": "Jorge Andrade",
+      "shows": "textbook comble a la Mansart profile: slate brisis (steep lower slope) meeting a near-flat zinc terrasson at the ridge, four evenly spaced pedimented (triangular-fronton) dormers each with a small cast-iron balustrade, souche at right, cornice with anthemion antefixes below",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": ""
+    },
+    {
+      "file": "images/se-comble/se-comble_04_rue-dalger-dormers-balcon-filant.jpg",
+      "title": "Rue d'Alger roofline and balcony",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Windows,_rue_d%27Alger,_Paris_14_October_2010.jpg",
+      "license": "CC BY-SA 2.0",
+      "author": "Chad and Steph",
+      "shows": "straight 45-degree zinc comble with three box dormers directly above a continuous balcon filant (top-floor running balcony) with a geometric cast-iron railing, persiennes (louvered shutters) on the floor below, souche at center",
+      "quality": "good",
+      "klass": "ordinary",
+      "year": "",
+      "street": "rue d'Alger, Paris 1er"
+    },
+    {
+      "file": "images/se-comble/se-comble_05_rue-halevy-dormer-row-cornice-balcon.jpg",
+      "title": "Haussmannian roofline, Rue Halevy",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_windows_and_dormer_windows,_haussmannian_facade.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Vania Teofilo",
+      "shows": "low-angle view of a cornice line with six evenly spaced pedimented dormers on a straight comble, a balcon filant with dense symmetrical cast-iron scrollwork at the floor below the cornice, foliated console brackets over the windows",
+      "quality": "good",
+      "klass": "grand",
+      "year": "",
+      "street": "rue Halevy, Paris 9e"
+    },
+    {
+      "file": "images/se-comble/se-comble_06_roofline-continuity-block.jpg",
+      "title": "Haussmannian immeuble roofline",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Haussman_paris_immeuble.JPG",
+      "license": "Public domain",
+      "author": "Dorian Bianco",
+      "shows": "roofline continuity across two adjoining party-wall buildings: straight slate/zinc combles with box (lucarne rentrante) dormers, continuous cornice, souches with terracotta chimney pots, and a top-floor balcony with cast-iron railing at the corner",
+      "quality": "good",
+      "klass": "ordinary",
+      "year": "",
+      "street": ""
+    },
+    {
+      "file": "images/se-comble/se-comble_07_rue-blanche-full-elevation-two-balcons.jpg",
+      "title": "53 Rue Blanche facade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:53_rue_Blanche_P1050933.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "Pline",
+      "shows": "complete canonical elevation: ashlar (pierre de taille) facade with carriage-door arch, a balcon filant at the 2nd floor and a second balcon filant at the 5th (top) floor exactly as the family brief describes, straight zinc comble with box dormers and souches above",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": "53 rue Blanche, Paris 9e"
+    },
+    {
+      "file": "images/se-comble/se-comble_08_malesherbes-quarter-roofscape.jpg",
+      "title": "Roofscape from Boulevard Malesherbes",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_75008_Boulevard_Malesherbes_no_27-29_roofscape_from_Hotel_Hyatt_20111015.jpg",
+      "license": "CC BY 3.0",
+      "author": "7777777kz",
+      "shows": "elevated quarter view of straight 45-degree combles lining up across a block, row of oval-topped dormers along one ridge, souches punctuating the skyline, balcon filant band on the facade below, Eiffel Tower on the horizon for scale/orientation",
+      "quality": "good",
+      "klass": "comfortable",
+      "year": "",
+      "street": "boulevard Malesherbes, Paris 8e"
+    },
+    {
+      "file": "images/se-comble/se-comble_09_saint-michel-quarter-roofscape.jpg",
+      "title": "Roofscape from Boulevard Saint-Michel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_75005_Boulevard_Saint-Michel_nos_99-103_roofscape_20160612.jpg",
+      "license": "CC BY-SA 2.0",
+      "author": "KimonBerlin",
+      "shows": "dense quarter roofscape of straight zinc combles with souches at golden hour, Pantheon dome on the horizon for orientation; note the corner building at right has a curved/domed roof (bell-cast rotonde) that is NOT representative of the canonical straight comble the rest of the block shows",
+      "quality": "partial",
+      "klass": "unknown",
+      "year": "",
+      "street": "boulevard Saint-Michel, Paris 5e"
+    },
+    {
+      "file": "images/se-comble/se-comble_10_souches-chimney-stack-forest.jpg",
+      "title": "Chimney stacks over Paris roofs",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Roofscapes_and_chimneys_in_Paris.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Javier Casado Tirado",
+      "shows": "dense field of souches (party-wall chimney stacks) each capped with multiple terracotta chimney pots, stepping back across successive roof ridges; straight zinc combles visible lower right and center",
+      "quality": "good",
+      "klass": "unknown",
+      "year": "",
+      "street": ""
+    },
+    {
+      "file": "images/se-comble/se-comble_11_chien-assis-dormers-danielle-casanova.jpg",
+      "title": "Rooftops of Rue Danielle Casanova",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_Rooftops_of_Rue_Danielle_Casanova.jpg",
+      "license": "CC BY 2.0",
+      "author": "Ben Garrett from London, U.K.",
+      "shows": "straight zinc comble with three small hipped/pyramidal-roofed dormers (chien-assis type, plainer than a pedimented lucarne) sitting directly above a balcon filant with simple iron railings, souches with terracotta pots on the flanking party walls",
+      "quality": "good",
+      "klass": "modest",
+      "year": "",
+      "street": "rue Danielle Casanova, Paris 2e"
+    }
+  ],
+  "notes": "Notable rejects: (1) File:Place Saint-Michel (Paris), numero 3, toit.jpg and numero 4, toit.jpg - both show bombe/curved corner dome roofs (toit en dos d'ane / rotonde), which is exactly the curved-comble tell the brief says to reject even though the buildings themselves date to the Second Empire percee of Place Saint-Michel (c.1855-60) - the ROOF FORM is what disqualifies them, not the building date. (2) File:126 rue de Rivoli Paris 2012 09.jpg - rejected for elaborate caryatid/atlante sculpture (a post-1870s ornamental tell) and because the Rivoli arcades themselves predate the Second Empire (Napoleon I era). (3) File:Paris - Rooftops in Paris - 3052.jpg - rejected: mixes a plain pedimented dormer with a heavily scrolled curved-surround oeil-de-boeuf on a bombe roof section, too visually ambiguous/late-reading to serve as canonical evidence. (4) File:Chimneys in Paris.jpg (CC0) - rejected, modern building with mural and exposed exhaust ductwork, no comble visible. (5) File:Paris 75013 Rue du Chevaleret no 65-67 souches de cheminees.jpg - rejected, this is the Paris Rive Gauche redevelopment zone (1990s-2000s ZAC), not Second Empire fabric despite the promising 'souches' title. (6) File:Paris 3e Rue de Turenne Lucarne 743.jpg and File:Paris 3e Lucarnes 646.jpg - rejected, these are 17th-18th century Marais hotel particulier dormers (carved stone lucarne, no zinc, no balcon filant, no continuous cornice), predating Haussmann by two centuries despite Commons filing them under Paris dormer categories. (7) File:Toits Paris.JPG - rejected, background includes a visible 1976 office tower (Le Courcellor II), breaking period. (8) File:Paris Pano Toits bd Auriol...jpg - rejected, dominated by modern high-rise towers in the 13e. Coverage gaps: no photograph in hand definitively shows a full pediment triangular lucarne AND its ironwork cresting/acroteria in one frame at high resolution - image 03 and 05 come closest. All dates are photograph dates on Commons and were NOT used as construction-year proxies, per instructions; every 'year' field is left blank because no source in this batch states an actual construction year. 'klass' is largely 'unknown' for anonymous roofscape/detail shots where no facade context is visible to judge building class; where a full or partial facade is visible (images 01, 05, 07, 08, 11) klass reflects the visible ornament level."
+}

@@ -1,0 +1,163 @@
+{
+  "family": "class-range",
+  "notes": "Class range spans modest faubourg shopfront housing to grand boulevard/place buildings. Modern color photos (Etienne-Marcel, Blanche, Sommerard, Voltaire, Place St-Michel, Avenue de l'Opera) are current-day facades of buildings dated stylistically to the Second Empire/Belle Epoque Haussmannian era but without a documented construction year on their Commons pages, so year is left blank rather than guessed. Several archival black-and-white prints (Faubourg-St-Antoine, Rue St-Merri, Rue de Bretagne, Hotel Montholon, Rue de Rivoli) come from Paris Musees / BHVP CC0 scans and carry a photo-taken date, which is recorded in 'street' or noted here, NOT presented as a construction year. Exception: the Faubourg-St-Antoine house (class-range_09) has an explicit construction date of 1730 written on the mount ('maison construite en 1730 par l'hopital et la famille d'Aligre'), predating the 19th-century Haussmann period this corpus targets; it is kept only because it is the clearest legible frontal 'modest faubourg shopfront' facade found and such pre-Haussmann houses commonly survived as infill along faubourg streets through the 19th century -- operator should judge whether this fits the procedural target or should be dropped. Several archival images were REJECTED for poor legibility (oblique raking angle, facades plastered with advertising posters obscuring the stonework): rue de Courcelles, rue des Gravilliers, rue Desgenettes, rue de Sevres, rue Traversiere. Two near-duplicate Place Saint-Michel frames and one duplicate 'grands boulevards' archival card were dropped to avoid redundancy. class-range_13 is a close detail crop (balcony/window ornament) rather than a full elevation -- useful evidence for cornice/balcony enrichment at the grand end but does not show the door, so treat it as supplementary, not a full facade comparison. class-range_05 (Hotel Montholon) and class-range_04 (Rivoli arcade) are shot at a steeper angle / partly screened by trees respectively; marked quality=partial accordingly.",
+  "saved": 13,
+  "images": [
+    {
+      "file": "images/class-range/class-range_01_grand-corner-place-st-michel.jpg",
+      "title": "1-3 Place Saint-Michel",
+      "street": "1-3 Place Saint-Michel, 5e/6e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Grand corner Haussmannian building on a major place: tall arched shopfronts, wrought-iron balconies at 2nd and top floor, heavily dressed stone bays, steep zinc mansard with dormers -- the 'grand' end of the class range where bays/balconies/cornice are elaborated well beyond a modest building while the ground-floor arcade rhythm still reads as door-scaled openings.",
+      "author": "Beyond My Ken",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2018_1-3_Place_Saint-Michel.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_02_grand-place-st-michel-pair.jpg",
+      "title": "5-7 Place Saint-Michel",
+      "street": "5-7 Place Saint-Michel, 5e arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Second grand corner building on the same place, giving a same-scale comparison pair: full mansard, iron balconies at two levels, arcaded ground floor with awnings -- confirms the grand-end proportions are a type, not a one-off.",
+      "author": "Beyond My Ken",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2018_5-7_Place_Saint-Michel.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_03_grand-avenue-de-lopera.jpg",
+      "title": "21 Avenue de l'Opera",
+      "street": "21 Avenue de l'Opera, 1er arrondissement, Paris",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "Long grand-boulevard streetscape (Avenue de l'Opera) shot at a mild oblique: wide stone facades, continuous cast-iron balcony band, heavy bracketed cornice, dormered mansard roofline receding into the distance -- shows how bay width and cornice massing scale up along a major boulevard even though the shot is not perfectly frontal.",
+      "author": "besopha (Flickr)",
+      "license": "CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Avenue_de_l%27Op%C3%A9ra,_Paris,_France_2009.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_04_grand-arcaded-rue-de-rivoli.jpg",
+      "title": "Rue de Rivoli, 1er arrondissement, Paris. PH20814",
+      "street": "Rue de Rivoli, 1er arrondissement, Paris (archival photo, dated on mount 28-8-16 i.e. photographed 1916)",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "Iconic grand arcaded ensemble along Rue de Rivoli: continuous ground-floor stone arcade, uniform balcony band, tall dormered mansard repeating down an entire block -- the most extreme 'grand boulevard' end of the range, though shot at a steep raking angle down the street rather than frontally.",
+      "author": "Charles Joseph Antoine Lansiaux",
+      "license": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_de_Rivoli,_1er_arrondissement,_Paris._PH20814.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_05_grand-hotel-montholon-archival.jpg",
+      "title": "Vue de la facade de l'Hotel particulier Montholon, cote boulevard Poissonniere. PH82956",
+      "street": "Hotel Montholon, Boulevard Poissonniere, 9e arrondissement, Paris (archival photo by Jean Barry, 1913)",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "A private hotel-particulier-turned-apartment building on a grand boulevard: giant-order fluted pilasters, pedimented main block, tall shuttered windows -- the most palatial end of the class range (door/portal barely bigger than an ordinary building's while the order and cornice above it are monumental). Partly screened by street trees in the foreground.",
+      "author": "Jean Barry (1913)",
+      "license": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Vue_de_la_fa%C3%A7ade_l%27H%C3%B4tel_particulier_Montholon,_c%C3%B4t%C3%A9_boulevard_Poissonni%C3%A8re,_9%C3%A8me_arrondissement,_Paris._PH82956.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_06_comfortable-rue-etienne-marcel.jpg",
+      "title": "16 rue Etienne-Marcel",
+      "street": "16 rue Etienne-Marcel, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Near-frontal full elevation of a comfortable-tier Haussmannian building: sculpted cartouche/cherub keystone over the entry, two tiers of wrought-iron balconies with carved consoles, pilastered bays -- a clear mid-point between plain modest housing and the palatial grand end, useful for showing door scale staying constant while balcony/window enrichment increases one notch.",
+      "author": "VVVCFFrance",
+      "license": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:16_rue_Etienne-Marcel.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_07_comfortable-rue-blanche.jpg",
+      "title": "53 rue Blanche",
+      "street": "53 rue Blanche, 9e arrondissement, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Excellent full-elevation frontal shot showing the family's core claim directly: a modestly sized arched double door at ground level, essentially unchanged in scale from a plainer building, below four upper floors of regularly repeated bays with wrought-iron balconies, foliate keystones and a dentillated cornice -- door stays small, everything above it grows more elaborate.",
+      "author": "Pline",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:53_rue_Blanche_P1050933.JPG"
+    },
+    {
+      "file": "images/class-range/class-range_08_comfortable-rue-du-sommerard.jpg",
+      "title": "31 rue Du Sommerard",
+      "street": "31 rue du Sommerard, 5e arrondissement, Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Frontal corner elevation, comfortable tier: pedimented window surrounds on the piano nobile, a balustraded balcony course, plain but generously sized door at grade -- again shows the door holding roughly constant scale while window dressing and balcony ironwork step up in richness going up the facade and up the class range.",
+      "author": "LPLT",
+      "license": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:31_rue_Du_Sommerard.JPG"
+    },
+    {
+      "file": "images/class-range/class-range_09_modest-faubourg-st-antoine-archival.jpg",
+      "title": "Maison, Faubourg St Antoine 122 (vue prise en 1904)",
+      "street": "122 rue du Faubourg-Saint-Antoine, 12e arrondissement, Paris (photographed 1904; construction inscribed on mount as 1730, built by the hopital des enfants trouves and the famille d'Aligre)",
+      "year": "1730",
+      "klass": "modest",
+      "quality": "good",
+      "shows": "Small plain shopfront house on a faubourg street: narrow bays, unadorned window surrounds, shutters, ground-floor shops crowding a small door -- the plainest, most modest end of the range. NOTE: construction date (1730) predates the 19th-century Haussmann period targeted by this corpus; kept as the clearest legible frontal example of 'modest faubourg' massing found on Commons, flag for operator review.",
+      "author": "Eugene Gossin",
+      "license": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fa%C3%A7ade_de_l%27immeuble_contruit_par_l%27h%C3%B4pital_des_enfants_trouv%C3%A9s,_n%C2%B0122_rue_du_Faubourg-Saint-Antoine,_12%C3%A8me_arrondisseme,_PH81966.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_10_modest-rue-st-merri-archival.jpg",
+      "title": "Rue St Merri 17-19 (Juin 1913)",
+      "street": "17-19 rue St Merri, 4e arrondissement, Paris (photographed June 1913 by Henri Godefroy)",
+      "year": "",
+      "klass": "modest",
+      "quality": "good",
+      "shows": "Frontal shot of two narrow, plain apartment buildings on a medieval-pattern street: minimal window dressing, small iron balconettes only at a couple of floors, plain shopfronts and a small round-arched carriage door at grade -- a clean modest-tier reference with door legible and undecorated.",
+      "author": "Henri Emile Cimarosa Godefroy",
+      "license": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fa%C3%A7ade_des_immeubles_17_et_19_rue_St_Merri,_4%C3%A8me_arrondissement,_Paris._PH34672.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_11_modest-rue-de-bretagne-archival.jpg",
+      "title": "Rue de Bretagne, n58-60",
+      "street": "58-60 rue de Bretagne, 3e arrondissement, Paris (photographed circa 1906)",
+      "year": "",
+      "klass": "modest",
+      "quality": "partial",
+      "shows": "Corner pair of modest dormered buildings above ground-floor cafe/wine-shop fronts: plain rendered wall surface, small windows, minimal ironwork, dormers instead of a grand mansard -- modest-tier reference with legible full elevation, though the ground floor is busy with period shop signage.",
+      "author": "Imprimerie photographique Berthaud",
+      "license": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_de_Bretagne,_n%C2%B058-60,_3%C3%A8me_arrondissement,_Paris._PH12399.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_12_ordinary-boulevard-voltaire.jpg",
+      "title": "2 boulevard Voltaire",
+      "street": "2 boulevard Voltaire, Paris (photographed 2016)",
+      "year": "",
+      "klass": "ordinary",
+      "quality": "good",
+      "shows": "Clean frontal full-elevation shot of a standard, unexceptional Haussmannian building on an ordinary (not grand) boulevard: regular bays, modest balcony ironwork at two floors only, plain door under a red awning at grade, simple dentil cornice -- a useful mid-range anchor between the modest faubourg examples and the ornate comfortable/grand ones.",
+      "author": "Lionel Allorge",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2_boulevard_Voltaire_%C3%A0_Paris_le_7_ao%C3%BBt_2016.jpg"
+    },
+    {
+      "file": "images/class-range/class-range_13_detail-balcony-ornament.jpg",
+      "title": "Immeuble haussmannien (34321494015)",
+      "street": "Paris (exact address not recorded on Commons page)",
+      "year": "",
+      "klass": "unknown",
+      "quality": "partial",
+      "shows": "Close oblique detail crop of an ornate facade: two registers of wrought-iron balconies on carved stone consoles, pilastered window surrounds, foliate cornice band -- useful supplementary evidence for how balcony/window enrichment intensifies at the richer end of the range, but it is a cropped detail (no ground floor, no door) rather than a full elevation, so treat as supplementary only.",
+      "author": "Dale Cruse (Flickr)",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble_haussmannien_(34321494015).jpg"
+    }
+  ]
+}

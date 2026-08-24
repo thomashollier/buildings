@@ -1,0 +1,151 @@
+{
+  "family": "second-empire",
+  "saved": 12,
+  "images": [
+    {
+      "file": "images/second-empire/second-empire_01_place-saint-michel-1-3.jpg",
+      "title": "1-3 Place Saint-Michel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2018_1-3_Place_Saint-Michel.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Beyond My Ken (Wikimedia Commons)",
+      "street": "1-3 Place Saint-Michel, 6e/5e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Corner block: 45-degree mansard comble with round dormers, bossage-rusticated ground-floor arcades, continuous balcon filant with sculpted balustrade at 2nd floor and plain ironwork balcon filant at top (5th/6th) floor, strict cornice-line unity across the block."
+    },
+    {
+      "file": "images/second-empire/second-empire_02_place-saint-michel-1-7.jpg",
+      "title": "1-7 Place Saint-Michel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2018_1-7_Place_Saint-Michel.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Beyond My Ken (Wikimedia Commons)",
+      "street": "1-7 Place Saint-Michel, 6e/5e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Two adjacent Second Empire buildings sharing identical cornice, mansard-roof, and balcon-filant lines across the parcel boundary -- clean evidence of strict block unity."
+    },
+    {
+      "file": "images/second-empire/second-empire_03_place-saint-michel-5-7.jpg",
+      "title": "5-7 Place Saint-Michel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2018_5-7_Place_Saint-Michel.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Beyond My Ken (Wikimedia Commons)",
+      "street": "5-7 Place Saint-Michel, 6e/5e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "Comble with round dormers and balcon filant at 2nd floor; a street tree obscures much of the ground-floor bossage and shopfronts."
+    },
+    {
+      "file": "images/second-empire/second-empire_04_avenue-opera-enfilade.jpg",
+      "title": "Avenue de l'Opéra enfilade",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Avenue_de_l%27Op%C3%A9ra,_Paris,_France_2009.jpg",
+      "license": "CC BY-SA 2.0",
+      "author": "besopha (Flickr, via Wikimedia Commons)",
+      "street": "Avenue de l'Opéra (near no. 21), 1er arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "partial",
+      "shows": "Long raking street view showing the enforced block unity of the avenue: matching cornice height, mansard roofline, and balcon-filant bands repeating unbroken across many separate buildings. Oblique/receding angle rather than frontal."
+    },
+    {
+      "file": "images/second-empire/second-empire_05_avenue-opera-no38.jpg",
+      "title": "Avenue de l'Opéra no. 38",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_Avenue_de_l%27Op%C3%A9ra_no_038.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Freepenguin (Wikimedia Commons)",
+      "street": "38 Avenue de l'Opéra, 1er/2e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Near-frontal full facade: sculpted balcon filant with scrollwork balustrade at 2nd floor, plainer continuous balcon filant at top floor just under the comble, dormers with round pediments, giving a clean read of the two-balcon-band rule."
+    },
+    {
+      "file": "images/second-empire/second-empire_06_bd-magenta-50-caryatide.jpg",
+      "title": "50 Boulevard Magenta, caryatid detail",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bd_Magenta_50-a-_W.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "FLLL (Wikimedia Commons)",
+      "street": "50 Boulevard Magenta, 10e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Close detail of a sculpted caryatid (by Charles Gauthier) supporting the 2nd-floor balcon filant, with the wrought-iron balustrade of the floor above visible -- clean evidence of the ornamental treatment at the balcon-filant floor."
+    },
+    {
+      "file": "images/second-empire/second-empire_07_bd-magenta-56-atlas.jpg",
+      "title": "56 Boulevard Magenta, atlas figures",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bd_Magenta_56-a-W.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "FLLL (Wikimedia Commons)",
+      "street": "56 Boulevard Magenta, 10e arr.",
+      "year": "1866-1867",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Close detail of paired sculpted atlas figures (by Sébastien Delarue) framing a window below a continuous ironwork balcon filant -- dated facade (1866-1867), squarely inside the canonical Second Empire window."
+    },
+    {
+      "file": "images/second-empire/second-empire_08_boulevard-sebastopol.jpg",
+      "title": "Boulevard de Sébastopol corner",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Boulevard-sebastopol.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Thierry Bezecourt (Wikimedia Commons)",
+      "street": "Boulevard de Sébastopol",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Corner building on one of Haussmann's first pierced boulevards: mansard comble, continuous balcon filant at 2nd floor and dormer-level balustrade at top floor, ground-floor shopfronts under a rusticated base."
+    },
+    {
+      "file": "images/second-empire/second-empire_09_immeuble-dome.jpg",
+      "title": "Haussmannian building with corner dome",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeubles_haussmannien_(34669957061).jpg",
+      "license": "CC BY 2.0",
+      "author": "Dale Cruse (Flickr, via Wikimedia Commons)",
+      "street": "Paris (exact address not recorded on Commons)",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Corner pavilion with a domed roof and a row of near-identical Haussmannian buildings receding down the block, each with matching balcon-filant bands -- good block-unity evidence, oblique/receding framing."
+    },
+    {
+      "file": "images/second-empire/second-empire_10_rue-de-rennes-105-107.jpg",
+      "title": "105 & 107 Rue de Rennes",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Immeuble_haussmannien,_105_%26_107,_rue_de_Rennes_(48098368467).jpg",
+      "license": "CC BY 2.0",
+      "author": "Fred Romero (Flickr, via Wikimedia Commons)",
+      "street": "105 & 107 Rue de Rennes, 6e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Near-frontal facade with full-height sculpted caryatids flanking the ground-floor shopfronts, a decorated balcon filant at 2nd floor immediately above them, and a plainer continuous balcon filant at the top floor below the comble."
+    },
+    {
+      "file": "images/second-empire/second-empire_11_rue-halevy-dormers-detail.jpg",
+      "title": "Rue Halévy dormers and comble detail",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Paris_windows_and_dormer_windows,_haussmannian_facade.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Vania Teofilo (Wikimedia Commons)",
+      "street": "Rue Halévy, 9e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Close, upward-angled detail of the mansard comble: a run of pedimented dormer windows above a continuous wrought-iron balcon filant and Corinthian-capped pilasters -- clean evidence of the roof/comble geometry and top-floor balcony band."
+    },
+    {
+      "file": "images/second-empire/second-empire_12_rue-halevy-12.jpg",
+      "title": "12 Rue Halévy",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rue_Halevy,_12.jpg",
+      "license": "Public domain",
+      "author": "Tangopaso (Wikimedia Commons)",
+      "street": "12 Rue Halévy, 9e arr.",
+      "year": "",
+      "klass": "grand",
+      "quality": "good",
+      "shows": "Full, near-frontal corner facade: rusticated bossage ground floor with round-arched openings, continuous balcon filant at 2nd floor, plain ironwork balcon filant at top floor just under the mansard comble -- one of the cleanest single-image reads of the whole family's defining stack."
+    }
+  ],
+  "notes": "All images from Wikimedia Commons, downloaded at the ~1280px thumbnail size returned by the API (iiurlwidth=1000 bucket), not full-resolution originals. Selection favours canonical, well-attested Haussmannian boulevard buildings (Place Saint-Michel, Avenue de l'Opéra, Boulevard Magenta, Rue Halévy, Rue de Rennes, Boulevard de Sébastopol) that clearly show the 45-degree mansard comble, rusticated bossage socle, and the two-band balcon filant (2nd floor + top floor) that defines this family. Several strong Commons candidates tagged 'Haussmannian' were rejected as out-of-period for this canonical 1853-1870 family: one facade carries an architect's plaque dated 1892, others show Art Nouveau/eclectic bow-windows, mosaic tile insets, or ornate Beaux-Arts corner domes typical of the 1880s-1900s rather than the strict Second Empire idiom. An aerial/bird's-eye Commons photo and a tourist-bus-obstructed shot were also dropped per the selection criteria. Exact construction dates were only available in the source description for one image (56 Boulevard Magenta, 1866-1867); all other images have year left blank rather than guessed, per instructions. 'klass' reflects the apparent socioeconomic register of the building fabric shown (mostly grand boulevard-front buildings with sculpted ornament), not a claim about construction date."
+}

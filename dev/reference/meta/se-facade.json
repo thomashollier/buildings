@@ -1,0 +1,140 @@
+{
+  "family": "se-facade",
+  "saved": 11,
+  "rejected": 24,
+  "notes": "Target street sample: boulevard de Malesherbes, boulevard Sebastopol, rue de Turbigo, boulevard Saint-Michel (all pierced/rebuilt 1853-1866, core Second Empire), plus boulevard Voltaire, boulevard Magenta, rue Etienne-Marcel, rue Blanche, rue de Chateaudun as modern cross-checks. Four images are genuine Charles Marville photographs taken during the Second Empire itself (Commons dates them ca.1853-70 from his official municipal documentation series) -- these are the strongest possible evidence since the buildings are dated by the photograph, not by later inference. The Marville boulevard/rue views are oblique street perspectives rather than tight single-building elevations (marked quality=partial for #4 st-michel, which is more distant); #1-3 are close enough to read as a near-frontal corner elevation and are marked good. \n\nREJECTED, and why (24 total): (a) Post-1870/1880s construction masquerading as 'haussmannien' on Commons -- the single biggest bucket. Dropped: Place Saint-Michel 1-3/1-7/5-7 (curved/bombe corner comble, confirmed same rotonde building, tree-obstructed); Immeuble haussmannien a Paris 52169315349 (bow window + part of an architect plaque reading '...ARCH 18..' cut off, clearly not 1853-70); Rue de l'Arbalete Villa Medicis (a '1892' date plaque is legible on the facade itself); Rue-monge-angle (bombe domed corner roof + atlantes flanking the door, classic 1880s-1900s rotonde); Paris Batignolles pharmacy building (brick/stone polychrome with bow-window bays, Batignolles-style post-1875); Paris Immeubles place d'Italie (brick polychrome + oriel windows, 13e redevelopment, clearly later); P1250051 rue Parrot n7 (paired full-height bow windows, rocaille pediments -- textbook 1900s revival, not Second Empire); Immeuble haussmannien 105&107/105/107 rue de Rennes (large near-universal caryatid figures across the whole width -- exactly the 1870s-90s escalation the brief warns about); Haussmannian apartment building 33619363893 (curved bow-window bay + elaborate rocaille dormer pediments); Haussmannian building 28285608446 (very rich relief pilaster capitals throughout, no ground floor, reads Belle Epoque); Angle rue Christiani (Commons' own caption says 'dome'); Bd Pereire 135 (oriel/bow window in the roof); Bd Richard-Lenoir 48 and 78a (both explicitly captioned as built 1905 and 1910, 'post-Haussmannian'). (b) Wrong shot type for a FACADE family (great material, wrong family) -- tight ironwork/entry/mascaron crops with no roof or no ground floor: Immeuble haussmannien 34321494015 (and the identical crop reused as v04_hauss1); the entire 'Polymagou' rue de Rivoli door-portrait series (134/138/142/90/94 rue de Rivoli); Bd Magenta 52-a (cherub-relief crop, though the building itself is dated 1869 and would be worth a wider re-shoot); Bd Voltaire 224 and 201 (door/ironwork details, 224's grape-motif ironwork also reads Art Nouveau); 16 rue de Turbigo, Rue Halevy 069 (angel/detail crops); 43 rue Taitbout and 91 rue Taitbout and 32-34 rue de Chateaudun (roofline and/or ground floor cropped out of frame, so comble compliance can't be verified even though the visible stone is period-plausible). (c) Framing/obstruction: Paris 75004 rue de Rivoli no 88 (steep bird's-eye from Tour Saint-Jacques, not frontal/mild-oblique); 72 boulevard Malesherbes and Hotel Montholon (both fully screened by street trees); avenue de l'Opera corner building (avenue only cut through 1876-79, i.e. after the period window, despite looking canonical). \n\nCoverage gaps: no confirmed-period (1853-70) image with an UNOBSTRUCTED ground floor showing bossage clearly next to a fully-visible straight comble -- every modern candidate found had either a shopfront/awning/signage band at the socle or a tree in front of it; treat ground-floor bossage legibility in this set as partial-to-good rather than excellent. Avenue de l'Opera, boulevard Haussmann's western end, and rue de Rennes were deliberately under-sampled because their construction runs mostly post-1870 despite the 'haussmannien' label Commons applies indiscriminately to all cream-stone Paris facades regardless of decade.",
+  "images": [
+    {
+      "file": "images/se-facade/se-facade_01_marville-malesherbes-courcelles.jpg",
+      "title": "Boulevard Malesherbes, du Boulevard de Courcelles",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Charles_Marville,_Boulevard_Malesherbes,_du_Boulevard_de_Courcelles,_ca._1853%E2%80%9370.jpg",
+      "license": "Public domain",
+      "author": "Charles Marville",
+      "street": "Boulevard Malesherbes (8e), Paris",
+      "year": "",
+      "klass": "comfortable",
+      "quality": "good",
+      "shows": "Genuine period photograph (Commons dates it ca.1853-70, taken by the City of Paris's official photographer during construction of the boulevard itself). Near-frontal view of the corner block: unbroken cornice line across party walls, continuous balcon filant at 2nd floor running the full block, straight-pitch mansard with regular dormers, flat unbroken wall plane -- the textbook block-unity effect the 1855 circulaire was written to produce."
+    },
+    {
+      "file": "images/se-facade/se-facade_02_marville-sebastopol.jpg",
+      "title": "Boulevard Sebastopol",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Charles_Marville,_Boulevard_S%C3%A9bastopol,_ca._1853%E2%80%9370.jpg",
+      "license": "Public domain",
+      "author": "Charles Marville",
+      "street": "Boulevard de Sebastopol, Paris",
+      "year": "",
+      "quality": "good",
+      "klass": "comfortable",
+      "shows": "Genuine period photograph, corner building pavement-to-ridge in near-frontal view: straight 45-degree comble roof with segmental-pedimented dormers, continuous balcon filant at 2nd floor across the whole block, ground-floor shopfronts under a classical pilastered corner surround ('Pygmalion' sign). One of the cleanest period-authentic references for the roof/balcony/cornice relationship."
+    },
+    {
+      "file": "images/se-facade/se-facade_03_marville-turbigo.jpg",
+      "title": "Rue de Turbigo",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Charles_Marville,_Rue_de_Turbigo,_ca._1853%E2%80%9370.jpg",
+      "license": "Public domain",
+      "author": "Charles Marville",
+      "street": "Rue de Turbigo, Paris",
+      "year": "",
+      "quality": "good",
+      "klass": "comfortable",
+      "shows": "Genuine period photograph of the corner building on rue de Turbigo (pierced 1854-1868), near-frontal, full height visible: ground-floor shopfronts, fenestration rhythm and pilaster articulation across 4-5 storeys, balconies at multiple levels, mansard partially visible at top. A sculpted corner figure is a single accent piece, not the near-universal caryatid escalation of the 1880s-90s."
+    },
+    {
+      "file": "images/se-facade/se-facade_04_marville-boulevard-stmichel.jpg",
+      "title": "Boulevard Saint-Michel, de la Fontaine Saint-Michel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Charles_Marville,_Boulevard_Saint-Michel,_de_la_Fontaine_Saint_Michel,_ca._1853%E2%80%9370.jpg",
+      "license": "Public domain",
+      "author": "Charles Marville",
+      "street": "Boulevard Saint-Michel, Paris",
+      "year": "",
+      "quality": "partial",
+      "klass": "comfortable",
+      "shows": "Genuine period photograph, but a distant street perspective rather than one building's full elevation -- useful mainly for the overall streetscape rhythm (uniform cornice heights, tree-lined pavement, shopfront awnings) rather than a single facade's storey stack. Kept as period-authentic supporting evidence, not a primary reference."
+    },
+    {
+      "file": "images/se-facade/se-facade_05_boulevard-sebastopol-modern.jpg",
+      "title": "Boulevard de Sebastopol (modern)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Boulevard-sebastopol.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Thierry Bezecourt",
+      "street": "Boulevard de Sebastopol, Paris",
+      "year": "",
+      "quality": "good",
+      "klass": "comfortable",
+      "shows": "Modern mild-oblique photo of a corner immeuble on boulevard de Sebastopol (pierced 1855-58): full elevation pavement-to-ridge, straight comble, two levels of continuous balcon filant, corner chamfer. Direct present-day counterpart to the Marville photographs of the same street."
+    },
+    {
+      "file": "images/se-facade/se-facade_06_boulevard-voltaire.jpg",
+      "title": "2 boulevard Voltaire",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2_boulevard_Voltaire_%C3%A0_Paris_le_7_ao%C3%BBt_2016.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Lionel Allorge",
+      "street": "2 boulevard Voltaire, Paris",
+      "year": "",
+      "quality": "good",
+      "klass": "comfortable",
+      "shows": "Dead-frontal, textbook canonical elevation: straight 45-degree comble with regularly spaced pedimented dormers, continuous balcon filant at both the 2nd floor and the top floor, flat unornamented wall plane, symmetrical window bays. Ground-floor bossage is partly masked by a shop awning but the storey stack and roof are fully legible -- probably the single best reference image in this set for the cornice-to-comble relationship."
+    },
+    {
+      "file": "images/se-facade/se-facade_07_rue-blanche-53.jpg",
+      "title": "53 rue Blanche",
+      "source_url": "https://commons.wikimedia.org/wiki/File:53_rue_Blanche_P1050933.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "Pline",
+      "street": "53 rue Blanche, Paris",
+      "year": "",
+      "quality": "good",
+      "klass": "comfortable",
+      "shows": "Dead-frontal full elevation, pavement to ridge: straight-pitch mansard with regular dormers, arched carriage-entry door with keystone on axis, individual balconies at most floors plus continuous filant bands at two levels, flat minimal-relief wall plane. One of the clearest single-building references in the set for the overall storey stack."
+    },
+    {
+      "file": "images/se-facade/se-facade_08_rue-etienne-marcel-16.jpg",
+      "title": "16 rue Etienne-Marcel",
+      "source_url": "https://commons.wikimedia.org/wiki/File:16_rue_Etienne-Marcel.jpg",
+      "license": "CC0",
+      "author": "VVVCFFrance",
+      "street": "16 rue Etienne-Marcel, Paris",
+      "year": "",
+      "quality": "poor",
+      "klass": "comfortable",
+      "shows": "Frontal elevation showing continuous balcon filant bands and repeated sculpted balcony-console heads, straight roofline. Ground floor is fully covered by modern shop signage (Intermarche/vape shop), so bossage is not verifiable in this image -- kept for the upper-storey stack and roofline only."
+    },
+    {
+      "file": "images/se-facade/se-facade_09_boulevard-magenta.jpg",
+      "title": "Immeuble, boulevard de Magenta",
+      "source_url": "https://commons.wikimedia.org/wiki/File:France_Paris_Immeuble_boulevard_de_Magenta.jpg",
+      "license": "CC BY-SA 3.0",
+      "author": "Coyau",
+      "street": "Boulevard de Magenta, Paris",
+      "year": "",
+      "quality": "poor",
+      "klass": "comfortable",
+      "shows": "Frontal elevation, straight mansard roof with dormers and a pedimented lucarne, continuous balcon filant at two levels. Street trees and ground-floor roller-shutters/signage obscure the socle, so usable mainly for the roof/balcony portion of the stack rather than the ground floor."
+    },
+    {
+      "file": "images/se-facade/se-facade_10_boulevard-magenta-50.jpg",
+      "title": "50 boulevard Magenta",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bd_Magenta_50-W.JPG",
+      "license": "CC BY-SA 3.0",
+      "author": "FLLL",
+      "street": "50 boulevard Magenta, Paris",
+      "year": "",
+      "quality": "partial",
+      "klass": "comfortable",
+      "shows": "Frontal full-height elevation, straight comble with dormers, two bands of continuous balcon filant. Boulevard de Magenta was pierced 1854-59, squarely in-period. Bare tree branches cross much of the facade and the ground floor is covered by shop signage, so this is kept as a supporting rather than primary reference; a pair of sculpted caryatid consoles flank the central bay as a single accent, not the near-universal escalation seen in rejected candidates."
+    },
+    {
+      "file": "images/se-facade/se-facade_11_rue-chateaudun-55.jpg",
+      "title": "55 rue de Chateaudun",
+      "source_url": "https://commons.wikimedia.org/wiki/File:55_Chateaudun.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Boubloub",
+      "street": "55 rue de Chateaudun, Paris",
+      "year": "",
+      "quality": "partial",
+      "klass": "grand",
+      "shows": "Mild-oblique full elevation, pavement to ridge: straight comble with segmental-arched dormers, continuous balcon filant at three levels, richly modenatured window surrounds. Ground floor has been converted to glazed modern shopfronts (Cojean, EFS) and the shot angle is fairly raking, so kept as partial; useful for the upper-storey rhythm and roof geometry on a wider, grander frontage than the other examples."
+    }
+  ]
+}
