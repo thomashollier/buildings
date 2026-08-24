@@ -26,6 +26,14 @@ building and nothing else and can be composited over anything.
     python3 dev/harness/sprite_sheet.py A AC H83 H87    # a subset
     python3 dev/harness/sprite_sheet.py --px 48         # finer
     python3 dev/harness/sprite_sheet.py --cols 5        # grid shape
+    python3 dev/harness/sprite_sheet.py --labels        # ...and a keyed copy
+
+``--labels`` writes a SECOND file, ``sprites_labelled.png``, for reading rather
+than for consuming. The sheet proper stays bare on purpose: text baked into a
+cell travels with the sprite, and the atlas's ``baseline_from_cell_top`` is a
+promise about cell geometry that a caption band would quietly break. So the
+keyed copy is a separate artifact with its own taller cells, and nothing reads
+it back.
 """
 from __future__ import annotations
 
@@ -40,16 +48,33 @@ ROOT = Path(__file__).resolve().parents[1].parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "dev" / "harness"))
 
-from PIL import Image  # noqa: E402
+from PIL import Image, ImageDraw, ImageFont  # noqa: E402
 
 import layouts  # noqa: E402
 from buildings.render.svg import render  # noqa: E402
 from buildings.render.svg.render import _MARGIN_M  # noqa: E402
 from buildings.typologies.paris.generate import generate  # noqa: E402
+from buildings.typologies.paris.roles import assign_roles  # noqa: E402
 from buildings.typologies.paris.structure import solve_structure  # noqa: E402
 
 PX_PER_M = 34.0
 GUTTER = 8
+
+#: The keyed copy's own furniture. Only ``--labels`` ever uses any of this.
+LABEL_H = 46
+PAPER = (250, 249, 246)
+INK = (28, 28, 30)
+DIM = (120, 120, 126)
+
+
+def _font(size: int):
+    for path in ("/System/Library/Fonts/Helvetica.ttc",
+                 "/System/Library/Fonts/Supplemental/Arial.ttf"):
+        try:
+            return ImageFont.truetype(path, size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
 
 #: The sky rect and the ground band, which `render()` emits as the first two
 #: elements after the stylesheet. Matched on being full-width and anchored at
@@ -107,9 +132,18 @@ def sprite_for(key: str, tmp: Path) -> tuple[Image.Image, dict]:
         for n in _walk(node)
         if n.props.get("h") is not None
     )
+    etages = sum(
+        1 for st in assign_roles(grid).storeys if st.role.value in ("principal", "upper")
+    )
+    garrets = sum(1 for st in assign_roles(grid).storeys if st.role.value == "attic")
     return im, {
         "key": key,
         "title": lay.title,
+        "etages": etages,
+        "garret_storeys": garrets,
+        "cornice_built_m": round(grid.built_height, 3),
+        "cornice_legal_m": round(float(grid.cornice_height), 3),
+        "comble_m": round(float(grid.comble_height), 3),
         "facade_w_m": round(facade_w, 4),
         "total_h_m": round(total_h, 4),
         "drawn_top_m": round(drawn_top, 4),
@@ -122,7 +156,45 @@ def sprite_for(key: str, tmp: Path) -> tuple[Image.Image, dict]:
     }
 
 
-def build(keys: list[str], out: Path, cols: int | None = None) -> Path:
+def _write_keyed_copy(sprites, cell_w, cell_h, cols, out: Path) -> Path:
+    """The same grid, on paper, with each cell keyed (``--labels``).
+
+    Deliberately a second file. The sheet proper is a consumable: text baked
+    into a cell travels with the sprite, and the atlas promises a fixed
+    ``baseline_from_cell_top`` that a caption band would silently move. This
+    copy has taller cells and no atlas, and nothing reads it back.
+    """
+    rows = (len(sprites) + cols - 1) // cols
+    tall = cell_h + LABEL_H
+    sheet = Image.new("RGB", (cols * cell_w, rows * tall), PAPER)
+    draw = ImageDraw.Draw(sheet)
+    f_key, f_sub = _font(19), _font(13)
+
+    for i, (key, im, meta) in enumerate(sprites):
+        col, row = i % cols, i // cols
+        ox = col * cell_w + (cell_w - im.width) // 2
+        oy = row * tall + (cell_h - GUTTER // 2 - im.height)
+        sheet.paste(im, (ox, oy), im)
+
+        tx, ty = col * cell_w + 10, row * tall + cell_h + 2
+        draw.text((tx, ty), f"{key} · {meta['title']}", fill=INK, font=f_key)
+        ceiling = meta["cornice_legal_m"]
+        pct = 100.0 * meta["cornice_built_m"] / ceiling if ceiling else 0.0
+        draw.text(
+            (tx, ty + 22),
+            f"{meta['etages']} étages · {meta['garret_storeys']} garret · "
+            f"cornice {meta['cornice_built_m']:.2f} of {ceiling:.2f} m ({pct:.0f} %) · "
+            f"comble {meta['comble_m']:.2f} m · {meta['year']}",
+            fill=DIM,
+            font=f_sub,
+        )
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(out)
+    return out
+
+
+def build(keys: list[str], out: Path, cols: int | None = None, labels: bool = False) -> Path:
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
         sprites = [(k, *sprite_for(k, tmp)) for k in keys]
@@ -166,12 +238,20 @@ def build(keys: list[str], out: Path, cols: int | None = None) -> Path:
         out.with_suffix(".json").write_text(
             json.dumps(atlas, indent=2) + "\n", encoding="utf-8"
         )
+        if labels:
+            _write_keyed_copy(
+                sprites, cell_w, cell_h, cols,
+                out.with_name(out.stem + "_labelled" + out.suffix),
+            )
         return out
 
 
 def main(argv: list[str]) -> int:
     global PX_PER_M
     cols = None
+    labels = "--labels" in argv
+    if labels:
+        argv.remove("--labels")
     for flag, cast in (("--px", float), ("--cols", int)):
         if flag in argv:
             i = argv.index(flag)
@@ -182,9 +262,12 @@ def main(argv: list[str]) -> int:
             else:
                 cols = value
     keys = [a for a in argv if a in layouts.LAYOUTS] or list(layouts.LAYOUTS)
-    out = build(keys, ROOT / "dev" / "logs" / "tiles" / "sprites.png", cols)
+    out = build(keys, ROOT / "dev" / "logs" / "tiles" / "sprites.png", cols, labels)
     print(f"{len(keys)} sprites -> {out.relative_to(ROOT)}")
     print(f"           atlas -> {out.with_suffix('.json').relative_to(ROOT)}")
+    if labels:
+        keyed = out.with_name(out.stem + "_labelled" + out.suffix)
+        print(f"          keyed -> {keyed.relative_to(ROOT)}")
     return 0
 
 
