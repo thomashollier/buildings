@@ -1,4 +1,4 @@
-## Commercial varieties — three, from the nine Daly commercial buildings
+## Commercial varieties — the four presets, and the corpus behind them
 
 "Commercial" = a building with an entresol, which in this corpus means a shop
 ground floor. Nine of the sixteen qualify.
@@ -31,44 +31,99 @@ in the same year.
 
 ---
 
-### C1 · Percée standard — facade to the ceiling
-`street 22 m · parcel 14 m · 1865 · comfortable · shop`
-4 étages, cornice pressed against the 20 m limit, comble minimal (~2.8 m, share
-.12), one-storey *porte piétonne*, entresol **arcaded** in the base's own bossage.
-The commonest case: 4 of the 9.
-*Daly: 120 bd de Sébastopol (19.98 / 2.77), 63 (19.72 / 2.69), 77, 6 bd Saint-Germain.*
+## The presets
 
-### C2 · Comble-heavy — height in the roof
-`street 22 m · parcel 12 m · 1865 · comfortable · shop`
-3 étages, cornice ~17.5 m — a full 2.5 m below what the law allowed — and a comble
-of ~6.9 m carrying two rows of *lucarnes*. The tallest buildings in the corpus,
-reached by building the facade **lower**. Entresol **absorbed** into the devanture;
-two-storey *porte piétonne* arch.
-*Daly: 2 et 4 bd de Sébastopol (Davioud, 17.52 / 7.00 / total 24.52), 1 bd de Sébastopol (17.55 / 6.80).*
+These are the four `C*` entries in `dev/harness/layouts.py`, which is the
+authoritative definition — run `python3 dev/harness/layouts.py C1 C2 C3 C4` to
+print the stack each actually produces. **The keys were renumbered when A15/A16
+reworked the garret trade; this document previously described a different C1–C3
+and has been brought back into line with the code.**
 
-### C3 · Carriage commercial — shops with a coach entrance
-`street 24 m · parcel 16 m · 1865 · comfortable · shop · carriage`
-4 étages, cornice near the ceiling, small comble — but a **two-storey round-arched
-*porte cochère*** (2.57 × 5.00 m) cutting through RdC and entresol. Shops either
-side of a coach arch: commerce at street level, carriage access to the court behind.
-Entresol **absorbed**, since the arch swallows it in the entrance bay.
-*Daly: 39 rue Neuve des Mathurins (19.82 / 3.18, cochère 2.57 × 5.00); 26 rue Bergère (cochère 2.67).*
+### C1 · Comble-heavy — height in the roof
+`street 22 m · parcel 11 m · depth 16 m · 1865 · grand · shop`
+3 étages under a deep **two-storey** garret, two rows of *lucarnes*. Cornice
+built to 16.93 m of a 20.00 m ceiling (85 %) — the height goes into the roof.
+
+Two conditions must hold together and both are structural: the street must clear
+the 14.81 m of stone a bought garret stands on, which only the >20 m step does;
+and the parcel must be deep enough to hold two garret bands before the 45° slopes
+meet, which is 12.20 m.
+
+*Daly: 2 et 4 bd de Sébastopol (Davioud), cornice 17.52 / comble 7.00 / total
+24.52 — the tallest in the corpus, reached by building the facade lower. Also
+1 bd de Sébastopol (17.55 / 6.80). Ours reaches comble 6.10 against 7.00, a
+residual of −0.90 m; the cap is decree ridge 3.20 + one brisis rise 2.90.*
+
+### C2 · The middle strategy — **deliberately unreachable**
+`street 20 m · parcel 13 m · depth 13 m · 1865 · comfortable · shop`
+Kept as a **failing** case rather than deleted. The comble is either one garret
+band or two, so the reachable set is roughly [2.0, 3.2] and [5.9, 6.1] with
+nothing between, and a 4.72 m comble sits in the gap.
+
+Whether the gap is wrong is genuinely open: Daly's two independent readings of
+this building disagree (4.32 vs 5.12), so the target is inside the corpus's own
+error bar. Left here so the gap stays visible instead of being quietly rounded
+to a neighbour.
+
+*Daly: 26 rue Bergère, cornice 18.74 / comble 4.72 / total 23.46, and a
+**one-storey** porte cochère of 3.474 m under a 3.09 m entresol — the record that
+refutes A17.1's compulsory two-storey arch (see Amendment 18).*
+
+### C3 · The small end
+`street 14 m · parcel 11 m · depth 10 m · 1865 · comfortable · shop`
+3 étages, low cornice, shallow comble — the shortest commercial building.
+
+A 14 m street never reaches the >20 m step, so the ceiling binds at 17.55 m and
+the 14.81 m stone bar is never cleared: no bought garret is possible here whatever
+the programme wants, and the shallow parcel would refuse it anyway. This is the
+case where the envelope, not ambition, decides how big the building is.
+
+*Daly: 9 rue du Conservatoire, cornice 18.15 / comble 2.85 / total 21.00.*
+
+### C4 · Facade to the ceiling
+`street 22 m · parcel 15 m · depth 11 m · 1865 · comfortable · shop`
+4 étages pressed to the cornice limit, **one-storey** garret. Cornice 19.20 m of
+20.00 m (96 %).
+
+The mirror of C1 and the commonest case, 4 of the 9. Same 22 m street, so the
+same ceiling and the same stone bar cleared — but at 11 m the parcel is too
+shallow to hold a second garret band, so the trade is not on offer and the height
+stays in the facade. **Depth, not money, is what separates this from C1.**
+
+*Daly: 39 rue Neuve des Mathurins (cornice 19.82 / comble 3.18, two-storey porte
+cochère 2.57 × 5.00). Also 120 / 63 / 77 bd de Sébastopol and 6 bd Saint-Germain.*
 
 ---
 
-### What the three span
+### What the four span
 
-| | C1 | C2 | C3 |
-|---|---|---|---|
-| facade/roof strategy | max facade | max roof | max facade |
-| étages | 4 | 3 | 4 |
-| comble share | .12 | .28 | .14 |
-| entrance | piétonne, 1 storey | piétonne, 2 storey | **cochère, 2 storey** |
-| entresol | arcaded | absorbed | absorbed |
+| | C1 | C2 | C3 | C4 |
+|---|---|---|---|---|
+| facade/roof strategy | max roof | *(unreachable)* | envelope-bound | max facade |
+| étages | 3 | — | 3 | 4 |
+| built / ceiling | 85 % | 96 % | 96 % | 96 % |
+| garret bands | 2 | — | 0 | 1 |
+| what decides it | depth ≥ 12.20 m | — | street step | depth < 12.20 m |
 
-Both comble strategies, both entrance widths, one- and two-storey arches, and both
-entresol treatments — with every cell anchored to a named building.
+C1 and C4 are the pair that matters: the same street and the same ceiling, split
+only by parcel depth. C3 is the case where the street decides instead. C2 is a
+known hole between the two comble modes, kept visible on purpose.
 
-**Overlap, stated honestly:** 2 et 4 bd de Sébastopol is the anchor for C2 *and*
-carries the two-storey arch of C2/C3. The varieties are not orthogonal axes; they
-are combinations that occur. Three presets sample the space, they do not partition it.
+**Entrance height** is a separate axis and does not belong to any one preset — see
+`A` / `AC` / `AP` in `layouts.py`, which hold street, parcel, date, class and
+programme fixed and move only the entrance. Both entrance kinds draw for the
+two-storey arch, at different rates (Amendment 18).
+
+**The entresol has one treatment.** A13 claimed two — *absorbed* into the
+devanture (77 bd de Sébastopol) against *arcaded* in the base's own stone (120) —
+and the absorbed form was a misreading of plate 77 that A17.2 retracted. Both
+plates show the same arrangement: the devanture closes at a full-width
+entablature over the rez-de-chaussée and the entresol above it is its own register
+in the stone, with its own short lights on a low *allège*, each carrying a
+garde-corps. What genuinely varies between the two plates is the **head** those
+lights are turned with — square at 77, *arc surbaissé* at 120 — drawn per frontage
+on `facade/entresol/head`.
+
+**Overlap, stated honestly:** 2 et 4 bd de Sébastopol anchors C1 and also carries
+a two-storey pedestrian arch. The varieties are not orthogonal axes; they are
+combinations that occur. Four presets sample the space, they do not partition it.

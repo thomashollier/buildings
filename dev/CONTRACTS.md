@@ -1569,6 +1569,13 @@ via `reglement.balcony_rule` and is correct.
 
 # Amendment 13 — the entresol belongs to the base, not to the upper facade
 
+> **PARTLY RETRACTED BY AMENDMENT 17.** A13.2's *absorbed* entresol — the
+> devanture spanning RdC + entresol as one framework — was a misreading of plate
+> 77 and does not exist in the corpus. A17.2 deleted it; what survives as real
+> variation is the entresol window's **head form**. A13.1 (the socle runs through
+> the entresol, the emphatic string course crowns the base block) is correct and
+> stands — see A17.3. Read A17 before acting on anything below.
+
 Reported by the operator looking at a generated commercial boulevard building:
 *"the comfortable doesn't have an entresol."* It does — `mezzanine`, 2.66 m
 against a 3.39 m principal — but it does not **read** as one, and the source
@@ -1637,6 +1644,12 @@ values WEAK — so **do not calibrate it here**. Recorded as a known offset.
 ---
 
 # Amendment 14 — the two-storey arched entrance
+
+> **RATE AMENDED BY AMENDMENT 18.** A14.2 draws the tall arch at one rate for
+> both entrance kinds, reasoning from "two carriage and two pedestrian" among
+> Daly's four. That counts numerators only; against the denominators the kinds
+> differ, and the rate is now kind-dependent. A14's form, geometry and
+> applicability conditions are unchanged.
 
 Requested by the operator: *"variations where a round porte cochère extends up to
 include the entresol."* It is a real, documented form, and the measurement pass

@@ -75,28 +75,44 @@ Troisième has **no piano nobile at all**: its floors sit within 0.07 m.
 
 The entrance is the facade's ruler, so it deserves its own axis.
 
-**D · Two-storey carriage arch** — *A14, in flight*
+**D · Two-storey carriage arch** — *A14, built as `AC`*
 `as A, with a round arch through RdC + entresol`
-2.60 m wide, ~7 m tall. The width does not move; only the height.
+2.60 m wide. The width does not move; only the height. `A` and `AC` are the
+matched pair — same street, parcel, date, class and programme, differing only in
+the seed, and rasterised against each other every difference falls in the
+entrance bay.
 *Daly: Avenue de l'Impératrice (2.62 × 7.30), 39 rue Neuve des Mathurins (2.57 × 5.00).*
 
-**E · Two-storey pedestrian arch** — *A14, in flight*
-`street 18 m · parcel 10 m · 1865 · comfortable · shop`
-The same idea at the narrower end, where a carriage entrance was never affordable.
+**E · Two-storey pedestrian arch** — *A14, built as `AP`*
+`street 11 m · parcel 9 m · 1865 · comfortable · shop`
+The same idea at the narrower end, where a carriage entrance was never available:
+an 11 m street is under the 12 m a carriage needs to turn in, so the frontage
+takes a porte piétonne however comfortable the household. The arch is 1.75 m wide
+here against 2.60 at `AC`, and neither figure moved when the arch grew to two
+storeys.
+
+The tall form is **rarer on a pedestrian door than on a carriage one** — 1 of 7
+against 1 of 2 among frontages that have an entresol — which is a rate and not a
+rule (A18). Both kinds draw for it.
 *Daly: 2 et 4 bd de Sébastopol (Davioud, 1.74 × 5.01), 87 bd de Sébastopol.*
 
 ---
 
-## Tier 3 — entresol treatments
+## Tier 3 — entresol head forms
 
-**F · Entresol absorbed** — *A13, in flight*
-The devanture spans RdC + entresol as one framework; no separate entresol band.
-This is what lets a modern awning swallow an entresol without trace.
-*Daly: 77 bd de Sébastopol.*
+~~**F · Entresol absorbed**~~ — **WITHDRAWN by A17.2.** This asked for a preset
+showing the devanture spanning RdC + entresol as one framework, with no separate
+entresol band. There is no such building. It was a misreading of plate 77, which
+at full resolution shows the shopfront closing at a full-width entablature and
+the entresol above it standing as its own register in the stone. A preset cannot
+be built for it because the generator no longer produces it, and should not.
 
-**G · Entresol arcaded** — *A13, in flight*
-Arched openings in the base's own bossage, on the shopfront entablature.
-*Daly: 120 bd de Sébastopol.*
+**F · Entresol head form** — *A17.2, done*
+One pair, identical but for the seed, showing the one thing that does vary between
+Daly's two entresols: the head their lights are turned with. Square-headed at 77,
+*arc surbaissé* at 120 — both on their own low *allège*, both with a garde-corps,
+both in the base's own bossage. Drawn per frontage on `facade/entresol/head`.
+*Daly: 77 bd de Sébastopol (square), 120 bd de Sébastopol (segmental).*
 
 ---
 
