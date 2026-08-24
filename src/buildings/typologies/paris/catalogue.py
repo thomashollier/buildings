@@ -1236,9 +1236,6 @@ def shopfront_in_slot(
     slot_w: float,
     slot_h: float,
     klass: BuildingClass,
-    *,
-    soubassement: bool = True,
-    enseigne: bool = True,
 ) -> OpeningGeometry:
     """A devanture: the ground floor opened up to the street.
 
@@ -1250,23 +1247,19 @@ def shopfront_in_slot(
     modest one's only by as much as its bay and its ground storey are --
     which is the honest amount.
 
-    **A13.2 -- the two registers.** A devanture that has absorbed an entresol
-    is one framework standing across two storeys of the stack, and the two
-    ABSOLUTE bands that close it belong to the framework, not to each storey
-    of it: there is one soubassement, at the pavement, and one enseigne
-    board, under the course that crowns the base. So each register says which
-    of the two it carries. A devanture that faces a single storey carries
-    both, which is the default and is bit-for-bit what this function returned
-    before. What is deliberately NOT here is a band between the registers:
-    the transom that divides a shop window from the entresol light above it
-    is joinery, drawn inside the glass, and inventing a second soubassement
-    or a second fascia at the storey line would cut the one framework in two
-    -- which is exactly the reading A13 exists to remove.
+    **A17.2.** A13.2 gave this function two flags, so that a devanture said
+    to span the rez-de-chaussee and the entresol could put its soubassement
+    on the lower register and its enseigne board on the upper one and neither
+    at the storey line between them. No plate shows such a framework: at 77
+    and at 120 bd de Sebastopol the shopfront closes at the entablature over
+    the shop. A devanture stands in one storey and carries both bands, so the
+    flags are gone rather than left defaulted -- an argument no caller can
+    usefully vary is a decision nobody makes.
     """
     pier_min = pier_filler().to_slot_spec(klass).minimum
     width = max(0.0, slot_w - 2.0 * pier_min) if slot_w > 2.0 * pier_min else slot_w * 0.5
-    sill = float(shop_threshold_height()) if soubassement else 0.0
-    fascia = float(shopfront_fascia_depth()) if enseigne else 0.0
+    sill = float(shop_threshold_height())
+    fascia = float(shopfront_fascia_depth())
     height = max(0.0, slot_h - sill - fascia)
     if height <= 0.0:
         sill, height = 0.0, max(0.0, slot_h * 0.5)
@@ -1488,7 +1481,7 @@ def entrance_in_slot(kind: str, slot_w: float, slot_h: float) -> OpeningGeometry
 
 #: The two forms an entrance takes in height. Named, and stated as a pair,
 #: because A14.2 is a choice between two real architectural forms in exactly
-#: the way A13.2's ``"absorbed"``/``"arcaded"`` is -- not a flag that some
+#: the way A17.2's ``"flat"``/``"segmental"`` entresol head is -- not a flag that some
 #: buildings have set. Three quarters of Daly's entrances are one-storey and
 #: that is not the absence of a decision, it is the other outcome of it.
 ENTRANCE_ARCH_ONE_STOREY = "one_storey"
@@ -1620,11 +1613,10 @@ class TwoStoreyEntranceArch:
     how the facade is built and how it has to be drawn: the base storey's wall
     is one course of masonry and the entresol's is the one above it, and an
     opening rectangle handed across that joint would be drawn over by the wall
-    of the storey it trespasses into. It is the same shape A13 already gave
-    the absorbed devanture -- one architectural object, two registers of one
-    grid, unified by a fact both of them state -- and it means every existing
-    invariant about an opening fitting the storey that carries it survives
-    untouched.
+    of the storey it trespasses into. One architectural object, two registers
+    of one grid, unified by a fact both of them state -- and it means every
+    existing invariant about an opening fitting the storey that carries it
+    survives untouched.
 
     ``clear_width`` is the ONE dimension shared by both registers and by the
     one-storey door: it comes from ``entrance_in_slot`` and is ABSOLUTE.

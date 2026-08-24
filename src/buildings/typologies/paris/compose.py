@@ -707,11 +707,11 @@ def qualify_from_grid(
                 "socle_present",
                 "socle_treatment",
                 # A13.1: the socle runs through the entresol where there is
-                # one, so the storey that has one says which form it took.
-                # The trace then answers "why is there stone up here?" and
-                # "why is there no railing on it?" from the serialised IR
-                # alone, which is the whole point of carrying the decision.
-                "entresol_treatment",
+                # one, so the storey that has one says how its lights are
+                # headed. The trace then answers "why is there stone up
+                # here?" and "why are these lights arched?" from the
+                # serialised IR alone, which is the point of carrying it.
+                "entresol_head_form",
                 "ornament_course_width",
                 "ornament_course_height",
             )
@@ -979,9 +979,7 @@ def qualify_from_grid(
                             #   registers this rectangle is. One arch across
                             #   two storeys of one grid, and the fact that
                             #   the two rectangles are one object is stated
-                            #   on both rather than inferred from adjacency,
-                            #   exactly as A13's absorbed devanture states
-                            #   ``entresol_treatment`` on both of its own.
+                            #   on both rather than inferred from adjacency.
                             # * ``leaf_height`` — the door inside the lower
                             #   register. The SAME clear height a one-storey
                             #   door has: what passes through the gate did
@@ -1011,10 +1009,6 @@ def qualify_from_grid(
                         "shopfront_present",
                         "shopfront_variant",
                         "ground_treatment",
-                        # A13.2: which register of the framework this is, and
-                        # why it carries a soubassement, a signboard, or
-                        # neither.
-                        "entresol_treatment",
                     )
                     bay_children.append(
                         ShopfrontNode(

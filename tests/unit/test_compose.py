@@ -1723,53 +1723,53 @@ def test_the_band_that_crowns_the_base_hangs_where_a_reader_can_see_it():
     assert float(crown.props["h"]) > float(inside.props["h"])
 
 
-def test_the_devanture_that_absorbed_an_entresol_states_its_bands_once():
-    """A13.2. Two registers of one framework: the soubassement is emitted at
-    the pavement and nothing is emitted at the storey line between them, so
-    there is no plinth and no signboard cutting the glass in half. The
-    enseigne band of such a frontage is the entablature that crowns the base
-    (77 bd de Sébastopol letters the shop's name on it)."""
-    seeds = []
+def test_the_devanture_states_its_bands_once_and_stays_in_the_rez_de_chaussee():
+    """A17.2. A13 had the shopfront framework span the rez-de-chaussée and the
+    entresol, splitting its soubassement and its enseigne board between the
+    two registers so that neither landed at the storey line. No plate shows
+    such a framework — 77 and 120 bd de Sébastopol both close the devanture at
+    a full-width entablature — so the shopfront stands in one storey and
+    carries both of its bands there.
+
+    Swept over every seed, because the invented form used to be drawn about
+    half the time."""
     for seed in range(24):
         storeys = _a13_storeys(_a13_building(seed))
+        ground = [
+            c
+            for bay in storeys["base"].children
+            for c in bay.children
+            if c.kind == "shopfront"
+        ]
+        assert ground, f"seed {seed}: the ground floor sells nothing"
+        for node in ground:
+            assert float(node.props["threshold_height"]) > 0.0, node.id
+            assert float(node.props["fascia_depth"]) > 0.0, (
+                f"{node.id}: the devanture lost the signboard that closes it"
+            )
+        # And the entresol carries no devanture at all — neither a framework
+        # of its own nor the upper half of the one below it.
+        upper = [
+            c
+            for bay in storeys["mezzanine"].children
+            for c in bay.children
+            if c.kind == "shopfront"
+        ]
+        assert upper == [], (
+            f"seed {seed}: the devanture reached the entresol again"
+        )
+        # What is up there is glazed stone: openings, and no shop bay.
         mezz_shops = [
             c
             for bay in storeys["mezzanine"].children
             for c in bay.children
             if c.kind == "opening" and c.props.get("opening_type") == "shop_bay"
         ]
-        if mezz_shops:
-            seeds.append(seed)
-    assert seeds, "no frontage in the sweep absorbed its entresol"
-
-    building = _a13_building(seeds[0])
-    storeys = _a13_storeys(building)
-    ground = [
-        c
-        for bay in storeys["base"].children
-        for c in bay.children
-        if c.kind == "shopfront"
-    ]
-    assert ground, "the ground floor sells nothing"
-    for node in ground:
-        assert float(node.props["threshold_height"]) > 0.0
-        assert float(node.props["fascia_depth"]) == pytest.approx(0.0), (
-            "a signboard at the storey line would cut the one framework in two"
-        )
-    # ...and the upper register emits no devanture node of its own, because
-    # every part of one would have come out zero (A6.6: an element that
-    # cannot be seen has no business in the IR).
-    upper = [
-        c
-        for bay in storeys["mezzanine"].children
-        for c in bay.children
-        if c.kind == "shopfront"
-    ]
-    assert upper == []
+        assert mezz_shops == [], f"seed {seed}: entresol bays are shop glass"
 
 
 def test_no_part_of_the_base_block_is_emitted_without_extent():
-    """A10.5, over both entresol forms. Whatever the base block emits, it has
+    """A10.5, over both entresol head forms. Whatever the base block emits, it has
     extent: nothing here is a zero-width node standing in for an absence."""
     for seed in range(12):
         storeys = _a13_storeys(_a13_building(seed))
@@ -1790,9 +1790,9 @@ def test_no_part_of_the_base_block_is_emitted_without_extent():
 # A14 — the two-storey arched entrance, in the IR
 # ===========================================================================
 #
-# The arch is ONE architectural object drawn across TWO registers of the grid,
-# which is the same shape A13 gave the absorbed devanture: the wall of a storey
-# is a course of masonry, and a rectangle handed across the joint between two
+# The arch is ONE architectural object drawn across TWO registers of the grid.
+# The wall of a storey is a course of masonry, and a rectangle handed across
+# the joint between two
 # of them would be painted over by the storey it trespasses into. So what
 # follows asserts that the two registers stack into one arch — same width, same
 # jambs, no gap — and that the census that counts entrances still finds one.

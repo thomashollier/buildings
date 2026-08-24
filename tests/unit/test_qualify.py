@@ -1616,12 +1616,12 @@ def _a13_storey(rows, role: Role):
     raise AssertionError(f"no {role} storey in the fixture")
 
 
-def _a13_forms(seeds=range(24)) -> dict[str, int]:
+def _a13_head_forms(seeds=range(24)) -> dict[str, int]:
     counted: dict[str, int] = {}
     for seed in seeds:
         rows = _a13_rows(seed)
         row, res = _a13_storey(rows, Role.MEZZANINE)
-        form = res[0].get("entresol_treatment")
+        form = res[0].get("entresol_head_form")
         counted[form] = counted.get(form, 0) + 1
     return counted
 
@@ -1710,11 +1710,13 @@ def test_the_crowning_course_is_a_level_and_follows_the_entresol_out_of_the_stac
 # --- A13.2: the entresol gets its own opening treatment --------------------
 
 
-def test_both_of_dalys_entresol_forms_are_reachable():
-    """A13.2. Neither plate is the norm and the other an exception; both are
-    Deuxième Classe of 1864 on the same boulevard."""
-    counted = _a13_forms()
-    assert set(counted) == {"absorbed", "arcaded"}, counted
+def test_both_of_dalys_entresol_head_forms_are_reachable():
+    """A17.2. What actually varies between the two plates is the head the
+    entresol's lights are turned with — square at 77 bd de Sébastopol,
+    *arc surbaissé* at 120. Neither is the norm and the other an exception;
+    both are Deuxième Classe of 1864 on the same boulevard."""
+    counted = _a13_head_forms()
+    assert set(counted) == {"flat", "segmental"}, counted
     assert min(counted.values()) >= 4, f"one form is barely reachable: {counted}"
 
 
@@ -1722,7 +1724,7 @@ def test_the_entresol_form_is_not_keyed_to_the_date_or_the_class():
     """The property this whole mechanism exists for: one year, one class, one
     street — and the frontages still differ, because the choice runs through
     ``DecisionStream`` and not through a period or a price."""
-    counted = _a13_forms()
+    counted = _a13_head_forms()
     assert len(counted) == 2, (
         "every frontage of 1865, comfortable class, on a 22 m boulevard came "
         f"out the same way: {counted}"
@@ -1731,30 +1733,36 @@ def test_the_entresol_form_is_not_keyed_to_the_date_or_the_class():
 
 def test_the_entresol_form_is_addressable_on_a_stable_path():
     """It has to be pinnable, or it cannot be argued with later. The path is
-    per FRONTAGE — a building has one shopfitter — so it is stable under
-    adding storeys and bays."""
+    per FRONTAGE — a building has one entresol and one mason — so it is
+    stable under adding storeys and bays."""
     ctx = _ctx(role=Role.MEZZANINE, slot_name="bay", ground=GroundProgramme.SHOP)
     for seed in range(30):
         rng = DecisionStream(seed)
-        drawn = rng.choice("facade/entresol/treatment", ["absorbed", "arcaded"])
-        assert base_layer.entresol_treatment_for(ctx, rng) == drawn
+        drawn = rng.choice("facade/entresol/head", ["flat", "segmental"])
+        assert base_layer.entresol_head_form(ctx, rng) == drawn
     # ...and re-asking is free and identical, because the stream is keyed on
     # (seed, path) and nothing here consumes a cursor.
     rng = DecisionStream(5)
-    first = base_layer.entresol_treatment_for(ctx, rng)
-    assert all(base_layer.entresol_treatment_for(ctx, rng) == first for _ in range(4))
+    first = base_layer.entresol_head_form(ctx, rng)
+    assert all(base_layer.entresol_head_form(ctx, rng) == first for _ in range(4))
 
 
-def test_a_masonry_ground_floor_has_no_framework_for_an_entresol_to_go_into():
-    """Not a coin toss where one side is impossible. A frontage with no
-    devanture has nothing to absorb an entresol, so its entresol is stone."""
-    for seed in range(8):
-        ctx = _ctx(
-            role=Role.MEZZANINE,
-            slot_name="bay",
-            ground=GroundProgramme.RESIDENTIAL,
-        )
-        assert base_layer.entresol_treatment_for(ctx, DecisionStream(seed)) == "arcaded"
+def test_the_devanture_stops_at_the_rez_de_chaussee():
+    """A17.2, as the thing it forbids. A13 had the shopfront framework span
+    the rez-de-chaussée and the entresol as one object, sourced to plate 77.
+    The plate does not show that: the devanture closes at a full-width
+    entablature and the entresol above it is a separate register in the
+    stone. So no storey above the base is ever faced by the framework, on any
+    seed and any glazed programme."""
+    for ground in (GroundProgramme.SHOP, GroundProgramme.CAFE, GroundProgramme.OFFICE):
+        for seed in range(8):
+            rng = DecisionStream(seed)
+            base = _ctx(role=Role.BASE, slot_name="bay", ground=ground)
+            mezz = _ctx(role=Role.MEZZANINE, slot_name="bay", ground=ground)
+            assert base_layer.devanture_faces(base, rng)
+            assert not base_layer.devanture_faces(mezz, rng), (
+                f"{ground.value}/{seed}: the devanture reached the entresol"
+            )
 
 
 def test_an_entresol_never_carries_a_shrunken_upper_floor_window():
@@ -1778,43 +1786,45 @@ def test_an_entresol_never_carries_a_shrunken_upper_floor_window():
             )
 
 
-def test_the_absorbed_entresol_is_the_devantures_own_upper_register():
-    """77 bd de Sébastopol. One framework across both storeys: the entresol's
-    bays are glass in the same devanture, in the same width, between the same
-    trumeaux, with no sill and no band of their own to divide it."""
-    seed = next(s for s in range(24) if _a13_forms([s]).get("absorbed"))
-    rows = _a13_rows(seed)
-    base_row, base_res = _a13_storey(rows, Role.BASE)
-    mezz_row, mezz_res = _a13_storey(rows, Role.MEZZANINE)
-    shops = [
-        i for i, r in enumerate(base_res) if r.get("opening_type") == "shop_bay"
-    ]
-    assert shops, "the fixture's ground floor sells nothing"
-    for i in shops:
-        assert mezz_res[i].get("opening_type") == "shop_bay", (
-            f"slot {i}: the absorbed entresol carries a separate opening band"
-        )
-        # The same framework, so the same glass in the same place...
-        assert mezz_res[i].get("opening_width") == pytest.approx(base_res[i].get("opening_width"))
-        assert mezz_res[i].get("opening_offset_x") == pytest.approx(
-            base_res[i].get("opening_offset_x")
-        )
-        # ...with the two ABSOLUTE bands stated ONCE for the whole framework:
-        # the soubassement at the pavement, nothing at the storey line.
-        assert float(base_res[i].get("opening_sill_height")) == pytest.approx(
-            float(catalogue.shop_threshold_height())
-        )
-        assert float(mezz_res[i].get("opening_sill_height")) == 0.0
-        assert mezz_res[i].get("shopfront_present") is False
-        # And no railing across a shop window.
-        assert not mezz_res[i].get("ironwork_present")
+def test_the_entresol_over_a_shop_is_its_own_register_of_windows():
+    """A17.2, and the guard against A13's error coming back. Both plates show
+    the same arrangement: over the devanture's entablature the entresol is a
+    separate register in the base's stone, with its own short lights standing
+    on a low *allège* — not glass in the shopfront's framework.
+
+    Stated over every seed rather than one, because the reading A13 invented
+    was reachable half the time."""
+    lean = float(catalogue.sill_lean_height())
+    allege = float(catalogue.entresol_allege_height())
+    for seed in range(12):
+        rows = _a13_rows(seed)
+        _base_row, base_res = _a13_storey(rows, Role.BASE)
+        _mezz_row, mezz_res = _a13_storey(rows, Role.MEZZANINE)
+        shops = [i for i, r in enumerate(base_res) if r.get("opening_type") == "shop_bay"]
+        assert shops, f"seed {seed}: the fixture's ground floor sells nothing"
+        for i in shops:
+            # A window in stone, not the upper half of a devanture.
+            assert mezz_res[i].get("opening_type") == "window", (
+                f"seed {seed} slot {i}: the devanture absorbed the entresol again"
+            )
+            assert not mezz_res[i].get("shopfront_present")
+            # Standing on the low allège — which is A13.2's real complaint,
+            # and the half of it that survives: not the lean-on sill of the
+            # storeys above, and not the zero sill of a shopfront either.
+            sill = float(mezz_res[i].get("opening_sill_height"))
+            assert sill == pytest.approx(allege), f"seed {seed} slot {i}: sill {sill}"
+            assert sill < lean
+            # ...and the RdC keeps its own soubassement, one storey down.
+            assert float(base_res[i].get("opening_sill_height")) == pytest.approx(
+                float(catalogue.shop_threshold_height())
+            )
 
 
 def test_the_arcaded_entresol_is_an_arch_in_the_bases_own_stone():
     """120 bd de Sébastopol. Its own band, and it belongs to the base: an
     *arc surbaissé* in the ground floor's coursing, on a low allège, with a
     small individual railing across the light."""
-    seed = next(s for s in range(24) if _a13_forms([s]).get("arcaded"))
+    seed = next(s for s in range(24) if _a13_head_forms([s]).get("segmental"))
     rows = _a13_rows(seed)
     row, res = _a13_storey(rows, Role.MEZZANINE)
     lit = [(ctx, r) for ctx, r in zip(row, res) if r.get("opening_type") == "window"]
@@ -1835,23 +1845,27 @@ def test_the_arcaded_entresol_is_an_arch_in_the_bases_own_stone():
 def test_the_arcade_stops_under_the_band_that_crowns_the_base():
     """An arch whose head runs up behind its own entablature is an arch drawn
     through its own cornice. Both rules read ``base_entablature_depth``, so
-    the two lines meet instead of crossing."""
-    seed = next(s for s in range(24) if _a13_forms([s]).get("arcaded"))
-    rows = _a13_rows(seed)
-    row, res = _a13_storey(rows, Role.MEZZANINE)
-    for ctx, r in zip(row, res):
-        if r.get("opening_type") != "window":
-            continue
-        head = (
-            ctx.level_above_pavement
-            + float(r.get("opening_sill_height"))
-            + float(r.get("opening_height"))
-        )
-        crown = ctx.base_block_top - base_layer.base_entablature_depth(ctx)
-        assert head <= crown + 1e-9, (
-            f"the arch head reaches {head:.3f} m; the entablature starts at "
-            f"{crown:.3f} m"
-        )
+    the two lines meet instead of crossing.
+
+    Swept over seeds rather than pinned to one, because since A17.2 the
+    entresol always has its own lights and both head forms have to clear the
+    band — the segmental one by its rise, the square one by its lintel."""
+    for seed in range(12):
+        rows = _a13_rows(seed)
+        row, res = _a13_storey(rows, Role.MEZZANINE)
+        for ctx, r in zip(row, res):
+            if r.get("opening_type") != "window":
+                continue
+            head = (
+                ctx.level_above_pavement
+                + float(r.get("opening_sill_height"))
+                + float(r.get("opening_height"))
+            )
+            crown = ctx.base_block_top - base_layer.base_entablature_depth(ctx)
+            assert head <= crown + 1e-9, (
+                f"seed {seed}: the arch head reaches {head:.3f} m; the "
+                f"entablature starts at {crown:.3f} m"
+            )
 
 
 # ===========================================================================
@@ -2214,16 +2228,13 @@ def test_the_arch_crown_lands_on_the_line_the_flanking_entresol_heads_do():
         )
 
 
-def test_both_a13_entresol_forms_carry_the_tall_arch():
-    """A14.2: "where the entresol is absorbed the tall arch is the natural
-    entrance form; where it is arcaded the arch springs from the same coursing
-    as the flanking arches. Both combinations must work."
-
-    At the Impératrice the entresol is absorbed into the base and the arch
-    rises through it all the same; at 39 rue Neuve des Mathurins the entresol
-    is its own band and the arch rises through that. So the form must not be
-    keyed to which of A13's two the frontage took.
-    """
+def test_both_entresol_head_forms_carry_the_tall_arch():
+    """A14.2 asked that the tall arch not be keyed to the entresol's form.
+    A13 stated that form as *absorbed* against *arcaded*; A17.2 retracted the
+    absorbed one, so what is left to be independent of is the head the
+    entresol's own lights are turned with — square at 77, segmental at 120.
+    The arch rises through the entresol either way, because what it needs is
+    a storey to rise through and not a fashion in the lights beside it."""
     seen: dict[str, int] = {}
     for seed in range(64):
         rows = _a14_rows(seed)
@@ -2231,11 +2242,11 @@ def test_both_a13_entresol_forms_carry_the_tall_arch():
         if base_res.get("entrance_arch_register") != catalogue.ENTRANCE_ARCH_LEAVES:
             continue
         _m, mez_res = _a14_entrance_cell(rows, Role.MEZZANINE)
-        treatment = mez_res.get("entresol_treatment")
-        seen[treatment] = seen.get(treatment, 0) + 1
+        head = mez_res.get("entresol_head_form")
+        seen[head] = seen.get(head, 0) + 1
         # Whichever it is, the arch is there and it is the same arch.
         assert mez_res.get("opening_type") == catalogue.ENTRANCE_ARCH_HEAD_OPENING
-    assert set(seen) == {"absorbed", "arcaded"}, (
+    assert set(seen) == {"flat", "segmental"}, (
         f"the tall arch reached only {sorted(seen)} — A14.2 needs both"
     )
 

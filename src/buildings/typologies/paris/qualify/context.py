@@ -103,9 +103,8 @@ PROPERTY_KEYS: frozenset[str] = frozenset(
         # ``"leaves"`` (the rez-de-chaussee -- the leaves and the carved
         # tympanum over them) or ``"arch_head"`` (the entresol -- the
         # balconette, the light and the round head with its agrafe). ``None``
-        # on every other cell in Paris. One arch, two registers, exactly as
-        # A13's absorbed devanture is one framework in two: the fact that
-        # they are one object is stated on both of them, so neither the
+        # on every other cell in Paris. One arch, two registers: the fact
+        # that they are one object is stated on both of them, so neither the
         # renderer nor a reader of the IR has to infer it from adjacency.
         "entrance_arch_register",
         # A14.1. The leaves' own clear height inside the lower register, in
@@ -141,14 +140,15 @@ PROPERTY_KEYS: frozenset[str] = frozenset(
         # the ground floor
         "socle_present",
         "socle_treatment",
-        # A13.2. Which of the two forms Daly draws the entresol in, where the
-        # base block has one: ``"absorbed"`` (the devanture spans the whole
-        # base and the entresol is glazed inside its framework — 77 bd de
-        # Sébastopol) or ``"arcaded"`` (arched openings in the base's own
-        # coursing, standing on the shopfront's entablature — 120 bd de
-        # Sébastopol). One fact about the frontage, resolved once, read by
-        # every rule that has to know whether the entresol is stone or glass.
-        "entresol_treatment",
+        # A17.2. What head Daly's entresol lights are turned with, where the
+        # base block has an entresol: ``"flat"`` (square-headed over the
+        # shopfront band — 77 bd de Sébastopol) or ``"segmental"`` (*arcs
+        # surbaissés* in the base's own coursing — 120 bd de Sébastopol).
+        # Both plates put the entresol in the stone as its own register; the
+        # head is the one thing that varies between them. One fact about the
+        # frontage, resolved once, carried so the trace can answer why this
+        # storey's lights are shaped as they are.
+        "entresol_head_form",
         "shopfront_present",
         "shopfront_variant",
         "shopfront_pane_max_span",
@@ -294,8 +294,8 @@ class QualContext:
 
     #: EXTENSION 5 — the ceiling of that base, metres above the pavement.
     #:
-    #: The line the strong string course runs along, and the top of an
-    #: absorbed devanture's framework. It is a *height above the pavement*,
+    #: The line the strong string course runs along, and the head the
+    #: entresol's lights stop under. It is a *height above the pavement*,
     #: like the 1823 ordonnance's own threshold, so the rules that read it
     #: read a level and not a floor number — take the entresol out of the
     #: stack and the crowning course drops to the top of the ground storey by

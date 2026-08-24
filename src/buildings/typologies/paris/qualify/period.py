@@ -167,7 +167,7 @@ def shopfront_of_its_date(ctx: QualContext, rng: DecisionStream) -> Properties |
 
     Applicability: every storey the devanture's framework stands in front of,
     on a frontage that sells something — the rez-de-chaussée, and the entresol
-    too where the devanture absorbed it (A13.2). One draw on one path, because
+    which since A17.2 is the rez-de-chaussée alone. One draw on one path, because
     a building has one shopfitter and the upper register of a framework is not
     glazed by a different decade from its lower one. ``SPEC_ROLE``.
     """

@@ -56,7 +56,6 @@ __all__ = [
     "sill_height_for",
     "opening_type_for",
     "base_entablature_depth",
-    "entresol_treatment_for",
     "entresol_head_form",
     "devanture_faces",
     "carries_an_ordinary_window",
@@ -410,9 +409,9 @@ def opening_type_for(ctx: QualContext, rng: DecisionStream) -> str:
             return catalogue.ENTRANCE_ARCH_HEAD_OPENING
         return "window"
     if ctx.slot_name == "bay":
-        # A13.2: the devanture is a fact about the base BLOCK, not about the
-        # ground storey — where it absorbed the entresol, the entresol's bay
-        # is glass in the same framework and not a window in a wall.
+        # The devanture faces the rez-de-chaussée and stops there (A17.2),
+        # so a bay it stands in front of is glass and every bay above it is a
+        # window in a wall.
         if devanture_faces(ctx, rng):
             return "shop_bay"
         return "window"
@@ -420,10 +419,9 @@ def opening_type_for(ctx: QualContext, rng: DecisionStream) -> str:
 
 
 #: What the ground floor is *for*, as the face it presents to the street.
-#: Lifted out of ``ground_programme_treatment`` so that the entresol the
-#: devanture absorbed can state the SAME face without restating the mapping —
-#: an absorbed entresol is not a second programme, it is the top half of the
-#: one below it, and two copies of this table would eventually disagree.
+#: Lifted out of ``ground_programme_treatment`` so that every rule needing the
+#: frontage's face reads one table rather than restating the mapping — two
+#: copies of it would eventually disagree.
 _GROUND_PROGRAMME_FACE: Mapping[GroundProgramme, str] = MappingProxyType(
     {
         GroundProgramme.SHOP: "devanture",
@@ -434,62 +432,9 @@ _GROUND_PROGRAMME_FACE: Mapping[GroundProgramme, str] = MappingProxyType(
     }
 )
 
-#: Ground programmes whose frontage is glazed joinery rather than masonry —
-#: the ones with a framework there for an entresol to be absorbed INTO.
+#: Ground programmes whose frontage is glazed joinery rather than masonry,
+#: which is what puts a devanture on the rez-de-chaussée at all.
 _GLAZED_GROUND = (GroundProgramme.SHOP, GroundProgramme.CAFE, GroundProgramme.OFFICE)
-
-
-def entresol_treatment_for(ctx: QualContext, rng: DecisionStream) -> str | None:
-    """Which of Daly's two entresol forms this frontage takes (A13.2).
-
-    ``None`` where the base block is the rez-de-chaussée alone — there is no
-    entresol to have a form.
-
-    **Why this is a draw and not a table.** Two plates of 1864, both Deuxième
-    Classe, both by Paul Mesnard, both with a measured 4.00 + 3.10 base:
-
-    * **77 bd de Sébastopol** — ``"absorbed"``. The devanture spans the whole
-      7.10 m as one framework and the entresol is glazed inside it. There is
-      no entresol band on the facade at all, which is why a modern awning can
-      swallow an entresol without leaving a visible trace.
-    * **120 bd de Sébastopol** — ``"arcaded"``. The entresol is its own band
-      and it belongs to the base: arched openings in the same coursing as the
-      ground floor, standing on the shopfront's entablature, with small
-      individual railings.
-
-    Same year, same class, same architect, same stack. So this is not a date
-    fact and not a money fact — it is variation *within* a class and a period,
-    which is precisely what ``DecisionStream`` is for. The path is per
-    FRONTAGE (``facade/entresol/treatment``), because a building has one
-    entresol and one shopfitter, and it is stable under adding storeys, so it
-    can be pinned in a test and argued with later.
-
-    **A17 RETRACTS the "absorbed" form.** It was read off plate 77 and it is
-    not there. At full resolution that plate shows the rez-de-chaussée
-    stopping at a clear entablature, and above the line an entresol that is
-    its own register: short windows, each with a garde-corps, in ashlar with
-    the coursing visible between them. The pedestrian door reaches the head of
-    the rez-de-chaussée and no further.
-
-    So 77 and 120 show the SAME arrangement. What differs between them is only
-    the entresol window's HEAD — square-headed at 77, *arc surbaissé* at 120 —
-    which is what ``entresol_head_form`` now draws. The devanture spanning both
-    registers was invented in A13 and never existed in the corpus; it is gone
-    rather than down-weighted, because a form with no source is not a rare
-    variant, it is a mistake.
-
-    The entresol therefore always has its own band. Only one opening on a
-    Paris frontage crosses the entresol floor, and it is the *porte cochère*
-    (A14) — because a carriage has to pass under that floor. A shop window
-    does not, and neither does a pedestrian door.
-
-    Restated as one shared expression, not read off another rule's output
-    (I1): four rules in three layers need this answer, and two of them stand
-    on the rez-de-chaussée where ``Role.MEZZANINE`` cannot be asked.
-    """
-    if not ctx.has_an_entresol:
-        return None
-    return "arcaded"
 
 
 def entresol_head_form(ctx: QualContext, rng: DecisionStream) -> str:
@@ -513,16 +458,19 @@ def entresol_head_form(ctx: QualContext, rng: DecisionStream) -> str:
 def devanture_faces(ctx: QualContext, rng: DecisionStream) -> bool:
     """Does the shopfront's own framework stand in front of THIS storey?
 
-    The rez-de-chaussée of a glazed frontage always; the entresol over it
-    only where the devanture absorbed it. Reads no horizontal fact, so every
-    cell of a row agrees about it — which is what lets the storey-scope rules
-    (the garde-corps, the string course) read it too.
+    The rez-de-chaussée of a glazed frontage, and nothing above it. Reads no
+    horizontal fact, so every cell of a row agrees about it — which is what
+    lets the storey-scope rules (the garde-corps, the string course) read it
+    too.
+
+    **A17.2.** This used to answer yes on the entresol as well, where the
+    devanture was said to have absorbed it. Both plates show otherwise: at 77
+    and at 120 bd de Sébastopol the shopfront closes at a full-width
+    entablature and the entresol above it is a separate register in the
+    stone. The framework never spanned both.
     """
     if ctx.ground not in _GLAZED_GROUND:
         return False
-    # A17: the rez-de-chaussée and nothing above it. A devanture stops at the
-    # entablature over the shop; the entresol is a separate register with its
-    # own windows. The framework never spanned both — that was A13's error.
     return ctx.role is Role.BASE
 
 
@@ -578,7 +526,7 @@ def entrance_arch_form_for(ctx: QualContext, rng: DecisionStream) -> str | None:
     calibration; only the ordering is contractual.
 
     The path is per FRONTAGE (``facade/entrance/arch_form``), the same shape
-    as A13.2's ``facade/entresol/treatment``, because a building has one
+    as A17.2's ``facade/entresol/head``, because a building has one
     entrance and one mason, and because a path that does not move when a
     storey is added is a path a test can pin. Stated as a choice between two
     NAMED forms rather than as a flag some buildings have set: three quarters
@@ -1084,16 +1032,12 @@ def ground_floor_of_a_shop(ctx: QualContext, rng: DecisionStream) -> Properties 
             # head form is dated the same way every other fashion axis is
             # dated, not hard-coded (A7.4) — see ``_shop_opening_head``.
             #
-            # A13.2: unless the framework carries on above this storey. Where
-            # the devanture absorbed the entresol the head belongs to the top
-            # of the whole framework and the register at the pavement is
-            # flat-topped, because an arch halfway up a devanture is an arch
-            # springing off nothing.
-            "opening_head": (
-                "flat"
-                if entresol_treatment_for(ctx, rng) == "absorbed"
-                else _shop_opening_head(ctx, rng)
-            ),
+            # A13.2 used to flatten this head where the devanture was said to
+            # carry on above the storey, on the reasoning that an arch halfway
+            # up a framework springs off nothing. A17.2 retracted the form: a
+            # devanture stops at the entablature over the shop, so this head
+            # is always the one the date supplies.
+            "opening_head": _shop_opening_head(ctx, rng),
             # A devanture has no sill: you walk into a shop over a step, and
             # ``shop_threshold_height`` is that step. ABSOLUTE, like the lean
             # height it replaces, and for the same kind of reason — a leg
@@ -1116,76 +1060,13 @@ def ground_floor_of_a_shop(ctx: QualContext, rng: DecisionStream) -> Properties 
     )
 
 
-def entresol_is_glazed_by_the_devanture(
-    ctx: QualContext, rng: DecisionStream
-) -> Properties | None:
-    """The absorbed entresol: the devanture spans it, so its bay is glass.
-
-    **A13.2, 77 bd de Sébastopol.** The shopfront framework runs the whole
-    4.00 + 3.10 m of the base as one architectural object and the entresol's
-    lights are the upper register of that glazing. There is no entresol band
-    on the facade at all — no sill, no stone frame, no keystone, no railing —
-    which is why an awning hung across a modern shopfront can swallow an
-    entresol without leaving a visible trace.
-
-    The register is stated, not the whole framework: the IR's grid is a
-    storey crossed with a slot, so the one devanture is described by the two
-    cells it stands in. What makes them one framework rather than two
-    shopfronts stacked is that the base block states its bands ONCE —
-    ``catalogue.shopfront_in_slot`` gives the soubassement to the register at
-    the pavement and the enseigne board to the register under the crowning
-    course, and neither gets one at the storey line between them — and that
-    no string course runs across the joint (``string_course_carries_the_
-    arcaded_entresol`` declines on this form). What is left at the joint is
-    the transom, which is joinery.
-
-    ``opening_head`` is flat here and the head form the date supplies goes on
-    the register that actually has a head — the top one. An arch halfway up a
-    devanture would be an arch springing off nothing.
-
-    Applicability: a bay on the entresol of a glazed frontage whose entresol
-    the devanture absorbed. ``SPEC_SLOT_AND_ROLE``, above ``bay_is_a_window``
-    and disjoint from ``entresol_is_arcaded_in_the_base_s_own_stone`` (the
-    two forms exclude each other) and from ``ground_floor_of_a_shop`` (the
-    base storey is not the entresol).
-    """
-    if ctx.role is not Role.MEZZANINE or ctx.slot_name != "bay":
-        return None
-    if not devanture_faces(ctx, rng):
-        return None
-    return Properties(
-        {
-            "opening_type": "shop_bay",
-            # Flat. The head of THIS framework is the entablature crowning
-            # the base, drawn by the string course over it; an arch turned in
-            # the joinery underneath would be an arch behind a cornice.
-            "opening_head": "flat",
-            # No sill and no step: the glass of the lower register comes up
-            # to this line and carries straight on through it.
-            "opening_sill_height": 0.0,
-            # And no devanture *bands* — no soubassement, because the step up
-            # from the street is two metres below, and no enseigne board,
-            # because the band that closes this framework is the entablature
-            # crowning the base and it is drawn by the string course. What is
-            # here is glass, so no ``shopfront`` node is emitted for it: a
-            # node whose every part came out zero would draw nothing, and an
-            # element that cannot be seen has no business in the IR (A6.6).
-            "shopfront_present": False,
-            "ground_treatment": _GROUND_PROGRAMME_FACE[ctx.ground],
-            "shopfront_pane_max_span": float(catalogue.shopfront_pane_max_span(None)),
-        },
-        rule="paris.qualify.base.opening.entresol_is_glazed_by_the_devanture",
-        specificity=SPEC_SLOT_AND_ROLE,
-    )
-
-
 def entresol_is_arcaded_in_the_base_s_own_stone(
     ctx: QualContext, rng: DecisionStream
 ) -> Properties | None:
     """The arcaded entresol: arched openings in the coursing of the base.
 
-    **A13.2, 120 bd de Sébastopol.** Here the entresol *is* its own band, and
-    it still belongs to the base: *arcs surbaissés* cut in the same ashlar the
+    **A17.2 — and since A17.2 this is what every entresol does.** The
+    entresol is its own band and it belongs to the base: *arcs surbaissés* cut in the same ashlar the
     ground floor is faced in (which is what ``socle_carries_the_wall`` running
     through this storey puts there), standing on the shopfront's entablature,
     with a small individual railing across each light. Together the two levels
@@ -1198,28 +1079,22 @@ def entresol_is_arcaded_in_the_base_s_own_stone(
     ``catalogue.entresol_allege_height``'s low breast wall rather than on a
     sill somebody leans out over the street from.
 
-    **The strip over the entrance takes this form too, on both.** A devanture
-    can only absorb the storey it stands in front of, and it does not stand in
-    front of the doorway: at 77 bd de Sébastopol the column carrying the porte
-    piétonne is masonry from the pavement to the cornice, between two shops
-    that are glass all the way up. So the arcade is what the entresol does
-    wherever the framework's glass does not reach — which on an absorbed
-    frontage is exactly the entrance strip, and on an arcaded one is the whole
-    storey.
+    **The strip over the entrance takes this form too.** At 77 bd de
+    Sébastopol the column carrying the porte piétonne is masonry from the
+    pavement to the cornice, and the entresol light above the door sits in it
+    exactly as its neighbours sit in theirs. So this is simply what the
+    entresol does, across the whole storey — which since A17.2 is the only
+    thing it does, the *absorbed* alternative having been retracted.
 
-    Applicability: a bay or the strip over the entrance, on an entresol, where
-    the devanture is not already glazing that slot. ``SPEC_SLOT_AND_ROLE``,
-    above ``bay_is_a_window``'s flat head and lean-on sill and above
-    ``over_the_entrance``'s ordinary window, and disjoint from
-    ``entresol_is_glazed_by_the_devanture`` by the last test.
+    Applicability: a bay or the strip over the entrance, on an entresol.
+    ``SPEC_SLOT_AND_ROLE``, above ``bay_is_a_window``'s flat head and lean-on
+    sill and above ``over_the_entrance``'s ordinary window.
     """
     if ctx.role is not Role.MEZZANINE:
         return None
     if ctx.slot_name != "bay" and ctx.slot_name not in catalogue.ENTRANCE_SLOT_NAMES:
         return None
-    if entresol_treatment_for(ctx, rng) is None:
-        return None
-    if ctx.slot_name == "bay" and devanture_faces(ctx, rng):
+    if not ctx.has_an_entresol:
         return None
     return Properties(
         {
@@ -1235,24 +1110,22 @@ def entresol_is_arcaded_in_the_base_s_own_stone(
 def the_base_block_states_its_entresol_s_form(
     ctx: QualContext, rng: DecisionStream
 ) -> Properties | None:
-    """Say, once, which of Daly's two entresol forms this base carries.
+    """Say, once, which head Daly's two entresols turn their lights with.
 
     The property nothing downstream *has* to read and every trace does: it is
-    what makes "why is there no railing on this storey?" answerable from the
-    serialised IR alone, and it is stated on BOTH storeys of the block
-    because the devanture that absorbed an entresol is a fact about the
-    ground floor too.
+    what makes "why are these lights arched?" answerable from the serialised
+    IR alone. Stated on BOTH storeys of the block, because A13.1's socle runs
+    through the entresol and the two registers are one base.
 
     Applicability: the base block of a frontage that has an entresol.
-    ``SPEC_ROLE``; the only rule that touches ``entresol_treatment``.
+    ``SPEC_ROLE``; the only rule that touches ``entresol_head_form``.
     """
     if not ctx.stands_in_the_base_block:
         return None
-    form = entresol_treatment_for(ctx, rng)
-    if form is None:
+    if not ctx.has_an_entresol:
         return None
     return Properties(
-        {"entresol_treatment": form},
+        {"entresol_head_form": entresol_head_form(ctx, rng)},
         rule="paris.qualify.base.entresol.belongs_to_the_base",
         specificity=SPEC_ROLE,
     )
@@ -1349,11 +1222,8 @@ def ground_floor_surround_is_the_ground_floor_s_own(
     that belongs to the base is framed the way the base is framed, not by the
     ladder of stone architraves the residential storeys climb. So an arcaded
     entresol's arch takes the same plain band of dressed stone an ordinary
-    ground-floor window takes — which is what 120 bd de Sébastopol draws —
-    and an entresol the devanture absorbed takes no surround of its own at
-    all: the framework was framed once, at the pavement, and a second frame
-    drawn round the upper register would put a line across the joint and cut
-    the one devanture in two.
+    ground-floor window takes — which is what 120 bd de Sébastopol draws, and
+    what 77 draws too under a square head.
 
     Applicability: a bay in the base block. ``SPEC_SLOT_AND_ROLE``, above
     ``surround_diminishes_with_rank`` in this layer; the class layer's
@@ -1500,13 +1370,12 @@ def garde_corps_where_a_body_could_fall(
     and hangs the per-opening kind only where there is an opening to guard.
     ``SPEC_ROLE``.
     """
+    # The rez-de-chaussée has no drop to guard, and neither has the comble's
+    # inside. Everything between does — including the entresol, whose short
+    # lights carry an individual garde-corps on both plates. (A13.2 excepted
+    # an entresol the devanture had absorbed; A17.2 retracted that form, and
+    # with it the exception.)
     if ctx.role is Role.BASE or ctx.within_comble:
-        return None
-    # A13.2: an entresol the devanture absorbed is glass in a joinery
-    # framework, not a window over a drop — 77 bd de Sébastopol carries no
-    # railing across its shop glass, and the arcaded form at 120 does, which
-    # is the same question about a body answered from the same fact.
-    if devanture_faces(ctx, rng):
         return None
     gap = catalogue.balustrade_child_gap_max()  # ABSOLUTE: never scales
     rail = catalogue.sill_lean_height()  # ABSOLUTE: a body leaning on it
@@ -1643,10 +1512,10 @@ def string_course_crowns_the_base_block(
     A Paris frontage's lower half has two possible horizontals — the top of
     the rez-de-chaussée and the top of the entresol — and only one of them is
     a division of *use*. On both of Daly's plates with a measured entresol the
-    emphatic band is the upper one: at 120 bd de Sébastopol a full moulded
-    entablature over the arcade, at 77 the cornice closing the devanture. What
-    runs under it, inside the block, is at most a thin line, and on the
-    absorbed form nothing at all.
+    emphatic band is the upper one, over the entresol. What runs under it,
+    inside the block — the cornice closing the devanture at the top of the
+    rez-de-chaussée — is the lesser of the two, and it divides a shop from
+    the storeroom over it rather than commerce from residence.
 
     So the weight goes here, and it goes here by *level*: the applicability is
     "this storey's floor is the ceiling of the base block", a height above the
@@ -1732,13 +1601,12 @@ def string_course_at_the_head_of_the_ground_floor(
     **Why its presence may not follow the entresol's form.** A string course is
     a BLOCK DATUM — the Circulaire du 21 septembre 1855, enforced by
     ``block.check_alignment`` — so every frontage on the block runs it at the
-    same level. The entresol's *treatment* varies building to building; that is
-    A13.2's whole point, two plates on the same boulevard. A course whose
-    presence followed that draw would be a datum line that stops at the party
-    wall, which is the failure the block level exists to prevent. So the line
-    is where the entresol is, on both forms: on the arcaded one it is the
-    entablature the arcade stands on, and on the absorbed one it is the
-    transom of the framework passing in front of it.
+    same level. What the entresol's lights vary in is their HEAD, building to
+    building; that is A17.2's point, two plates on the same boulevard, square
+    at 77 and segmental at 120. A course whose presence followed that draw
+    would be a datum line that stops at the party wall, which is the failure
+    the block level exists to prevent. So the line is where the entresol is,
+    under whichever head its lights are turned with.
 
     Applicability: the mezzanine. Disjoint from both rules above — the
     mezzanine is never rank 0, and it never stands on top of the block it is
@@ -1793,7 +1661,6 @@ BASE_RULES: tuple[Rule, ...] = (
     the_entresol_of_a_tall_arch_is_a_balconette_inside_it,
     special_slot_takes_a_narrow_feature,
     ground_floor_of_a_shop,
-    entresol_is_glazed_by_the_devanture,
     entresol_is_arcaded_in_the_base_s_own_stone,
     the_base_block_states_its_entresol_s_form,
     noble_floor_steps_out_onto_its_balcon_filant,

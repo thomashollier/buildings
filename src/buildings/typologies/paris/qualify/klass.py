@@ -57,7 +57,6 @@ from buildings.typologies.paris.qualify.base import (
     aspect_for_rank,
     base_entablature_depth,
     carries_an_ordinary_window,
-    entresol_treatment_for,
     opening_type_for,
     ornament_for_rank,
     ornament_modules_at,
@@ -379,15 +378,12 @@ def shopfront_opening_is_as_wide_as_the_structure_allows(
     bay and its ground storey are, which is far less than the difference
     between their upper windows.
 
-    **A13.2 — one framework, two registers.** Where the devanture absorbed the
-    entresol it is one object standing across two storeys of the stack, and
-    the two ABSOLUTE bands that close it belong to the object, not to each
-    storey of it: one soubassement, at the pavement, and one enseigne board,
-    under the course that crowns the base. So each register asks the catalogue
-    for its own, and the joint between them carries neither — what is there is
-    the transom, and a transom is joinery. Give both registers both bands and
-    the glass is cut in two by a plinth and a signboard at the storey line,
-    which is the reading A13 exists to remove.
+    **A17.2.** A13.2 had this rule spanning two storeys, splitting the
+    devanture's two ABSOLUTE bands between them so that neither landed at the
+    storey line. There is no such framework: the shopfront stands in the
+    rez-de-chaussée and closes at the entablature over it, so it is one
+    register with a soubassement at the pavement and an enseigne board under
+    its own cornice.
 
     Applicability: any storey the devanture faces on a frontage that sells
     something — which ``opening_type_for`` already answers, because it is the
@@ -396,29 +392,12 @@ def shopfront_opening_is_as_wide_as_the_structure_allows(
     """
     if opening_type_for(ctx, rng) != "shop_bay":
         return None
-    at_the_pavement = ctx.role is Role.BASE
-    absorbed = entresol_treatment_for(ctx, rng) == "absorbed"
-    # The upper register stops under the band that crowns the base — the same
-    # ``base_entablature_depth`` the string course itself reads and the same
-    # allowance the arcaded form gives its arches. Glass drawn up behind its
-    # own cornice is glass that cannot be seen.
-    under_the_crown = (
-        base_entablature_depth(ctx) if absorbed and not at_the_pavement else 0.0
-    )
     geom = catalogue.shopfront_in_slot(
         ctx.slot_w,
-        max(0.0, ctx.slot_h - under_the_crown),
+        ctx.slot_h,
         ctx.klass,
-        soubassement=at_the_pavement,
-        # A framework that spans two storeys is closed at the top by the band
-        # that crowns the base (``base.string_course_crowns_the_base_block``),
-        # which is where 77 bd de Sébastopol letters the shop's name. So
-        # neither register reserves an enseigne board of its own: one at the
-        # storey line would cut the glass in two, and one under the
-        # entablature would be a board nothing could see.
-        enseigne=not absorbed,
     )
-    asked = float(catalogue.shop_threshold_height()) if at_the_pavement else 0.0
+    asked = float(catalogue.shop_threshold_height())
     return Properties(
         _geometry_props(geom, asked),
         rule="paris.qualify.klass.opening.shopfront_is_as_wide_as_the_structure_allows",
