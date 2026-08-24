@@ -121,9 +121,24 @@ both in the base's own bossage. Drawn per frontage on `facade/entresol/head`.
 These are the **discontinuity tests** — the brief's "move the date past a decree
 and the roofline should change shape."
 
-**H · The 1884 pair** — *proposed*
-Two presets, identical but for the year: `1883` and `1886`. Straight 45° comble
-against Alphand's circular arc, and a storey gained. Nothing else changes.
+**H · The 1884 pair** — *half built; the post-1884 side is `P`*
+Two presets, identical but for the year. Straight 45° comble against Alphand's
+circular arc, and a storey gained. Nothing else changes.
+
+`P` is the post-1884 side, at 1887. The matched pre-1884 twin is **not** a
+preset, but the hinge it was written to test does work — run `P`'s own site at
+1883 against 1887 and only the year differs:
+
+| | 1883 | 1887 |
+|---|---:|---:|
+| comble profile | 4 points (straight 45° brisé) | 28 points (circular arc) |
+| ridge over eaves | 3.20 m | 7.04 m |
+| storeys | 6 | 7 |
+| cornice built | 19.45 m | 22.48 m |
+
+So the storey **is** gained and the roof **does** change shape, exactly as this
+entry predicted. What is still missing is the pair as a shipped, rendered preset
+so the discontinuity is visible on a contact sheet rather than only in a table.
 
 **I · Post-Bonnier** — *proposed*
 `street 22 m · 1905` — eighth-circle arc continued by a 45° oblique; projections
@@ -138,7 +153,7 @@ runs backwards as well as forwards.
 
 ## Tier 5 — geometry the solver has to survive
 
-**K · Corner with *pan coupé*** — *proposed*
+**K · Corner with *pan coupé*** — *built as `P`*
 `corner=True` — the chamfer as a third short facade with its own rhythm. The
 3 rue La Fayette condition.
 

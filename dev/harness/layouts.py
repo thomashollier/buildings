@@ -130,7 +130,7 @@ LAYOUTS: dict[str, Layout] = {
             "daly_elevation_02_blvd-sebastopol-2-4.jpg."
         ),
     ),
-    "P" : Layout(
+    "P": Layout(
         key="P",
         title="Post-1884 commercial corner — the dated anchor",
         site=SiteContext(
