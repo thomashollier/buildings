@@ -172,6 +172,8 @@ __all__ = [
     "ENTRANCE_ARCH_HEAD",
     "ENTRANCE_ARCH_HEAD_OPENING",
     "TWO_STOREY_ARCH_RATE",
+    "TWO_STOREY_ARCH_RATE_CARRIAGE",
+    "two_storey_arch_rate",
     "round_arch_rise",
     "TwoStoreyEntranceArch",
     "two_storey_entrance_arch",
@@ -1508,17 +1510,66 @@ ENTRANCE_ARCH_HEAD = "arch_head"
 #: second door. It is the arch's own upper light, and it is named for that.
 ENTRANCE_ARCH_HEAD_OPENING = "entrance_arch_head"
 
-#: How often an entrance takes the two-storey arch, where the base block can
-#: carry one.
+#: How often a *porte pietonne* takes the two-storey arch, where the base
+#: block can carry one.
 #:
 #: **INFERRED, and deliberately not calibrated.** Daly shows 4 of 16, which
 #: is where 0.25 comes from, but n = 16 with a known publication bias is an
-#: *observation*, not a rate: it is not keyed to date (all four are 1864),
-#: not to class (two Premiere, two Deuxieme), and not to entrance kind (two
-#: of each). What is contractual is that both forms occur and that the tall
-#: one is the minority; the figure itself is one number a later measurement
-#: pass should expect to move.
+#: *observation*, not a rate: it is not keyed to date (all four are 1864) and
+#: not to class (two Premiere, two Deuxieme). What is contractual is that
+#: both forms occur and that the tall one is the minority; the figure itself
+#: is one number a later measurement pass should expect to move.
+#:
+#: **A17.1, corrected.** This constant used to say the choice was not keyed
+#: to entrance kind either, "two of each". That counted numerators and left
+#: the denominators out. Set against how many entrances of each kind the
+#: corpus holds, the two are not alike:
+#:
+#: * *porte cochere* -- 2 of 7 take the tall form (Imperatrice 7.30 m,
+#:   39 rue Neuve des Mathurins 5.00 m)
+#: * *porte pietonne* -- 2 of 10 (2 et 4 bd de Sebastopol 5.01 m,
+#:   87 bd de Sebastopol 5.07 m)
+#:
+#: A17.1 then over-corrected the other way and made the tall arch compulsory
+#: on every carriage entrance. That is refuted inside our own corpus by
+#: **26 rue Bergere**: an entresol of 3.09 m under a porte cochere measuring
+#: 3.474 m, a carriage entrance that plainly stops at the rez-de-chaussee.
+#: So it is a draw for both kinds, drawn at different rates.
 TWO_STOREY_ARCH_RATE = 0.25
+
+#: The same decision for a *porte cochere*, which leans to the tall form.
+#:
+#: **INFERRED, and calibrated by nothing.** There is a real reason to expect
+#: the lean -- a carriage has to pass under the entresol floor to reach the
+#: cour, which is a clearance fact about a vehicle rather than a fashion --
+#: and there is no sound way to get a number out of it. The corpus offers two
+#: denominators and neither is the right one:
+#:
+#: * **0.286**, 2 of all 7 carriage entrances, which counts four entresol-less
+#:   grand addresses where the choice did not exist to be made
+#: * **0.50**, 1 of the 2 carriage entrances standing on a frontage that has
+#:   an entresol at all (26 rue Bergere plain, 39 rue Neuve des Mathurins
+#:   tall), which is n = 2
+#:
+#: 0.40 sits between them because the honest reading is between them. Only
+#: the ORDERING is contractual, and it is a two-sided ordering: the carriage
+#: arch is likelier than the pedestrian one AND still the minority of carriage
+#: entrances. Nothing may assert the value.
+TWO_STOREY_ARCH_RATE_CARRIAGE = 0.40
+
+
+def two_storey_arch_rate(kind: str) -> float:
+    """The rate at which an entrance of ``kind`` draws the two-storey arch.
+
+    One expression rather than a conditional at the call site, for the reason
+    ``entrance_for`` is in this module at all: a rate is a fact about the
+    vocabulary, and a rule should read the decision rather than re-derive it.
+    """
+    if kind == ENTRANCE_CARRIAGE:
+        return TWO_STOREY_ARCH_RATE_CARRIAGE
+    if kind == ENTRANCE_PEDESTRIAN:
+        return TWO_STOREY_ARCH_RATE
+    raise KeyError(f"no entrance named {kind!r}; known: {sorted(ENTRANCE_SLOT_NAMES)}")
 
 
 #: INFERRED, and **not calibrated** (A15.4). How many times its own span a

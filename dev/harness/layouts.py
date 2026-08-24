@@ -40,7 +40,7 @@ LAYOUTS: dict[str, Layout] = {
         title="Commercial boulevard — the maximal stack",
         site=SiteContext(
             street_width=22.0, parcel_width=14.0, parcel_depth=11.0, year=1865,
-            klass=BuildingClass.COMFORTABLE, ground=GroundProgramme.SHOP, seed=3,
+            klass=BuildingClass.COMFORTABLE, ground=GroundProgramme.SHOP, seed=8,
         ),
         expect="RdC + entresol + 4 étages + comble",
         why=(
@@ -83,7 +83,7 @@ LAYOUTS: dict[str, Layout] = {
             "'facade/entrance/arch_form' (A14.2). That is the "
             "whole claim: the two-storey arch is not a consequence of the date, "
             "the class or the street — all four of Daly's are 1864, two are "
-            "Première and two Deuxième, two carriage and two pedestrian — it is "
+            "Première and two Deuxième — it is "
             "variation within a class and a period, and the pair A / AC is what "
             "makes that visible. The arch is 2.60 m wide in both, unchanged; "
             "only its height moves."
@@ -93,9 +93,11 @@ LAYOUTS: dict[str, Layout] = {
             "4.10 m rez-de-chaussée and a 2.40 m entresol, and one of the five "
             "canonical-stack buildings (cornice 19.82 m). So the tall arch does "
             "not replace the entresol stack, it rises through it. See also "
-            "Avenue de l'Impératrice (Raban), 2.62 x 7.30 m, where the entresol "
-            "is absorbed into the base instead — dev/reference/images/daly-1864/"
-            "daly_elevation_25_avenue-imperatrice.jpg."
+            "Avenue de l'Impératrice (Raban), 2.62 x 7.30 m, the tallest arch "
+            "in the corpus — dev/reference/images/daly-1864/"
+            "daly_elevation_25_avenue-imperatrice.jpg. That plate carries no "
+            "measured entresol; the reading that it had one 'absorbed' into "
+            "the base was retracted by A17.2."
         ),
     ),
     "AP": Layout(

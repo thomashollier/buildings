@@ -563,11 +563,19 @@ def entrance_arch_form_for(ctx: QualContext, rng: DecisionStream) -> str | None:
     * 87 bd de Sébastopol — porte piétonne, Première Classe, 1864
 
     Same year for all four, so it is not a date fact. Two Première and two
-    Deuxième, so it is not a class fact. Two carriage and two pedestrian, so
-    it is not an entrance-kind fact either. It is variation *within* a class
-    and a period, which is what ``DecisionStream`` is for, and the rate it is
-    drawn at is ``catalogue.TWO_STOREY_ARCH_RATE`` — INFERRED, an observation
-    from n = 16, not a calibration.
+    Deuxième, so it is not a class fact. It is variation *within* a class and
+    a period, which is what ``DecisionStream`` is for.
+
+    **The entrance kind does move the rate, and A17.1 got this wrong twice.**
+    "Two carriage and two pedestrian" was the reason this used to give for
+    calling it kind-blind, and it counts numerators only: the corpus holds 7
+    carriage entrances and 10 pedestrian ones, so the same four are 2 of 7
+    against 2 of 10. A17.1 then over-corrected and made the tall form
+    compulsory on every porte cochère, which 26 rue Bergère refutes on a
+    measured plate. The lean is real, the absolute is not, so the kind picks
+    a rate (``catalogue.two_storey_arch_rate``) and both outcomes stay
+    reachable on both kinds. Both rates are INFERRED and neither is a
+    calibration; only the ordering is contractual.
 
     The path is per FRONTAGE (``facade/entrance/arch_form``), the same shape
     as A13.2's ``facade/entresol/treatment``, because a building has one
@@ -580,12 +588,13 @@ def entrance_arch_form_for(ctx: QualContext, rng: DecisionStream) -> str | None:
     **Offered only where the base block could build one.** Two conditions,
     both structural rather than tasteful:
 
-    1. There is an entresol for it to rise through (A14.1). Note this is not
-       the same as "the entresol is drawn as its own band": at the
-       Impératrice the entresol is *absorbed* into the base and the arch
-       rises through it all the same, which is why the test is
-       ``has_an_entresol`` and not ``entresol_treatment_for(...) ==
-       "arcaded"``. Both A13 forms reach this, as A14.2 requires.
+    1. There is an entresol for it to rise through (A14.1). The test is
+       ``has_an_entresol`` — the structural fact that there is a second
+       register in the base block — and not anything about how that register
+       is drawn. (This condition used to justify itself by the Impératrice,
+       where the entresol was said to be *absorbed* into the base; A17.2
+       retracted that form, and the Impératrice carries no measured entresol
+       at all. The condition stands on its own without the example.)
     2. The entresol is deep enough to turn the round head in — a semicircle
        on an ABSOLUTE span, under the band that crowns the base. Asked
        *before* the draw, so a frontage that could never build one does not
@@ -605,23 +614,29 @@ def entrance_arch_form_for(ctx: QualContext, rng: DecisionStream) -> str | None:
         crown_below=_crown_below(ctx),
     ):
         return None
-    # A17.1 — the asymmetry, and the reason for it. Only one opening on a
+    # A17.1, as corrected. One draw for both kinds of entrance, at a rate the
+    # entrance kind sets — not a branch that hands the carriage arch out
+    # unconditionally.
+    #
+    # A17.1 first read the asymmetry as an absolute: only one opening on a
     # Paris frontage crosses the entresol FLOOR, and it is the carriage
     # entrance, because a carriage has to pass under that floor to reach the
-    # court. That is a clearance fact about a vehicle, not a fashion, so on a
-    # frontage that can build the arch at all the porte cochère takes it as
-    # the norm rather than on a coin.
+    # cour. The clearance argument is sound and it is still the wrong shape of
+    # rule — it says why a carriage door MAY span the floor, not why every one
+    # must. Daly refutes the absolute directly: 26 rue Bergère carries a porte
+    # cochère of 3.474 m under an entresol of 3.09 m, stopping at the
+    # rez-de-chaussée like any shop door.
     #
-    # The pedestrian arch stays reachable but becomes the exception: Daly
-    # documents it twice (2 et 4 and 87 bd de Sébastopol, 5.01 / 5.07 m), so
-    # it is real, and n = 2 is exactly why the rate is INFERRED and only the
-    # ordering is contractual.
-    if ctx.slot_name == catalogue.ENTRANCE_CARRIAGE:
-        return catalogue.ENTRANCE_ARCH_TWO_STOREY
+    # So the lean lives in the rate (``catalogue.two_storey_arch_rate``) and
+    # both outcomes stay reachable on both kinds. One path, not two: a
+    # building has one entrance and one mason, and a frontage that changes its
+    # entrance kind should move along the same decision rather than start a
+    # fresh one — which also keeps the path pinnable, as A14.2 requires.
+    rate = catalogue.two_storey_arch_rate(ctx.slot_name)
     return rng.choice(
         "facade/entrance/arch_form",
         [catalogue.ENTRANCE_ARCH_TWO_STOREY, catalogue.ENTRANCE_ARCH_ONE_STOREY],
-        [catalogue.TWO_STOREY_ARCH_RATE, 1.0 - catalogue.TWO_STOREY_ARCH_RATE],
+        [rate, 1.0 - rate],
     )
 
 
