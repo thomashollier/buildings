@@ -230,7 +230,7 @@ LAYOUTS: dict[str, Layout] = {
             street_width=22.0, parcel_width=11.0, parcel_depth=16.0, year=1865,
             klass=BuildingClass.GRAND, ground=GroundProgramme.SHOP, seed=3,
         ),
-        expect="3 etages under a deep TWO-storey garret, two rows of lucarnes",
+        expect="3 etages under a deep TWO-storey garret, two rows of openings in it",
         why=(
             "Two conditions have to hold together and both are structural. The "
             "street must clear the 14.81 m of stone a bought garret has to stand "
@@ -246,7 +246,21 @@ LAYOUTS: dict[str, Layout] = {
             "total 24.52 — the tallest building in the corpus, reached by building "
             "the facade LOWER. Also 1 bd de Sebastopol (17.55 / 6.80). "
             "Ours reaches comble 6.10 against 7.00: a residual of -0.90 m, the "
-            "cap being decree ridge 3.20 + one brisis rise 2.90."
+            "cap being decree ridge 3.20 + one brisis rise 2.90.\n\n"
+            "A19: both plates carry TWO rows of openings in the comble, which is "
+            "what this preset is for and is corpus-attested. Neither, however, "
+            "shows what we draw. At 2 et 4 the brisis is a BRICK WALL: a full "
+            "storey of moulded window surrounds with individual balconettes, and "
+            "above it a row of small plain lights under the eaves — no dormer "
+            "projects anywhere on that plate. At 1 bd the brisis is faced in "
+            "vertical-seamed metal, and only the UPPER row is a true lucarne "
+            "(round-arched, scrolled consoles); the lower row is again windows "
+            "set in the brisis face, each with its own balconette. We draw both "
+            "rows as pedimented dormers, so the lower row is wrong on both "
+            "anchors. See dev/reference/images/daly-1864/"
+            "daly_elevation_02_blvd-sebastopol-2-4.jpg and "
+            "dev/reference/images/daly-1864/"
+            "daly_elevation_73_sebastopol-1-deuxieme-classe.jpg."
         ),
     ),
     "C2": Layout(

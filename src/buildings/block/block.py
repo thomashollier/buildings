@@ -119,6 +119,19 @@ from buildings.solver.fitting import PlacedSlot, SlotKind, SlotSpec, solve
 from buildings.trace import TraceEntry
 from buildings.typologies.paris import catalogue
 from buildings.typologies.paris.terminate import derive_hip_arris
+
+
+def _stated_fold_height(props) -> float | None:
+    """The roof's fold, in metres over its eaves, read off the props the roof
+    node already states — never recomputed here (A6.10/A9.3). ``None`` where
+    the roof states no break, which is a single-plane comble."""
+    lower, upper = props.get("lower_angle_deg"), props.get("upper_angle_deg")
+    pct, ridge = props.get("break_pct"), props.get("h")
+    if None in (lower, upper, pct, ridge):
+        return None
+    if abs(float(lower) - float(upper)) <= 1.0 or float(pct) >= 0.995:
+        return None
+    return float(ridge) * float(pct)
 from buildings.typologies.paris.compose import Layer
 from buildings.typologies.paris.generate import generate, walk
 from buildings.typologies.paris.reglement_adapter import (
@@ -1668,7 +1681,15 @@ def _chamfer_roof(chamfer: Chamfer, path: str, building: Node) -> tuple[Node, ..
             # crosses itself once drawn on a face this much narrower. The
             # depth `profile` itself is not width-derived (a section into the
             # parcel, not across the frontage) and is carried over unchanged.
-            "hip_arris": derive_hip_arris(chamfer.width, roof.props.get("profile") or ()),
+            # A19.1: the fold is passed too, from the parent roof's own stated
+            # `break_pct` — a chamfer is a narrower face of the SAME roof, so
+            # it breaks plane at the same height, and an arris derived without
+            # it would put a fold on the frontage and none on the chamfer.
+            "hip_arris": derive_hip_arris(
+                chamfer.width,
+                roof.props.get("profile") or (),
+                _stated_fold_height(roof.props),
+            ),
         },
     )
     silhouette_node = Node(

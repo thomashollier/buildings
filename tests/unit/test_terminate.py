@@ -1424,27 +1424,98 @@ def test_the_hip_fix_does_not_move_a_mid_block_souche():
 # ---------------------------------------------------------------------------
 
 
-def test_a_hip_arris_is_a_straight_rafter_not_the_curved_section():
-    """A4.5: the hip return used to reuse the curved depth-section verbatim
-    as the frontage-wise arris — convex, calibrated against the parcel's
-    depth, not the frontage's width — which is what bulged into an onion
-    dome on a narrow chamfer. A real arêtier is a straight timber even under
-    a curved mansard front, so the arris is now a straight line at the
-    section's own average pitch: at most two points, and dead straight
-    whether or not the returns meet before the ridge."""
+def stated_fold(roof) -> float | None:
+    """The fold height a roof node states, read the way production reads it.
+
+    A19.1. Tests that want the roof surface must ask with the SAME fold the
+    phase used to build it; recomputing a foldless one here and comparing is
+    the two-independent-opinions defect this module's history is made of.
+    """
+    props = roof.props
+    lower, upper = props.get("lower_angle_deg"), props.get("upper_angle_deg")
+    pct, ridge = props.get("break_pct"), props.get("h")
+    if None in (lower, upper, pct, ridge):
+        return None
+    if abs(float(lower) - float(upper)) <= 1.0 or float(pct) >= 0.995:
+        return None
+    return float(ridge) * float(pct)
+
+
+def test_a_hip_arris_never_follows_the_curve_of_the_section():
+    """A4.5, as A19.1 restates it. The hip return used to reuse the curved
+    depth-section verbatim as the frontage-wise arris — convex, calibrated
+    against the parcel's depth rather than the frontage's width — which is
+    what bulged into an onion dome on a narrow chamfer.
+
+    A4.5's fix was "one straight line at the section's average pitch". The
+    straightness was right; the singleness was not, and A19.1 replaces it with
+    one straight segment per PLANE. So the invariant this test defends is no
+    longer a point count — it is that no segment ever follows the curve, which
+    is what the onion dome was made of.
+
+    Stated as: the arris is never OUTSIDE the section it belongs to. A curve
+    that starts near-vertical (a post-1884 arc) stands further out than its own
+    chord everywhere between the knots, so an arris that tracked it would fail
+    this; a chord cannot."""
+    # A convex section: near-vertical at the eaves, flattening to the ridge.
     curved = [(0.0, 0.0), (1.0, 2.0), (3.0, 3.4), (6.0, 4.0)]
 
-    wide = terminate.derive_hip_arris(30.0, curved)  # room to spare: reaches the true ridge
-    assert wide == ((0.0, 0.0), (6.0, 4.0))
+    def section_run_at(height):
+        prev_x, prev_h = curved[0]
+        for x, h in curved[1:]:
+            if height <= h:
+                span = h - prev_h
+                t = (height - prev_h) / span if span > 1e-12 else 0.0
+                return prev_x + t * (x - prev_x)
+            prev_x, prev_h = x, h
+        return curved[-1][0]
 
-    narrow = terminate.derive_hip_arris(5.0, curved)  # 2.5 m half-frontage < 6 m full run
+    for fold in (None, 3.4):
+        arris = terminate.derive_hip_arris(30.0, curved, fold)
+        assert arris[0] == (0.0, 0.0)
+        # every knot at or INSIDE the section's own run at that height
+        for run, height in arris[1:]:
+            assert run <= section_run_at(height) + 1e-9, (
+                f"fold={fold}: the arris stands at {run:.3f} m where the section "
+                f"is only {section_run_at(height):.3f} m in — that is the onion dome"
+            )
+        # ...and monotone, so it is a rafter and not a scribble
+        assert [k[0] for k in arris] == sorted(k[0] for k in arris)
+        assert [k[1] for k in arris] == sorted(k[1] for k in arris)
+
+
+def test_a_hip_breaks_where_the_roof_breaks():
+    """A19.1. A mansard is two planes, so its arêtier is two timbers meeting at
+    the fold — not one timber at the average of the two pitches.
+
+    The average is what made the fold vanish. On the post-1884 corner preset
+    the brisis break was drawn across 1.00 m of a 15 m frontage where the
+    geometry puts it across 9.68 m, so the roof read as a plain cone instead of
+    a steep skirt under a small pyramidal cap."""
+    # A steep brisis to 3.0 m in 1.0 m of run, then a shallow terrasson.
+    mansard = [(0.0, 0.0), (1.0, 3.0), (7.0, 4.0)]
+
+    plain = terminate.derive_hip_arris(30.0, mansard)
+    folded = terminate.derive_hip_arris(30.0, mansard, 3.0)
+    assert len(plain) == 2, "no stated fold, one plane, one timber"
+    assert len(folded) == 3, "a stated fold puts a knot in the rafter"
+    assert folded[1] == pytest.approx((1.0, 3.0))
+
+    # The fold's consequence: near the eaves the folded hip stands much higher
+    # than the averaged one, which is what keeps the break out on the frontage
+    # instead of collapsing it toward the apex.
+    at_run = 0.8
+    on_plain = terminate._arris_height_at(plain, at_run)
+    on_folded = terminate._arris_height_at(folded, at_run)
+    assert on_folded > on_plain + 0.5, (
+        f"folded {on_folded:.3f} m vs averaged {on_plain:.3f} m at {at_run} m in"
+    )
+
+    # And on a frontage too narrow to reach the fold, the hip is still on the
+    # brisis and is still straight — a pavilion peak on the steep plane.
+    narrow = terminate.derive_hip_arris(1.2, mansard, 3.0)
     assert len(narrow) == 2
-    assert narrow[0] == (0.0, 0.0)
-    assert narrow[-1][0] == pytest.approx(2.5)
-    # Same pitch as the un-truncated rafter would have had, not the height
-    # the curved section itself reaches at that inset (3.4 m) — the whole
-    # point is that the two are no longer the same line.
-    assert narrow[-1][1] == pytest.approx(4.0 * 2.5 / 6.0)
+    assert narrow[-1] == pytest.approx((0.6, 1.8))
 
 
 def test_a_return_deeper_than_the_frontage_stops_at_mid_frontage():
@@ -1521,7 +1592,7 @@ def test_the_roof_node_states_the_one_hip_arris_the_renderer_reads():
     roof = kind(others, "roof")[0]
     assert roof.props["hip_arris"], "a corner building must state a hip arris"
     assert roof.props["hip_arris"] == terminate.derive_hip_arris(
-        roof.props["w"], roof.props["profile"]
+        float(roof.props["w"]), roof.props["profile"], stated_fold(roof)
     )
 
     mid_grid, _, _mid_sil, mid_others = run(site(corner=False))
@@ -1634,8 +1705,16 @@ def test_a_lucarne_never_stands_where_the_hip_has_already_fallen_below_its_head(
     not on a slope that reaches that high. Every dormer this phase actually
     emits on a corner building must clear the local surface at its own
     position; where a bay's position cannot, a ``special`` node says so
-    instead."""
-    grid, roled, sil, others = run(site(corner=True, street_width=20.0, parcel_width=16.0))
+    instead.
+
+    **A19.1 moved this test's site from a 16 m parcel to a 10 m one.** Giving
+    the hip its fold made it steeper near the eaves, which raised the roof
+    surface over the end bays — so on a 16 m frontage every lucarne now clears
+    the hip and nothing is skipped, and the test stopped exercising the defect
+    it exists for. That is the correction working, not the guard becoming
+    unnecessary: at 10 m the returns still meet before the end bays, and the
+    clipping still fires. The site moved; the assertion did not weaken."""
+    grid, roled, sil, others = run(site(corner=True, street_width=20.0, parcel_width=10.0))
     roof = kind(others, "roof")[0]
     facade_w = float(roof.props["w"])
     ridge_h = float(roof.props["h"])
@@ -1649,7 +1728,7 @@ def test_a_lucarne_never_stands_where_the_hip_has_already_fallen_below_its_head(
         centre = float(d.props["x"]) + float(d.props["w"]) / 2.0
         head = float(d.props["y"]) - grid.eaves_height + float(d.props["h"])
         local_surface = terminate._roof_surface_height_at(
-            centre, facade_w, ridge_h, ends, profile
+            centre, facade_w, ridge_h, ends, profile, stated_fold(roof)
         )
         assert head <= local_surface + 1e-6, (
             f"a lucarne at x={centre:.3f} m needs a head of {head:.3f} m over the "
@@ -2048,7 +2127,7 @@ def test_the_pipeline_survives_the_situation_space(year, ground):
 # ===========================================================================
 
 
-def test_a_two_storey_garret_carries_two_rows_of_lucarnes():
+def test_a_two_storey_garret_gives_both_its_storeys_windows():
     """**The one thing A15.2 lets anyone assert about the second mode.**
 
     The rate at which a comble takes two storeys of *chambres de bonne* is
@@ -2058,6 +2137,13 @@ def test_a_two_storey_garret_carries_two_rows_of_lucarnes():
     standing two storeys of rooms has two rows of windows in its brisis,
     because the brisis is the rooms' outside wall and a wall with rooms behind
     it and no windows in it is the bare-zinc defect A8.3 named.
+
+    **A19.2 renamed this test and widened what it counts.** It used to require
+    two rows of *lucarnes*, which is not what either deep-comble plate shows:
+    the row under the eaves is a lucarne and the storey below has its windows
+    in the plane of the brisis. So what is contractual is that both storeys are
+    LIT and that each says which storey it lights — not that both are lucarnes.
+    The strength is unchanged: a row with no openings still fails.
 
     Asserted mid-block, where the roof surface is one flat band the whole
     frontage wide. On a hipped corner the surface falls away toward the
@@ -2077,23 +2163,107 @@ def test_a_two_storey_garret_carries_two_rows_of_lucarnes():
                 continue
             seen += 1
             assert len(grid.comble_storeys) == 2, grid.comble_storeys
-            dormers = [n for n in others if n.kind == "dormer"]
-            rows = {n.trace[0].inputs["row"] for n in dormers}
+            # Both kinds count: A19.2 puts the lower storey's openings in the
+            # brisis face and keeps the register under the eaves a lucarne.
+            lit_nodes = [
+                n for n in others if n.kind in ("dormer", "brisis_window")
+            ]
+            rows = {n.trace[0].inputs["row"] for n in lit_nodes}
             assert rows == {0, 1}, (
                 f"{street} m street, {depth} m plot: a garret of "
-                f"{len(grid.comble_storeys)} storeys carries lucarnes in rows "
+                f"{len(grid.comble_storeys)} storeys carries openings in rows "
                 f"{sorted(rows)} — the second storey has no windows"
             )
+            # ...and the split is by row, never mixed within one.
+            by_row: dict[int, set[str]] = {}
+            for n in lit_nodes:
+                by_row.setdefault(n.trace[0].inputs["row"], set()).add(n.kind)
+            assert by_row[0] == {"brisis_window"}, by_row
+            assert by_row[1] == {"dormer"}, by_row
             # Each row lights its own storey, and says which.
             lit = {
-                n.trace[0].inputs["row"]: n.props["lights_storey_index"]
-                for n in dormers
+                n.trace[0].inputs["row"]: (
+                    n.props.get("lights_storey_index")
+                    if n.kind == "dormer"
+                    else n.trace[0].inputs.get("lights_storey_index")
+                )
+                for n in lit_nodes
             }
             assert lit[0] is not None and lit[1] is not None
             assert lit[1] == lit[0] + 1, lit
             # Both rows stand ON the brisis, under the fold this phase cut.
             fold = grid.brisis_height
-            for n in dormers:
+            for n in lit_nodes:
                 head = n.props["y"] - grid.built_height + n.props["h"]
-                assert head <= fold + 1e-6, (street, depth, head, fold)
+                assert head <= fold + 1e-6, (street, depth, n.kind, head, fold)
     assert seen > 0, "no two-storey garret in the sweep — A15.1 is unreachable"
+
+
+# ---------------------------------------------------------------------------
+# A19.2 — the brisis carries a storey, and it is not a row of dormers
+# ---------------------------------------------------------------------------
+
+
+def _comble_openings(others):
+    return (
+        [n for n in others if n.kind == "dormer"],
+        [n for n in others if n.kind == "brisis_window"],
+    )
+
+
+def test_a_one_band_comble_is_all_lucarnes():
+    """The majority case, and the one A19.2 must not disturb. A comble standing
+    one band of brisis has a single garret storey, that storey IS the register
+    under the eaves, and its openings are lucarnes exactly as before."""
+    grid, _roled, _sil, others = run(site(parcel_depth=11.0))
+    dormers, windows = _comble_openings(others)
+    assert dormers, "a one-band comble should still carry lucarnes"
+    assert windows == [], (
+        "a comble with one garret storey has no row BELOW the register under "
+        "the eaves, so nothing here is a window in the face"
+    )
+
+
+def test_the_lower_garret_row_is_a_window_and_the_top_row_is_a_lucarne():
+    """A19.2, asked of a comble that actually stands two bands.
+
+    The split is by ROW and not by taste: the register under the eaves is the
+    lucarne, every row below it is a window in the slope. So the two kinds must
+    both appear, and the windows must all sit lower than the lucarnes."""
+    grid, _roled, _sil, others = run(
+        site(street_width=22.0, parcel_width=11.0, parcel_depth=16.0,
+             klass=BuildingClass.GRAND)
+    )
+    dormers, windows = _comble_openings(others)
+    assert dormers, "the top row must still be lucarnes"
+    assert windows, (
+        "a comble standing two bands must put its lower storey's windows in "
+        "the brisis face — this situation was chosen because it stands two"
+    )
+    lowest_dormer = min(float(d.props["y"]) for d in dormers)
+    highest_window = max(float(w.props["y"]) for w in windows)
+    assert highest_window < lowest_dormer, (
+        f"a brisis window at {highest_window:.3f} m stands at or above a "
+        f"lucarne at {lowest_dormer:.3f} m — the rows have crossed"
+    )
+
+
+def test_a_brisis_window_is_flush_and_railed_and_states_its_own_railing():
+    """It is a hole in a wall, so it carries what a hole in a wall carries: a
+    garde-corps, and the count of bars in it. The count is stated in the IR
+    because a renderer choosing a bar spacing is a renderer deciding — the
+    thing ``check_renderer_dumb`` exists to forbid, and the thing that put two
+    opinions about one railing in two modules the last six times."""
+    grid, _roled, _sil, others = run(
+        site(street_width=22.0, parcel_width=11.0, parcel_depth=16.0,
+             klass=BuildingClass.GRAND)
+    )
+    _dormers, windows = _comble_openings(others)
+    assert windows
+    for w in windows:
+        assert w.props.get("garde_corps") is True
+        assert int(w.props["bar_count"]) >= 2, w.props
+        # Flush with the slope: it states the roof's own setback at its head,
+        # so a consumer places it ON the brisis instead of guessing an offset.
+        assert float(w.props["setback"]) > 0.0
+        assert float(w.props["h"]) > 0.0 and float(w.props["w"]) > 0.0

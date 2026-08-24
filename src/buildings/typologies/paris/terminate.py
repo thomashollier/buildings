@@ -236,6 +236,7 @@ from typing import Mapping, Sequence
 
 from buildings.ir.nodes import (
     DormerNode,
+    BrisisWindowNode,
     IronworkNode,
     Node,
     RoofNode,
@@ -1305,7 +1306,9 @@ def _attic_storey(roled: RoledGrid):
 
 
 def derive_hip_arris(
-    facade_w: float, profile: Sequence[tuple[float, float]]
+    facade_w: float,
+    profile: Sequence[tuple[float, float]],
+    break_h: float | None = None,
 ) -> tuple[tuple[float, float], ...]:
     """The hip's own arris, one side, as ``((0, 0), (run, height))`` — how far
     in from the end of the frontage and how high over the eaves the front
@@ -1315,14 +1318,39 @@ def derive_hip_arris(
     there separately: a run past mid-span folds back onto this same half by
     distance from the *nearest* end.
 
-    A STRAIGHT line (A4.5): a real arêtier is a straight timber even under a
-    curved mansard front, so this is not the curved depth-section reused
-    edge-on, which is what bulged into an onion dome on a narrow chamfer. Its
-    pitch is the section's own average rise over run, taken to the section's
-    TRUE reach — the point the profile FIRST climbs to full height, not
-    ``profile[-1]`` (A8.2/A9.3), which can run on flat for however much of
-    the parcel's depth a terrasse or a curve's own flattening approach to the
-    ridge leaves spare, and has nothing to do with the frontage.
+    STRAIGHT SEGMENTS, one per plane of the roof (A4.5, as A19.1 corrects it).
+
+    A real arêtier is a straight timber, so this is never the curved
+    depth-section reused edge-on — that is what bulged into an onion dome on a
+    narrow chamfer. But a mansard is not one plane, and it therefore is not one
+    timber: a steep brisis and a shallow terrasson meet at a fold, and the hip
+    breaks there like everything else on the roof does.
+
+    A4.5 originally read "straight" as "a single straight line at the section's
+    AVERAGE pitch". That average is what a two-plane roof is precisely not. On
+    a tall comble it puts the hip far too shallow near the eaves, which drags
+    the fold inward until it disappears: on the post-1884 corner preset the
+    brisis break was drawn across 1.00 m of a 15 m frontage where the geometry
+    puts it across 9.68 m, and the roof read as a plain cone rather than a
+    steep skirt under a small pyramidal cap.
+
+    So the arris is a polyline whose every SEGMENT is straight, with a knot at
+    the fold. The onion dome cannot come back, because no segment ever follows
+    the curve: on a post-1884 arc the lower segment is the arc's CHORD, which
+    lies inside the section by construction.
+
+    ``break_h`` is the fold's height over the eaves, and it comes from the
+    roof's own ``break_pct`` — the A6.10 rule, that where a plane changes is a
+    stated fact and not something to be guessed from a polyline vertex, since
+    "a curve refined for tolerance can carry an extra vertex nowhere near the
+    actual break". Omitted, this degrades to the single-plane line, which is
+    the right answer for a roof that genuinely has one plane.
+
+    Both knots are taken to the section's TRUE reach — the point the profile
+    FIRST climbs to full height, not ``profile[-1]`` (A8.2/A9.3), which can run
+    on flat for however much of the parcel's depth a terrasse or a curve's own
+    flattening approach to the ridge leaves spare, and has nothing to do with
+    the frontage.
     """
     half = facade_w / 2.0
     if half <= _EPS or len(profile) < 2:
@@ -1344,9 +1372,47 @@ def derive_hip_arris(
             break
         prev_x, prev_h = x, h
 
+    # The knots: the eaves, the fold if there is one inside the true reach,
+    # and the point the section is fully risen.
+    knots: list[tuple[float, float]] = [(0.0, 0.0)]
+    if break_h is not None and _EPS < float(break_h) < full_h - _EPS:
+        fold_run = _profile_run_at_height(profile, float(break_h))
+        if _EPS < fold_run < rise_run - _EPS:
+            knots.append((fold_run, float(break_h)))
+    knots.append((rise_run, full_h))
+
+    # Two returns have to fit side by side in the frontage there is. Where the
+    # section outruns it the arris stops at mid-frontage, on whichever plane it
+    # had got to — a pavilion peak (A9.3), not a spike and not a clamp.
     if half >= rise_run:
-        return ((0.0, 0.0), (rise_run, full_h))
-    return ((0.0, 0.0), (half, full_h * half / rise_run))
+        return tuple(knots)
+    kept: list[tuple[float, float]] = []
+    prev_x, prev_h = knots[0]
+    for x, h in knots:
+        if x >= half:
+            span = x - prev_x
+            t = (half - prev_x) / span if span > 1e-12 else 0.0
+            kept.append((half, prev_h + t * (h - prev_h)))
+            break
+        kept.append((x, h))
+        prev_x, prev_h = x, h
+    return tuple(kept)
+
+
+def _profile_run_at_height(
+    profile: Sequence[tuple[float, float]], height: float
+) -> float:
+    """How far into the section the profile stands at ``height`` over the
+    eaves — linear between the sampled points, and the LAST such run where a
+    profile touches that height more than once (a flat terrasse at exactly the
+    fold's height would otherwise report its own near edge)."""
+    run = 0.0
+    prev_x, prev_h = profile[0]
+    for x, h in profile[1:]:
+        if (prev_h - height) * (h - height) <= 0.0 and abs(h - prev_h) > 1e-12:
+            run = prev_x + (height - prev_h) / (h - prev_h) * (x - prev_x)
+        prev_x, prev_h = x, h
+    return run
 
 
 def _arris_height_at(
@@ -1380,6 +1446,7 @@ def _roof_surface_height_at(
     ridge_h: float,
     ends: str,
     profile: Sequence[tuple[float, float]],
+    break_h: float | None = None,
 ) -> float:
     """How high the roof surface stands over the eaves at ``x`` metres along
     the frontage — the ridge everywhere mid-block, falling away toward a
@@ -1398,7 +1465,7 @@ def _roof_surface_height_at(
     """
     if ends != "hipped" or facade_w <= _EPS:
         return ridge_h
-    arris = derive_hip_arris(facade_w, profile)
+    arris = derive_hip_arris(facade_w, profile, break_h)
     if not arris:
         return ridge_h
     x0 = max(x, 0.0)
@@ -1498,6 +1565,17 @@ def terminate(
     # for every pre-1884 building that description is 45°/45°/100% — no break —
     # which the renderer faithfully drew.
     lower_angle, upper_angle, break_pct = _mansard_angles_of(profile, brisis_h, ridge_h)
+    # A19.1: the fold's height over the eaves, resolved ONCE here from the
+    # stated break, and handed to everything that needs to know where the roof
+    # changes plane — the hip arris, the surface a souche stands on, and the
+    # test that a lucarne is not standing where the surface has fallen below
+    # its own head. Stated rather than re-derived per caller, which is the
+    # defect A9.3 removed from this same geometry one level up.
+    fold_h = (
+        ridge_h * float(break_pct)
+        if abs(float(lower_angle) - float(upper_angle)) > 1.0 and float(break_pct) < 0.995
+        else None
+    )
     # How far back the ridge stands — the terrasson's own far end, decided
     # with the fold it leaves (A12.1) so the two cannot disagree. NOT
     # ``profile[-1]``: the polyline runs on past it wherever a flat terrasse
@@ -1796,7 +1874,7 @@ def terminate(
     # own props so the renderer draws exactly this shape instead of deriving
     # its own from the profile a second time. Empty mid-block: there is no
     # return to trace and the front slope is the ridge everywhere.
-    hip_arris = derive_hip_arris(facade_w, profile) if ends == "hipped" else ()
+    hip_arris = derive_hip_arris(facade_w, profile, fold_h) if ends == "hipped" else ()
 
     roof_node = RoofNode(
         id="b/roof",
@@ -1952,7 +2030,7 @@ def terminate(
                 # inside a hipped return's own flat ridge run, this is
                 # `ridge_h` and the check never fires.
                 local_surface = _roof_surface_height_at(
-                    centre, facade_w, ridge_h, ends, profile
+                    centre, facade_w, ridge_h, ends, profile, fold_h
                 )
                 if foot + dormer_top > local_surface + _EPS:
                     others.append(
@@ -2002,6 +2080,87 @@ def terminate(
                     )
                     continue
                 width = min(dormer_w, slot.width * 0.75)
+
+                # A19.2 — the lowest garret's openings are in the WALL.
+                #
+                # A brisis steep enough to carry two storeys is a wall that
+                # happens to be roof, and both deep-comble plates in the corpus
+                # build and face it as one: at 2 et 4 bd de Sébastopol the
+                # brisis is brick, carrying a full storey of moulded surrounds
+                # with individual balconettes and, above them, a row of small
+                # plain lights under the eaves — no dormer projects anywhere on
+                # that plate. At 1 bd de Sébastopol the brisis is faced in
+                # vertical-seamed metal and only the UPPER row is a true
+                # lucarne; the lower row is again windows set in the face.
+                #
+                # So the register under the eaves is the lucarne, and every row
+                # below it is a window in the slope. On a one-band comble —
+                # which is the majority — `rows` is 1, this row IS the register
+                # under the eaves, and nothing here changes.
+                if row < rows - 1:
+                    others.append(
+                        BrisisWindowNode(
+                            id=f"b/roof/brisis_window{n}",
+                            kind="brisis_window",
+                            trace=(
+                                TraceEntry(
+                                    rule="paris.terminate.brisis.window_in_the_face",
+                                    phase="termination",
+                                    detail=(
+                                        f"window {n} in the brisis face lights "
+                                        f"{_lights(row)}, over bay {slot_index} "
+                                        f"({slot.width:.3f} m wide, centred at "
+                                        f"{slot.start + slot.width / 2:.3f} m), in row "
+                                        f"{row + 1} of {rows}. Not a lucarne: this comble "
+                                        f"stands {rows} bands of brisis, so the row under "
+                                        "the eaves is the lucarne and every row below it "
+                                        "is a window in the slope's own face (A19.2). A "
+                                        "brisis carrying two storeys is a wall that "
+                                        "happens to be roof, and Daly's two deep combles "
+                                        "both build it as one — brick at 2 et 4 bd de "
+                                        "Sébastopol, seamed metal at 1 bd."
+                                    ),
+                                    inputs={
+                                        "bay_index": slot_index,
+                                        "row": row,
+                                        "rows": rows,
+                                        "lights_storey_index": (
+                                            attics[row].index_from_bottom
+                                            if row < len(attics)
+                                            else None
+                                        ),
+                                    },
+                                ),
+                            ),
+                            props={
+                                "x": slot.start + (slot.width - width) / 2.0,
+                                "y": eaves + foot + skirt,
+                                "w": width,
+                                "h": face,
+                                # Flush with the slope: how far the roof plane
+                                # itself has set back at this window's own head,
+                                # so a consumer places it ON the brisis rather
+                                # than guessing an offset. The SAME
+                                # `env.setback_at` a lucarne's inset reads.
+                                "setback": dormer_inset,
+                                "garde_corps": True,
+                                # How many bars the railing across this light
+                                # is made of. Decided HERE, from the same
+                                # ABSOLUTE a balustrade's gap has always been
+                                # measured against — a child's head — because
+                                # a count derived in the renderer from a
+                                # spacing chosen in the renderer is the
+                                # renderer deciding, which the guard forbids
+                                # and which would put a second opinion about
+                                # this railing next to the first.
+                                "bar_count": catalogue.repeats_across(
+                                    width, float(catalogue.balustrade_child_gap_max())
+                                ),
+                            },
+                        )
+                    )
+                    continue
+
                 form = rng.choice(
                     f"roof/dormer/{n}/form",
                     list(repertoire.dormer_forms),
@@ -2259,7 +2418,9 @@ def terminate(
         # or anywhere on a hipped frontage still inside the flat ridge run —
         # this is the ridge exactly as A4.4 had it; only near a hipped
         # return's own ends does it fall.
-        surface_h = _roof_surface_height_at(centre, facade_w, ridge_h, ends, profile)
+        surface_h = _roof_surface_height_at(
+            centre, facade_w, ridge_h, ends, profile, fold_h
+        )
         souche_base = eaves + surface_h
         souche_top = souche_base + visible_h
         souche_hidden = max(0.0, souche_base - eaves)

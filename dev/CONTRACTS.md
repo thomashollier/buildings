@@ -2073,3 +2073,90 @@ So the rule needs a second half, about writing rather than checking:
 
 The failure mode is not believing something false. It is filing an inference in
 the drawer marked *observation*, where nobody thinks to ask it for a source.
+
+---
+
+# Amendment 19 — the brisis is a wall, and the hip breaks where the roof does
+
+Two findings from one question. The operator, looking at a contact sheet of every
+preset, asked whether the post-1884 corner's pointed roof was right and whether
+two storeys inside a comble were right. Neither was a false alarm.
+
+## A19.1 — a mansard's hip is two timbers, not one
+
+`derive_hip_arris` returned a single straight line at the section's **average**
+pitch. A mansard is two planes — a steep brisis and a shallow terrasson — and the
+average is precisely what it is not. Near the eaves the hip came out far too
+shallow, which dragged the fold inward until it disappeared:
+
+| | as drawn | as built |
+|---|---:|---:|
+| pavilion peak (preset `P`) | 6.21 m | **6.83 m** |
+| brisis fold spans | **1.00 m** of a 15 m frontage | **9.68 m** |
+
+So the roof read as a plain cone rather than a steep skirt under a small
+pyramidal cap.
+
+**A4.5 is not retracted, it is restated.** Its concern was reusing the curved
+depth-section verbatim edge-on, which "bulged into an onion dome on a narrow
+chamfer". Straightness was right; *singleness* was the error. The arris is now a
+polyline whose every SEGMENT is straight, with a knot at the fold — and on a
+post-1884 arc the lower segment is the arc's **chord**, which lies inside the
+section by construction, so the dome cannot return.
+
+The fold's height comes from the roof's own `break_pct`, per **A6.10**: where a
+plane changes is a stated fact, not something to be guessed from a polyline
+vertex, since "a curve refined for tolerance can carry an extra vertex nowhere
+near the actual break".
+
+**Required, and done.** One consequence worth recording rather than hiding: the
+corrected hip is steeper near the ends, so the roof surface over the end bays
+rose, and lucarnes that used to be clipped there now fit. The clipping guard is
+still real — it fires on a 10 m frontage — and its test moved to one. The site
+moved; the assertion did not weaken.
+
+## A19.2 — the brisis carries a storey, and it is not a row of dormers
+
+The deep-comble mode holds two garret storeys. That is **corpus-attested** and the
+storey count is right. What we draw in them is not.
+
+Read at full resolution, the two deep-comble plates show:
+
+- **2 et 4 bd de Sébastopol** (comble 7.00 m) — the brisis is a **brick wall**.
+  A full storey of moulded window surrounds with individual iron balconettes,
+  and above it a row of small plain lights tucked under the eaves. **No dormer
+  projects anywhere on that plate.**
+- **1 bd de Sébastopol** (comble 6.80 m) — the brisis is faced in
+  vertical-seamed metal. The **upper** row is a true *lucarne*: round-arched,
+  scrolled consoles. The **lower** row is again windows set into the brisis
+  face, each with its own balconette.
+
+So the common form, on both, is a **lower storey whose windows sit in the plane
+of the brisis** — not on it. A brisis steep enough (65–80°) is a wall that
+happens to be roof, and it is built and faced as one: brick at 2 et 4, metal at
+1 bd. Only the *upper* register is ever a dormer, and only on one of the two.
+
+We draw both rows as pedimented dormers, so the lower row is wrong on both
+anchors.
+
+**Required.** Where a comble holds more than one garret storey, the LOWEST
+garret's openings are windows in the brisis face — sill, surround and garde-corps
+in the plane of the roof — and not dormers standing out of it. Dormers remain
+what they are for: the register under the eaves, and every single-storey comble,
+which is the majority.
+
+**The face material is NOT required and must not be invented.** Brick at one
+plate and metal at the other is n = 1 each; that is variation with no rate behind
+it. What is contractual is the OPENING, which both plates agree on.
+
+## A19.3 — where the wording came from
+
+`LAYOUTS_COMMERCIAL.md` said this mode carried "two rows of *lucarnes*", sourced
+to these plates. Neither shows two rows of lucarnes; one shows none at all. The
+phrase was written from a picture in the head rather than from the plate, and it
+survived because it lived in a layouts document rather than in an amendment —
+where A17.4's "state what you see before you compare" and A18.3's "a table that
+claims to be a reading may hold only rows that were read" would have caught it.
+
+**Those two rules apply to every document in `dev/`, not only to amendments.**
+A caption is a claim.

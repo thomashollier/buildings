@@ -1165,6 +1165,39 @@ def draw_dormer(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
         canvas.rect(x - overhang, cap_y, w + 2 * overhang, cap_h, _C["roof_zinc"], stroke_w=0.6)
 
 
+def draw_brisis_window(
+    canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]
+) -> None:
+    """A window in the plane of the brisis (A19.2).
+
+    Everything a lucarne has except the parts that make it a lucarne: a
+    surround, a light and a garde-corps, and NO cheeks, no roof of its own and
+    no shadow onto the slope. It is a hole in a wall, and the wall happens to
+    be the roof.
+
+    Drawn flush, which is the whole distinction being made: a lucarne is
+    ``draw_dormer``'s body standing proud of the tiles, this is an opening
+    reading as depth behind them.
+    """
+    canvas.rect(x, y, w, h, _C["dormer"], stroke_w=0.6)
+    pad = w * 0.12
+    glass_h = h * 0.86
+    canvas.rect(
+        x + pad, y + h * 0.07, w - 2 * pad, glass_h - h * 0.07,
+        _C["dormer_window"], stroke=_C["window_frame"], stroke_w=0.5,
+    )
+    canvas.line(x + w / 2.0, y + h * 0.07, x + w / 2.0, y + glass_h, _C["window_frame"], 0.4)
+    if props.get("garde_corps"):
+        # The individual railing both plates put across the lower row's lights.
+        rail_y = y + h * 0.07
+        rail_h = h * 0.30
+        canvas.rect(x + pad, rail_y, w - 2 * pad, rail_h, None, stroke=_C["iron"], stroke_w=0.5)
+        bars = _count(props, "bar_count", 6)
+        for i in range(1, bars):
+            bx = x + pad + (w - 2 * pad) * i / bars
+            canvas.line(bx, rail_y, bx, rail_y + rail_h, _C["iron"], 0.3)
+
+
 def draw_chimney(canvas: Canvas, x: float, y: float, w: float, h: float) -> None:
     canvas.rect(x, y, w, h, _C["chimney"], stroke_w=0.6)
     cap_w = w * 1.2

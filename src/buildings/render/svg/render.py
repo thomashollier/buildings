@@ -260,6 +260,19 @@ def draw_building(canvas: Canvas, building: Node, labels: bool = False) -> None:
             dormer.props,
         )
 
+    # A19.2: the lower garret's openings are windows in the brisis face, not
+    # lucarnes standing out of it. A separate kind in the IR, so a separate
+    # call here — this module never decides which a row gets.
+    for window in _children_of_kind(building, "brisis_window"):
+        el.draw_brisis_window(
+            canvas,
+            _num(window.props, "x"),
+            _num(window.props, "y"),
+            _num(window.props, "w"),
+            _num(window.props, "h"),
+            window.props,
+        )
+
     for ironwork in _children_of_kind(building, "ironwork"):
         # Cresting: the only ironwork living directly on the building rather
         # than on a bay. ``draw_ironwork`` reads its own "position" prop.

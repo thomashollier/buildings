@@ -41,7 +41,7 @@ and has been brought back into line with the code.**
 
 ### C1 · Comble-heavy — height in the roof
 `street 22 m · parcel 11 m · depth 16 m · 1865 · grand · shop`
-3 étages under a deep **two-storey** garret, two rows of *lucarnes*. Cornice
+3 étages under a deep **two-storey** garret, two rows of openings in it. Cornice
 built to 16.93 m of a 20.00 m ceiling (85 %) — the height goes into the roof.
 
 Two conditions must hold together and both are structural: the street must clear
@@ -53,6 +53,20 @@ meet, which is 12.20 m.
 24.52 — the tallest in the corpus, reached by building the facade lower. Also
 1 bd de Sébastopol (17.55 / 6.80). Ours reaches comble 6.10 against 7.00, a
 residual of −0.90 m; the cap is decree ridge 3.20 + one brisis rise 2.90.*
+
+> **This entry used to say "two rows of *lucarnes*", and that was a description
+> of something nobody read off a plate.** Two rows of *openings* is right and
+> both plates show it. What neither shows is a lucarne in the lower row:
+>
+> - **2 et 4 bd de Sébastopol** — the brisis is a **brick wall**. A full storey
+>   of moulded window surrounds with individual balconettes, and above it a row
+>   of small plain lights under the eaves. Nothing projects.
+> - **1 bd de Sébastopol** — the brisis is faced in vertical-seamed metal. The
+>   **upper** row is a true lucarne (round-arched, scrolled consoles); the
+>   **lower** row is again windows set in the brisis face with balconettes.
+>
+> We draw both rows as pedimented dormers, so the lower row is wrong on both
+> anchors. See **Amendment 19**.
 
 ### C2 · The middle strategy — **deliberately unreachable**
 `street 20 m · parcel 13 m · depth 13 m · 1865 · comfortable · shop`

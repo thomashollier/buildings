@@ -132,6 +132,25 @@ class DormerNode(Node):
 
 
 @dataclass(frozen=True)
+class BrisisWindowNode(Node):
+    """A window in the PLANE of the brisis, not a dormer standing out of it.
+
+    A19.2. Where a comble holds more than one garret storey, the lowest one's
+    openings are windows in the roof's own face — sill, surround and
+    garde-corps flush with the slope — because a brisis steep enough to carry
+    two storeys is a wall that happens to be roof, and both deep-comble plates
+    in the corpus build and face it as one. Only the register under the eaves
+    is ever a lucarne.
+
+    A separate kind rather than a ``dormer`` with a flag, because it is a
+    different object: it has no cheeks, no roof of its own, and nothing to cast
+    a shadow onto the slope.
+    """
+
+    __post_init__ = _fixed_kind("brisis_window")
+
+
+@dataclass(frozen=True)
 class SilhouetteNode(Node):
     __post_init__ = _fixed_kind("silhouette")
 
@@ -164,6 +183,7 @@ CONCRETE_NODE_KINDS: tuple[type[Node], ...] = (
     ShopfrontNode,
     RoofNode,
     DormerNode,
+    BrisisWindowNode,
     SilhouetteNode,
     IronworkNode,
     KeystoneNode,
