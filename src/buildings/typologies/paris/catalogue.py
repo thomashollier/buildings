@@ -142,6 +142,7 @@ __all__ = [
     "narrow_special_oeil_de_boeuf",
     "storey_minimum_height",
     "sill_lean_height",
+    "window_allege_height",
     "balustrade_child_gap_max",
     "lintel_bearing_depth",
     "minimum_light_height",
@@ -605,6 +606,50 @@ def balustrade_child_gap_max() -> Quantity:
     child's head").
     """
     return Abs(0.11, "INFERRED — a gap a child's head cannot pass through; not a cited French ordinance")
+
+
+def window_allege_height() -> Quantity:
+    """The *allege* under an ordinary upper-floor window -- the breast wall the
+    light stands on.
+
+    **A22. This replaces ``sill_lean_height`` as the SILL, and the distinction
+    is the whole point.** 0.90 m is the height a body leans on. It is the top of
+    the guard, not the top of the masonry: a Paris *croisee* comes down onto a
+    low breast and the iron *barre d'appui* carries the rest of the way up to
+    the leaning height. Reading 0.90 as the masonry made every upper-floor
+    window 0.60 m too short and pushed its head to within a lintel bearing of
+    the floor band above -- which is exactly the complaint A13 made about the
+    entresol, one storey further up.
+
+    **SOURCED against 77 bd de Sebastopol.** Daly measures that facade's upper
+    storeys at 3.043 / 2.870 / 2.991 m floor to floor, and its opening aspects
+    at 1.923 / 1.761 / 1.954 on a typical width of 1.27 m -- so lights of 2.442 /
+    2.236 / 2.481 m. Subtract each light and the SOURCED 0.30 m lintel bearing
+    from its storey and the breast left under it is:
+
+        0.30    0.33    0.21   m
+
+    Three storeys, one plate, one number. It is also, exactly,
+    ``entresol_allege_height`` -- which is corroboration and not duplication:
+    the same masonry breast under the same kind of light, arrived at from two
+    different plates and kept as two constants so that moving one cannot
+    silently move the other.
+
+    **The honest limit.** Run the same subtraction over all 32 upper storeys in
+    the corpus and it spreads 0.21-1.76 m with a median back at 0.90. That
+    reconstruction is noisy because ``opening_width_typical`` is ONE figure per
+    building set against per-storey aspects, so on any building whose upper
+    windows are not the typical width it drifts. 77 is the tightest and most
+    internally consistent case in the corpus and it is the plate this model is
+    calibrated against elsewhere; the corpus-wide median is recorded here so
+    nobody has to rediscover that it disagrees.
+    """
+    return Abs(
+        0.30,
+        "SOURCED -- 77 bd de Sebastopol, three upper storeys giving 0.30 / 0.33 / "
+        "0.21 m of breast under the light once the SOURCED 0.30 m lintel bearing "
+        "is taken off. The corpus-wide reconstruction is noisier (A22)",
+    )
 
 
 def lintel_bearing_depth() -> Quantity:

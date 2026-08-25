@@ -253,10 +253,20 @@ def sill_height_for(ctx: QualContext) -> Quantity:
     """Where the underside of an ordinary opening sits above this storey's
     floor.
 
-    Normally ``catalogue.sill_lean_height`` — ABSOLUTE, the height a body can
-    lean on — and it is the same number on the first floor and the fifth,
-    which is exactly why the top storey's windows come out squarer than the
-    noble floor's without anybody writing that down.
+    Normally ``catalogue.window_allege_height`` — ABSOLUTE, the breast wall a
+    light stands on — and it is the same number on the first floor and the
+    fifth, which is exactly why the top storey's windows come out squarer than
+    the noble floor's without anybody writing that down.
+
+    **A22 changed which absolute this is.** It used to be
+    ``sill_lean_height``, 0.90 m, on the reasoning that a sill is what a body
+    leans on. 0.90 m IS what a body leans on — but that is the top of the
+    GUARD, not the top of the masonry. A Paris *croisée* comes down onto a low
+    breast and the iron *barre d'appui* carries the rest of the way up to the
+    leaning height, which is why A21 found the railing crossing the glass
+    rather than standing on a sill beneath it. Reading the leaning height as
+    the masonry made every upper-floor window 0.60 m too short and pushed its
+    head to within one lintel bearing of the floor band above.
 
     The one exception is not a taste and not a discount: where the noble
     floor's own *balcon filant* runs, the opening onto it is a porte-fenêtre
@@ -292,7 +302,7 @@ def sill_height_for(ctx: QualContext) -> Quantity:
             0.0,
             "a porte-fenêtre onto the balcon filant is stepped through, not leaned on",
         )
-    return catalogue.sill_lean_height()
+    return catalogue.window_allege_height()
 
 
 def _special_feature(ctx: QualContext, rng: DecisionStream) -> str:
@@ -725,7 +735,7 @@ def bay_is_a_window(ctx: QualContext, rng: DecisionStream) -> Properties | None:
     """
     if ctx.slot_name != "bay":
         return None
-    sill = catalogue.sill_lean_height()  # ABSOLUTE: never scales with class
+    sill = catalogue.window_allege_height()  # ABSOLUTE: never scales (A22)
     return Properties(
         {
             "opening_type": "window",
@@ -824,7 +834,7 @@ def over_the_entrance(ctx: QualContext, rng: DecisionStream) -> Properties | Non
             # over the door was the one column of the facade whose windows
             # sat on the floor, because the sill rule tests for a slot named
             # "bay" and this slot is named for the door underneath it.
-            "opening_sill_height": float(catalogue.sill_lean_height()),
+            "opening_sill_height": float(catalogue.window_allege_height()),
         },
         rule="paris.qualify.base.opening.over_the_entrance",
         specificity=SPEC_SLOT,

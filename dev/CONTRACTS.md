@@ -2355,3 +2355,77 @@ says so everywhere else — so the two are now asserted separately:
   test's own name claimed and its body never checked
 
 Neither is weaker than what it replaced, and the second is new.
+
+---
+
+# Amendment 22 — the sill is the allège, not the leaning height
+
+Reported by the operator from the contact sheet: *"the third and fourth floor
+windows are too high within their row and crowd the separation with the new
+floor. the reference images show a much more regular spacing."*
+
+Both halves true, and the cause was one word doing two jobs.
+
+## The measurement
+
+Our upper storeys against 77 bd de Sébastopol, as fractions of the storey:
+
+| | plate 77 | ours (before) |
+|---|---:|---:|
+| light | **78–83 %** | 60–63 % |
+| below it | ~10 % | **28–30 %** |
+| above it | ~10 % | 9 % |
+
+The margin *above* was right — `lintel_bearing_depth` is 0.30 m and **SOURCED
+twice**, from printed callouts on two plates in two classes. It stays. What was
+wrong is the margin below, and it was wrong by 0.60 m, which is why the light
+came out short and its head sat one bearing off the floor band.
+
+## A22.1 — two different heights, one name
+
+`sill_lean_height` is 0.90 m and **INFERRED** — its own docstring says so: *"a
+sill height an adult can lean on without bending."* That number is real. It is
+the height a body leans on, which is the top of the **guard**.
+
+It is not the top of the **masonry**. A Paris *croisée* comes down onto a low
+breast and the iron *barre d'appui* carries the rest of the way to the leaning
+height — which is precisely what A21 found when it put the railing inside the
+opening rather than on the wall beneath it. A21 and A22 are the same discovery
+arriving from two directions.
+
+**Required.** The sill of an ordinary window is `window_allege_height`, and
+`sill_lean_height` keeps the job it actually names: the guard, and the *balcon
+filant*'s rail.
+
+## A22.2 — the number, and its limit
+
+**0.30 m, SOURCED against 77 bd de Sébastopol.** Daly measures that facade's
+upper storeys at 3.043 / 2.870 / 2.991 m and its aspects at 1.923 / 1.761 /
+1.954 on a typical width of 1.27 m. Subtract each light and the 0.30 m lintel
+bearing from its storey:
+
+```
+0.30    0.33    0.21   m
+```
+
+Three storeys, one plate, one number. It is also **exactly**
+`entresol_allege_height`, reached from a different plate — corroboration, not
+duplication, and kept as two constants so moving one cannot silently move the
+other.
+
+**The limit, recorded rather than buried.** Run the same subtraction over all 32
+upper storeys in the corpus and it spreads **0.21–1.76 m with a median back at
+0.90**. That reconstruction is noisy because `opening_width_typical` is one
+figure per building set against per-storey aspects, so it drifts on any building
+whose upper windows are not the typical width. 77 is the tightest and most
+internally consistent case and it is the plate this model is calibrated against
+elsewhere. A later measurement pass with a scale bar — the 1881 rue de Rennes
+sheet, or the unidentified dimensioned survey drawing — settles it directly
+instead of by subtraction.
+
+## What it moved
+
+Every window on every building. Goldens: all four, in `y`/`h`/`w`/`x`,
+`sill_height`, `pier_width`, `lintel_height` — the openings growing and dropping,
+and their surrounds and railings following. Upper storeys now read 80–81 % light
+against the plate's 78–83 %, with 0.30 m above and 0.30 m below.

@@ -280,16 +280,15 @@ def test_the_sill_the_ir_states_is_the_sill_that_gets_drawn():
             # lumping them in would make this test assert that a French window
             # has a windowsill.
             continue
-        if abs(float(stated) - float(_cat.entresol_allege_height())) <= 1e-9:
-            # A13.2's third body fact, and excluded for exactly the reason the
-            # two above are. An arcaded entresol's light stands on a low
-            # *allège* with a small garde-corps across it — knee height, not
-            # the height an adult leans out over the street from — so it is a
-            # different ABSOLUTE, not this one moving. It is still asserted to
-            # be absolute: `test_absolute_quantities_reach_the_facade_unscaled`
-            # holds every catalogue ABSOLUTE, this one included, to arriving
-            # unscaled by class.
-            continue
+        # **A22 removed the exclusion that used to sit here.** It skipped any
+        # sill equal to `entresol_allege_height`, on the grounds that an
+        # arcaded entresol's light stands on a low breast and is a DIFFERENT
+        # absolute from the one this test is about. A22 made the ordinary
+        # upper-floor sill that same breast — the 0.90 m it used to read was
+        # the height a body LEANS on, which is the top of the guard, not the
+        # top of the masonry. So the two absolutes are now one, the exclusion
+        # would skip every opening on the building, and there is nothing left
+        # for it to exclude.
         canvas = _unit_canvas()
         # The opening's OWN rectangle, not its bay's (A4.1). Qualification
         # resolved it and `compose` already added the sill to the storey
@@ -343,7 +342,7 @@ def test_the_sill_the_ir_states_is_the_sill_that_gets_drawn():
     from buildings.typologies.paris import catalogue
 
     assert drawn[0][2] == pytest.approx(
-        float(catalogue.sill_lean_height()), abs=el._HEAD_MARGIN + 0.005
+        float(catalogue.window_allege_height()), abs=el._HEAD_MARGIN + 0.005
     )
 
 

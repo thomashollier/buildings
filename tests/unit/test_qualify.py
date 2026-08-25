@@ -711,7 +711,11 @@ def test_the_sill_stays_where_a_body_puts_it_however_short_the_storey():
         _, vals = _window_geometry(slot_h=slot_h, rank_from_principal=1, role=Role.UPPER)
         sills.add(round(vals["opening_sill_height"], 9))
         heights.append(vals["opening_height"])
-    assert sills == {round(float(catalogue.sill_lean_height()), 9)}
+    # A22: the sill is the ALLÈGE, the breast a light stands on — not
+    # ``sill_lean_height``, which is the height a body leans on and therefore
+    # the top of the GUARD. Still ABSOLUTE, still identical on every storey,
+    # which is all this test was ever about.
+    assert sills == {round(float(catalogue.window_allege_height()), 9)}
     assert heights == sorted(heights, reverse=True)
 
 
@@ -727,7 +731,9 @@ def test_a_porte_fenetre_onto_the_balcon_filant_has_no_sill_to_lean_on():
     assert base_layer.filant_runs_here(on_the_filant)
     assert not base_layer.filant_runs_here(below_it)
     assert float(base_layer.sill_height_for(on_the_filant)) == 0.0
-    assert float(base_layer.sill_height_for(below_it)) == float(catalogue.sill_lean_height())
+    assert float(base_layer.sill_height_for(below_it)) == float(
+        catalogue.window_allege_height()
+    )
     # ...and it is the same for every class: a grand owner does not buy the
     # absence of a sill.
     for klass in BuildingClass:
