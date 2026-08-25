@@ -77,38 +77,111 @@ def test_widen_filler_only_after_the_ends_are_at_maximum() -> None:
 
 def test_widen_bay_only_after_the_filler_band_is_spent() -> None:
     # ends 0.70 + filler 5x0.15 = 1.45 exhausted, so the opening must stretch.
-    budget = BASE + 5 * BAY.preferred + 1.45 + 0.20
+    #
+    # The margin above 1.45 is thin now and that is not an accident. The count
+    # chooser takes the *closest* count, so the slack it hands the ladder never
+    # exceeds half a bay — 1.50 m here — and the window in which the bay itself
+    # must stretch is whatever lies between the filler band and that half. Ask
+    # for more and the answer is a sixth bay, correctly.
+    budget = BASE + 5 * BAY.preferred + 1.48
     r = solve(budget, end=END, bay=BAY, special=SPECIAL)
     assert r.rung is Rung.WIDEN_BAY
+    assert len(bays(r)) == 5
     assert abs(r.slots[0].width - END.maximum) < EPS
-    assert abs(bays(r)[0].width - (3.0 + (1.45 + 0.20 - 0.70) / 5)) < EPS
+    assert abs(bays(r)[0].width - (3.0 + (1.48 - 0.70) / 5)) < EPS
 
 
 def test_insert_special_fires_before_add_module() -> None:
-    # Slack 2.40 m: past the full elastic range (0.70 + 5x0.30 = 2.20) but not
-    # worth squeezing a sixth bay in. Five good bays plus one narrow odd one.
-    budget = BASE + 5 * BAY.preferred + 2.40
-    r = solve(budget, end=END, bay=BAY, special=SPECIAL)
+    """A leftover no whole number of bays reaches is answered with a special.
+
+    The budget had to move. It used to be five preferred bays plus 2.40 m,
+    chosen because flooring produced a 2.40 m leftover the elastic range could
+    not swallow. Nothing produces a leftover that size any more: the count
+    chooser takes the closest count, so it would simply have built six bays,
+    which is what the old ladder had to climb two rungs to discover.
+
+    What still reaches this rung is a width no whole number of bays gets near
+    at all — here 8.11 m, where two bays leave 1.31 m over and three bays are
+    1.69 m short, and the vocabulary's elastic bands reach neither. That is the
+    leftover the brief calls architecturally meaningful, and it is now the only
+    kind there is.
+    """
+    r = solve(8.11, end=END, bay=BAY, special=SPECIAL, min_bays=0)
     assert r.rung is Rung.INSERT_SPECIAL
-    assert len(bays(r)) == 5
+    assert len(bays(r)) == 2
     specials = [s for s in r.slots if s.is_special]
     assert len(specials) == 1
     assert SPECIAL.minimum - EPS <= specials[0].width <= SPECIAL.maximum + EPS
 
 
-def test_add_module_fires_when_no_special_is_in_the_vocabulary() -> None:
-    budget = BASE + 5 * BAY.preferred + 2.40
-    r = solve(budget, end=END, bay=BAY)  # no special offered
+def test_a_closest_count_leaves_add_module_nothing_to_repair() -> None:
+    """Rung 5 is now unreachable without parity, and that is a proof, not a gap.
+
+    ADD_MODULE is the repair for a count chosen from below: floor the division,
+    discover the leftover will not fit, add a module. Once the count chooser
+    looks upward on its own account the repair is subsumed — if one more bay
+    were the better answer it is already the count that was chosen.
+
+    Stated as an argument, since it is one: ADD_MODULE is only reached after
+    the plain rungs failed at the natural count, and the natural count falls
+    back to the floor *only* when no count at all is permitted by the bounds.
+    So when rung 5 runs, ``_plain`` cannot succeed at any count, including
+    every count rung 5 would step to. Measured below over the whole sweep to
+    make sure the argument matches the code.
+
+    Parity is the exception and has its own test: it moves the count off the
+    closest one deliberately, which is exactly when adding modules can help.
+    """
+    seen = set()
+    for i in range(20, 4000):
+        budget = i / 100.0
+        for kwargs in (
+            dict(end=END, bay=BAY, special=SPECIAL),
+            dict(end=END, bay=BAY),  # no special offered
+        ):
+            try:
+                seen.add(solve(budget, min_bays=0, **kwargs).rung)
+            except FitInfeasible:
+                continue
+    assert Rung.ADD_MODULE not in seen
+    assert {Rung.EXACT, Rung.WIDEN_ENDS, Rung.WIDEN_FILLER, Rung.WIDEN_BAY} <= seen
+
+
+def test_add_module_still_fires_where_parity_forbids_the_closest_count() -> None:
+    """The other half of the argument above: rung 5 is subsumed, not deleted.
+
+    A central composition may not take the closest count when that count gives
+    the run the wrong parity, so it steps down to one that leaves surplus in
+    hand — and where the vocabulary is too stiff to absorb that surplus, adding
+    modules two at a time is still the honest answer and still the last one
+    tried.
+    """
+    r = solve(6.60, end=TIGHT_END, bay=TIGHT_BAY, central_feature=True, min_bays=0)
     assert r.rung is Rung.ADD_MODULE
-    assert len(bays(r)) == 6
+    n = len([s for s in r.slots if s.name == TIGHT_BAY.name])
+    assert n == 3
+    assert n - _natural_count(6.60, TIGHT_END, TIGHT_BAY, central=True) == 2
+    assert len(interior(r)) % 2 == 1  # still centred
 
 
 def test_ladder_is_climbed_in_order_as_slack_grows() -> None:
-    """For a fixed natural bay count the rung must be monotonic in slack."""
+    """For a fixed natural bay count the rung must be monotonic in slack.
+
+    The sweep stops at half a bay rather than a whole one, because that is now
+    where the natural count changes: past the half the closest count is the
+    next one up and the slack starts again from the other side. Running on
+    would not show a ladder being climbed out of order, it would show two
+    ladders spliced together.
+
+    INSERT_SPECIAL has left this set for the same reason it left the test
+    above: at five bays the elastic range reaches 2.20 m and the slack can no
+    longer exceed 1.50 m, so there is nothing here for a special to answer.
+    """
     seen: list[Rung] = []
     slack = 0.0
-    while slack < BAY.preferred - 1e-6:
+    while slack < BAY.preferred / 2.0 - 1e-6:
         r = solve(BASE + 5 * BAY.preferred + slack, end=END, bay=BAY, special=SPECIAL)
+        assert len(bays(r)) == 5, slack
         seen.append(r.rung)
         slack += 0.02
     assert seen[0] is Rung.EXACT
@@ -118,8 +191,27 @@ def test_ladder_is_climbed_in_order_as_slack_grows() -> None:
         Rung.WIDEN_ENDS,
         Rung.WIDEN_FILLER,
         Rung.WIDEN_BAY,
-        Rung.INSERT_SPECIAL,
     }
+
+
+def test_the_ladder_is_climbed_in_order_downward_too() -> None:
+    """The same ordering going the other way, which is now a reachable regime.
+
+    A closest count may sit *above* the budget as readily as below it, so the
+    ladder runs downward for half of every bay-width of frontage. The rung
+    ordering is a fact about which elements exist to be adjusted, not about
+    which direction they are adjusted in, so it must hold identically here.
+    """
+    seen: list[Rung] = []
+    slack = 0.0
+    while slack < BAY.preferred / 2.0 - 1e-6:
+        r = solve(BASE + 5 * BAY.preferred - slack, end=END, bay=BAY, special=SPECIAL)
+        assert len(bays(r)) == 5, slack
+        seen.append(r.rung)
+        slack += 0.02
+    assert seen[0] is Rung.EXACT
+    assert [s.value for s in seen] == sorted(s.value for s in seen)
+    assert {Rung.WIDEN_ENDS, Rung.WIDEN_FILLER} <= set(seen)
 
 
 # ------------------------------------------------------------ centreline unit
@@ -193,10 +285,37 @@ def _natural_count(
     increment leaves the count free to walk 1, 2, 3, 4 as the budget grows,
     which puts the axis on a pier half the time — so the tests below measure the
     step against a count that already knows the rule.
+
+    **Restated for the closest-count rule, and deliberately restated rather
+    than imported**, so these tests check an independent statement of the rule
+    and not the implementation's own arithmetic. It used to be a bare
+    ``floor()``: as many whole preferred bays as stand beside two preferred
+    ends. It is now the count whose resulting widths land *nearest* their
+    preferred values — which, because those deviations have to add up to the
+    slack, is the count leaving the least slack in absolute value — restricted
+    to counts the declared bounds actually permit. Where the bounds permit
+    none, the solver falls back to the old floor and so does this.
     """
-    n = int(math.floor((budget - 2 * end.preferred) / bay.preferred + EPS))
+    run = budget - 2 * end.preferred
+
+    def permitted(n: int) -> bool:
+        """Can two ends and ``n`` bays swallow this slack without leaving their
+        own bounds? Stated as capacity, which is the fact, rather than by
+        calling the solver's own absorber."""
+        slack = run - n * bay.preferred
+        if slack >= 0.0:
+            room = 2 * (end.maximum - end.preferred) + n * (bay.maximum - bay.preferred)
+        else:
+            room = 2 * (end.preferred - end.minimum) + n * (bay.preferred - bay.minimum)
+        return abs(slack) <= room + EPS
+
+    allowed = [n for n in range(0, 80) if permitted(n)]
+    if allowed:
+        n = min(allowed, key=lambda k: (abs(run - k * bay.preferred), k))
+    else:
+        n = int(math.floor(run / bay.preferred + EPS))
     if central and n % 2 == 0:
-        n -= 1  # the largest odd count that still fits at preferred widths
+        n -= 1  # the adjustment goes down first, so surplus stays in hand
     return n
 
 
@@ -224,23 +343,32 @@ CENTRED_FROM = 106  # 5.30 m, in units of the 0.05 m sweep step
 
 
 def test_central_feature_steps_the_bay_count_by_two() -> None:
-    budget = 0.80 + 8 * 3.00 + 2.50
+    """Same budget, same vocabulary: the plain composition needs no module and
+    the central one needs two.
 
-    plain = solve(budget, end=TIGHT_END, bay=TIGHT_BAY, special=TINY_SPECIAL)
+    The budget moved for the reason given at
+    ``test_a_closest_count_leaves_add_module_nothing_to_repair``. It used to be
+    a width at which *both* compositions had to add modules, one stepping by
+    one and the other by two, and the pair of them made the contrast. No plain
+    composition adds a module any more — the count chooser has already looked
+    upward — so the contrast is now sharper rather than weaker: the plain
+    answer rests where it is, and the central one, forbidden the count that
+    would have rested, steps past it two at a time.
+    """
+    budget = 6.60
+
+    plain = solve(budget, end=TIGHT_END, bay=TIGHT_BAY, min_bays=0)
     central = solve(
-        budget,
-        end=TIGHT_END,
-        bay=TIGHT_BAY,
-        special=TINY_SPECIAL,
-        central_feature=True,
+        budget, end=TIGHT_END, bay=TIGHT_BAY, central_feature=True, min_bays=0
     )
-    assert plain.rung is Rung.ADD_MODULE
+    assert plain.rung is not Rung.ADD_MODULE
     assert central.rung is Rung.ADD_MODULE
 
     n_plain = len([s for s in plain.slots if s.name == TIGHT_BAY.name])
     n_central = len([s for s in central.slots if s.name == TIGHT_BAY.name])
-    assert n_plain - _natural_count(budget, TIGHT_END, TIGHT_BAY) == 1
+    assert n_plain - _natural_count(budget, TIGHT_END, TIGHT_BAY) == 0
     assert n_central - _natural_count(budget, TIGHT_END, TIGHT_BAY, central=True) == 2
+    assert len(interior(central)) % 2 == 1  # and it is still centred
 
 
 def test_central_feature_puts_an_element_on_the_axis_at_every_width() -> None:
@@ -317,7 +445,17 @@ def test_central_feature_places_its_specials_symmetrically() -> None:
             assert run[0] is specials[0] and run[-1] is specials[1], budget
         ws = widths(got)
         assert all(abs(a - b) < EPS for a, b in zip(ws, reversed(ws))), budget
-    assert lone > 20 and paired > 20, (lone, paired)
+    # Both arrangements must actually occur, or every assertion in the loop is
+    # vacuous. The lone-special band has narrowed sharply — 9 budgets out of
+    # 614 where it used to be about 200 — and that is the closest-count rule
+    # showing through rather than a regression: a lone central special exists
+    # to make an even run centred, and an even run is now reached only where
+    # the odd family beside it cannot absorb the width at all. The flanking
+    # pair, which the odd family takes, correspondingly does more of the work.
+    # The per-budget assertions above are the substance and they still run on
+    # every one of the 614 widths; these two numbers only keep them honest.
+    assert lone >= 5, lone
+    assert paired > 100, paired
 
 
 def test_a_central_composition_refuses_rather_than_apologising() -> None:
@@ -374,9 +512,13 @@ def test_a_fixed_slot_counts_toward_the_centring() -> None:
 
 
 def test_a_lone_special_answers_the_entrance_from_the_opposite_side() -> None:
-    budget = BASE + 5 * BAY.preferred + 2.60 + PORTE.preferred
-    left = solve(budget, end=END, bay=BAY, special=SPECIAL, fixed=[(0, PORTE)])
-    right = solve(budget, end=END, bay=BAY, special=SPECIAL, fixed=[(5, PORTE)])
+    # The budget moved down to a width the whole bays genuinely cannot reach —
+    # two bays leave 1.31 m over and three are short by more than the bands
+    # allow — because that is now the only way rung 4 is entered at all. The
+    # rule under test, which side the special takes, is untouched by that.
+    budget = BASE + 2 * BAY.preferred + PORTE.preferred + 1.31
+    left = solve(budget, end=END, bay=BAY, special=SPECIAL, fixed=[(0, PORTE)], min_bays=0)
+    right = solve(budget, end=END, bay=BAY, special=SPECIAL, fixed=[(9, PORTE)], min_bays=0)
     assert left.rung is right.rung is Rung.INSERT_SPECIAL
 
     def special_index(r) -> int:
@@ -426,8 +568,11 @@ def test_determinism() -> None:
 
 
 def test_the_account_explains_the_result() -> None:
-    budget = BASE + 5 * BAY.preferred + 2.40
-    r = solve(budget, end=END, bay=BAY, special=SPECIAL)
+    # 8.11 m for the reason `test_insert_special_fires_before_add_module`
+    # gives: it is a width no whole number of bays reaches, which is what the
+    # narrow special is for and now the only thing that summons it.
+    budget = 8.11
+    r = solve(budget, end=END, bay=BAY, special=SPECIAL, min_bays=0)
     assert r.account
     assert all(isinstance(line, str) and line for line in r.account)
     joined = "\n".join(r.account)
@@ -445,6 +590,174 @@ def test_the_account_says_where_the_centreline_went() -> None:
 def test_the_account_names_the_reserved_absolute_width() -> None:
     r = solve(24.0, end=END, bay=BAY, special=SPECIAL, fixed=[(2, PORTE)])
     assert any("2.6000" in line for line in r.account)
+
+
+# ------------------------------------------- the solver is parameter-driven
+#
+# The operator will constrain these numbers from outside — arbitrarily, and by
+# building type, so that a grand frontage carries wider bays than a modest one.
+# Nothing in the solver may resist that. These three tests are the guarantee
+# that it does not: the same call, different specs, different composition, and
+# no branch anywhere in the module on what kind of building it is.
+
+
+def test_a_wider_bay_band_gives_a_wider_rhythm_on_the_same_frontage() -> None:
+    """The whole of "grand buildings have wider bays", as far as this module is
+    concerned: the caller passes a different band and gets a different rhythm.
+
+    Asserted as a relation rather than as two numbers, because the numbers are
+    the caller's to choose and will change; what may not change is that
+    choosing them has the effect it obviously ought to.
+    """
+    modest = SlotSpec("bay", SlotKind.REPEATING, 2.00, 2.40, 2.80)
+    grand = SlotSpec("bay", SlotKind.REPEATING, 3.00, 3.60, 4.20)
+    frontage = 24.0
+
+    a = solve(frontage, end=END, bay=modest, special=SPECIAL, min_bays=0)
+    b = solve(frontage, end=END, bay=grand, special=SPECIAL, min_bays=0)
+
+    n_a = len([s for s in a.slots if s.name == "bay"])
+    n_b = len([s for s in b.slots if s.name == "bay"])
+    assert n_a > n_b, (n_a, n_b)
+    assert [s.width for s in a.slots if s.name == "bay"][0] < (
+        [s.width for s in b.slots if s.name == "bay"][0]
+    )
+    # And both filled the same budget exactly, which is the hard requirement
+    # the freedom must not cost.
+    for r in (a, b):
+        assert abs(total(r) - frontage) < EPS
+        assert r.residual < EPS
+
+
+def test_the_module_names_no_widths_of_its_own() -> None:
+    """Every number the solver acts on came in through its arguments.
+
+    A literal width compiled into this module is a building type it cannot be
+    told about. The two constants it does own are a float tolerance and a share
+    of declared headroom, neither of which is a dimension.
+    """
+    import buildings.solver.fitting as module
+
+    numeric = {
+        name: value
+        for name, value in vars(module).items()
+        if isinstance(value, float) and not name.startswith("__")
+    }
+    assert set(numeric) == {"EPS", "FILLER_SHARE"}, numeric
+
+
+def test_the_caller_chooses_among_several_specials_in_its_own_order() -> None:
+    """Support for "a half-bay, or an oeil-de-boeuf, or a blind panel".
+
+    The solver takes the first special the leftover fits, in the order given,
+    so the order is the caller's design statement. A caller that wants the
+    choice biased by building type shuffles the list before calling — which is
+    also how randomness stays out of a module that must be deterministic.
+    """
+    half_bay = SlotSpec("half_bay", SlotKind.FLEXIBLE, 1.25, 1.35, 1.60)
+    oeil = SlotSpec("oeil_de_boeuf", SlotKind.FLEXIBLE, 0.90, 1.10, 1.31)
+    budget = 8.11  # a width no whole number of bays reaches
+
+    # The 1.31 m leftover is inside both bands, so nothing about the geometry
+    # decides between them and the caller's ordering is the only thing that
+    # does. That is the case worth pinning: where both fit, the list is a
+    # preference and is obeyed as one.
+    first = solve(budget, end=END, bay=BAY, special=[oeil, half_bay], min_bays=0)
+    second = solve(budget, end=END, bay=BAY, special=[half_bay, oeil], min_bays=0)
+    assert [s.name for s in first.slots if s.is_special] == ["oeil_de_boeuf"]
+    assert [s.name for s in second.slots if s.is_special] == ["half_bay"]
+
+    # A single spec still works, unchanged, and means the same as a list of one.
+    lone = solve(budget, end=END, bay=BAY, special=oeil, min_bays=0)
+    assert [s.width for s in lone.slots] == [s.width for s in first.slots]
+
+
+def test_a_special_the_leftover_cannot_take_is_passed_over_for_one_it_can() -> None:
+    """The list is a set of options, not a set of attempts that may fail.
+
+    A caller offering three specials expects the leftover answered by whichever
+    of them fits, not a refusal because the first one did not.
+    """
+    too_wide = SlotSpec("porch", SlotKind.FLEXIBLE, 2.60, 2.65, 2.69)
+    usable = SlotSpec("oeil_de_boeuf", SlotKind.FLEXIBLE, 0.90, 1.10, 1.40)
+    r = solve(8.11, end=END, bay=BAY, special=[too_wide, usable], min_bays=0)
+    assert r.rung is Rung.INSERT_SPECIAL
+    assert [s.name for s in r.slots if s.is_special] == ["oeil_de_boeuf"]
+
+
+# ------------------------------------------------------------------- strain
+
+
+def test_strain_is_zero_at_preferred_and_one_on_a_bound() -> None:
+    """The signal a caller reads to decide it wants a different vocabulary.
+
+    Not an error and not a bound: a report. It says how much of each slot's own
+    declared latitude the answer had to spend, so a caller can notice that a
+    composition only just reached its width and offer something else — wider
+    ends, another special — before drawing it.
+    """
+    exact = solve(BASE + 5 * BAY.preferred, end=END, bay=BAY, special=SPECIAL)
+    assert exact.rung is Rung.EXACT
+    assert exact.strain == ()
+    assert exact.worst_strain == pytest.approx(0.0)
+    assert exact.strain_of("bay") == pytest.approx(0.0)
+
+    # Ends at their maximum: 0.70 m of slack is exactly their whole headroom,
+    # and the bay has not been touched at all.
+    at_the_bound = solve(BASE + 5 * BAY.preferred + 0.70, end=END, bay=BAY, special=SPECIAL)
+    assert at_the_bound.slots[0].width == pytest.approx(END.maximum)
+    assert at_the_bound.strain_of("end") == pytest.approx(1.0)
+    assert at_the_bound.strain_of("bay") == pytest.approx(0.0)
+
+    # Monotonic in how hard the answer was pushed, within one count, per slot.
+    for name in ("end", "bay"):
+        strains = [
+            solve(
+                BASE + 5 * BAY.preferred + k * 0.05, end=END, bay=BAY, special=SPECIAL
+            ).strain_of(name)
+            for k in range(0, 14)
+        ]
+        assert strains == sorted(strains), (name, strains)
+
+
+def test_strain_separates_the_ends_from_the_rhythm() -> None:
+    """Why it is keyed by name and not reduced to one number.
+
+    The ends are the most elastic thing in the composition, so the ladder
+    spends them first and they sit on a bound over most of the range. A single
+    worst-slot figure would therefore read 1.0 almost everywhere and tell a
+    caller nothing. Keyed by name, the bay's own strain is visible underneath
+    it — which is the thing an operator watching for a rhythm drifting to the
+    extremes of its band actually wants.
+    """
+    ends_maxed = bay_still_easy = 0
+    for i in range(200, 3600):
+        r = solve(i / 100.0, end=END, bay=BAY, special=SPECIAL, min_bays=0)
+        if r.strain_of("end") >= 1.0 - EPS:
+            ends_maxed += 1
+            if r.strain_of("bay") < 0.5:
+                bay_still_easy += 1
+    assert ends_maxed > 500, ends_maxed
+    assert bay_still_easy > 100, (ends_maxed, bay_still_easy)
+
+
+def test_strain_never_counts_a_slot_that_could_not_move() -> None:
+    """A rigid slot is at its preferred width by construction, so it is not
+    evidence about how hard anything was pushed. Counting it would report a
+    comfortable facade as comfortable *because* of the one element that was
+    never in question."""
+    r = solve(24.0, end=END, bay=BAY, special=SPECIAL, fixed=[(2, PORTE)])
+    porte = [s for s in r.slots if s.name == PORTE.name][0]
+    assert porte.width == PORTE.preferred
+    assert PORTE.name not in dict(r.strain)
+    assert all(0.0 <= fraction <= 1.0 for _name, fraction in r.strain)
+    # Worst first, so a caller can read the top of the list and stop.
+    assert [f for _n, f in r.strain] == sorted((f for _n, f in r.strain), reverse=True)
+
+
+def test_strain_is_reported_in_the_account_too() -> None:
+    r = solve(BASE + 5 * BAY.preferred + 0.70, end=END, bay=BAY, special=SPECIAL)
+    assert any("strain" in line for line in r.account)
 
 
 # --------------------------------------------------------------- both axes

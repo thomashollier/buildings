@@ -63,6 +63,13 @@ class Vocabulary:
     kwargs: dict[str, Any]
     covers_from: float = LO
     parity: bool = False
+    #: Whether this vocabulary can reach ADD_MODULE at all. Since the natural
+    #: count became the *closest* count rather than the largest that fits, rung
+    #: 5 is only reachable where parity forces the composition off the closest
+    #: count AND the elastic bands are too stiff to absorb what that costs. A
+    #: vocabulary with generous bands never gets there, because the count
+    #: chooser has already considered — and taken — the extra module.
+    reaches_add_module: bool = False
 
     def specs(self) -> dict[str, SlotSpec]:
         out = {self.kwargs["end"].name: self.kwargs["end"], self.kwargs["bay"].name: self.kwargs["bay"]}
@@ -134,6 +141,7 @@ VOCABULARIES: tuple[Vocabulary, ...] = (
         dict(**_tight(), central_feature=True),
         covers_from=6.60,
         parity=True,
+        reaches_add_module=True,
     ),
     Vocabulary(
         "storeys",
@@ -171,14 +179,38 @@ def _plain_count(budget: float, v: Vocabulary) -> int:
     lone central special is centred too (A1.6), and nothing below reads this
     function as if it were: it is used only where the odd-run family is the
     subject, i.e. to measure the ADD_MODULE increment.
+
+    **Restated for the closest-count rule.** It was ``floor()`` — the largest
+    count that still fits at preferred widths, which is the closest count *from
+    below* and nothing more. It is now the count whose ends and bays land
+    nearest their preferred widths, out of those the declared bounds permit;
+    where they permit none, the floor is what the solver falls back to and so
+    does this. Written from the bounds themselves rather than by calling the
+    solver's own absorber, so it stays an independent statement of the rule.
     """
     end = v.kwargs["end"]
     bay = v.kwargs["bay"]
     lo = v.kwargs.get("min_bays", 1)
     hi = v.kwargs.get("max_bays", 24)
     n_fixed = len(v.kwargs.get("fixed", ()))
-    raw = int(math.floor((budget - _reserved(v) - 2 * end.preferred) / bay.preferred + EPS))
-    n = min(max(raw, lo), hi)
+    run = budget - _reserved(v) - 2 * end.preferred
+
+    def permitted(n: int) -> bool:
+        slack = run - n * bay.preferred
+        lo_end = 0.0 if end.pinned else end.preferred - end.minimum
+        hi_end = 0.0 if end.pinned else end.maximum - end.preferred
+        if slack >= 0.0:
+            room = 2 * hi_end + n * (bay.maximum - bay.preferred)
+        else:
+            room = 2 * lo_end + n * (bay.preferred - bay.minimum)
+        return abs(slack) <= room + TOL
+
+    allowed = [n for n in range(lo, hi + 1) if permitted(n)]
+    if allowed:
+        n = min(allowed, key=lambda k: (abs(run - k * bay.preferred), k))
+    else:
+        raw = int(math.floor(run / bay.preferred + EPS))
+        n = min(max(raw, lo), hi)
     if v.kwargs.get("central_feature") and (n + n_fixed) % 2 == 0:
         n = n - 1 if n - 1 >= lo else n + 1
     return n
@@ -363,9 +395,19 @@ def test_parity_steps_the_composition_by_two_never_one(v: Vocabulary) -> None:
     and still walk the composition 1, 2, 3, 4 elements as the budget grows,
     because the count it starts from was chosen by a bare floor(), which puts the
     axis on a joint half the time. The composition as a function of the budget is
-    therefore checked directly, and every ADD_MODULE firing is checked as well —
-    `fired > 0`, so a vocabulary that never reaches the top rung cannot pass this
-    test by asserting nothing.
+    therefore checked directly, and every ADD_MODULE firing is checked as well.
+
+    ``fired > 0`` used to be demanded of every parity vocabulary, to stop one
+    that never reaches the top rung from passing by asserting nothing. It is
+    now demanded only of those marked ``reaches_add_module``, and the reason is
+    not that the guard got inconvenient. The natural count is the *closest*
+    count now, not the largest that fits, so a vocabulary with elastic bands
+    wide enough to cover half a bay never needs a module added: the chooser
+    already took it. What is left of rung 5 is the case where parity forbids
+    the closest count and the bands are too stiff to pay for the substitute —
+    which is precisely ``tight_central``, and it still carries the assertion.
+    The sweep half of this test, which is the half about parity, runs unchanged
+    on every parity vocabulary.
 
     The thing that steps by two is the **interior run**, not the bay count. That
     is what parity is about: the run is what carries the centreline, and holding
@@ -404,7 +446,16 @@ def test_parity_steps_the_composition_by_two_never_one(v: Vocabulary) -> None:
             assert (n0 - n1, r1) == (1, r0), (
                 f"{v.name}: {n0} -> {n1} bays between {b0:.2f} and {b1:.2f} m"
             )
-    assert fired > 0, f"{v.name} never reached ADD_MODULE; the assertion above is vacuous"
+    if v.reaches_add_module:
+        assert fired > 0, (
+            f"{v.name} never reached ADD_MODULE; the assertion above is vacuous"
+        )
+    else:
+        assert fired == 0, (
+            f"{v.name} reached ADD_MODULE {fired} time(s); it is marked as a "
+            "vocabulary whose bands are wide enough that the closest count never "
+            "needs a module added, so either the mark or the chooser is wrong"
+        )
 
 
 @pytest.mark.parametrize("v", VOCABULARIES, ids=IDS)
@@ -481,19 +532,26 @@ def test_every_refusal_is_genuinely_infeasible(v: Vocabulary) -> None:
 
 
 def test_without_parity_the_module_count_can_step_by_one() -> None:
-    """The control for the parity test: the step of 2 is a decision, not an artefact."""
-    plain = Vocabulary("tight", _tight())
+    """The control for the parity test: the step of 2 is a decision, not an artefact.
+
+    The control used to be read off ADD_MODULE — find a firing of rung 5 that
+    stepped by one and the step of two is evidently a choice. That reading is
+    no longer available: without parity the composition never reaches rung 5,
+    because the natural count is the closest one and a module the composition
+    wanted was already taken when the count was chosen. Asserting on a rung
+    that cannot fire would make this control vacuous, which is the opposite of
+    a control.
+
+    So it is read off the thing the parity test itself measures — the interior
+    run as a function of the budget. Under parity the run grows two elements at
+    a time; the claim being controlled is that this is the flag's doing. Here,
+    with the same vocabulary and the flag off, it grows one at a time. Same
+    quantity, same sweep, no dependence on which rung happened to answer.
+    """
     stepped_by_one = 0
-    for budget in _budgets():
-        try:
-            result = solve(budget, **plain.kwargs)
-        except FitInfeasible:
-            continue
-        if result.rung is not Rung.ADD_MODULE:
-            continue
-        n = len([s for s in result.slots if s.name == "bay"])
-        if n - _plain_count(budget, plain) == 1:
-            stepped_by_one += 1
+    for _budget, before, after in _run_changes(_tight()):
+        assert after - before == 1, (before, after)
+        stepped_by_one += 1
     assert stepped_by_one > 0
 
 
@@ -605,7 +663,14 @@ def test_the_centred_special_is_used_and_is_genuinely_central(v: Vocabulary) -> 
         assert at == len(run) // 2, [s.name for s in result.slots]
         assert at == len(run) - 1 - at  # the same number of elements either side
         assert _bay_count(result, v) % 2 == 0 or v.kwargs.get("fixed")
-    assert used > 20, f"{v.name} never used the centred special: {used}"
+    # The coverage guard, retuned rather than removed. The arrangement is
+    # reached far less often than it was — 9 budgets in this sweep where it
+    # used to be well over 20 — because a lone central special exists to make
+    # an *even* run centred, and since the natural count became the closest
+    # count the odd family beside it usually absorbs the width on its own. The
+    # arrangement is still reached, still correct where it is reached, and
+    # still worth having; what changed is how often the solver needs it.
+    assert used >= 5, f"{v.name} never used the centred special: {used}"
 
 
 def test_the_parity_fix_does_not_reintroduce_an_off_centre_special() -> None:

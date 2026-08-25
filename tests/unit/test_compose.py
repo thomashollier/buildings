@@ -833,10 +833,36 @@ def _sweep_sites():
     # absorbs what the class factor used to make awkward. The sweep is widened
     # rather than the thresholds below it lowered; the tests that count
     # specials must still be counting enough of them to prove anything.
+    #
+    # **A26 reaches the bottom of the range, and the reason is a finding rather
+    # than a fixture tweak.** With the bay band at 2.00 / 2.60 / 3.20 the
+    # rhythm reaches so much further that **no parcel of 6 m or more needs a
+    # narrow special at all** — measured, this sweep produced exactly zero
+    # special bays across 480 buildings where it used to produce hundreds.
+    # Raising the *count* does not help: 960 buildings over the same range
+    # still produce zero, because the cause is reachability and not sampling.
+    # What still produces a special is a parcel too narrow to carry one more
+    # whole bay, and those now start below 6 m.
+    #
+    # So the sweep is stratified rather than merely stretched: a share of the
+    # sites is drawn from 4.0-7.0 m, the band where the leftover exists at all,
+    # and the rest from the range it always used. 4.0 m is comfortably above
+    # the 3.44 m at which a carriage entrance and two minimum piers stop
+    # fitting, so every site is still a building this generator can build, and
+    # this sweep refuses none of them.
+    #
+    # Measured, so that the shares are chosen and not guessed: 480 buildings
+    # over 6-26 m give 0 special columns; 480 over 4.5-26 m give 15; 960 over
+    # 4.0-26 m give 49; and 480 with this 45 % narrow share give 62, clearing
+    # every threshold below with margin and without the sweep getting slower.
+    # Same discipline as at A8.6: widen the sweep, never lower the thresholds.
     for _ in range(480):
         yield SiteContext(
             street_width=rnd.uniform(6.0, 32.0),
-            parcel_width=rnd.uniform(6.0, 26.0),
+            parcel_width=(
+                rnd.uniform(4.0, 7.0) if rnd.random() < 0.45
+                else rnd.uniform(6.0, 26.0)
+            ),
             parcel_depth=rnd.uniform(8.0, 25.0),
             year=rnd.randint(1800, 1914),
             klass=rnd.choice(list(BuildingClass)),

@@ -287,16 +287,43 @@ class TestDoorWidthByType:
 
 
 class TestWindowOpeningWidth:
-    """SOURCED. Daly 1864, sixteen buildings across all three classes:
-    width 1.04-1.30 m, non-monotonic by class (median 1.139 / 1.235 / 1.070).
-    Printed '1.300' at 2-4 boulevard de Sébastopol anchors the top; the floor
-    is a scale-bar reading at rue de Longchamps."""
+    """OPERATOR-SET (A26), and the corpus recorded beside it.
 
-    def test_the_band_matches_the_corpus_span(self) -> None:
+    Daly 1864, sixteen buildings across all three classes, measures the width
+    at 1.04-1.30 m, non-monotonic by class (median 1.139 / 1.235 / 1.070), with
+    a printed '1.300' at 2-4 boulevard de Sébastopol anchoring the top and a
+    scale-bar reading at rue de Longchamps at the floor. That was the band.
+
+    The operator has set the band at 1.20 / 1.30 / 1.35, which sits inside the
+    top third of the corpus span and steps 0.05 m past its ceiling. The class
+    findings below are untouched by that — the width is still one band for all
+    four classes — but the band is no longer a description of the sixteen
+    plates, and this class says which of the two it is."""
+
+    def test_the_band_is_the_operators_and_says_so(self) -> None:
         spec = catalogue.opening_window()
-        assert float(spec.minimum) == pytest.approx(1.04, rel=0.10)  # scale-bar
-        assert float(spec.preferred) == pytest.approx(1.20, abs=0.02)  # printed-anchored
-        assert float(spec.maximum) == pytest.approx(1.30, abs=1e-6)  # printed
+        assert float(spec.minimum) == pytest.approx(1.20, abs=1e-6)
+        assert float(spec.preferred) == pytest.approx(1.30, abs=1e-6)
+        assert float(spec.maximum) == pytest.approx(1.35, abs=1e-6)
+        for bound in (spec.minimum, spec.preferred, spec.maximum):
+            assert "OPERATOR-SET" in bound.why, bound
+
+    def test_the_band_no_longer_matches_the_corpus_span_and_the_gap_is_recorded(
+        self,
+    ) -> None:
+        """Kept as a test rather than deleted, because the gap is the finding.
+
+        Daly's span is 1.04-1.30 m. The operator's band is 1.20-1.35 m. The
+        floor has risen 0.16 m and the ceiling 0.05 m past anything measured,
+        so every window this generator cuts is at or above the corpus median
+        and some are wider than any croisée in it. That is a legitimate
+        decision and an invisible one unless something asserts it, which is
+        what this does.
+        """
+        spec = catalogue.opening_window()
+        corpus_lo, corpus_hi = 1.04, 1.30
+        assert float(spec.minimum) > corpus_lo + 0.10
+        assert float(spec.maximum) > corpus_hi
 
     def test_window_width_never_exceeds_the_sourced_band_anywhere_in_the_ir(
         self, ir_sweep

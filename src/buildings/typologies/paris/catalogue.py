@@ -326,27 +326,49 @@ def opening_window() -> ModuleSpec:
     Still ``FLEXIBLE`` in the solver, and still the least elastic of the
     three composable tiers: the band has real width, and an opening may move
     inside it. What it may not do is move *with the class*.
+
+    **A26 — the three figures are now OPERATOR-SET, and the marker on them has
+    to change with them.** The band was ``1.04 / 1.20 / 1.30`` and every bound
+    of it was a reading off Daly: the minimum was the narrowest croisée in the
+    corpus, the maximum a printed callout, the preferred the middle of a
+    sixteen-building spread. The operator has set the band directly at
+    ``1.20 / 1.30 / 1.35``. Those are not those readings — the new minimum is
+    the old preferred, and the new maximum stands 0.05 m above the widest
+    croisée measured. So the provenance below says **OPERATOR-SET** and keeps
+    the Daly figures as the context they now are: the corpus this generator no
+    longer quite describes at this quantity, and the thing to compare against
+    if the band is ever revisited.
+
+    Everything the docstring above says about *kind* is untouched by that. The
+    width is still ABSOLUTE and still never passes through
+    ``scale_for_class`` — the class ladder lives in the height — and the new
+    band is narrower than the old one, which makes that claim harder rather
+    than easier to bend.
     """
     return ModuleSpec(
         name="opening_window",
         slot_kind=SlotKind.FLEXIBLE,
         minimum=Abs(
-            1.04,
-            f"SOURCED — {DALY_1864}, narrowest typical croisée in the corpus "
-            f"(rue de Longchamps, Troisième Classe; {SCALE_BAR})",
+            1.20,
+            f"OPERATOR-SET — the narrowest croisée this generator will cut. NOT a "
+            f"corpus reading: {DALY_1864} measures the narrowest typical croisée at "
+            f"1.04 m (rue de Longchamps, Troisième Classe; {SCALE_BAR}), which is "
+            f"0.16 m under this floor",
         ),
         preferred=Abs(
-            1.20,
-            f"SOURCED — {DALY_1864}, 16 buildings across all three classes, "
-            f"1.04-1.30 m, medians 1.139 / 1.235 / 1.070 by class — non-monotonic, "
-            f"so ABSOLUTE. The printed croisée callout '1.300' at 2-4 boulevard de "
-            f"Sébastopol and the window chain at 9 rue du Conservatoire "
-            f"('2.100/1.800/0.800/0.300') anchor the band ({PRINTED})",
+            1.30,
+            f"OPERATOR-SET — the croisée width this generator rests at. NOT the "
+            f"corpus median: {DALY_1864}'s 16 buildings run 1.04-1.30 m with medians "
+            f"1.139 / 1.235 / 1.070 by class (non-monotonic, which is why the "
+            f"quantity is ABSOLUTE). This figure equals the corpus MAXIMUM, the "
+            f"printed croisée callout '1.300' at 2-4 boulevard de Sébastopol "
+            f"({PRINTED}), not its middle",
         ),
         maximum=Abs(
-            1.30,
-            f"SOURCED — {DALY_1864}, widest typical croisée in the corpus, printed "
-            f"'1.300' at 2-4 boulevard de Sébastopol ({PRINTED})",
+            1.35,
+            f"OPERATOR-SET — NOT a corpus reading: the widest typical croisée "
+            f"{DALY_1864} shows is the printed '1.300' at 2-4 boulevard de "
+            f"Sébastopol ({PRINTED}), 0.05 m under this ceiling",
         ),
         elasticity=1.0,
     )
@@ -779,11 +801,43 @@ def carriage_jamb_width() -> Quantity:
     is deliberately NOT ``pier_filler``'s minimum: that one is PROPORTIONAL
     and would put a wider jamb on a grand carriage entrance than a modest
     one, which is the doll's-house effect this door exists to refuse.
+
+    **A26 — PROVISIONAL, and the one number here that was moved by arithmetic
+    rather than by evidence. Read this before trusting it.**
+
+    It was 0.40 m, INFERRED. The A26 band puts ``_BAY_PITCH_MAX`` at 3.20 m,
+    and ``carriage_slot_width`` is ``2.60 clear + 2 x jamb`` — so at 0.40 the
+    slot is 3.40 m, which is 0.20 m wider than a bay may be, and the A9.2/D6
+    tripwire in ``structure.solve_structure`` refuses the building outright.
+    Every comfortable and grand frontage on a street 12 m or wider takes the
+    carriage door, so at 0.40 none of them can be built at all.
+
+    Three ways out of that, and this is the one taken: narrow the jamb, keep
+    the SOURCED 2.60 m clear opening untouched, keep both guards intact, keep
+    the operator's 3.20 m ceiling. The value chosen is **not** the one that
+    merely makes the arithmetic close (0.30 would put the slot at exactly
+    3.20): it is the figure ``dev/HANDOFF.md`` already derives from the corpus
+    — at 39 rue Neuve des Mathurins the door measures 2.57 m in a 3.02 m pitch,
+    implying about 0.22 m of jamb either side, roughly half what this module
+    used to state. That puts the slot at 3.04 m and clears the ceiling with
+    room rather than by a hair.
+
+    **What is missing is the check.** HANDOFF calls that reading "unchecked,
+    cheap to check" across the other six carriage doors Daly measures, and it
+    has not been done. One plate is not a corpus. Until it is checked this
+    figure is PROVISIONAL: it is the best-evidenced number available, it is
+    the only one that lets the A26 band and the porte cochere coexist, and it
+    is a decision the operator has not yet ratified. Reverting it is one line,
+    and reverting it means no carriage entrance can be built.
     """
     return Abs(
-        0.40,
-        "INFERRED — the jamb carrying the arch over a carriage opening; the arch's "
-        "thrust does not scale with ambition, so neither does the pier under it",
+        0.22,
+        "PROVISIONAL (A26) — the jamb carrying the arch over a carriage opening; the "
+        "arch's thrust does not scale with ambition, so neither does the pier under "
+        "it. Was 0.40 m, INFERRED. Moved because 0.40 puts the carriage slot at "
+        "3.40 m, above the A26 bay ceiling of 3.20 m, which the D6 tripwire refuses. "
+        "0.22 is the figure the corpus implies at 39 rue Neuve des Mathurins (2.57 m "
+        "door in a 3.02 m pitch) — ONE plate, unchecked against the other six",
     )
 
 
@@ -1102,7 +1156,7 @@ def shopfront_pane_max_span(style: str | None) -> Quantity:
 
 
 def opening_aspect_band() -> tuple[float, float]:
-    """How tall a Paris opening is relative to its own width: 1:1.7 to 1:2.
+    """How tall a Paris opening is relative to its own width: 1.56 to 2.0.
 
     A dimensional limit on the *shape* of an opening, not on its size, so it
     is a bare ratio rather than a ``Quantity``: it survives ``scale_for_class``
@@ -1124,11 +1178,61 @@ def opening_aspect_band() -> tuple[float, float]:
     and elastic — the pier beside it simply widens — while the aspect is what
     carries the reading, and there is no such thing as an elastic proportion.
     Upper floors still read differently from the noble floor: their openings
-    are shorter and narrower and sit at ``1.70`` rather than ``2.00``, which
-    is a change of size and of proportion within the band, not a collapse
-    out of it.
+    are shorter and narrower and sit near the bottom of the band rather than
+    at its top, which is a change of size and of proportion within the band,
+    not a collapse out of it.
+
+    **A26 — the FLOOR comes down to 1.56, on the nobile evidence. The ceiling
+    does not move.**
+
+    The floor was 1.70, and it sat above the corpus it claims to describe.
+    ``opening_aspect_principal`` in ``dev/reference/daly_measurements.json`` —
+    the opening height over width at the piano nobile, which is the storey the
+    failing case is on — measures:
+
+    ============  ====  ==============  ======
+    class         n     measured range  median
+    ============  ====  ==============  ======
+    Première      4     2.35 - 2.83     2.485
+    Deuxième      10    1.56 - 2.45     2.035
+    Troisième     2     1.93 - 1.96     1.945
+    ============  ====  ==============  ======
+
+    The Deuxième floor of **1.56** is a real noble-floor opening standing
+    0.14 below the bound this module enforced, so the bound excluded it. That
+    quantity is rated *"SOURCED for ordering; WEAK for Troisième"* — good
+    enough to move a floor, which is what is done here and all that is done
+    here.
+
+    **``opening_aspect_uppers`` was considered and rejected.** It reaches lower
+    still — Deuxième 1.14-2.08 over n=22 — and lowering the floor to 1.14 would
+    have been easy to justify from it. It is rated **INSUFFICIENT** in the same
+    file's own summary, and its note says exactly why: *"within-building
+    variation is larger than between-class variation: 9 Conservatoire runs 1.74
+    down to 1.14 while 63 Sébastopol runs 1.98 / 1.66 / 2.08 in the wrong
+    order."* The 1.14 is one storey of one building, not a property of anything.
+    A quantity the source register marks INSUFFICIENT may not carry an ABSOLUTE
+    bound, and it does not carry this one.
+
+    **The 2.00 ceiling is left alone deliberately.** The nobile data does show
+    Première openings reaching 2.83, but n=4, on a different storey type, and
+    nothing is failing against the ceiling. Widening a bound with no failing
+    case behind it is an unforced change, and this file's own error budget —
+    *"assume any un-printed width could be 10 % wrong and any storey height
+    0.2-0.4 m wrong"* — is up to 20 % straight into any ratio derived from
+    them. One end of the band had a defect; that end moved.
+
+    **Why widen at all rather than tune a class.** The failing case is that a
+    MODEST noble-floor window is 2.040 m tall, so at a 1.70 floor the widest
+    light it can carry in proportion is 1.200 m and the ABSOLUTE 1.30 m width
+    gave way — making the realised width move with class, which is the one
+    thing A9.4 says it must never do. The fix has to be in a *generic*
+    constraint, because the generic set has to be able to produce every class
+    before any per-class bias is laid on top of it. That the two figures agree
+    to three decimals — 1.56 measured, 1.569 needed — is corroboration arrived
+    at independently, and is emphatically not the reason for the value.
     """
-    return (1.70, 2.00)
+    return (1.56, 2.00)
 
 
 @dataclass(frozen=True)
@@ -1149,7 +1253,7 @@ class OpeningGeometry:
 
     @property
     def aspect(self) -> float:
-        """Height over width. 1.7--2.0 is the Paris band; see ``opening_aspect_band``."""
+        """Height over width. 1.56--2.0 is the Paris band; see ``opening_aspect_band``."""
         return self.height / self.width if self.width > 0.0 else 0.0
 
 

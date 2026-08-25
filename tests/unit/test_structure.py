@@ -1803,19 +1803,36 @@ def test_a_carriage_arch_costs_one_axis_at_most_and_the_class_costs_none() -> No
             priced += 1
 
     # The arithmetic that makes "never two" true, stated rather than trusted.
+    #
+    # A26: the figure was 1.05 m, from a 3.40 m carriage slot against a 2.35 m
+    # pedestrian one. The carriage slot is now 3.04 m, because the A26 bay
+    # ceiling of 3.20 m would not admit 3.40 and the jamb came in to 0.22 m
+    # (PROVISIONAL — see ``catalogue.carriage_jamb_width``). So the arch costs
+    # 0.69 m of frontage rather than 1.05 m. The *relation* is what this test
+    # is about and it holds more comfortably than before: the difference is
+    # still under one bay, which is why an arch can never cost two axes.
     extra = float(catalogue.carriage_slot_width()) - float(
         catalogue.pedestrian_slot_width()
     )
-    assert extra == pytest.approx(1.05, abs=1e-9), extra
+    assert extra == pytest.approx(0.69, abs=1e-9), extra
     assert extra < float(structure._BAY_PITCH_MIN), (extra, structure._BAY_PITCH_MIN)
     assert priced == 32
 
-    # The three frontages A10.2 named, pinned as door effects rather than
-    # class ones: on each of them the arch really does cost the axis, and it
-    # costs it to a MODEST building with a carriage entrance exactly as much
-    # as to a GRAND one. That is the whole of the residual.
+    # Three frontages on which the arch really does cost the axis, pinned as
+    # door effects rather than class ones: it costs it to a MODEST building
+    # with a carriage entrance exactly as much as to a GRAND one. That is the
+    # whole of the residual, and it is the part of A10.2 that matters.
+    #
+    # A26 moved *which* three frontages those are, and moved the counts on all
+    # of them, for two compounding reasons: the bay band came in to
+    # 2.00 / 2.60 / 3.20 so every frontage carries more axes than it did, and
+    # the carriage slot came in to 3.04 m so the arch costs 0.69 m rather than
+    # 1.05 m. 12.0 m used to be an arch-costs-an-axis width and is no longer
+    # one — at 4 axes either way the 0.69 m no longer crosses a bay boundary —
+    # so it is replaced here by 10.0 m, which is. The claim under test is
+    # unchanged; only the widths that witness it have moved.
     for parcel, walked_expected, driven_expected in (
-        (12.0, 4, 3), (18.0, 6, 5), (20.0, 7, 6)
+        (10.0, 4, 3), (18.0, 7, 6), (20.0, 8, 7)
     ):
         for klass in (BuildingClass.MODEST, BuildingClass.GRAND):
             walked, _ = _axes_and_door(
@@ -1849,23 +1866,36 @@ def test_the_bay_pitch_floor_names_the_repeating_bay() -> None:
 
     The reason it is stated rather than fixed is that the entrance's 2.35 m
     is not free to move. 1.75 m of it is Daly's SOURCED median of eight
-    measured doors, and the jambs either side are 0.30 m. Reaching 2.70 m
-    would need 0.475 m jambs on a pedestrian door — thicker than the 0.40 m
-    jamb this catalogue puts under a carriage arch, which is a bigger pier
-    under a smaller load. The floor is what the honest arithmetic makes it,
-    and the honest arithmetic puts a door below it.
+    measured doors, and the jambs either side are 0.30 m.
+
+    **A26 — the floor moved to 2.00 m and the rule did not.** The operator set
+    the band at 2.00 / 2.60 / 3.20. That happens to put the porte piétonne's
+    2.35 m slot *above* the floor rather than below it, so the illustration
+    this test used to lean on — a door under the floor, and the dishonest jamb
+    it would take to lift it over — no longer applies to that door. What the
+    rule is about is unchanged and still has a witness: the narrow special's
+    whole band lies under the floor, because being narrower than a bay is what
+    a narrow special is. That is asserted directly below instead, which is the
+    stronger statement anyway: it does not depend on which of two doors the
+    arithmetic happens to put where.
     """
     assert "REPEATING" in structure._BAY_PITCH_MIN.why, structure._BAY_PITCH_MIN.why
-    assert float(structure._BAY_PITCH_MIN) == 2.70
+    assert float(structure._BAY_PITCH_MIN) == 2.00
+    assert "OPERATOR-SET" in structure._BAY_PITCH_MIN.why
+
+    # The narrow special: a slot that is *defined* by being under the floor,
+    # and the reason the floor has to name the repeating bay rather than every
+    # slot in the run.
+    special_hi = 1.80
+    assert special_hi < float(structure._BAY_PITCH_MIN), special_hi
 
     pedestrian = float(catalogue.pedestrian_slot_width())
     assert pedestrian == pytest.approx(2.35, abs=1e-9), pedestrian
-    assert pedestrian < float(structure._BAY_PITCH_MIN), pedestrian
-    # And the arithmetic that makes widening it dishonest.
-    needed_jamb = (float(structure._BAY_PITCH_MIN) - float(
-        catalogue.door_pedestrian().preferred
-    )) / 2.0
-    assert needed_jamb > float(catalogue.carriage_jamb_width()), needed_jamb
+    # The entrance is a one-off standing in the rhythm, not a member of it, so
+    # it is bounded by its own two checks and not by this floor — which is the
+    # whole content of A10.1 and stays true whichever side of the floor the
+    # door lands on. Recorded here because it has just changed sides.
+    assert pedestrian > float(structure._BAY_PITCH_MIN), pedestrian
 
 
 def test_the_bay_pitch_floor_holds_over_every_repeating_bay() -> None:
@@ -1963,15 +1993,26 @@ def test_the_bay_rhythm_is_the_same_for_every_class() -> None:
     runs 2.32 to 3.49 m. The measurement pass marks bay pitch INSUFFICIENT as
     a class discriminator, and A8.6's residual one-third trend is gone.
 
-    The figure itself stays INFERRED: A9.4 names eleven quantities that may be
-    promoted and this is not one of them.
+    **A26 — the figure is now OPERATOR-SET, not INFERRED.** It was 2.80 m and
+    agreed with two independent corpus medians of 2.80 m, which is what
+    "INFERRED and corroborated" meant here. The operator set it at 2.60 m. It
+    no longer equals either median, so the citation says OPERATOR-SET and this
+    test holds it to that instead — a number that agrees with a source and a
+    number taken from one were always different things, and so is a number
+    that used to agree with one.
+
+    The class finding is untouched and is what this test is actually for: the
+    band is identical for every class, because Daly's pitches are 2.81 / 2.85 /
+    2.54 m and there is no ladder in them.
     """
     bands = {klass: structure._bay_pitch_band(klass) for klass in BuildingClass}
     assert len(set(bands.values())) == 1, bands
-    assert "INFERRED" in structure._BAY_PITCH_PREFERRED.why
+    assert "OPERATOR-SET" in structure._BAY_PITCH_PREFERRED.why
+    assert "INFERRED" not in structure._BAY_PITCH_PREFERRED.why
     lo, pref, hi = bands[BuildingClass.GRAND]
     assert lo <= pref <= hi
-    # Daly's corpus range, as the band the resting pitch has to lie in.
+    # Daly's corpus range, as the band the resting pitch still has to lie in —
+    # the operator moved the figure, not out of the range the plates show.
     assert 2.09 <= pref <= 3.49
 
 

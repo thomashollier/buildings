@@ -500,14 +500,75 @@ BRISIS_RISE = _PLAIN_STOREY_HEIGHT + _BRISIS_PLATE
 #: the ``_BAY_PITCH_MAX`` tripwire on the entrance, so that the band is now
 #: guarded on both sides, each over its own domain — and the entrance carries
 #: its own two-sided guard there against the bounds that are genuinely its.
+#:
+#: **A25 — EVIDENCE AGAINST THIS FIGURE, recorded but NOT yet acted on.** The
+#: 2026-08 measuring pass read 16 elevations off the plates against their own
+#: scale bars. Six of the fifteen usable frontages come in under this floor:
+#:
+#:     2.11  rue du Conservatoire, 9      (GOOD)
+#:     2.28  125 Champs-Elysees           (MEDIUM)
+#:     2.41  1 bd de Sebastopol           (HIGH — operator read 2.40 independently)
+#:     2.48  77 bd de Sebastopol          (HIGH)
+#:     2.51  rue de Longchamps            (MEDIUM)
+#:     2.52  11 bd de Sebastopol          (MEDIUM)
+#:
+#: The paragraph above argues that "a facade built of 2.35 m bays is not the
+#: same claim" as a single narrow column. On the evidence it is the same claim,
+#: and Paris built it repeatedly — 1 bd de Sebastopol carries seven axes at
+#: 2.41 m across a 16.84 m frontage. The lowest reading, 2.11 m, also lands
+#: within 0.02 m of the 2.09 m corpus minimum quoted at
+#: ``_BAY_PITCH_PREFERRED``, from a wholly separate measurement.
+#:
+#: **A26 — MOVED, and by decision rather than by measurement.** The paragraph
+#: above ended "the value is left at 2.70 deliberately … moving it is a
+#: decision about what this generator claims". That decision has now been
+#: taken: the operator set the band directly at **2.00 / 2.60 / 3.20 m**. The
+#: figure is therefore **OPERATOR-SET**, not SOURCED and not derived from the
+#: evidence listed above — though it moves in the direction that evidence
+#: pointed, and 2.00 sits just under the 2.11 m lowest reading in the corpus
+#: rather than a metre away from it. The old 2.70 was never a measurement
+#: either; what changes is only which person's judgement it records.
 _BAY_PITCH_MIN = Abs(
-    2.70, "the narrowest REPEATING bay a window and its two piers make sense in"
+    2.00,
+    "OPERATOR-SET — the narrowest REPEATING bay this generator will build. Not a "
+    "corpus figure: the 2026-08 pass read six of fifteen frontages under the old "
+    "2.70 floor, lowest 2.11 m, so the corpus is consistent with a floor here but "
+    "did not choose it",
 )
 
 #: ABSOLUTE. The widest bay: what a stone lintel spans over an opening, and
 #: what the floor joists behind it run, before the wall wants a column.
+#:
+#: **A25 — the ceiling is crossed too, once.** 119 avenue des Champs-Elysees
+#: measures **3.71 m** (HIGH confidence: 14.86 m frontage, 4 axes, clean glass
+#: detection), which is 0.31 m ABOVE this bound. Avenue de l'Imperatrice sits
+#: just under at 3.37 m. So the band stated here is crossed at both ends by
+#: the corpus it claims to describe.
+#:
+#: One plate is not grounds to move an ABSOLUTE bound, and this one carries a
+#: caveat: 119 Champs-Elysees is the plate whose facade width was disputed —
+#: the operator read 12.4 m, two independent measurements give 14.86/14.93 m,
+#: and the 3.71 m pitch follows from the larger width. That dispute is now
+#: resolved in favour of the larger figure (see
+#: ``dev/reference/operator_axis_counts.json``), which means the exceedance is
+#: real rather than an artefact of the disputed number. Recorded here so the
+#: next person does not rediscover it as a surprise.
+#:
+#: **A26 — MOVED to 3.20 m, OPERATOR-SET.** Set directly by the operator along
+#: with the other two figures of the band. It moves *away* from the corpus at
+#: this end rather than toward it — 119 Champs-Elysees at 3.71 m and avenue de
+#: l'Imperatrice at 3.37 m are now both outside — so the ceiling is a statement
+#: about what this generator builds and not a description of the sixteen
+#: plates. Recorded plainly rather than dressed as a reading.
+#:
+#: **It is also 0.20 m under the porte cochere's own 3.40 m slot**, which the
+#: A9.2 tripwire in ``solve_structure`` forbids outright. See the note at
+#: ``_CARRIAGE_SLOT_OVER_BAY_MAX`` below.
 _BAY_PITCH_MAX = Abs(
-    3.40, "the widest bay a stone lintel and the joist run behind it will span"
+    3.20,
+    "OPERATOR-SET — the widest REPEATING bay this generator will build. Not a "
+    "corpus figure: two of the fifteen measured frontages run wider (3.37 and "
+    "3.71 m)",
 )
 
 #: The pitch a facade takes when nothing forces it off, stated explicitly
@@ -529,13 +590,60 @@ _BAY_PITCH_MAX = Abs(
 #: 16 m and hands the leftover to a narrow special: a grand frontage came out
 #: as three 3.40 m bays and a 1.35 m panel where four 2.85 m bays — well
 #: inside the same ABSOLUTE band — were available and are what Paris built.
+#:
+#: **A25 — re-measured, and it holds.** The corroboration above came from one
+#: automated pass whose axis counts were never re-verified. A second pass,
+#: independent of it, measured 16 elevations directly off the plates —
+#: calibrated on each sheet's own printed scale bar, with every window/pier
+#: detection checked against the drawing by eye. Over the 15 usable single
+#: frontages the median pitch is **2.80 m**, the same figure to two decimals,
+#: on a range of 2.11-3.71 m. Two measuring passes that share no method and no
+#: intermediate numbers landing on the same median is about as much support as
+#: an INFERRED quantity can get without becoming SOURCED — and it stays
+#: INFERRED, because A9.4 still does not list it among the promotable
+#: quantities. See ``dev/reference/daly_elevation_scan_2026-08-24.json``.
+#:
+#: What the same pass says about the two bounds either side of this one is
+#: less comfortable, and is recorded at ``_BAY_PITCH_MIN``/``_BAY_PITCH_MAX``.
+#: **A26 — MOVED to 2.60 m, and its marker changes with it.** Everything above
+#: is the record of a number that agreed with two independent corpus medians of
+#: 2.80 m. It no longer equals them: the operator set 2.60 m directly. So the
+#: quantity is **OPERATOR-SET** rather than INFERRED-and-corroborated, and the
+#: Daly medians are kept as context — they are what the figure used to rest on
+#: and they are 0.20 m away from it — rather than as its justification.
 _BAY_PITCH_PREFERRED = Abs(
-    2.80,
-    "INFERRED — the pitch a Paris facade falls to when nothing forces it off. "
-    "Corroborated (not sourced) by Daly 1864: 16 buildings, median 2.80 m, range "
-    "2.09-3.49 m; that corpus-wide figure is usable but bay pitch is INSUFFICIENT "
-    "as a class discriminator and A9.4 does not list it among the quantities that "
-    "may be promoted, so this stays the generator's own number",
+    2.60,
+    "OPERATOR-SET — the pitch a facade falls to when nothing forces it off. It is "
+    "NOT the corpus median: Daly 1864 gives 2.80 m over 16 buildings (2.09-3.49 m), "
+    "and an independent 2026-08 pass over the plates gives 2.80 m over 15 frontages "
+    "(2.11-3.71 m). Both medians sit 0.20 m above this figure and are kept here as "
+    "context, not as its source",
+)
+
+#: **A26 — the third of the operator's figures, and the SOFT one.** How much of
+#: a bay the opening in it should be. OPERATOR-SET at 0.45, and explicitly
+#: *soft*: it has no minimum and no maximum, it may not make any frontage
+#: infeasible, and it may not override the bay band above.
+#:
+#: It has to be soft, because **the three figures cannot all hold at once**.
+#: The operator's ideal window is 1.30 m and the ideal bay 2.60 m, and
+#: ``1.30 / 2.60 = 0.500``, not 0.45. Reaching 0.45 with a 1.30 m window needs
+#: a **2.889 m** bay — inside the [2.00, 3.20] band, but 0.29 m above the bay
+#: the same instruction calls ideal. Two of the three can hold and the third
+#: cannot, and the operator settled which one gives way: this one. So at rest
+#: a facade shows a ratio of **0.500** and not 0.45.
+#:
+#: What the figure therefore does is exactly one thing: it is handed to the
+#: solver as the bay's ``affinity`` — a lean, not a target — where it breaks
+#: ties between bay counts that are otherwise equally far from the preferred
+#: widths. It never widens a bay on its own account, because doing that would
+#: be preferring 0.45 over the 2.60 that outranks it.
+_WINDOW_BAY_RATIO = Abs(
+    0.45,
+    "OPERATOR-SET and SOFT — the share of a bay its opening wants to be. It cannot "
+    "hold together with the other two ideals (a 1.30 m window in a 2.60 m bay is "
+    "0.500, and 0.45 would need a 2.889 m bay), and it is the one of the three that "
+    "gives way: it only breaks ties between bay counts",
 )
 
 #: **D6, closed (A9.2).** The porte cochère's slot is the one fixed element
@@ -2659,9 +2767,33 @@ def solve_structure(site: SiteContext, datums: BlockDatums | None = None) -> Gri
     end_spec = SlotSpec("pier_end", SlotKind.FLEXIBLE, end_lo, end_pref, end_hi, elasticity=2.0)
 
     bay_lo, bay_pref, bay_hi = _bay_pitch_band(site.klass)
-    bay_spec = SlotSpec("bay", SlotKind.REPEATING, bay_lo, bay_pref, bay_hi)
+
+    # **A26 — the SOFT window/bay ratio, and the only way it is allowed to
+    # act.** ``_WINDOW_BAY_RATIO`` says an opening wants to be 0.45 of the bay
+    # carrying it. The opening's own width is ABSOLUTE and comes from the
+    # catalogue, so the ratio is a statement about the BAY: the bay that would
+    # satisfy it is ``window / ratio``. That figure is handed to the solver as
+    # the bay's ``affinity`` — a lean the solver consults only to separate two
+    # bay counts that sit equally far from the preferred pitch, never a bound
+    # and never a reason to refuse a frontage.
+    #
+    # It is emphatically not the preferred pitch, and the two disagree on
+    # purpose: at the operator's own figures the lean asks for 2.889 m and the
+    # preferred pitch is 2.60 m. The preferred pitch wins every time the two
+    # are in contention, which is what "soft" means here (see
+    # ``_WINDOW_BAY_RATIO`` for why all three figures cannot hold at once).
+    _window_pref = float(catalogue.opening_window().preferred)
+    _ratio = float(_WINDOW_BAY_RATIO)
+    bay_affinity = _window_pref / _ratio if _ratio > _TOL else None
+    bay_spec = SlotSpec(
+        "bay", SlotKind.REPEATING, bay_lo, bay_pref, bay_hi, affinity=bay_affinity
+    )
     account.append(
-        f"bay pitch {bay_pref:.2f} m, held in [{bay_lo:.2f}, {bay_hi:.2f}] m — "
+        f"bay pitch {bay_pref:.2f} m, held in [{bay_lo:.2f}, {bay_hi:.2f}] m, leaning "
+        f"toward {bay_affinity:.2f} m where nothing else decides — the width at which "
+        f"a {_window_pref:.2f} m opening is {_ratio:.2f} of its bay ("
+        f"{_WINDOW_BAY_RATIO.why}). At the preferred pitch the ratio lands at "
+        f"{_window_pref / bay_pref:.3f}, and the pitch outranks the ratio — "
         f"{_BAY_PITCH_MIN.why} / {_BAY_PITCH_MAX.why}. The rhythm is what the masonry "
         f"spans, so it is very nearly the same on every frontage in Paris; a "
         f"{site.klass.value} builder moves it by "

@@ -245,7 +245,7 @@ from buildings.ir.nodes import (
 )
 from buildings.quantity import Abs, Prop, Quantity, scale_for_class
 from buildings.rng import DecisionStream
-from buildings.site import SiteContext
+from buildings.site import BuildingClass, SiteContext
 from buildings.solver.fitting import PlacedSlot
 from buildings.trace import TraceEntry
 from buildings.typologies.paris import catalogue, chronology
@@ -387,6 +387,55 @@ def _dormer_skirt() -> Quantity:
     ambition.
     """
     return Abs(0.35, "INFERRED — gutter and the first course of zinc, passing below the lucarne")
+
+
+#: The cornice projection as a fraction of the storey it crowns. The SAME
+#: number as ``qualify/klass.py:cornice_projection``; restated because the
+#: comble phase may not reach into qualification (I1), and pinned by test.
+_CORNICE_FRACTION = 0.28
+
+
+def _cornice_clearance(top_storey_h: float, klass: BuildingClass) -> Quantity:
+    """How far above the eaves the main cornice reaches, and a lucarne clears.
+
+    **A25.** The comble springs from ``built_height`` and so did the lucarne —
+    its foot stood at ``eaves + skirt``, the plumber's apron and nothing else.
+    But the main cornice crowns that same line and stands ON it, deeper than
+    the apron, so it reached up through the apron and cut the feet and
+    surrounds off the dormers. Real on three of the four canonical situations
+    (House A by 0.10 m, ordinary by 0.01 m, grand by 0.17 m); the modest one
+    escaped only because a modest cornice is shallow enough to duck under.
+
+    The lucarne is what moves. A cornice is masonry crowning a wall and its
+    height is not negotiable against a roof detail; a dormer is set out by the
+    roofer afterwards, and setting it clear of the cornice is what a roofer
+    does.
+
+    **It lifts the BOTTOM ROW ONLY, and this is the whole reason the fix is
+    affordable.** Applying it to every row spends the clearance once per row
+    out of a brisis that is already fully let — and a two-storey garret on a
+    30 m street promptly came back with "openings in rows [0]", its second
+    storey blind. That is A8.3's bare-zinc defect, worse than the overlap it
+    would have cured. Only row 0 stands anywhere near the cornice; every row
+    above it is a whole ``BRISIS_RISE`` clear already and must not pay.
+
+    The halving mirrors what the renderer draws
+    (``elements.py:draw_cornice`` takes ``projection * 0.5``) and is the part
+    to be unhappy about: ``compose`` sets a cornice's ``h`` equal to its
+    ``projection``, one number standing for both how far the moulding juts out
+    and how tall it is, so no phase can ask a cornice its height and this one
+    has to know how it is drawn. That conflation is the defect; this is the
+    dressing.
+    """
+    projection = scale_for_class(
+        Prop(_CORNICE_FRACTION * top_storey_h, "cornice projection relative to the storey it crowns"),
+        klass,
+    )
+    return Abs(
+        float(projection) * 0.5,
+        f"INFERRED — the main cornice standing on the eaves reaches "
+        f"{float(projection) * 0.5:.3f} m above it, and a lucarne stands clear of it",
+    )
 
 
 def _shortest_brisis_that_carries_a_lucarne(skirt: float) -> float:
@@ -1957,6 +2006,11 @@ def terminate(
     # from overhanging the terrasson.
     skirt_q = _dormer_skirt()
     skirt = float(skirt_q)
+    # A25: the bottom row of lucarnes stands clear of the cornice below it.
+    _below = [s_ for s_ in grid.storeys if s_.start + s_.width <= grid.built_height + _EPS]
+    _crowned = max(_below, key=lambda s_: s_.start) if _below else None
+    cornice_clear_q = _cornice_clearance(_crowned.width if _crowned else 0.0, site.klass)
+    cornice_clear = float(cornice_clear_q)
     # A8.3: the lucarne fills the band of brisis it stands in, so its face is a
     # question about THIS roof's section rather than a constant — and A12.1:
     # the section's own fold, so a shorter brisis carries a shorter lucarne
@@ -1967,9 +2021,11 @@ def terminate(
     # the whole brisis is the same window drawn twice at two heights. On a
     # one-band comble, and on every row with a whole band above its foot, this
     # is exactly the number the single call used to give.
-    face_q = _dormer_face_height(brisis_h, skirt)
+    _slack0 = max(0.0, brisis_h - _shortest_brisis_that_carries_a_lucarne(skirt))
+    cornice_clear = min(cornice_clear, _slack0)
+    face_q = _dormer_face_height(brisis_h, skirt + cornice_clear)
     face = float(face_q)
-    dormer_top = skirt + face
+    dormer_top = cornice_clear + skirt + face
     band = float(BRISIS_RISE)
     rows = max(1, int(garret_wall / band + _EPS)) if band > 0.0 else 1
 
@@ -2005,9 +2061,19 @@ def terminate(
         n = -1
         for row in range(rows):
             foot = row * band
-            face_q = _dormer_face_height(brisis_h - foot, skirt)
+            # Only as far as this row's brisis can afford: on a shallow comble
+            # the lucarne cannot rise the whole way and a roofer would not
+            # delete it for that. Lifting past the slack drops the row, which
+            # is a blank roof where a window belongs.
+            slack = max(
+                0.0,
+                (brisis_h - foot)
+                - _shortest_brisis_that_carries_a_lucarne(skirt),
+            )
+            lift = min(cornice_clear, slack) if row == 0 else 0.0
+            face_q = _dormer_face_height(brisis_h - foot, skirt + lift)
             face = float(face_q)
-            dormer_top = skirt + face
+            dormer_top = lift + skirt + face
             if foot + dormer_top > brisis_h + _EPS:
                 break  # the band above this one is not a whole room
             # As far forward as the law lets it stand at its own highest point.
@@ -2134,7 +2200,7 @@ def terminate(
                             ),
                             props={
                                 "x": slot.start + (slot.width - width) / 2.0,
-                                "y": eaves + foot + skirt,
+                                "y": eaves + foot + lift + skirt,
                                 "w": width,
                                 "h": face,
                                 # Flush with the slope: how far the roof plane
@@ -2236,7 +2302,7 @@ def terminate(
                         ),
                         props={
                             "x": slot.start + slot.width / 2.0 - width / 2.0,
-                            "y": eaves + foot + skirt,
+                            "y": eaves + foot + lift + skirt,
                             "w": width,
                             "h": face,
                             "form": form,

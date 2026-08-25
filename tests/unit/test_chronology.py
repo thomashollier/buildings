@@ -730,14 +730,30 @@ class TestDalyCalibration:
 
         Asserted as kinds and as behaviour under ``scale_for_class``, not as
         two numbers, because it is the kinds that carry the finding.
+
+        **A26 — the width band is now OPERATOR-SET and this test says so.** The
+        band was 1.04 / 1.20 / 1.30, every bound of it a reading off Daly, and
+        this test asserted the citations said SOURCED. The operator has set the
+        band directly at 1.20 / 1.30 / 1.35, which is not those readings, so
+        the citations no longer claim to be and neither does this test. What is
+        emphatically *unchanged* is the finding the test exists for: the width
+        is still ABSOLUTE, still identical for every class, and the height at
+        the noble floor is still PROPORTIONAL and still a ladder. A different
+        number of the same kind does not touch the distinction.
+
+        The citation is held to a higher standard instead of a lower one: it
+        must say OPERATOR-SET, and it must still name the corpus figure it
+        departed from, so that nobody reads the band as a measurement.
         """
         width = catalogue.opening_window()
         for bound in (width.minimum, width.preferred, width.maximum):
             assert bound.kind is Kind.ABSOLUTE, bound
-            assert "SOURCED" in bound.why and "Daly 1864" in bound.why
+            assert "OPERATOR-SET" in bound.why, bound
+            assert "SOURCED" not in bound.why, bound
+            assert "Daly 1864" in bound.why, bound  # what it departed from
         widths = {k: width.to_slot_spec(k).preferred for k in BuildingClass}
         assert len(set(widths.values())) == 1, widths
-        assert 1.04 <= float(width.preferred) <= 1.30
+        assert 1.20 <= float(width.preferred) <= 1.35
 
         height = catalogue.opening_height_at_the_nobile()
         assert height.kind is Kind.PROPORTIONAL
@@ -780,13 +796,37 @@ class TestDalyCalibration:
             catalogue.door_pedestrian().minimum,
             catalogue.door_pedestrian().preferred,
             catalogue.door_pedestrian().maximum,
-            catalogue.opening_window().minimum,
-            catalogue.opening_window().preferred,
-            catalogue.opening_window().maximum,
             catalogue.lintel_bearing_depth(),
         ]
         for q in promoted:
             assert "SOURCED" in q.why, q
+            assert catalogue.DALY_1864 in q.why, q
+            assert (catalogue.PRINTED in q.why) or (catalogue.SCALE_BAR in q.why), q
+
+    def test_a_quantity_the_operator_overrode_stops_claiming_the_corpus(self):
+        """The other side of the discipline above, and A26's whole obligation.
+
+        ``opening_window``'s three bounds used to be in the list above: each
+        was a reading off Daly and each said SOURCED. The operator has set the
+        band directly at 1.20 / 1.30 / 1.35, which is not what Daly measured —
+        the new minimum is 0.16 m above the narrowest croisée in the corpus and
+        the new maximum 0.05 m above the widest. A citation that went on saying
+        SOURCED would be the most damaging kind of wrong in this codebase: a
+        number carrying borrowed authority.
+
+        So they are held to the opposite requirement. They must NOT say
+        SOURCED, they must say OPERATOR-SET, and they must still name the
+        corpus and the figure they departed from — because "we chose this" is
+        only honest when it is next to "and here is what the evidence said".
+        """
+        overridden = [
+            catalogue.opening_window().minimum,
+            catalogue.opening_window().preferred,
+            catalogue.opening_window().maximum,
+        ]
+        for q in overridden:
+            assert "SOURCED" not in q.why, q
+            assert "OPERATOR-SET" in q.why, q
             assert catalogue.DALY_1864 in q.why, q
             assert (catalogue.PRINTED in q.why) or (catalogue.SCALE_BAR in q.why), q
 
@@ -810,11 +850,36 @@ class TestDalyCalibration:
             catalogue.shop_threshold_height(),
             catalogue.shopfront_fascia_depth(),
             catalogue.carriage_clear_height(),
-            catalogue.carriage_jamb_width(),
         ]
         for q in still_open:
             assert "INFERRED" in q.why, q
             assert "SOURCED" not in q.why, q
+
+    def test_the_carriage_jamb_says_it_is_provisional(self):
+        """A26. ``carriage_jamb_width`` was INFERRED at 0.40 m and is in this
+        territory too — no plate measures a jamb. It is now 0.22 m, and it did
+        not move because anybody measured one: it moved because the A26 bay
+        ceiling of 3.20 m is narrower than the 3.40 m slot 0.40 m produced, so
+        at 0.40 no building with a carriage entrance could be generated at all.
+
+        The value chosen is the one ``dev/HANDOFF.md`` derives from a single
+        plate (39 rue Neuve des Mathurins, a 2.57 m door in a 3.02 m pitch),
+        and HANDOFF is explicit that the reading is unchecked against the other
+        six carriage doors in the corpus. One plate is not a corpus, and a
+        number moved to satisfy an arithmetic constraint is not a measurement.
+
+        So it must say PROVISIONAL, must not claim to be SOURCED, and must name
+        both the constraint that moved it and the single reading behind it.
+        This test is the thing that has to be deleted, deliberately, when
+        somebody does the check.
+        """
+        q = catalogue.carriage_jamb_width()
+        assert float(q) == pytest.approx(0.22)
+        assert "PROVISIONAL" in q.why, q
+        assert "SOURCED" not in q.why, q
+        assert "3.20" in q.why and "3.40" in q.why, q
+        # And the constraint it exists to satisfy actually holds.
+        assert float(catalogue.carriage_slot_width()) <= 3.20 + 1e-9
 
 
 class TestTheCarriageEntranceIsAnEntitlement:

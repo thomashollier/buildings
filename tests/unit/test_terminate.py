@@ -1713,8 +1713,18 @@ def test_a_lucarne_never_stands_where_the_hip_has_already_fallen_below_its_head(
     the hip and nothing is skipped, and the test stopped exercising the defect
     it exists for. That is the correction working, not the guard becoming
     unnecessary: at 10 m the returns still meet before the end bays, and the
-    clipping still fires. The site moved; the assertion did not weaken."""
-    grid, roled, sil, others = run(site(corner=True, street_width=20.0, parcel_width=10.0))
+    clipping still fires. The site moved; the assertion did not weaken.
+
+    **A26 moved it back to 16 m, for the mirror of the same reason.** The bay
+    band came in to 2.00 / 2.60 / 3.20, so a frontage of any given width now
+    carries more and narrower bays. At 10 m that puts every dormer inboard of
+    where the hip has fallen and nothing is skipped again; at 16 m the extra
+    bays reach out far enough that the end ones are clipped, which is the
+    condition this test needs. Third time this site has moved and the reason
+    has been the same every time: the defect lives where the outermost bay
+    meets the hip, and anything that changes the bay grid changes which
+    frontage width puts a bay there. The assertion has never moved."""
+    grid, roled, sil, others = run(site(corner=True, street_width=20.0, parcel_width=16.0))
     roof = kind(others, "roof")[0]
     facade_w = float(roof.props["w"])
     ridge_h = float(roof.props["h"])
