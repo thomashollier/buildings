@@ -1,0 +1,25 @@
+diff --git a/src/buildings/solver/fitting.py b/src/buildings/solver/fitting.py
+index 98a7936..6447140 100644
+--- a/src/buildings/solver/fitting.py
++++ b/src/buildings/solver/fitting.py
+@@ -419,11 +419,15 @@ def _natural_count(
+     avail: float, end: SlotSpec, bay: SlotSpec, *, min_bays: int = 1, max_bays: int = 24
+ ) -> int:
+     """The bay count the ladder starts from: whole preferred bays beside two ends."""
+-    if bay.preferred > EPS:
+-        raw = int(math.floor((avail - 2.0 * end.preferred) / bay.preferred + EPS))
+-    else:
+-        raw = max_bays
+-    return min(max(raw, min_bays), max_bays)
++    if bay.preferred <= EPS:
++        return min(max(max_bays, min_bays), max_bays)
++    run = avail - 2.0 * end.preferred
++    if run <= EPS:
++        return min(max(min_bays, min_bays), max_bays)
++    nearest = int(math.floor(run / bay.preferred + 0.5))
++    while nearest > 1 and run / nearest < bay.minimum - EPS:
++        nearest -= 1
++    return min(max(nearest, min_bays), max_bays)
+ 
+ 
+ def _count_with_run_parity(

@@ -8,6 +8,8 @@ it is held to account.
 
 | Path | What it is |
 |---|---|
+| `HANDOFF.md` | **Start here on a fresh session.** Current state, the one open problem, and how the operator wants to work |
+| `GLOSSARY.md` | The French architectural vocabulary the model is written in, and where each word lives in the code |
 | `PLAN.md` | The execution contract: stages S0–S11, dependencies, and the verification gate each must pass |
 | `CONTRACTS.md` | **The frozen interface contract.** Every agent codes against it; none may change it |
 | `workflows/` | The orchestration scripts, one per build wave |
