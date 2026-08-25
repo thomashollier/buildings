@@ -441,13 +441,22 @@ def entresol_arcade_is_sized_by_the_storey_it_lights(
     sill = float(catalogue.entresol_allege_height())
     # The head stops under the band that crowns the base. An arcade whose
     # arches run up behind their own entablature is an arch drawn through its
-    # own cornice, and the ordinary ``lintel_bearing_depth`` the catalogue
-    # leaves over an opening is the floor structure, not a moulding — so where
-    # the crowning band is deeper than that, the difference comes off the
-    # storey the light is fitted into. ``base_entablature_depth`` is the same
-    # expression the string course itself reads, so the two lines meet.
+    # own cornice, so what must stand over this light IS that entablature —
+    # ``base_entablature_depth``, the same expression the string course reads,
+    # which is how the two lines meet.
+    #
+    # What is subtracted here is only the EXCESS, because ``window_in_slot``
+    # reserves its own share over every opening and this must total the
+    # entablature rather than stack on top of it. **A23 widened that share**
+    # from the bare lintel bearing to the bearing plus the facade's floor band,
+    # so the excess is measured against both — otherwise the entresol pays for
+    # a floor band it already has, and its light loses 0.30 m, which is the
+    # shrunken-window defect A13 exists to have fixed.
     over_the_head = max(
-        0.0, base_entablature_depth(ctx) - float(catalogue.lintel_bearing_depth())
+        0.0,
+        base_entablature_depth(ctx)
+        - float(catalogue.lintel_bearing_depth())
+        - float(catalogue.floor_band_depth()),
     )
     geom = catalogue.window_in_slot(
         ctx.slot_w,

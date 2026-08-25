@@ -145,6 +145,7 @@ __all__ = [
     "window_allege_height",
     "balustrade_child_gap_max",
     "lintel_bearing_depth",
+    "floor_band_depth",
     "minimum_light_height",
     "minimum_light_width",
     "shop_threshold_height",
@@ -645,10 +646,42 @@ def window_allege_height() -> Quantity:
     nobody has to rediscover that it disagrees.
     """
     return Abs(
+        0.50,
+        "INFERRED (A23) -- the lower half of the 1.10 m the corpus median leaves "
+        "for sill and head on a 3.24 m storey. NOT read off one plate: A22 took "
+        "0.30 from 77 bd de Sebastopol, which is at the 91st percentile of the "
+        "corpus for window height and is not typical of it",
+    )
+
+
+def floor_band_depth() -> Quantity:
+    """The moulded band a facade carries at each floor line, ABOVE the bearing.
+
+    **A23.** ``lintel_bearing_depth`` is the lintel stone and the joist ends --
+    what holds the floor up, SOURCED twice at 0.30 m and not in question. It is
+    not the whole of what stands between a window head and the storey above: a
+    Paris facade also runs a moulded band along every floor line, and that band
+    is carried ON the wall in front of the bearing rather than instead of it.
+
+    Reserving only the bearing put every upper window's head 0.30 m under the
+    floor above, with the band crowded into that same 0.30 m. The operator's
+    words for it: "the gap above was non existent and the gap below was too
+    wide."
+
+    INFERRED, and one half of a single inferred split -- see
+    ``window_allege_height`` for the other. What the corpus fixes is the SUM,
+    not the division: at the median light-to-storey ratio (0.661 across 32 upper
+    storeys) a 3.24 m storey leaves 1.10 m for sill and head together. How that
+    divides is not recoverable from the measurements, because the reconstruction
+    can only reach the sill by ASSUMING the head. So the sum is evidence and the
+    split is a reading -- recorded as such rather than dressed as a measurement,
+    which is the mistake A22 made in the other direction.
+    """
+    return Abs(
         0.30,
-        "SOURCED -- 77 bd de Sebastopol, three upper storeys giving 0.30 / 0.33 / "
-        "0.21 m of breast under the light once the SOURCED 0.30 m lintel bearing "
-        "is taken off. The corpus-wide reconstruction is noisier (A22)",
+        "INFERRED (A23) -- the moulded floor band standing in front of the "
+        "structural bearing; the upper half of the 1.10 m the corpus median "
+        "leaves for sill and head together",
     )
 
 
@@ -1153,7 +1186,9 @@ def _fit_height(slot_h: float, sill: float, wanted: float) -> tuple[float, float
     sill, whereas a floor without a lintel over its window is a floor that
     falls down.
     """
-    head_room = max(0.0, slot_h - float(lintel_bearing_depth()))
+    head_room = max(
+        0.0, slot_h - float(lintel_bearing_depth()) - float(floor_band_depth())
+    )
     min_light = float(minimum_light_height())
     sill_eff = min(sill, max(0.0, head_room - min_light))
     height = max(0.0, min(wanted, head_room - sill_eff))
@@ -1258,7 +1293,10 @@ def window_in_slot(
             # opening at ankle height, and the height a body can lean on is
             # ABSOLUTE precisely so that cannot happen. Only to keep it a
             # window at all.
-            head_room = max(0.0, slot_h - float(lintel_bearing_depth()))
+            head_room = max(
+                0.0,
+                slot_h - float(lintel_bearing_depth()) - float(floor_band_depth()),
+            )
             height = min(head_room, floor_w * low)
             width = height / low
             sill_eff = max(0.0, head_room - height)

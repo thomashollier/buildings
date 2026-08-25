@@ -2429,3 +2429,82 @@ Every window on every building. Goldens: all four, in `y`/`h`/`w`/`x`,
 `sill_height`, `pier_width`, `lintel_height` — the openings growing and dropping,
 and their surrounds and railings following. Upper storeys now read 80–81 % light
 against the plate's 78–83 %, with 0.30 m above and 0.30 m below.
+
+---
+
+# Amendment 23 — A22 was calibrated on an outlier, and fixed the wrong edge
+
+Two errors, both mine, caught by the operator asking a question I should have
+asked myself: *"are the windows the correct height with respect to the floor
+height?"*
+
+## A23.1 — the plate A22 trusted is the tallest-windowed building in the corpus
+
+A22 set the *allège* to 0.30 m from 77 bd de Sébastopol. Measured as light height
+over storey height across all 32 upper storeys in the corpus:
+
+```
+median 0.661    IQR 0.609–0.725    range 0.480–0.830
+```
+
+Plate 77's three upper storeys sit at the **88th, 91st and 97th percentile**. It
+is close to the tallest-windowed building Daly measured. A22 calibrated an
+ABSOLUTE on it, and did so in a docstring that already recorded that the
+corpus-wide reconstruction disagreed — which is A13's failure exactly, committed
+one amendment after A18.3 restated the rule against it.
+
+The corpus median implied sill is **0.89 m**, which is within a hair of the 0.90
+that A22 replaced.
+
+## A23.2 — the complaint was about the head, not the sill
+
+The report was: *"the top of the window was too close to the top edge of the
+floor... the gap above was non existent and the gap below was too wide."* Two
+gaps, both wrong, in opposite directions. A22 read only the second half and
+moved the **bottom** down — which, because the light is height-capped, grew the
+window **upward into the very gap the complaint was about**.
+
+What the corpus fixes is the SUM. At the median ratio a 3.24 m storey leaves
+**1.10 m** for sill and head together. We were spending all of it below the light
+and none above:
+
+| | below | light | above | light ÷ storey |
+|---|---:|---:|---:|---:|
+| originally | 0.90 | 2.04 | 0.30 | 0.63 |
+| A22 | 0.30 | 2.62 | 0.31 | **0.81** |
+| **A23** | **0.50** | **2.14** | **0.60** | **0.660** |
+
+## A23.3 — what the head reserve actually is
+
+`lintel_bearing_depth` is the lintel stone and the joist ends — what holds the
+floor up, SOURCED twice at 0.30 m, not in question. It is **not** the whole of
+what stands between a window head and the storey above: a Paris facade also runs
+a moulded band along every floor line, carried in front of the bearing rather
+than instead of it. Reserving only the bearing is what left the head 0.30 m
+under the floor with the band crowded into that same 0.30 m.
+
+**Required.** The reserve over an opening is `lintel_bearing_depth` +
+`floor_band_depth`, composed rather than restated.
+
+**The split is INFERRED and says so.** The corpus fixes the 1.10 m sum; it cannot
+fix the division, because the reconstruction reaches the sill only by *assuming*
+the head. 0.50 below and 0.60 above is a reading of the plates, recorded as one.
+
+## A23.4 — the operator's own test, and the entresol it caught
+
+The specification came back as a ratio marked on a plate: the light against the
+**gap between vertically adjacent windows**. Measured off those marks: **1.70,
+2.32, 1.81**. Ours now:
+
+```
+light 2.14 ÷ gap (0.60 above + 0.50 below) = 1.94
+```
+
+A22 gave 4.3. The original gave 1.70, at the low edge.
+
+Widening the reserve also made the **entresol** pay twice: its rule already
+reserves the crowning entablature and subtracts only the *excess* over what
+`window_in_slot` takes, so a wider generic share stacked on top and cost its
+light 0.30 m — the shrunken-window defect A13 exists to have fixed. The excess is
+now measured against the bearing **and** the band, so the total is the
+entablature, as it always should have been.
