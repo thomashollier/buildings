@@ -13,3 +13,9 @@ dev/logs/**/*.svg
 # either. Regenerate both with dev/harness/sprite_sheet.py. The measurement
 # JSON elsewhere under dev/logs is NOT generated output and stays tracked.
 dev/logs/tiles/sprites.json
+
+# Daly source PDFs — originals kept locally, too large for the tree.
+# The single page that earned its place is committed at
+# dev/reference/sources/; see dev/reference/SOURCES.md for provenance and for
+# why the full volume is not worth its 128 MB.
+/*.pdf

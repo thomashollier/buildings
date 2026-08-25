@@ -1,77 +1,124 @@
-# Where this stands — 2026-08-24
+# Where this stands — 2026-08-25
 
-Read this first on a fresh session, then `dev/GLOSSARY.md` for the vocabulary and
-`dev/CONTRACTS.md` for the binding spec.
+Read this first on a fresh session, then `README.md` for the invariants and the
+construction ladder, `dev/GLOSSARY.md` for vocabulary and `dev/CONTRACTS.md` for
+the binding spec.
 
 ## Repo state
-- HEAD `5c9b7ad`, working tree clean, **1507 tests passing**, all three guards clean.
-- Nothing in flight. Two unapplied patches are parked in `dev/logs/a24-wip/` with a
-  README explaining what each does and why neither landed.
 
-## The one open problem: the facade is under-divided
+**1520 tests passing, 0 failing. All three guards clean. IR verified
+byte-identical over five runs of one site and seed.**
 
-A 14.0 m frontage (House A) currently gets **4 axes** — one carriage door plus three
-windows. The plates say a frontage that wide gets **5**. Everything the operator has
-complained about downstream (piers too fat, rhythm too slack, windows too far apart)
-falls out of that single miscount.
+A24 — "the facade is under-divided" — is **CLOSED**. The two patches that were
+parked in `dev/logs/a24-wip/` are gone; neither was applied, and the README
+there now records why.
 
-Full diagnosis, measurements, the operator's five resolution rules, and the two
-candidate patches: **`dev/logs/a24-wip/README.md`**. That is the live document.
+## What changed, and what it was worth
 
-The short version: `_natural_count` in `src/buildings/solver/fitting.py` floors
-`10.60 / 2.80 = 3.79` to 3. Nearest gives 4, which yields a 2.40 m pitch and a
-pier/window ratio of 1.0 — matching the two Sebastopol plates. Costs ~29 test
-rewrites. Not landed because the operator has not approved it.
+### The bay count is chosen by closeness, not by flooring (A24)
 
-## Two questions left on the table
+`_natural_count` in `src/buildings/solver/fitting.py` used to floor the
+division, which discards up to a whole axis and then forces the ladder to hide
+the remainder. It now walks candidate counts outward from the nearest-filling
+one and takes the first the declared bounds permit.
 
-**1. Is the 3.40 m door universal? No.**
-There are two doors: *porte cochere* 3.40 m (street >= 12 m AND comfortable/grand)
-and *porte pietonne* 2.35 m (everything else, and much commoner). House A gets the
-carriage door because its street is 22 m and its class is comfortable.
+House A — 14.0 m, 22 m street, 1865, comfortable, shop, seed 8 — was the case
+this was raised on. It now solves symmetrically, with the entrance on the centre
+axis and every bay on the preferred pitch:
 
-The 3.40 decomposes as `2.60 clear + 2 x 0.40 jamb`. Those halves are not equally
-sound:
-- **2.60 is SOURCED and near-universal.** Daly measures 7 carriage doors,
-  2.41-2.67; Premiere median 2.567, Deuxieme median 2.575 — two classes agreeing to
-  **0.4%**. There is also a printed dimension on the 119 Champs-Elysees plate.
-  A quantity that steady while everything else scales with money is a genuine
-  absolute: it is about a vehicle, not a purse.
-- **0.40 jamb is INFERRED.** Never measured. At 39 rue Neuve des Mathurins the door
-  is 2.57 in a 3.02 pitch, implying roughly **0.22 m** per jamb — about half what we
-  use. If that holds across the other six, the slot should be nearer **3.05** than
-  3.40, and House A recovers 0.35 m before anything else changes. Unchecked. Cheap
-  to check. Independent of the bay-count problem.
+    pier_end 0.280 | 2.600 | 2.600 | porte cochère 3.040 | 2.600 | 2.600 | pier_end 0.280
+    = 14.000 m, 5 axes
 
-**2. What "corpus pitch" means — asked, answered here.**
-It is the `bay_pitch` field in `dev/reference/daly_measurements.json`, defined there
-as *"mean window-axis to window-axis spacing"*. Provenance:
-- It came from an **earlier automated measuring pass** (`generated: 2026-08-21`,
-  inputs `dev/logs/daly_measure_*.json`), not from anything done by hand in the
-  current sessions, and not from me eyeballing the plates.
-- The four numbers I measured *this* session — window, pier, pitch on plates 77,
-  1, 39, 120 — were done differently: a programmatic pixel scan calibrated against
-  each plate's own stated facade width. Those are in the A24 README.
-- **The axis counts behind `bay_pitch` were never re-verified.** That matters: the
-  operator counted 119 Champs-Elysees independently and got a width 2.5 m off ours.
-  Treat `bay_pitch` as corroborating evidence, not as ground truth, and prefer a
-  count read directly off the plate when the two disagree.
+Where no count is eligible the old floor is returned unchanged, so every width
+that reaches rungs 4–5 solves bit-identically to before.
 
-The record itself is honest about its limits and worth quoting before using it as a
-class signal:
+### The bands were redrawn — OPERATOR-SET, not measured
 
-> `"2.81 / 2.85 / 2.54 m. Deuxieme sits ABOVE Premiere. The class ladder does not
-> exist in this quantity."` — verdict, `bay_pitch.ladder`
+|  | min | preferred | max | was |
+|---|---:|---:|---:|---|
+| bay pitch | 2.00 | 2.60 | 3.20 | 2.70 / 2.80 / 3.40 |
+| window | 1.20 | 1.30 | 1.35 | 1.04 / 1.20 / 1.30 |
 
-So pitch is SOURCED as a corpus-wide range and **INSUFFICIENT** as a per-class
-discriminator. Do not build a class ladder on it.
+Both are **OPERATOR-SET** and their `why` strings say so. They are *not* Daly
+medians and must not be cited as such. The corpus is kept in the docstrings as
+context, not as justification.
+
+A soft `window / pitch = 0.45` target is handed to the solver as the bay's
+`affinity` — a tie-break between counts that are equally far from preferred. It
+never widens a bay on its own account and never makes an arrangement
+infeasible. Note the three ideals cannot all hold: 1.30 / 2.60 = 0.500, so at
+rest the ratio lands at 0.500 and the soft target yields.
+
+### The aspect band floor moved on evidence
+
+`opening_aspect_band` is now **(1.56, 2.00)**, was (1.70, 2.00). The floor moved
+on `opening_aspect_principal` — Deuxième n=10, min 1.56, rated "SOURCED for
+ordering". The ceiling was left alone: nothing was failing against it.
+
+`opening_aspect_uppers` was considered and **rejected as INSUFFICIENT** — the
+file's own note says within-building variation exceeds between-class variation,
+and its 1.14 minimum is one storey of one building.
+
+### The dormers clear the cornice (A25)
+
+The main cornice crowns the eaves and stands *on* that line; lucarnes stood at
+`eaves + skirt`, the plumber's 0.35 m apron and nothing else. The cornice
+reached up through the apron and cut the feet off the dormers. Real on three of
+the four canonical situations.
+
+`_cornice_clearance` in `terminate.py` lifts the **bottom row only** — applying
+it per row spends an already-full brisis and a two-storey garret came back with
+its second storey blind — and is **clamped to available slack**, because
+lifting past it deletes the row entirely.
+
+## Open, and none of it is blocking
+
+**The carriage jamb is PROVISIONAL.** `carriage_jamb_width` is 0.22, marked
+PROVISIONAL in both the docstring and the `why` string, with
+`test_the_carriage_jamb_says_it_is_provisional` existing to be deleted when
+someone settles it. It moved because the 3.40 m slot it produced collides with
+the new 3.20 m pitch ceiling — every carriage building raised `RuntimeError`.
+
+Two ways to settle it, neither taken:
+
+1. **Measure the jambs.** HANDOFF used to call this "cheap to check". It is
+   not. The corpus has door *clear* widths (2.41 / 2.534 / 2.57 / 2.575 / 2.60 /
+   2.619 / 2.672) but **not the slots**, and inferring a slot from the bay pitch
+   gives absurd results including negative jambs. It needs pier-face to
+   pier-face measurement off the porte detail plates.
+2. **Give the entrance its own ceiling.** A10.1 already gave it its own *floor*
+   via `special_lo` — which is why a 2.35 m porte piétonne legitimately sits
+   under the pitch floor. The entrance currently has its own floor and someone
+   else's ceiling. Completing that symmetry needs no new number.
+
+**The class-flat window width has never held.** A9.4 says the width does not
+move with class. That is true of the catalogue's declared band — `scale_for_class`
+really is a no-op on it — and false of what gets drawn. Across a sweep the
+realised width differs between classes on **60 of 60 sites**, before the 2026-08
+changes as well as after. `window_in_slot` narrows an opening that would be
+squat for its storey, class drives storey height, so class drives width. The
+test only ever checked one fixture. Needs its own decision: may width give way
+to aspect at all?
+
+**Piers cannot vary.** `_absorb` returns two scalars, so every end pier is one
+width and every interior pier another. The operator's A24 rules 3 and 4 —
+"symmetrical: piers narrower in the middle" and its inverse — are not
+unimplemented features, they are inexpressible in the current object. The
+primitive that survives non-uniform piers is *axis positions plus one window
+width*, with pitch and pier both derived per interval. `_absorb` is the seam.
+
+**`_BAY_PITCH_MAX` is crossed by the corpus.** 119 Champs-Élysées measures
+3.71 m against the 3.20 ceiling. One plate, recorded rather than acted on.
 
 ## How the operator wants to work
-Stated directly this session, after a stretch where I moved too fast:
-- Explain in plain terms before changing anything. Jargon ("rungs", "invariants")
-  without definition is not communication.
-- Work on **one building at a time**. Current focus is **House A** — 14.0 m wide,
-  11.0 m deep, 22 m street, 1865, comfortable, shop ground floor, seed 8.
-- Measure against the plates rather than against my own prose. Two reviews have
-  already passed a form no plate supports because both compared the render to a
-  written specification instead of to the drawing.
+
+- Explain in plain terms before changing anything.
+- **Generic first.** Do not lock in numbers by building class until a generic,
+  inclusive parameter set works on an average building. The generic ranges must
+  be able to produce *all* classes; class then becomes a bias *within* them, not
+  a separate band. Several bands are still drawn tighter than their evidence —
+  auditing them against `daly_measurements.json`'s own SOURCED / WEAK /
+  INSUFFICIENT ratings is the natural next pass.
+- Measure against the plates, not against prose.
+- Check a quantity's rating before quoting it. That file rates itself, and two
+  numbers were leant on this session that it marks INSUFFICIENT.

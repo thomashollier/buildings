@@ -1,91 +1,76 @@
-# A24 — the pier is too wide (PARKED, not landed)
+# A24 — CLOSED, 2026-08-25
 
-## The complaint
-The wall between two windows (the **pier**) renders wider than it is on the plates.
-Ours: window 1.20 m, pier 1.83 m — the pier is 1.53x the window.
-Daly's: pier runs 1.09x to 1.92x the window, but the *narrow-pitch* buildings sit near 1.1x.
+**The facade was under-divided. It no longer is.** Kept as the record of what
+the problem was and why the two patches parked here were both wrong; the
+patches themselves have been deleted, neither having been applied.
 
-## What the operator specified
-Pier must land between **0.8x and 1.5x** the window. Surplus frontage is resolved by,
-in preference order:
-1. widen or narrow the spacing within that range
-2. add a module (one more bay)
-3. symmetrical: piers narrower in the middle, wider at the ends
-4. inverse: wider in the middle, more crowded at the edges
-5. if a pier still exceeds 1.5x, put something on it (a pilaster / column / panel)
+## What the complaint was
 
-Only (1) and (2) have been attempted. (3), (4), (5) are unimplemented.
+A 14.0 m frontage (House A) carried 4 axes where the plates say 5. The pier
+rendered 1.53x the window against a corpus that runs nearer 1.0-1.2. Everything
+downstream — piers too fat, rhythm too slack, windows too far apart — fell out
+of that single miscount.
 
-Rule 5 makes a **testable prediction**: the plates whose piers exceed 1.5x
-(39 rue Neuve des Mathurins at 1.75x, 120 bd de Sebastopol at 1.92x) should carry
-something on those piers; the ones under (77 bd de Sebastopol 1.09x, 1 bd de
-Sebastopol 1.16x) should not. Nobody has checked this. It is the cheapest next test.
+## The cause
 
-## Root cause
-The window is an ABSOLUTE quantity and the bay is elastic, so every metre of
-frontage slack the solver cannot place elsewhere ends up inside the pier via the
-WIDEN_FILLER rung. The pier has no upper bound of its own.
+`_natural_count` floored `run / bay.preferred`. Flooring discards up to a whole
+axis and then obliges the ladder to hide the remainder. On a 15.0 m frontage
+with a carriage entrance it took 3 axes and inflated every pitch to 3.367 m to
+absorb 2.5 m of slack, where 4 axes sit near the preferred pitch.
 
-## The measurements this rests on
-Taken off four plates, calibrated against each plate's own stated facade width.
+## The fix
 
-| plate | window (glass) | pier | pitch | window / pitch | pier / window |
-|---|---:|---:|---:|---:|---:|
-| 77 bd de Sebastopol  | 1.11 | 1.23 | 2.35 | 0.474 | 1.11 |
-| 1 bd de Sebastopol   | 1.04 | 1.21 | 2.24 | 0.463 | 1.16 |
-| 39 rue Neuve des Mathurins | 1.10 | 1.93 | 3.02 | 0.364 | 1.75 |
-| 120 bd de Sebastopol | 0.91 | 1.75 | 2.68 | 0.340 | 1.92 |
-| **ours (House A)**   | 1.20 | **1.83** | **3.03** | 0.396 | **1.53** |
+The count is now chosen by *closeness* — walk candidates outward from the
+nearest-filling one, take the first the declared bounds permit. Plus a redrawn
+pitch band (2.00 / 2.60 / 3.20, OPERATOR-SET). Neither alone was enough: the
+count change could not give House A its fifth axis while the floor stood at
+2.70, because that arrangement needs 2.550 m.
 
-Note the window measurement is to the **glass**, not to the outside of the stone
-surround. `opening_width_typical` in `daly_measurements.json` includes the surround
-and so reads about 0.15 m wider; do not mix the two.
+House A now solves symmetrically, entrance on the centre axis, every bay on the
+preferred pitch:
 
-## The patches here
-- `pier-ratio-band.patch` — clamps pier/window into the 0.8..1.5 band directly.
-  Treats the symptom. Does not change the bay count, so House A still gets a
-  3.03 m pitch, which no plate of that width shows.
-- `natural-count-nearest.patch` — changes `_natural_count` in
-  `src/buildings/solver/fitting.py` from `floor` to **nearest**, with a guard that
-  steps back down if nearest would push the run below `bay.minimum`.
-  This is the one that addresses the cause. See the note below.
+    pier_end 0.280 | 2.600 | 2.600 | porte cochère 3.040 | 2.600 | 2.600 | pier_end 0.280
+    = 14.000 m, 5 axes
 
-Neither is applied. HEAD is green without them.
+See `README.md` for the ladder and `dev/HANDOFF.md` for what remains open.
 
-## Why `nearest` is probably the real fix
-House A is a 14.0 m frontage. The solver computes 10.60 / 2.80 = 3.79 bays and
-floors it to 3, so the facade carries 4 axes (1 door + 3 windows) at a 3.50 m
-theoretical pitch, resolved down to 3.03 m with the surplus dumped in the piers.
+## The two patches, and why both were wrong
 
-Rounding to nearest gives 4 bays -> **5 axes** -> a 2.40 m pitch -> a 1.20 m window
-against a 1.20 m pier -> **ratio 1.0**, inside the operator's band and matching the
-two Sebastopol frontages measured above.
+**`natural-count-nearest.patch`** — a naive floor→nearest swap. Its own guard
+stepped back down whenever `run / n < bay.minimum`, which reverted it to
+flooring on exactly the cases that mattered. Applied to House A it was a
+**no-op**, and it cost 33 failures and 21 errors for nothing. The README that
+recommended it also had its arithmetic wrong: it computed `10.60 / 2.80 = 3.79`
+having forgotten to subtract the two end piers. The real division is
+`9.90 / 2.80 = 3.54`.
 
-The operator supplied four counts read straight off the plates:
+**`pier-ratio-band.patch`** — clamped pier/window into the 0.8–1.5 band
+directly. Treated the symptom. It did not change the count, so House A kept a
+3.03 m pitch that no plate of that width shows.
 
-| plate | width (m) | axes | implied pitch |
-|---|---:|---:|---:|
-| 119 Champs-Elysees | 12.4 | 4 | 3.10 |
-| 3 rue de la Paix | 16.7 | 7 | 2.39 |
-| 39 rue Neuve des Mathurins | 15.0 | 5 | 3.00 |
-| 1 bd de Sebastopol | 16.8 | 7 | 2.40 |
+## The bracket argument was also wrong
 
-Those bracket House A: 12.4 m -> 4 axes and 15.0 m -> 5 axes, so 14.0 m should
-carry **5**. It currently carries 4. That is the bug, stated without reference to
-any ratio.
+The case for 5 axes rested on interpolating operator-read plate counts:
+12.4 m -> 4 axes and 15.0 m -> 5, so 14.0 m -> 5. The 12.4 m was a misreading of
+119 Champs-Élysées; two independent measurements give 14.86 and 14.93 m.
+Corrected, that anchor becomes 14.86 m -> 4 axes and points the other way.
 
-## Cost of landing it
-About 29 tests fail — they pin which ladder rung fires for a given frontage, and
-changing the starting count changes the rung. They are pinning the old behaviour,
-not an invariant. They need rewriting, not deleting. The three guards
-(`check_ir_is_consumed`, `check_no_period_branching`, `check_renderer_dumb`) are
-untouched by this and must stay clean.
+A wider scan of all 16 elevations shows width does **not** determine axis count:
+frontages of 14.2–15.1 m carry 4, 5, 6 and 7 axes. Five for a 14.0 m frontage is
+well inside what Daly built and is the median for that band, but the plates do
+not force it. See `dev/reference/daly_elevation_scan_2026-08-24.json`.
 
-## Open discrepancy — do not lose this
-The operator reads **119 Champs-Elysees as 12.4 m wide**. Our
-`daly_measurements.json` records **14.93 m** for the same building. That is a 2.5 m
-disagreement and it changes that plate's pitch from 3.10 to 3.49 — which is the
-single widest pitch in the whole corpus and is currently doing real work as the
-upper anchor for `_BAY_PITCH_MAX`. Resolve the width before trusting anything
-derived from it. The other three widths agree to within 0.13 m, so this one looks
-like a genuine error rather than a definitional difference.
+## Rules 3, 4 and 5 remain unimplemented
+
+The operator's resolution order was: (1) adjust spacing, (2) add a module,
+(3) symmetrical — piers narrower in the middle, wider at the ends, (4) inverse,
+(5) if a pier still exceeds 1.5x, put something on it.
+
+Only (1) and (2) exist. **(3) and (4) are not missing features — they are
+inexpressible**: `_absorb` returns one end width and one bay width, so a facade
+whose piers vary cannot be represented at all. That needs the object to become
+*axis positions plus one window width*, with pitch and pier derived per
+interval. `_absorb` is the seam.
+
+Rule (5) makes a testable prediction nobody has checked: the plates whose piers
+exceed 1.5x should carry something on them, and the ones under should not.
