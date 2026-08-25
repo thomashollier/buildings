@@ -89,6 +89,107 @@ Série 1 was initially assumed to be two *maisons à loyer* tomes. It is not:
 ("HOTEL PRIVE… par Mr Botrel"). All 69 were correctly excluded during the
 harvest. The real pool for this project was 83 plates, not 154.
 
+### Originals held locally — `sources/`
+
+`sources/daly1870bd1_2__p0031-0031.pdf` — UB Heidelberg (DWork) scan,
+<https://doi.org/10.11588/diglit.18393#0031>. *L'architecture privée au XIXe
+siècle*, **Sér. 1,2 "Maisons à loyer", Paris, 1870**, sheet **"Exemple A2
+Pl. 1"** = *MAISON À LOYER, Deuxième Classe, Rue de Rivoli N° 88, Élévation,
+par M. Rolland arch.* — the same sheet as
+`images/daly-1864/daly_elevation_29_rue-de-rivoli-88.jpg`, from an independent
+digitisation.
+
+Kept because it earned its place twice:
+
+- **It caught a calibration error.** Rue de Rivoli is one of only two
+  *landscape* sheets in the set. A wider sheet scanned to the same 1920 px gives
+  a smaller px/m, and the measuring pass had applied the portrait figure to
+  both. Reading the rulers on the two independent scans (36.3 px/m here, 43.2
+  px/m on the repo copy) put that beyond doubt and corrected rue de Rivoli from
+  15.1 m to 19.9 m, and Beaumarchais from 18.9 m to 24.9 m. See
+  `daly_elevation_scan_2026-08-24.json`.
+- **It shows the sheet draws the NEIGHBOURS either side of the subject
+  building**, cut at the sheet edge. Facade extent has to be taken at the
+  composition — here the narrow medallion end bays — not at the edge of the
+  drawing. Any automated extent-finder that does not know this will mis-bound
+  such a plate.
+
+**Note the year.** Heidelberg dates this volume **1870**; this repo's image
+folder is named `daly-1864` and `structure.py` cites "Daly 1864" throughout.
+Série 1 did appear in 1864 and this is a volume of that series, so the two are
+probably edition-vs-series years rather than a contradiction — but they should
+not be quoted interchangeably without checking which volume a given plate came
+from.
+
+The full 115-page volume was also obtained (`daly1870bd1_2__z4.pdf`, 128 MB, and
+three lower-resolution siblings). It is **not committed**, but two plates were
+taken from it — see below.
+
+### Which scan is actually sharper — measure the ink, not the page
+
+Page-pixel counts mislead here. The Heidelberg pages are 2118 px wide against
+Polona's 1920, which looks like a 1.10× win, but the Polona scans are **cropped
+tighter to the plate**, so more of their pixels land on the drawing. Comparing
+the *inked drawing width* instead:
+
+| plate | Polona (repo) | Heidelberg z4 | verdict |
+|---|---:|---:|---|
+| rue de Rivoli 88 (landscape) | 1191 px | 2009 px | **1.69× — replaced** |
+| bd Beaumarchais 36-38-40 (landscape) | 1114 px | 1800 px | **1.62× — replaced** |
+| rue Bergère 26 (portrait, control) | 1382 px | 1253 px | **0.91× — kept Polona** |
+
+The two *landscape* elevations were the ones being hurt: a wide sheet squeezed
+into a 1920 px-wide frame leaves the drawing at roughly half the linear
+resolution the portrait sheets get. Heidelberg gives each its own full portrait
+page with the drawing rotated, so the ink lands on ~1.65× more pixels. Those two
+files are now the Heidelberg versions, rotated upright to match the previous
+orientation, with the 152 px Heidelberg watermark bar removed.
+
+**Portrait plates were deliberately not replaced.** On the control the Heidelberg
+copy is measurably *worse*, and there is no reliable automated way to map volume
+pages onto the 78 repo filenames — image correlation matches blank pages, and
+the "Exemple A² Pl. 1" headers are engraved script that OCR cannot read. Swapping
+them wholesale would risk mis-filing the corpus for a gain that is negative
+anyway.
+
+Consequence for measurement: the px/m calibration for those two plates is
+**superseded** — re-read each from its own ruler. The physical figures already
+recorded (width, bay count, ratios) are unaffected.
+
+### The volume's own plate index — and two elevations the harvest missed
+
+Page 12 of the volume is its **"TABLE DES PLANCHES DU TOME DEUXIÈME"**, which
+lists every example by class, address, architect and plate. That index is the
+authority on what this volume contains, and checking the harvest against it
+turned up a real gap.
+
+The volume holds **21 examples carrying 18 elevations** — 4 Première, 13
+Deuxième (lettered A²–N², with no J), 4 Troisième. Three examples have **no
+elevation plate at all**, only plans: **K²** (bd de Sébastopol, 87), **L²**
+(bd de Sébastopol, 70) and **D³** (bd du Prince-Eugène). The harvest held 16 of
+the 18. The two missing were both cases where the harvest took the *plans* and
+not the *elevation*:
+
+| | example | address / architect | Heidelberg |
+|---|---|---|---|
+| **E²** | Deuxième | **Boulevard de Sébastopol, 11**, par M. H. Blondel | `#0055` |
+| **B³** | Troisième | **Grande Rue, 4, à Batignolles**, par M. Bourlier — "Élévation principale et coupe" | `#0101` |
+
+Both are now in `images/daly-1864/` as
+`daly_elevation_h55_boulevard-sebastopol-11.jpg` and
+`daly_elevation_h101_grande-rue-batignolles-4.jpg`. The **`h` prefix marks
+Heidelberg provenance** — they are 2118 px wide from `daly1870bd1_2__z4.pdf`,
+not 1920 px from Polona/Commons like the rest, and the plate numbers in the
+existing filenames are harvest sequence numbers, not Heidelberg page numbers
+(`55` was already taken by `daly_detail_55_…`).
+
+**A number to fix.** The index reads *"grande rue, **4**, à Batignolles"* and so
+does the plate caption. The existing `daly_plan_70_grande-rue-batignolles-1.jpg`
+says **1**. The plan file is misnamed.
+
+**And one for the measuring pass.** `rue Neuve-des-Mathurins, 39` is confirmed as
+**39** by the index — an OCR pass over the plate captions read it as 59.
+
 ---
 
 ## 2. The regulations

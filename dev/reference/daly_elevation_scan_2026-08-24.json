@@ -1,0 +1,213 @@
+{
+ "meta": {
+  "title": "Elevation measurements read off the Daly 1864 plates",
+  "recorded": "2026-08-24",
+  "provenance": "PIXEL-SCAN, calibrated 57.0 px/m",
+  "calibration": "TWO calibrations. Polona/Commons portrait sheets: 57.0 px/m - read directly off plate 03's ruler (56.8) and cross-checked against three operator widths (57.1/56.8/57.8). Heidelberg z4 sheets (rue de Rivoli, Beaumarchais, Sebastopol 11, Batignolles 4): 73.0 px/m - read directly off all four rulers (73.2/73.9/72.5/72.7), all 1:100, and independently corroborated at 72.4 by scaling the single-page Heidelberg PDF. Plate scales are NOT uniform across the volume (some sheets are 1:200), so a plate's own ruler is the only safe source.",
+  "window_convention": "window = the dark glazed opening (GLASS), pier = gap between glazed openings, so window+pier=pitch. Same convention as the A24 table; NOT opening_width_typical, which includes the stone surround and reads ~0.15 m wider.",
+  "caveat": "Bay count is facade_width/period where the overlay was clean; where counted windows and the FFT period disagreed the counted windows were preferred. Read quality per entry.",
+  "source_note": "Provenance checked against an original page supplied by the operator: daly1870bd1_2__p0031-0031.pdf = UB Heidelberg DWork, doi 10.11588/diglit.18393#0031, 'L'architecture privee au XIXe siecle', Ser. 1,2 'Maisons a loyer', Paris, 1870, 'Exemple A2 Pl. 1' = MAISON A LOYER, Deuxieme Classe, Rue de Rivoli No 88, par M. Rolland arch. NOTE: that volume is dated 1870, while this repo's image folder and structure.py docstrings say 'Daly 1864'. Series 1 appeared 1864 and this is a later volume/edition of the same series - worth confirming before citing a year.",
+  "image_provenance": "Most plates are the Polona/Commons scans at 1920 px. The two LANDSCAPE elevations (rue de Rivoli 88, bd Beaumarchais 36-38-40) were replaced on 2026-08-24 with Heidelberg z4 scans: measured on the inked drawing area they are 1.69x and 1.62x larger. Portrait plates were NOT replaced - measured the same way the Heidelberg copy is 0.91x, i.e. WORSE, because the Polona scans are cropped tighter to the plate so more of their pixels land on the drawing. Page-pixel counts (2118 vs 1920) are misleading; compare inked width.",
+  "revision": "2026-08-24 second pass: re-banded the four failed plates, added the two new facades, split Polona/Heidelberg calibration."
+ },
+ "plates": {
+  "03_blvd-sebastopol-77": {
+   "width_m": 14.88,
+   "bays": 6,
+   "pitch_m": 2.48,
+   "win_m": 1.16,
+   "pier_m": 1.21,
+   "pier_over_win": 1.05,
+   "quality": "HIGH",
+   "calibration_px_per_m": 57.0,
+   "note": "tight glass boxes; agrees with A24 pixel scan (1.11)"
+  },
+  "49_champs-elysees-119": {
+   "width_m": 14.86,
+   "bays": 4,
+   "pitch_m": 3.71,
+   "win_m": 1.34,
+   "pier_m": 2.26,
+   "pier_over_win": 1.69,
+   "quality": "HIGH",
+   "calibration_px_per_m": 57.0,
+   "note": "clean; width confirms daly_measurements 14.93 against the 12.4 operator reading"
+  },
+  "52_rue-neuve-des-mathurins-39": {
+   "width_m": 14.95,
+   "bays": 5,
+   "pitch_m": 2.99,
+   "win_m": 1.28,
+   "pier_m": 1.77,
+   "pier_over_win": 1.38,
+   "quality": "HIGH",
+   "calibration_px_per_m": 57.0,
+   "note": "width/bays/pitch match operator exactly (15.0/5/3.00)"
+  },
+  "73_sebastopol-1-deuxieme-classe": {
+   "width_m": 16.84,
+   "bays": 7,
+   "pitch_m": 2.41,
+   "win_m": 1.18,
+   "pier_m": 1.09,
+   "pier_over_win": 0.93,
+   "quality": "HIGH",
+   "calibration_px_per_m": 57.0,
+   "note": "width matches operator 16.8; 7 counted windows match operator's 7 axes (FFT said 8 - rejected)"
+  },
+  "29_rue-de-rivoli-88": {
+   "width_m": 20.0,
+   "bays": 7,
+   "pitch_m": 2.85,
+   "win_m": 1.23,
+   "pier_m": 1.42,
+   "pier_over_win": 1.21,
+   "quality": "HIGH",
+   "calibration_px_per_m": 73.0,
+   "note": "hand-measured on the Heidelberg original against its own ruler; axes at -4.36..12.95 m, entrance central, outer bays are narrow medallion bays. Plate also draws BOTH NEIGHBOURS - extent must be cut at the medallion bays, not the sheet edge"
+  },
+  "25_avenue-imperatrice": {
+   "width_m": 13.47,
+   "bays": 4,
+   "pitch_m": 3.37,
+   "win_m": 1.32,
+   "pier_m": 2.0,
+   "pier_over_win": 1.52,
+   "quality": "GOOD",
+   "calibration_px_per_m": 57.0,
+   "note": "clean glass boxes"
+  },
+  "51_boulevard-sebastopol-120": {
+   "width_m": 17.53,
+   "bays": 6,
+   "pitch_m": 2.92,
+   "win_m": 1.18,
+   "pier_m": 1.58,
+   "pier_over_win": 1.34,
+   "quality": "GOOD",
+   "calibration_px_per_m": 57.0,
+   "note": "clean glass boxes"
+  },
+  "53_boulevard-saint-germain-6": {
+   "width_m": 11.18,
+   "bays": 4,
+   "pitch_m": 2.79,
+   "win_m": 1.1,
+   "pier_m": 1.98,
+   "pier_over_win": 1.81,
+   "quality": "GOOD",
+   "calibration_px_per_m": 57.0,
+   "note": "clean glass boxes"
+  },
+  "40_rue-du-conservatoire-9": {
+   "width_m": 12.46,
+   "bays": 5,
+   "pitch_m": 2.11,
+   "win_m": 1.12,
+   "pier_m": 0.96,
+   "pier_over_win": 0.86,
+   "quality": "GOOD",
+   "calibration_px_per_m": 57.0,
+   "note": "RE-MEASURED: earlier extent clipped the facade to 8.09 m. Hand-set extent x600-1310, window band y1150-1260; 5 clean glass boxes"
+  },
+  "42_boulevard-beaumarchais-36-38-40": {
+   "width_m": 25.3,
+   "bays": 10,
+   "pitch_m": 2.46,
+   "win_m": 1.06,
+   "pier_m": 1.38,
+   "pier_over_win": 1.3,
+   "quality": "GOOD",
+   "calibration_px_per_m": 73.0,
+   "note": "THREE PARCELS on one sheet - 25.3 m is the GROUP, ~8.4 m per house. 10 windows total, matching the 3/4/3 split recorded in dev/logs/daly_measure_troisieme.json. Not a single building; do not use the width as one frontage"
+  },
+  "01_blvd-sebastopol-63": {
+   "width_m": 14.28,
+   "bays": 5,
+   "pitch_m": 2.86,
+   "win_m": 1.65,
+   "pier_m": 1.46,
+   "pier_over_win": 0.88,
+   "quality": "MEDIUM",
+   "calibration_px_per_m": 57.0,
+   "note": "boxes include stone surround; window over-measured so ratio biased low"
+  },
+  "34_rue-bergere-26": {
+   "width_m": 16.79,
+   "bays": 6,
+   "pitch_m": 2.8,
+   "win_m": 1.52,
+   "pier_m": 1.33,
+   "pier_over_win": 0.88,
+   "quality": "MEDIUM",
+   "calibration_px_per_m": 57.0,
+   "note": "ornate surrounds inflate window width"
+  },
+  "50_rue-de-la-paix-3": {
+   "width_m": 16.93,
+   "bays": 6,
+   "pitch_m": 2.82,
+   "win_m": 1.3,
+   "pier_m": 0.98,
+   "pier_over_win": 0.76,
+   "quality": "MEDIUM",
+   "calibration_px_per_m": 57.0,
+   "note": "pediments included; operator counts 7 axes, this pass counts 6"
+  },
+  "75_champs-elysees-125-premiere-classe": {
+   "width_m": 11.4,
+   "bays": 5,
+   "pitch_m": 2.28,
+   "win_m": 1.26,
+   "pier_m": 1.11,
+   "pier_over_win": 0.88,
+   "quality": "MEDIUM",
+   "calibration_px_per_m": 57.0,
+   "note": "clean boxes but facade extent may be clipped"
+  },
+  "74_rue-de-longchamps-troisieme-classe": {
+   "width_m": 12.53,
+   "bays": 5,
+   "pitch_m": 2.51,
+   "win_m": 1.21,
+   "pier_m": 1.2,
+   "pier_over_win": 0.99,
+   "quality": "MEDIUM",
+   "calibration_px_per_m": 57.0,
+   "note": "RE-BANDED onto the window storey (was a cornice); count and pitch now plausible"
+  },
+  "02_blvd-sebastopol-2-4": {
+   "width_m": 16.88,
+   "bays": 5,
+   "pitch_m": 3.38,
+   "win_m": 1.82,
+   "pier_m": 1.4,
+   "pier_over_win": 0.77,
+   "quality": "LOW",
+   "calibration_px_per_m": 57.0,
+   "note": "band sits on balcony ornament; window badly over-measured, ratio unusable"
+  },
+  "h55_boulevard-sebastopol-11": {
+   "width_m": 12.88,
+   "bays": 5,
+   "pitch_m": 2.52,
+   "win_m": 1.47,
+   "pier_m": 1.33,
+   "pier_over_win": 0.91,
+   "quality": "MEDIUM",
+   "calibration_px_per_m": 73.0,
+   "note": "NEW plate (Heidelberg, 73.0 px/m). Width and count usable; boxes include the stone surround so win/pier are soft"
+  },
+  "h101_grande-rue-batignolles-4": {
+   "width_m": 8.08,
+   "bays": 3,
+   "pitch_m": 2.01,
+   "win_m": 1.53,
+   "pier_m": 0.54,
+   "pier_over_win": 0.35,
+   "quality": "LOW",
+   "calibration_px_per_m": 73.0,
+   "note": "NEW plate (Heidelberg, 73.0 px/m). Width and 3-bay count usable; band caught window+pediment so the 0.35 ratio is an artefact, not a measurement"
+  }
+ }
+}

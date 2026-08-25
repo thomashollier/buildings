@@ -1,22 +1,68 @@
 {
-  "meta": {
-    "title": "Axis counts read off the plates by the operator",
-    "recorded": "2026-08-24",
-    "why": "Independent of the automated measuring pass that produced bay_pitch in daly_measurements.json. Where the two disagree, prefer this: it is a count of things visible on the drawing, not a scale-bar inference.",
-    "definition": "axes = vertical compositional divisions across the facade, INCLUDING the entrance axis.",
-    "provenance": "OPERATOR-COUNTED"
+ "meta": {
+  "title": "Axis counts read off the plates by the operator",
+  "recorded": "2026-08-24",
+  "why": "Independent of the automated measuring pass that produced bay_pitch in daly_measurements.json. Where the two disagree, prefer this: it is a count of things visible on the drawing, not a scale-bar inference.",
+  "definition": "axes = vertical compositional divisions across the facade, INCLUDING the entrance axis.",
+  "provenance": "OPERATOR-COUNTED"
+ },
+ "counts": [
+  {
+   "id": "ce119",
+   "plate": "daly_elevation_49_champs-elysees-119.jpg",
+   "facade_width_m": 14.86,
+   "axes": 4,
+   "implied_pitch_m": 3.71,
+   "facade_width_m_as_read_by_operator": 12.4,
+   "width_resolution": "RESOLVED 2026-08-24. The operator read 12.4 m; an independent pixel scan calibrated on the plate's own ruler gives 14.86 m, within 0.07 m of daly_measurements.json's 14.93 m. Two independent measurements agree against the 12.4 reading, so 14.86 is adopted and the operator's figure is retained above for the record. The axis COUNT of 4 is unchanged and was never in dispute."
   },
-  "counts": [
-    {"id": "ce119",  "plate": "daly_elevation_49_champs-elysees-119.jpg",           "facade_width_m": 12.4, "axes": 4, "implied_pitch_m": 3.10},
-    {"id": "paix3",  "plate": "daly_elevation_50_rue-de-la-paix-3.jpg",             "facade_width_m": 16.7, "axes": 7, "implied_pitch_m": 2.39},
-    {"id": "math39", "plate": "daly_elevation_52_rue-neuve-des-mathurins-39.jpg",   "facade_width_m": 15.0, "axes": 5, "implied_pitch_m": 3.00},
-    {"id": "seb1",   "plate": "daly_elevation_73_sebastopol-1-deuxieme-classe.jpg", "facade_width_m": 16.8, "axes": 7, "implied_pitch_m": 2.40}
-  ],
-  "agreement_with_daly_measurements_json": {
-    "paix3":  {"ours": 2.32, "operator": 2.39, "delta": 0.07, "verdict": "agrees"},
-    "math39": {"ours": 3.06, "operator": 3.00, "delta": 0.06, "verdict": "agrees"},
-    "seb1":   {"ours": 2.23, "operator": 2.40, "delta": 0.17, "verdict": "agrees within tolerance"},
-    "ce119":  {"ours": 3.49, "operator": 3.10, "delta": 0.39, "verdict": "DISPUTED — our facade_width is 14.93 m, the operator reads 12.4 m. A 2.5 m disagreement. Our figure is the widest pitch in the corpus and currently anchors _BAY_PITCH_MAX, so resolve this before relying on it."}
+  {
+   "id": "paix3",
+   "plate": "daly_elevation_50_rue-de-la-paix-3.jpg",
+   "facade_width_m": 16.7,
+   "axes": 7,
+   "implied_pitch_m": 2.39
   },
-  "what_this_constrains": "Interpolating the four points brackets a 14.0 m frontage (House A) between 12.4 m -> 4 axes and 15.0 m -> 5 axes, so it should carry 5. It currently carries 4. See dev/logs/a24-wip/README.md."
+  {
+   "id": "math39",
+   "plate": "daly_elevation_52_rue-neuve-des-mathurins-39.jpg",
+   "facade_width_m": 15.0,
+   "axes": 5,
+   "implied_pitch_m": 3.0
+  },
+  {
+   "id": "seb1",
+   "plate": "daly_elevation_73_sebastopol-1-deuxieme-classe.jpg",
+   "facade_width_m": 16.8,
+   "axes": 7,
+   "implied_pitch_m": 2.4
+  }
+ ],
+ "agreement_with_daly_measurements_json": {
+  "paix3": {
+   "ours": 2.32,
+   "operator": 2.39,
+   "delta": 0.07,
+   "verdict": "agrees"
+  },
+  "math39": {
+   "ours": 3.06,
+   "operator": 3.0,
+   "delta": 0.06,
+   "verdict": "agrees"
+  },
+  "seb1": {
+   "ours": 2.23,
+   "operator": 2.4,
+   "delta": 0.17,
+   "verdict": "agrees within tolerance"
+  },
+  "ce119": {
+   "ours": 3.71,
+   "operator": 3.1,
+   "delta": 0.61,
+   "verdict": "RESOLVED - our facade_width stands. Measured 14.86 m against the JSON's 14.93 m; the operator's 12.4 m is superseded. Implied pitch is therefore 3.71 m, the widest in the corpus, and it remains the upper anchor for _BAY_PITCH_MAX - note it now EXCEEDS that bound (3.40)."
+  }
+ },
+ "what_this_constrains": "SUPERSEDED. The original claim - that interpolating these four points brackets a 14.0 m frontage between 12.4 m -> 4 axes and 15.0 m -> 5 axes, so House A should carry 5 - rests on the 12.4 m width now shown to be wrong. Corrected, that anchor becomes 14.86 m -> 4 axes, which points the other way. The wider scan of all 16 plates shows width does NOT determine axis count: frontages of 14.2-15.1 m carry 4, 5, 6 and 7 axes (119 Champs-Elysees 14.86->4, 63 bd de Sebastopol 14.23->5, 39 Mathurins 14.95->5, 77 bd de Sebastopol 14.88->6, 88 rue de Rivoli 20.0->7). Five axes for a 14.0 m frontage is well inside what Daly built and is the median for that width band, but the plates do not force it. See daly_elevation_scan_2026-08-24.json."
 }
