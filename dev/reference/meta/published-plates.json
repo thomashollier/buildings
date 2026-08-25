@@ -110,6 +110,85 @@
       "period": "EARLY \u2014 classical, reads pre-Haussmann. A candidate anchor for the far side of the 1859 r\u00e8glement, which the register has nothing for.",
       "shows": "Elevation, section AND plans on one sheet, with a scale.",
       "quality": "good"
+    },
+    {
+      "file": "images/published-plates/1866_maison-boulevard-haussmann_sedille.jpg",
+      "title": "Maison, boulevard Haussmann \u2014 fa\u00e7ade",
+      "architect": "J. et P. S\u00e9dille",
+      "year": "1866 (printed on the sheet)",
+      "period": "SECOND EMPIRE \u2014 two years after Daly's 1864 corpus, under the same 1859 reglement.",
+      "publication": "A. L\u00e9vy, r. de Seine 29; Ch. Chardon a\u00een\u00e9 imp.; A. Normand direx.",
+      "shows": "Full coloured fa\u00e7ade: rusticated base with a carriage arch, four storeys, mansard with segmental lucarnes, individual garde-corps at every window and a balcon filant.",
+      "why_it_matters": "The closest sheet in date to the Daly corpus from a DIFFERENT publisher. Coloured, so it also carries joinery and ironwork tone, which Daly's engravings do not.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/1879_pl7_maison-avenue-de-lopera_destailleur.jpg",
+      "title": "Maison, avenue de l'Op\u00e9ra \u2014 fa\u00e7ade",
+      "architect": "M. Destailleur",
+      "year": "1879 (ANN\u00c9E 1879, PL. 7, printed on the sheet)",
+      "period": "THIRD REPUBLIC, pre-Alphand \u2014 inside the 1859 regime.",
+      "publication": "Imp. Lemercier et Cie; Martel sc.",
+      "shows": "Avenue frontage: continuous glazed commercial ground floor, five storeys, oeil-de-boeuf lucarnes in the mansard, balcons filants.",
+      "why_it_matters": "Carries a printed SCALE BAR, so it is measurable. Fills 1879, between the 1866 sheet and 1885.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/1885_pl37_maison-21-boulevard-saint-germain_boussard.jpg",
+      "title": "Maison \u00e0 Paris, boulevard Saint-Germain 21 \u2014 \u00e9l\u00e9vation sur rue",
+      "architect": "M. J. Boussard",
+      "year": "1885 (ANN\u00c9E 1885, PL. 37, printed on the sheet)",
+      "period": "THIRD REPUBLIC, ONE YEAR AFTER the Alphand decree of 23 July 1884.",
+      "publication": "Imp. Lemercier & Cie; Hibon sc.",
+      "shows": "A rich boulevard frontage with a deep glazed ground floor, caryatid-flanked entrance and a heavily modelled upper facade.",
+      "why_it_matters": "Carries a printed SCALE BAR, so it is measurable. TWO THINGS. It is on boulevard Saint-Germain, where Daly measures no. 6 \u2014 same street, twenty-one years apart. And it is by the SAME ARCHITECT as the 1881 rue de Rennes sheet in this family: Boussard at 1881 and again at 1885, on either side of the Alphand decree. That is a natural control for the H83/H87 discontinuity \u2014 one hand, one city, one rule changed between them.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/1891_pl10_maison-avenue-friedland_hubaine.jpg",
+      "title": "Maison, avenue Friedland \u00e0 Paris \u2014 fa\u00e7ade",
+      "architect": "M. Hubaine",
+      "year": "1891 (Moniteur des Architectes, Ann\u00e9e 1891, PL. 10)",
+      "period": "THIRD REPUBLIC, post-Alphand.",
+      "publication": "Moniteur des Architectes; Alice Sulpis sc.",
+      "shows": "Coloured fa\u00e7ade, a grand avenue building with a heavily sculpted centre bay and a carriage entrance.",
+      "why_it_matters": "Coloured, and by a woman engraver (Alice Sulpis) \u2014 worth noting because the register's attributions are otherwise uniformly male.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/calliat_maison-avenue-des-champs-elysees_duval.jpg",
+      "title": "Maison, avenue des Champs-\u00c9lys\u00e9es",
+      "architect": "Duval",
+      "year": "not printed on the sheet",
+      "period": "NOT ESTABLISHED \u2014 the drawing convention reads Second Empire but that is a judgement, not a date.",
+      "publication": "dessin\u00e9 et publi\u00e9 par V. Calliat, architecte; grav\u00e9 par Hibon; Paris, chez B. Bance \u00e9diteur, rue Croix-des-Petits-Champs 23",
+      "shows": "Wide Champs-\u00c9lys\u00e9es frontage, arcaded ground floor, five storeys.",
+      "why_it_matters": "Carries a printed SCALE BAR, so it is measurable. Calliat's own publication \u2014 a third publisher independent of both Daly and the Moniteur.",
+      "quality": "good"
+    },
+    {
+      "file": "images/published-plates/maison-angle-rue-vivienne-boulevard.jpg",
+      "title": "\u00c9l\u00e9vation de la maison \u00e0 l'angle de la rue Vivienne et du boulevard \u2014 plan sur le boulevard",
+      "architect": "not established",
+      "year": "not printed on the sheet",
+      "period": "NOT ESTABLISHED.",
+      "publication": "a drawn survey sheet, not an engraving; carries a red collection stamp",
+      "shows": "A CORNER building drawn along its whole boulevard elevation \u2014 the pan coup\u00e9 condition, at length.",
+      "why_it_matters": "The register's corner evidence is otherwise one 340px thumbnail. This shows a corner's full run.",
+      "quality": "partial",
+      "limits": "Faint, and no scale bar located."
+    },
+    {
+      "file": "images/published-plates/survey_elevation-with-dimension-lines.jpg",
+      "title": "Measured elevation with dimension lines (unidentified)",
+      "architect": "not established",
+      "year": "not printed on the sheet",
+      "period": "NOT ESTABLISHED.",
+      "publication": "a measured survey drawing, not a published plate",
+      "shows": "An elevation with DIMENSION LINES and callouts drawn on it, and shopfront details dimensioned below.",
+      "why_it_matters": "Potentially the most useful of the batch if the callouts can be read at higher resolution \u2014 dimensioned drawings are what the sill question needs. Unidentified as it stands.",
+      "quality": "partial",
+      "open_question": "Can the dimension callouts be read? Not legible at this resolution."
     }
   ],
   "crawl": {

@@ -182,6 +182,35 @@ dates, which is the only way to tell a Daly **convention** apart from a Paris
 | **rue de Rennes** — "ANNÉE 1881, PL. 58", Maurage sc., arch. BOUSSARD (partial reading) | Dated **1881** and carries a scale bar: the only sheet in the register that is both dated and measurable outside 1864, and it lands in the long gap between the 1859 règlement and Alphand. |
 | **avenue Duquesne** — A. Lévy éditeur, V.2 pl. 36; E. Japhet *del.*, arch. P. Vigouroux | A *maison de rapport de petits appartements* with a **printed total cost** (80 897 f 75, terrain excluded) and a **vertical section strip** showing every floor slab. The only direct evidence of what a programme cost, against a corpus drawn from a luxury journal. |
 
+### The dated run
+
+The operator then supplied seven more sheets by hand, and these are the ones that
+change what the register can do. Four carry a **printed year** and a **scale
+bar**:
+
+| year | building | architect |
+|---:|---|---|
+| **1866** | boulevard Haussmann | J. et P. Sédille |
+| **1879** | avenue de l'Opéra | Destailleur |
+| **1881** | rue de Rennes | Boussard |
+| **1885** | boulevard Saint-Germain 21 | **J. Boussard** |
+| 1891 | avenue Friedland | Hubaine |
+
+Daly was one year. This is a run from 1866 to 1891, measurable throughout.
+
+**The pair worth noticing: Boussard at 1881 and again at 1885** — the same
+architect either side of the *Décret du 23 juillet 1884*. The generator's own
+1884 hinge (presets `H83` / `H87`) holds street, parcel, class, programme and
+seed fixed and moves only the year; this is the same experiment run by a real
+architect in the real city, and it is the closest thing to a control the corpus
+has ever offered. The 1885 sheet is also on boulevard Saint-Germain, where Daly
+measures no. 6 — same street, twenty-one years apart.
+
+One sheet in the batch is a **measured survey drawing with dimension lines and
+callouts**, unidentified and not legible at the resolution available. If those
+callouts can be read it is worth more than the rest together, because a
+dimensioned drawing is exactly what the open sill question needs.
+
 ### On the archimaps crawl
 
 `archimaps.tumblr.com/search/paris` was walked 15 pages deep, 223 posts, rate
