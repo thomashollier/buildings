@@ -257,6 +257,21 @@ def _comble_of(sil):
     return [(i, y - eaves) for i, y in sil.props["points"] if y > eaves + 1e-9]
 
 
+def _apron_of(*nodes) -> float:
+    """The lucarne apron this comble was solved with, off its own trace.
+
+    **A30.** The apron is the deeper of the plumber's zinc (0.35 m) and the
+    cornice standing on the same eaves, and the cornice is a fraction of the
+    storey it crowns — so it is not a constant and these tests may not write
+    one. ``terminate`` states it on the trace for exactly this reason.
+    """
+    for node in nodes:
+        for entry in (node.trace or ()):
+            if entry.inputs and "lucarne_apron" in entry.inputs:
+                return float(entry.inputs["lucarne_apron"])
+    raise AssertionError("no lucarne_apron on the trace — A30 stopped stating it")
+
+
 def test_the_fold_is_where_the_terrasson_reaches_the_ridge():
     """A12.1 on the canonical case, with the answer it replaced named.
 
@@ -282,17 +297,38 @@ def test_the_fold_is_where_the_terrasson_reaches_the_ridge():
     assert roof.props["h"] == pytest.approx(3.20, abs=0.005)
     assert roof.props["h"] == pytest.approx(grid.comble_height, abs=1e-9)
 
-    # Two segments: brisis to the fold, terrasson to the ridge at mid-depth.
-    assert len(comble) == 2
-    (fold_inset, fold_h), (ridge_inset, ridge_h) = comble
+    # **A30 — on this section the LUCARNE floor now binds, not the ridge.**
+    # The fold may not drop below the shortest brisis that carries a lucarne,
+    # and A30 corrected the first term of that sum: the apron under a lucarne
+    # is the deeper of the plumber's zinc and the cornice crowning the same
+    # eaves, not the zinc alone. Here that is 0.502 m rather than 0.350 m, so
+    # the floor rises from 1.900 to 2.052 m — above the 1.904 m at which the
+    # terrasson would have met the ridge — and the fold stops on the floor.
+    #
+    # The terrasson therefore tops out just short of mid-depth and leaves a
+    # deck. That is A12.1's own third rule doing what it says, not the defect
+    # A12.1 removed: the deck it removed was 3.69 m of a 8.0 m half-depth, and
+    # this one is 0.55 m. The assertion below pins the difference rather than
+    # merely allowing a deck.
+    apron = _apron_of(sil, roof)
+    assert len(comble) == 3
+    (fold_inset, fold_h), (reach_inset, reach_h), (ridge_inset, ridge_h) = comble
     assert ridge_h == pytest.approx(grid.comble_height, abs=1e-9)
-    assert ridge_inset == pytest.approx(8.0, abs=1e-9), "the terrasson stopped short"
-    assert fold_h == pytest.approx(1.904, abs=0.005)
-    assert fold_h / ridge_h == pytest.approx(0.595, abs=0.005)
+    assert reach_h == pytest.approx(grid.comble_height, abs=1e-9)
+    assert ridge_inset == pytest.approx(8.0, abs=1e-9)
+    assert fold_h == pytest.approx(apron + 1.30 + 0.25, abs=1e-6), (
+        "the fold sits on the shortest brisis that carries a lucarne, "
+        "measured with the apron A30 corrected"
+    )
+    assert fold_h == pytest.approx(2.052, abs=0.005)
+    assert fold_h / ridge_h == pytest.approx(0.641, abs=0.005)
+    # The deck is the small one, not the slab A12.1 was raised on.
+    assert 8.0 - reach_inset == pytest.approx(0.546, abs=0.01)
+    assert 8.0 - reach_inset < 1.0, "the 3.69 m of flat zinc must not return"
 
     # ...and the answer this replaced, so a regression to it reads as one.
     assert grid.brisis_height / grid.comble_height == pytest.approx(0.906, abs=0.005)
-    assert fold_h < grid.brisis_height - 0.9
+    assert fold_h < grid.brisis_height - 0.8
 
     # The fold slid DOWN the envelope; it did not leave it.
     assert fold_inset == pytest.approx(env.setback_at(fold_h), abs=1e-12)
@@ -300,13 +336,13 @@ def test_the_fold_is_where_the_terrasson_reaches_the_ridge():
     # Both slopes, as a consumer reads them.
     assert math.degrees(math.atan2(fold_h, fold_inset)) == pytest.approx(45.0, abs=0.01)
     terrasson = math.degrees(
-        math.atan2(ridge_h - fold_h, ridge_inset - fold_inset)
+        math.atan2(reach_h - fold_h, reach_inset - fold_inset)
     )
     assert terrasson == pytest.approx(12.0, abs=0.01)
     assert roof.props["lower_angle_deg"] == pytest.approx(45.0, abs=0.01)
     assert roof.props["upper_angle_deg"] == pytest.approx(12.0, abs=0.01)
     assert roof.props["break_pct"] == pytest.approx(fold_h / ridge_h, abs=1e-12)
-    assert roof.props["has_terrasse"] is False
+    assert roof.props["has_terrasse"] is True  # A30: the small deck above
     assert Silhouette(sil.props["points"]).within(env)
 
 
@@ -382,8 +418,16 @@ def test_the_lucarne_comes_down_with_the_brisis():
         )
     # It is the FOLD it fills, not the garret wall: on the wall it would be
     # a metre taller, and a metre out of the roof.
-    assert dormers[0].props["h"] == pytest.approx(fold - 0.35 - 0.25, abs=0.005)
-    assert dormers[0].props["h"] < grid.brisis_height - 0.35 - 0.25 - 0.9
+    #
+    # **A30: less the APRON, not less the plumber's zinc.** The zinc is
+    # 0.35 m and a constant; the apron is the deeper of it and the cornice
+    # crowning the same eaves, which is a fraction of a class-scaled storey.
+    # Writing 0.35 here pinned a building whose cornice happened to be
+    # shallower than its zinc.
+    apron = _apron_of(sil, roof)
+    assert apron >= 0.35
+    assert dormers[0].props["h"] == pytest.approx(fold - apron - 0.25, abs=0.005)
+    assert dormers[0].props["h"] < grid.brisis_height - apron - 0.25 - 0.8
 
 
 def test_a_parcel_deep_enough_keeps_the_terrasse_it_earns():
@@ -400,8 +444,11 @@ def test_a_parcel_deep_enough_keeps_the_terrasse_it_earns():
     fold = roof.props["h"] * roof.props["break_pct"]
     assert roof.props["has_terrasse"] is True
     assert roof.props["ridge_setback"] < 22.0 / 2.0 - 1.0
-    # The fold stopped at the shortest brisis with a window in it...
-    assert fold == pytest.approx(0.35 + 1.30 + 0.25, abs=1e-6)
+    # The fold stopped at the shortest brisis with a window in it — measured
+    # with A30's apron, the deeper of the plumber's zinc and the cornice, so
+    # this is no longer 0.35 + 1.30 + 0.25.
+    apron = _apron_of(sil, roof)
+    assert fold == pytest.approx(apron + 1.30 + 0.25, abs=1e-6)
     assert fold < grid.brisis_height - 0.5
     # ...and the window is still there.
     assert kind(others, "dormer")

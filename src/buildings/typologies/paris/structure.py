@@ -2845,16 +2845,67 @@ def solve_structure(site: SiteContext, datums: BlockDatums | None = None) -> Gri
     # itself was resolved in 2a, before either budget was filled.
     entrance_q = _entrance_slot_width_quantity(entrance)
     entrance_w = float(entrance_q)
-    entrance_spec = SlotSpec(
+
+    # **A27 — an entrance is an opening in an ordinary bay, like a window is.**
+    #
+    # ``entrance_w`` is the clear width the body or the vehicle needs plus the
+    # jamb its head lands on either side. That is a *structural minimum* — the
+    # narrowest this slot may be — and it used to be handed to the solver as
+    # the slot's width, full stop: FIXED, rigid, exactly ``entrance_w`` and not
+    # a millimetre more. Which made the entrance the one rigid element in an
+    # elastic run, and produced the thing backwards: on a 14.40 m frontage the
+    # bays came out at 2.638 m and the door slot at 2.350 m, so the masonry
+    # between the door and its neighbour was 0.969 m against 1.338 m between
+    # two windows. The wall carrying the biggest hole in the facade, at the
+    # storey where the whole building's load arrives, was the THINNEST wall on
+    # the frontage. Nobody chose that; it is what a rigid slot sitting in an
+    # elastic run does.
+    #
+    # So the entrance is offered to the solver as a member of the repeating
+    # pool: a bay like any other, standing at a named place, carrying a wider
+    # opening. It takes the frontage's own pitch, and the masonry beside it
+    # then differs from the masonry between two windows by exactly what the two
+    # OPENINGS differ by — which is a real difference and the right one, since
+    # a 1.75 m hole in a 2.60 m bay does leave less wall than a 1.30 m one.
+    #
+    # ``entrance_w`` keeps its whole meaning as the slot's ``minimum``. Where
+    # the frontage's pitch is under it — a carriage arch is 3.04 m and the
+    # pitch is 2.60 m, so this is the porte cochère's ordinary case — the
+    # solver refuses, and the fallback below gives the entrance a module of its
+    # own at exactly the width it always had. **The exception is conditioned on
+    # WIDTH, not on being a door**, which is what the D6 guard's own words ask
+    # for: "a fixed slot WIDER than a bay is carried up every storey and costs
+    # the building a window on every floor". A door narrower than a bay has no
+    # such problem and should not pay that price.
+    #
+    # The maximum is the bay's own: above the pavement this column is an
+    # ordinary window column, so whatever ceiling the rhythm has is its ceiling
+    # too. ``max()`` guards both bounds against a band that does not bracket
+    # the door, which the two tripwires below refuse outright anyway.
+    entrance_in_rhythm = SlotSpec(
+        entrance.kind,
+        SlotKind.REPEATING,
+        entrance_w,
+        max(bay_pref, entrance_w),
+        max(bay_hi, entrance_w),
+    )
+    entrance_own_bay = SlotSpec(
         entrance.kind, SlotKind.FIXED, entrance_w, entrance_w, entrance_w, rigid=True
     )
 
-    # **D6, asserted (A9.2).** The entrance slot is FIXED and stands in the bay
-    # run for the full height of the facade, so a slot wider than a bay may be
-    # is a bay the building does not get — paid for by the classes that have
-    # a carriage entrance, which is to say by the grand ones. It was 3.80 m
-    # against a 3.40 m maximum and cost exactly that: 4 openings on a 16 m
-    # frontage where a modest building got 5.
+    # **D6, asserted (A9.2).** The entrance slot stands in the bay run for the
+    # full height of the facade, so a slot wider than a bay may be is a bay the
+    # building does not get — paid for by the classes that have a carriage
+    # entrance, which is to say by the grand ones. It was 3.80 m against a
+    # 3.40 m maximum and cost exactly that: 4 openings on a 16 m frontage where
+    # a modest building got 5.
+    #
+    # A27 sharpened what this guard is *for* without weakening it. It is the
+    # ceiling on the FALLBACK — on the entrance that takes a module of its own
+    # because the rhythm will not hold it — and that is precisely the case D6
+    # was always about, since an entrance inside the rhythm is by construction
+    # no wider than a bay and can cost nothing. So this now bounds exactly the
+    # arrangement it describes, and the arithmetic it checks is unchanged.
     #
     # The relation this asserts is that the widest entrance this typology can
     # place still fits inside the band the masonry states, so the column over
@@ -2942,18 +2993,35 @@ def solve_structure(site: SiteContext, datums: BlockDatums | None = None) -> Gri
     n_bays_guess = max(1, round(avail / bay_pref)) if bay_pref > 0.0 else 1
     bay_result = None
     placement_why = ""
+    entrance_in_the_rhythm = True
     for _ in range(4):
         hint, placement_why = _entrance_index_hint(n_bays_guess)
-        bay_result = solve(
-            site.parcel_width,
-            end=end_spec,
-            bay=bay_spec,
-            special=special_spec,
-            fixed=((hint, entrance_spec),),
-            central_feature=False,
-            min_bays=min_bays,
-            max_bays=40,
-        )
+        # In rhythm first, and a module of its own only where that is refused.
+        # The order is the rule: an entrance is an opening in an ordinary bay
+        # UNLESS it is too wide to fit one. Both calls are the same solve with
+        # the same hint and the same bands — only the entrance's declared kind
+        # differs — so the frontage that ends up in the second branch is
+        # exactly the frontage whose pitch cannot hold the door, and it solves
+        # there precisely as it always did.
+        for spec, in_rhythm in ((entrance_in_rhythm, True), (entrance_own_bay, False)):
+            try:
+                bay_result = solve(
+                    site.parcel_width,
+                    end=end_spec,
+                    bay=bay_spec,
+                    special=special_spec,
+                    fixed=((hint, spec),),
+                    central_feature=False,
+                    min_bays=min_bays,
+                    max_bays=40,
+                )
+            except FitInfeasible:
+                if in_rhythm:
+                    continue  # the pitch cannot hold the door: give it its own bay
+                raise
+            entrance_in_the_rhythm = in_rhythm
+            break
+        assert bay_result is not None
         n_bays_solved = sum(1 for s in bay_result.slots if s.name == "bay")
         if n_bays_solved == n_bays_guess:
             break
@@ -2963,6 +3031,30 @@ def solve_structure(site: SiteContext, datums: BlockDatums | None = None) -> Gri
         f"{entrance.kind}: {entrance_w:.2f} m of frontage — the clear opening plus the "
         f"jamb its head lands on either side ({entrance_q.why}). {placement_why}"
     )
+    # A27, in the account because it is the one thing about this frontage a
+    # reader will want explained: whether the door is in step with the windows
+    # or standing in a bay of its own, and which of the two it is is a fact
+    # about the door's width against this frontage's pitch, nothing else.
+    _door_slot = next(s for s in bay_result.slots if s.name in catalogue.ENTRANCE_SLOT_NAMES)
+    if entrance_in_the_rhythm:
+        account.append(
+            f"the entrance stands IN the rhythm: its slot came out at "
+            f"{_door_slot.width:.3f} m, the frontage's own pitch, because "
+            f"{entrance_w:.2f} m — the opening plus a jamb either side — fits inside "
+            "it. An entrance is an opening in an ordinary bay exactly as a window is, "
+            "and the masonry beside it is then thinner than the masonry between two "
+            "windows by exactly half what the two openings differ by, which is the "
+            "only difference there should be (A27)"
+        )
+    else:
+        account.append(
+            f"the entrance takes a bay of its OWN, {_door_slot.width:.3f} m wide against "
+            f"the rhythm around it: {entrance_w:.2f} m of opening and jambs will not go "
+            "inside this frontage's pitch. This is the exception, and it is conditioned "
+            "on width rather than on the slot being a door — a slot wider than a bay is "
+            "carried up every storey and costs the building a window on every floor, "
+            "which a narrower one does not (A27, D6)"
+        )
     # **A10.2, in the account rather than only in a comment.** The one thing on
     # this frontage that costs the building axes is the door it has, and a
     # trade that real is worth saying out loud in the artefact that records

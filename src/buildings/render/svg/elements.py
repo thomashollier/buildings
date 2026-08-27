@@ -81,8 +81,6 @@ def draw_bay_background(canvas: Canvas, x: float, y: float, w: float, h: float) 
 # Openings
 # ---------------------------------------------------------------------------
 
-_HEAD_MARGIN = 0.06  # metres of frame reveal around the glass
-
 
 def _arch_points(x0: float, x1: float, y_spring: float, rise: float, steps: int = 16):
     cx = (x0 + x1) / 2.0
@@ -179,14 +177,18 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
             )
         return
 
-    # ``_HEAD_MARGIN`` — a fixed frame reveal, the glass sitting a few
-    # centimetres back of the masonry reveal. This is the one margin left for
-    # the renderer to invent, and it no longer stands in for the pier: it is a
-    # constant, not a fraction of ``w``, so it does not grow with the opening
-    # the way the old 10%-of-bay margin did.
-    reveal = min(_HEAD_MARGIN, w * 0.3, h * 0.3)
-    body_x = x + reveal
-    body_w = max(0.0, w - 2 * reveal)
+    # A28: the glass fills the opening. There used to be a ``_HEAD_MARGIN`` of
+    # 0.06 m here — "the one margin left for the renderer to invent" — set in
+    # from all four masonry reveals, so a 1.300 m opening drew 1.180 m of blue
+    # and the facade measured 0.120 m narrower than the catalogue's own
+    # ABSOLUTE says a croisée is. 1.300 m is the MASONRY OPENING (Daly's
+    # measured quantity, and SOURCED), the IR states that rectangle, and a
+    # renderer that quietly keeps a tenth of it is deciding the width of a
+    # window — which is the one thing this file may not do. The frame is drawn
+    # by the stroke on the body and by the sash bars, not by a hole in the
+    # geometry.
+    body_x = x
+    body_w = w
     # A14.1: where the IR states how far the head rises, that IS the head's
     # depth — a round arch turned on the opening's own span rises half of it,
     # which is what the word "round" means, and the figure travels stated
@@ -325,11 +327,14 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         canvas.line(cx, body_bot, cx, body_top, _C["door_dark"], 1.4)
         return
 
-    body_bot = y + reveal
-    body_top = y + h - (head_h if head_form in ("round", "segmental") else reveal)
+    # A28: vertically too. The reveal was applied on all four sides, so the
+    # glass lost 0.120 m of height as well as of width; the light now runs
+    # from the stated sill to the stated head.
+    body_bot = y
+    body_top = y + h - (head_h if head_form in ("round", "segmental") else 0.0)
     body_top = max(body_bot, body_top)
     canvas.rect(body_x, body_bot, body_w, body_top - body_bot, _C["window"], stroke=_C["window_frame"], stroke_w=0.8)
-    springing = _draw_head(canvas, body_x, y + h - reveal, body_w, head_h, head_form, _C["window"])
+    springing = _draw_head(canvas, body_x, y + h, body_w, head_h, head_form, _C["window"])
     mid_x = body_x + body_w / 2.0
     canvas.line(mid_x, body_bot, mid_x, springing, _C["window_frame"], 0.6)
     transom_y = body_bot + (springing - body_bot) * 0.62

@@ -853,14 +853,31 @@ def _sweep_sites():
     #
     # Measured, so that the shares are chosen and not guessed: 480 buildings
     # over 6-26 m give 0 special columns; 480 over 4.5-26 m give 15; 960 over
-    # 4.0-26 m give 49; and 480 with this 45 % narrow share give 62, clearing
+    # 4.0-26 m give 49; and 480 with a 45 % narrow share gave 62, clearing
     # every threshold below with margin and without the sweep getting slower.
     # Same discipline as at A8.6: widen the sweep, never lower the thresholds.
-    for _ in range(480):
+    #
+    # **A27 widened it once more, for the third time and the same cause.** The
+    # entrance now stands IN the repeating pool and takes the frontage's own
+    # pitch, so the leftover it used to leave beside itself — 2.35 m of door in
+    # a run of 2.6 m bays left 0.25 m of slack every time — is gone, and with
+    # it a share of the narrow specials that slack used to buy. Measured, the
+    # 480 / 45 % sweep fell from 62 special columns to 34, under the threshold
+    # of 50 below. The property those tests assert never wavered: the longest
+    # run of identical storeys in a special column stayed at 2 throughout,
+    # which is the thing under test. Only the sample fell.
+    #
+    # So: 720 sites at a 60 % narrow share, measured at 69 special columns.
+    # 480 / 65 % gives 55, which clears 50 by too little to be worth having;
+    # 960 / 45 % gives 62 and costs twice the runtime. This choice also leaves
+    # 288 wide-band sites against the 264 the sweep drew before, so the two
+    # rule-coverage tests that share this generator sample the ordinary end of
+    # the range no more thinly than they did.
+    for _ in range(720):
         yield SiteContext(
             street_width=rnd.uniform(6.0, 32.0),
             parcel_width=(
-                rnd.uniform(4.0, 7.0) if rnd.random() < 0.45
+                rnd.uniform(4.0, 7.0) if rnd.random() < 0.60
                 else rnd.uniform(6.0, 26.0)
             ),
             parcel_depth=rnd.uniform(8.0, 25.0),
@@ -1635,7 +1652,7 @@ def test_the_lucarne_count_is_the_comble_s_own_and_never_the_class_s():
     classes on one parcel with one door get the same roofscape, exactly, not
     "give or take one".
     """
-    buckets: dict[tuple[float, float, bool, str], set[int]] = {}
+    buckets: dict[tuple[float, float, bool, str], dict[BuildingClass, int]] = {}
     for parcel in (10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0):
         for street in (10.0, 20.0, 30.0):
             for corner in (False, True):
@@ -1650,16 +1667,52 @@ def test_the_lucarne_count_is_the_comble_s_own_and_never_the_class_s():
                             klass=klass, ground=ground, corner=corner,
                         )
                         key = (parcel, street, corner, door, ground)
-                        buckets.setdefault(key, set()).add(count)
+                        buckets.setdefault(key, {})[klass] = count
     assert buckets
-    for (parcel, street, corner, door, ground), counts in sorted(
+    ladder = list(BuildingClass)
+    for (parcel, street, corner, door, ground), by_class in sorted(
         buckets.items(), key=lambda kv: (kv[0][0], kv[0][1], kv[0][2], kv[0][3], kv[0][4].value)
     ):
-        assert len(counts) == 1, (
+        counts = set(by_class.values())
+        if not corner:
+            assert len(counts) == 1, (
+                f"a {parcel:.0f} m frontage on a {street:.0f} m street "
+                f"(mid-block, {door}, {ground.value}) carries "
+                f"{sorted(counts)} lucarnes depending on class — a comble is floor, "
+                "not show, and class must not appear in its roofscape"
+            )
+            continue
+        # **A30 — the hipped corner is the one exemption, and it is geometry
+        # rather than show.** A lucarne's apron is the deeper of the plumber's
+        # zinc and the cornice standing on the same eaves
+        # (``terminate._lucarne_apron``); a cornice is
+        # ``_CORNICE_FRACTION x the storey it crowns``, and storey heights are
+        # class-scaled, so a grander building's lucarne sets its foot higher.
+        # Mid-block that costs nothing. On a hip the roof surface falls away
+        # toward the returns, so a foot set higher genuinely runs out of roof
+        # on the outer bays and those lucarnes are not drawn.
+        #
+        # That is the comble answering to the FACADE's real height, which is
+        # what "floor, not show" permits — the alternative was to let the
+        # cornice go on cutting the lucarnes (H83 overlapped by 0.152 m) or to
+        # spend ``_DORMER_FACE_MINIMUM``, a window an adult has to see out of
+        # standing. Measured at the time of writing: 7 of 182 buckets split,
+        # every one a corner, always by exactly 2.
+        #
+        # The residual claim is the one A9.1 actually cared about, and it is
+        # asserted rather than skipped: **the roofscape never grows as the
+        # building gets grander.** The original defect was a 16 m frontage
+        # reading 5 / 5 / 4 / 4 down the ladder — the modest building with the
+        # biggest roofscape. A deeper cornice can only ever take lucarnes off
+        # a hip, never add them.
+        seen = [by_class[k] for k in ladder if k in by_class]
+        assert seen == sorted(seen, reverse=True), (
             f"a {parcel:.0f} m frontage on a {street:.0f} m street "
-            f"({'corner' if corner else 'mid-block'}, {door}, {ground.value}) carries "
-            f"{sorted(counts)} lucarnes depending on class — a comble is floor, "
-            "not show, and class must not appear in its roofscape"
+            f"(corner, {door}, {ground.value}) carries {seen} lucarnes down the "
+            f"class ladder {[k.name for k in ladder if k in by_class]} — on a hip "
+            "the count may fall as the cornice deepens, but it must never RISE: "
+            "that is A9.1's original defect, the modest building with the "
+            "biggest roofscape"
         )
 
     # The exact case A9.1 names, which used to read 5 / 5 / 4 / 4.

@@ -684,18 +684,38 @@ def test_an_opening_is_a_tall_rectangle_and_the_noble_floor_gets_the_tallest():
     never be taller for its width than a Paris opening gets. The floor of the
     band is what an opening *wants*, and a storey too short to give it wins —
     which is why the assertion below is on the ordering, not on the value.
+
+    **A28 made the paragraph above true of the code.** It has always said the
+    floor is a want and that a short storey wins, and it then asserted the
+    floor as though it were a bound — which held only because
+    ``catalogue.window_in_slot`` bought it by narrowing the window
+    (``width = height / low``). The width is ABSOLUTE and no longer gives way,
+    so a short storey now yields a squatter opening and the realised aspect may
+    legitimately sit under 1.56. The floor assertion is therefore replaced,
+    not deleted, by the three claims it was standing in for: an opening is
+    taller than it is wide, it shortens as it leaves the noble floor, and it
+    does all of that at ONE width.
     """
-    low, high = catalogue.opening_aspect_band()
+    _low, high = catalogue.opening_aspect_band()
     heights = []
+    widths = []
     for rank in range(0, 5):
         _, vals = _window_geometry(rank_from_principal=rank, slot_h=6.0)
         aspect = vals["opening_height"] / vals["opening_width"]
         assert aspect <= high + 1e-9, f"rank {rank}: {aspect:.2f} is taller than 1:{high}"
-        assert aspect >= low - 1e-9, f"rank {rank}: {aspect:.2f} is squatter than 1:{low}"
+        assert aspect > 1.0, (
+            f"rank {rank}: aspect {aspect:.2f} — a Paris opening is not a square, "
+            f"however short the storey carrying it"
+        )
         heights.append(vals["opening_height"])
+        widths.append(vals["opening_width"])
     assert heights[0] == max(heights), "the noble floor's opening is not the tallest"
     assert heights == sorted(heights, reverse=True), (
         f"openings do not shorten as they move up from the noble floor: {heights}"
+    )
+    # A28: rank shortens the opening, and does nothing whatever to its width.
+    assert len({round(w, 9) for w in widths}) == 1, (
+        f"the window WIDTH moved with the storey's rank, and it is ABSOLUTE: {widths}"
     )
 
 
@@ -751,19 +771,33 @@ def test_the_openings_of_one_facade_stay_centred_and_never_widen_going_up():
     identical from the first floor to the cornice, with only the heights
     changing, and the cost of that was 94 % of upper openings below
     ``catalogue.opening_aspect_band``'s stated floor — a wall of squares. The
-    proportion is what carries the reading, so where a storey is too short to
-    give it the WIDTH comes in.
+    proportion is what carries the reading, so where a storey was too short to
+    give it the WIDTH came in.
 
-    What must still hold, and is what "the jambs line up" was really about:
+    **A28 repealed that half of A8.4, and this test is rewritten because it
+    pinned it.** The version below asserted ``low <= ht / w <= high`` on the
+    realised rectangle, which is exactly the invariant A28 removes: the width
+    is ABSOLUTE, ``opening_window`` says it may not move with the class, and
+    moving with the STOREY is the same defect wearing another name. Storey
+    heights fall as a facade rises, so the old rule tapered a real three-axis
+    frontage 1.210 / 1.076 / 0.962 / 0.962 against a declared 1.300. A short
+    storey now yields a squatter window, which is a fact about the storey
+    rather than a reason to shrink the light.
+
+    The "never widen going up" claim survives in its strongest form: the
+    widths do not merely fail to grow, they do not move at all. What must
+    hold, and is what "the jambs line up" was always about:
 
     * every opening is centred on its bay, so the vertical axis of the facade
       is the same line on every storey;
-    * the widths are *monotonic* going up — an opening never grows over the
-      one below it — so the jambs step inward toward the cornice rather than
-      wandering;
-    * and every one of them is inside the band.
+    * every opening is the SAME width — the ABSOLUTE ``opening_window`` asks
+      for — however short the storey carrying it, so the jambs run dead
+      straight from the first floor to the cornice;
+    * every one is still taller than it is wide, and none is taller for its
+      width than the band's ceiling, which A28 did not touch.
     """
-    low, high = catalogue.opening_aspect_band()
+    _low, high = catalogue.opening_aspect_band()
+    wanted_w = float(catalogue.opening_window().preferred)
     seen = []
     for r, h in ((0, 3.6), (1, 3.3), (2, 3.0), (3, 2.8)):
         ctx, vals = _window_geometry(rank_from_principal=r, slot_h=h)
@@ -771,9 +805,13 @@ def test_the_openings_of_one_facade_stay_centred_and_never_widen_going_up():
         ht = vals["opening_height"]
         seen.append(w)
         assert vals["opening_offset_x"] == pytest.approx((ctx.slot_w - w) / 2.0, abs=1e-9)
-        assert low - 1e-6 <= ht / w <= high + 1e-6, (r, w, ht, ht / w)
-    assert seen == sorted(seen, reverse=True), (
-        f"a window widened over the one below it: {seen}"
+        assert w == pytest.approx(wanted_w, abs=1e-9), (
+            f"rank {r} on a {h} m storey: the storey moved an ABSOLUTE width — "
+            f"{w:.4f} m against the {wanted_w:.4f} m the catalogue declares"
+        )
+        assert 1.0 < ht / w <= high + 1e-6, (r, w, ht, ht / w)
+    assert len({round(w, 9) for w in seen}) == 1, (
+        f"the window width moved between storeys of one facade: {seen}"
     )
 
 
@@ -2360,3 +2398,111 @@ def test_the_tall_pedestrian_arch_is_shorter_than_the_tall_carriage_arch():
     # The carriage arch is the one A15.4 says is already right, and it stays
     # inside the band Daly's own two tall carriage arches make (5.00-7.30 m).
     assert 5.00 <= carriage.clear_height <= 7.30, carriage.clear_height
+
+
+# ---------------------------------------------------------------------------
+# A29 — the entresol is not on the facade's aspect ladder
+#
+# Operator: "the dormer and entresol windows don't have the same window aspect
+# ratio restrictions. Entresol treatments take all sorts of shapes and sizes."
+#
+# The entresol used to ask ``aspect_for_rank`` for a proportion and get 2.000
+# back — the principal floor's own figure — and was saved only by its short
+# storey clipping the answer. This pins the difference between *squat by
+# accident* and *free to be squat*: move the band, and the facade windows must
+# move while the entresol must not.
+# ---------------------------------------------------------------------------
+
+
+def _lights_by_role(site):
+    """Every drawn light in one building, split into entresol and facade."""
+    from buildings.typologies.paris.generate import generate
+
+    building, _ = generate(site)
+    seen: list = []
+
+    def walk(node):
+        seen.append(node)
+        for child in getattr(node, "children", ()) or ():
+            walk(child)
+
+    walk(building)
+    entresol, facade = [], []
+    for node in seen:
+        if node.kind != "opening" or node.props.get("h", 0.0) <= 0.0:
+            continue
+        if node.props.get("opening_type") != "window":
+            continue
+        bucket = entresol if "entresol" in str(node.trace) else facade
+        bucket.append((round(node.props["w"], 6), round(node.props["h"], 6)))
+    return sorted(entresol), sorted(facade)
+
+
+_A29_SITE = SiteContext(
+    street_width=22.0, parcel_width=14.0, parcel_depth=14.0, year=1865,
+    klass=BuildingClass.COMFORTABLE, ground=GroundProgramme.SHOP, seed=8,
+)
+
+
+def test_the_entresol_does_not_ask_for_the_aspect_of_the_taller_windows(monkeypatch):
+    """Move the aspect band; the facade follows it and the entresol does not.
+
+    This is the whole of A29 as a falsifiable claim. The band is what
+    ``aspect_for_rank`` reads, so a caller *on* the ladder cannot ignore a
+    change to it and a caller *off* the ladder cannot notice one.
+    """
+    before_entresol, before_facade = _lights_by_role(_A29_SITE)
+    assert before_entresol, "fixture must actually have an entresol light"
+    assert before_facade, "fixture must actually have facade windows"
+
+    # A band the facade cannot possibly realise the same way: squat, and far
+    # from the shipped (1.56, 2.00).
+    monkeypatch.setattr(catalogue, "opening_aspect_band", lambda: (0.90, 1.10))
+    after_entresol, after_facade = _lights_by_role(_A29_SITE)
+
+    assert after_facade != before_facade, (
+        "the facade windows read the aspect band through aspect_for_rank; "
+        "if moving the band does not move them, this test has stopped "
+        "testing anything"
+    )
+    assert after_entresol == before_entresol, (
+        "the entresol asked the aspect band how tall to be. It is sized by "
+        "the storey it lights (catalogue.light_head_room), not by the "
+        f"proportion of the windows above it. {before_entresol} -> {after_entresol}"
+    )
+
+
+def test_the_entresol_light_is_the_storey_it_lights():
+    """It fills its storey: head room less the low allège, and nothing else.
+
+    The positive half of the rule. Above, the entresol merely fails to notice
+    the band; here it is the storey — and only the storey — that sets it.
+    """
+    entresol, _ = _lights_by_role(_A29_SITE)
+    assert entresol
+    height = entresol[0][1]
+    assert height > 0.0
+    # Not the facade's want. The old code asked for the nobile height scaled
+    # by 2.000/2.000 — i.e. the nobile outright — and would have taken it had
+    # the storey allowed.
+    nobile = float(
+        catalogue.scale_for_class(
+            catalogue.opening_height_at_the_nobile(), _A29_SITE.klass
+        )
+    )
+    assert height < nobile, (
+        "an entresol light that reaches the noble floor's height is the "
+        "A29 defect returning"
+    )
+
+
+def test_window_in_slot_wants_exactly_one_of_aspect_or_height():
+    """Neither, or both, is a caller that has not decided which rule it is on."""
+    common = dict(slot_w=2.6, slot_h=3.0, klass=BuildingClass.COMFORTABLE, sill=0.5)
+    with pytest.raises(ValueError, match="exactly one"):
+        catalogue.window_in_slot(**common)
+    with pytest.raises(ValueError, match="exactly one"):
+        catalogue.window_in_slot(**common, wanted_aspect=2.0, wanted_height=2.0)
+    # ...and either alone is fine.
+    assert catalogue.window_in_slot(**common, wanted_aspect=2.0).height > 0
+    assert catalogue.window_in_slot(**common, wanted_height=1.8).height > 0

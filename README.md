@@ -142,6 +142,21 @@ and *that ordering is the solver*:
 entrance must admit a carriage, and stretching a doorway to make the arithmetic
 work is the move that destroys scale.
 
+**An entrance is an opening in an ordinary axis, exactly like a window.** The
+ABSOLUTE quantity is the *clear opening* — the body or the vehicle that has to
+pass — not the strip of frontage around it. So a slot the solver is told to
+place at an index may be declared a member of the repeating pool: it takes one
+of the modules, at the pitch, and the masonry beside it then differs from the
+masonry between two windows by exactly what the two openings differ by. The
+opening plus a jamb either side is that slot's **minimum**, and where the pitch
+falls under it the solver refuses and the caller re-solves with the slot given a
+module of its own. That is the only exception, and it is conditioned on
+**width** rather than on the slot being a door: at the 2.00–3.20 m band a
+pedestrian door needs 2.35 m and effectively never triggers it, a carriage arch
+needs 3.04 m and usually does. Before this, the entrance was the one rigid
+element in an elastic run, and the wall next to the biggest hole in the facade
+came out *thinner* than the wall between two windows.
+
 Two placements are deliberate. `INSERT_SPECIAL` sits *below* `ADD_MODULE` and is
 tried first: five good axes plus one narrow one reads better than six squeezed
 ones, so the leftover is treated as architecturally meaningful rather than as

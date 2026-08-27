@@ -83,12 +83,38 @@ things exist to make that loop workable:
   the width some ratio would rather it had — which is consulted only to
   separate arrangements the real rule leaves tied.
 
-Two absorbers the brief anticipates are **not** supported yet and would each
-need a real change rather than a parameter: an entrance permitted to take some
-of the slack (``fixed`` slots are placed at ``preferred``, full stop, and
-``_assemble`` enforces it), and bays that vary symmetrically across the run —
-narrower in the middle, wider at the ends, or the inverse. Both would attach at
-``_absorb``, which is the one place that decides where slack goes.
+**A positioned slot may be a member of the repeating pool.** ``fixed`` names
+*where* a slot stands; it does not, on its own, say the slot stands outside the
+rhythm. Which of those two it is, is the slot's own ``kind``:
+
+* ``SlotKind.FIXED`` — the slot is reserved off the budget at ``preferred``
+  before anything is divided, and never absorbs. This is for a positioned
+  element genuinely too big for the rhythm to hold, whose width the run must
+  work around.
+* ``SlotKind.REPEATING`` — the slot **is** one of the modules. It occupies one
+  place in the run at its index hint, it counts toward the module count, and it
+  comes out at the same width every other module does. Its own
+  ``[minimum, maximum]`` still bind, so a rhythm too narrow to hold it is
+  refused rather than quietly delivered, and the caller is free to answer that
+  refusal by re-solving with the slot declared FIXED instead — which is exactly
+  "this one module has to grow".
+
+That distinction is the whole of it, and note what it is *not*: it is not a
+statement about what the slot is for. A positioned slot narrow enough to live
+inside the rhythm should be in the rhythm, and only a slot the rhythm cannot
+hold earns a module of its own. Nothing here knows or cares which is which; the
+caller declares a kind and the arithmetic follows from it.
+
+There is no iteration involved and none is needed. A pooled slot is a module,
+so ``N`` modules beside two ends fill the budget by the same division they
+always did — the circularity a caller might expect, where the module width
+depends on the pooled slot's width and the pooled slot's width depends on the
+module width, does not arise because the two are the same number.
+
+One absorber the brief anticipates is still **not** supported and would need a
+real change rather than a parameter: bays that vary symmetrically across the
+run — narrower in the middle, wider at the ends, or the inverse. It would
+attach at ``_absorb``, which is the one place that decides where slack goes.
 
 Two interpretations this file had to make, because the frozen contract exposes
 no separate "filler" slot and no placement rule for fixed slots:
@@ -99,9 +125,10 @@ no separate "filler" slot and no placement rule for fixed slots:
   ``bay.maximum``; this module only decides how much of that latitude the pier
   can plausibly account for on its own.
 * ``fixed`` slots are *inserted into* the run rather than substituted for a bay:
-  ``index_hint`` is the number of bays standing to the left of the fixed slot.
-  A porte cochere therefore sits between two half-piers exactly as a bay does,
-  and the centreline arithmetic of the remaining run is untouched.
+  ``index_hint`` is the number of **ordinary bays** standing to the left of the
+  positioned slot. A porte cochere therefore sits between two half-piers exactly
+  as a bay does, and the centreline arithmetic of the remaining run is
+  untouched.
 """
 
 from __future__ import annotations
@@ -137,7 +164,8 @@ FILLER_SHARE = 0.5
 # caller may legitimately reuse one spec in two positions.
 _END = "end"
 _BAY = "bay"
-_FIXED = "fixed"
+_FIXED = "fixed"  # positioned, reserved off the budget, outside the rhythm
+_POOLED = "pooled"  # positioned, but a member of the rhythm: takes the bay width
 _SPECIAL = "special"
 
 
@@ -153,7 +181,12 @@ class FitInfeasible(ValueError):
 
 class SlotKind(Enum):
     FIXED = "fixed"  # exactly `preferred`; never absorbs (use for ABSOLUTE)
-    REPEATING = "repeating"  # the bay; count may change
+    #: A member of the rhythm. As the ``bay`` argument it is the module whose
+    #: count may change; as a ``fixed`` entry it is a module that has been given
+    #: a *place* in the run, and it comes out at the module width like any
+    #: other. Same meaning in both positions — "this is one of the repeats" —
+    #: which is why one kind serves both.
+    REPEATING = "repeating"
     FLEXIBLE = "flexible"  # filler and ends; absorbs first
 
 
@@ -356,19 +389,39 @@ def _special_side(fixed: Sequence[tuple[int, SlotSpec]], n_bays: int) -> str:
     return "right" if mean < n_bays / 2.0 else "left"
 
 
-def _order_run(
-    n_bays: int, bay: SlotSpec, fixed: Sequence[tuple[int, SlotSpec]]
-) -> list[tuple[str, SlotSpec]]:
-    """The interior run: bays with the fixed slots interleaved.
+def _is_pooled(spec: SlotSpec) -> bool:
+    """True when a positioned slot is a member of the rhythm rather than beside it.
 
-    ``index_hint`` is read as the number of bays standing to the left of the
-    fixed slot, so hint 0 puts it first and hint ``n_bays`` puts it last.
+    Stated once, as a function, because four places need the same answer and a
+    solver where the count chooser and the assembler disagreed about whether an
+    element is a module would be very hard to read backwards from.
     """
+    return spec.kind is SlotKind.REPEATING
+
+
+def _order_run(
+    n_modules: int, bay: SlotSpec, fixed: Sequence[tuple[int, SlotSpec]]
+) -> list[tuple[str, SlotSpec]]:
+    """The interior run: modules with the positioned slots interleaved.
+
+    ``n_modules`` counts every element that comes out at the module width,
+    which includes any positioned slot declared REPEATING — those occupy one of
+    the modules rather than standing beside them, so the ordinary bays this
+    lays down are ``n_modules`` less the number of pooled slots.
+
+    ``index_hint`` is read as the number of **ordinary bays** standing to the
+    left of the positioned slot, so hint 0 puts it first and a hint at or past
+    the bay count puts it last. Counting only ordinary bays keeps the hint
+    meaning one thing whichever kind the caller declared, so a caller may
+    re-solve with the other kind and the same hint and get the same placement.
+    """
+    n_bays = n_modules - sum(1 for _h, s in fixed if _is_pooled(s))
     keyed: list[tuple[int, int, str, SlotSpec]] = [
-        (i, 1, _BAY, bay) for i in range(n_bays)
+        (i, 1, _BAY, bay) for i in range(max(n_bays, 0))
     ]
     for hint, spec in fixed:
-        keyed.append((min(max(int(hint), 0), n_bays), 0, _FIXED, spec))
+        role = _POOLED if _is_pooled(spec) else _FIXED
+        keyed.append((min(max(int(hint), 0), max(n_bays, 0)), 0, role, spec))
     keyed.sort(key=lambda t: (t[0], t[1]))  # stable: equal hints keep input order
     return [(role, spec) for _, _, role, spec in keyed]
 
@@ -440,6 +493,13 @@ def _assemble(
 ) -> tuple[tuple[PlacedSlot, ...], float, tuple[tuple[str, float], ...]]:
     """Turn chosen widths into placed slots, then close the float gap exactly.
 
+    Width is assigned by **role**, and the roles are the whole of the geometry:
+    the two ends take ``end_w``, every module takes ``bay_w`` — including a
+    positioned slot the caller declared REPEATING, which is what makes it a
+    member of the rhythm rather than an interruption in it — a special takes
+    ``special_w``, and a reserved positioned slot takes the ``preferred`` it
+    reserved.
+
     The residual gap is float noise (order 1e-16), not a design decision, so it
     lands on an elastic slot and never on a pinned one — a pinned slot emerging
     at anything other than ``preferred`` is precisely the failure this solver
@@ -450,7 +510,7 @@ def _assemble(
     for role, spec in specs:
         if role == _END:
             widths.append(end_w)
-        elif role == _BAY:
+        elif role in (_BAY, _POOLED):
             widths.append(bay_w)
         elif role == _SPECIAL:
             widths.append(special_w)
@@ -482,16 +542,32 @@ def _assemble(
     # Bounds are re-checked on the assembled result rather than trusted from the
     # arithmetic that produced it, so no future change to the ladder can quietly
     # emit an out-of-range slot.
-    for slot, (_role, spec) in zip(slots, specs):
+    for slot, (role, spec) in zip(slots, specs):
         if spec.pinned and abs(slot.width - spec.preferred) > EPS:
             raise FitInfeasible(
                 f"rigid slot {spec.name!r} would emerge at {slot.width}, "
                 f"not {spec.preferred}"
             )
         if slot.width < spec.minimum - EPS or slot.width > spec.maximum + EPS:
+            # A pooled slot out of its own band is the one case here that has a
+            # named remedy rather than being a dead end: the rhythm this run
+            # settled on is not one this module can be a member of, so it has
+            # to stop being a member and take a module of its own. That is a
+            # decision about the composition, so it is the caller's to take —
+            # by re-solving with the slot declared FIXED — and saying so is the
+            # difference between a refusal and a refusal one can act on.
+            remedy = (
+                (
+                    f"; {spec.name!r} is positioned IN the repeating pool, and this "
+                    f"rhythm is one it cannot be a member of. Re-solve with it "
+                    "declared SlotKind.FIXED to give it a module of its own"
+                )
+                if role == _POOLED
+                else ""
+            )
             raise FitInfeasible(
                 f"slot {spec.name!r} at {slot.width} outside "
-                f"[{spec.minimum}, {spec.maximum}]"
+                f"[{spec.minimum}, {spec.maximum}]{remedy}"
             )
 
     residual = abs(budget - math.fsum(s.width for s in slots))
@@ -855,6 +931,29 @@ def solve(
     the caller with the caller's own seeded RNG and arrives here as an ordered
     list, which is a decision already taken rather than one to be taken.
 
+    ``fixed`` places a slot at an index; the slot's own ``kind`` says whether it
+    stands **in** the rhythm or beside it. A ``SlotKind.REPEATING`` entry is one
+    of the modules — it reserves nothing, it counts toward the module count, and
+    it comes out at the module width, so a run of them is one pitch throughout.
+    A ``SlotKind.FIXED`` entry is reserved off the budget at ``preferred`` and
+    the rhythm divides what is left. The first is the right declaration for a
+    positioned element the rhythm can hold; the second for one it cannot.
+
+    A pooled slot's own ``[minimum, maximum]`` still bind. Where the rhythm this
+    budget settles on falls outside them, the solve is **refused** rather than
+    delivered out of band, and the answer to that refusal is a *composition*
+    decision the caller owns: re-solve with the slot declared FIXED and it gets
+    a module of its own, wider than the rest. That is deliberately not decided
+    here. Whether an element too big for the rhythm should break the rhythm or
+    the rhythm should open up for it is a question about the thing being built,
+    and this module does not know what is being built.
+
+    ``min_bays`` and ``max_bays`` bound the **ordinary** bays — the anonymous
+    repeats — so they mean the same thing whichever kind a positioned slot is
+    declared, and a caller may re-solve with the other kind without rewriting
+    them. ``min_bays=0`` therefore admits a run consisting of nothing but the
+    positioned slots.
+
     Read ``FitResult.strain`` to find out whether the answer was comfortable.
     A caller that gets back a strained composition and wants to try a different
     absorber — wider ends, another special, an entrance permitted to take some
@@ -869,20 +968,52 @@ def solve(
     if bay.kind is not SlotKind.REPEATING:
         raise ValueError(f"bay slot {bay.name!r} must be SlotKind.REPEATING")
     fixed = tuple(fixed)
+    for _hint, spec in fixed:
+        if _is_pooled(spec) and spec.rigid:
+            # Contradictory: pooling a slot is exactly saying its width is the
+            # rhythm's to set, and ``rigid`` is exactly saying nothing may set
+            # it. Caught here rather than allowed to surface as a bounds
+            # failure in ``_assemble`` on some frontage far from the call.
+            raise ValueError(
+                f"positioned slot {spec.name!r} is REPEATING and rigid=True: a member "
+                "of the repeating pool takes the module width, which a rigid slot by "
+                "definition never does. Declare it SlotKind.FIXED to keep it rigid, or "
+                "drop rigid to let it join the rhythm"
+            )
     specials: tuple[SlotSpec, ...] = (
         () if special is None
         else (special,) if isinstance(special, SlotSpec)
         else tuple(special)
     )
 
-    reserved = math.fsum(spec.preferred for _, spec in fixed)
+    # Positioned slots split two ways, and the split is the slot's own `kind`.
+    # A pooled one IS a module: it reserves nothing, it counts toward the module
+    # count, and it comes out at the module width. A reserved one stands beside
+    # the rhythm and is taken off the budget before anything is divided.
+    n_pooled = sum(1 for _h, s in fixed if _is_pooled(s))
+    n_reserved = len(fixed) - n_pooled
+    reserved = math.fsum(spec.preferred for _, spec in fixed if not _is_pooled(spec))
     avail = budget - reserved
 
+    # Counts inside this function are **module** counts — every element that
+    # comes out at the bay width, pooled positioned slots included — because
+    # that is the number the arithmetic is about. The caller's `min_bays` and
+    # `max_bays` bound the ORDINARY bays, so the two differ by exactly the
+    # number of pooled slots and are converted once, here.
+    lo_modules = min_bays + n_pooled
+    hi_modules = max_bays + n_pooled
+
     account: list[str] = [f"budget {budget:.4f} m"]
-    if fixed:
+    if n_reserved:
         account.append(
-            f"{len(fixed)} fixed slot(s) reserve {reserved:.4f} m at exactly their "
+            f"{n_reserved} fixed slot(s) reserve {reserved:.4f} m at exactly their "
             "preferred width — absolute, so they never absorb"
+        )
+    if n_pooled:
+        account.append(
+            f"{n_pooled} positioned slot(s) stand IN the repeating pool: each takes one "
+            "of the modules and comes out at the module width, so the rhythm runs "
+            "through them rather than around them"
         )
 
     # The natural count: the count whose bays and ends land closest to their
@@ -892,16 +1023,19 @@ def solve(
     # is why `_absorb` was written to take a signed delta. Where no count is
     # allowed the old floor comes back instead, slack is non-negative again,
     # and rungs 4 and 5 get the surplus they need to work with.
-    natural = _natural_count(avail, end, bay, min_bays=min_bays, max_bays=max_bays)
+    natural = _natural_count(avail, end, bay, min_bays=lo_modules, max_bays=hi_modules)
     if central_feature:
         # Two admissible families, because two arrangements put an element on the
         # axis: an odd run (its middle element is the centre) and an even run
-        # carrying a lone central special (the special is the centre).
+        # carrying a lone central special (the special is the centre). Only the
+        # RESERVED positioned slots are extra elements of the run — a pooled one
+        # is already inside the module count, so counting it again here would
+        # get the run's parity wrong by one per pooled slot.
         n0 = _count_with_run_parity(
-            natural, len(fixed), min_bays, max_bays, odd_run=True
+            natural, n_reserved, lo_modules, hi_modules, odd_run=True
         )
         n_axis = _count_with_run_parity(
-            natural, len(fixed), min_bays, max_bays, odd_run=False
+            natural, n_reserved, lo_modules, hi_modules, odd_run=False
         )
     else:
         n0, n_axis = natural, None
@@ -910,8 +1044,9 @@ def solve(
     # always a base count to report even when the other family is empty.
     base = natural if n0 is None or n_axis is None else n0
     account.append(
-        f"{base} bay(s) at preferred {bay.preferred:.4f} m, centreline to centreline "
+        f"{base} module(s) at preferred {bay.preferred:.4f} m, centreline to centreline "
         f"= {base * bay.preferred:.4f} m"
+        + (f" ({n_pooled} of them a positioned slot in the pool)" if n_pooled else "")
     )
     if central_feature:
         account.append(
@@ -962,7 +1097,9 @@ def solve(
                 if got_s is None:
                     continue
                 got, each, slack = got_s
-                side = "centre" if central_feature else _special_side(fixed, n)
+                side = (
+                    "centre" if central_feature else _special_side(fixed, n - n_pooled)
+                )
                 if count >= 2:
                     placed = (
                         f"inserted {count} narrow specials {spec.name!r} at "
@@ -1009,7 +1146,7 @@ def solve(
     # Rung 5. Parity-aware: a composition with a central feature steps by two, so
     # it takes twice the slack to reach.
     if attempt is None and n0 is not None:
-        for n in range(n0 + step, max_bays + 1, step):
+        for n in range(n0 + step, hi_modules + 1, step):
             added = (
                 f"added {n - n0} module(s), stepping by {step}"
                 + (" to hold the central feature's parity" if central_feature else "")
@@ -1038,7 +1175,11 @@ def solve(
                         if got_s is None:
                             continue
                         got, each, slack = got_s
-                        side = "centre" if central_feature else _special_side(fixed, n)
+                        side = (
+                            "centre"
+                            if central_feature
+                            else _special_side(fixed, n - n_pooled)
+                        )
                         attempt = _Attempt(
                             Rung.ADD_MODULE,
                             n,

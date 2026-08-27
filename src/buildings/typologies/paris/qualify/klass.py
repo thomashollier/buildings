@@ -417,9 +417,22 @@ def entresol_arcade_is_sized_by_the_storey_it_lights(
     (``catalogue.entresol_allege_height``, a third of the height a body leans
     on). That one substitution is A13's complaint answered arithmetically: in
     a 2.66 m entresol the lean-on sill leaves 1.46 m of light and the low
-    allège leaves better than 1.75 m, and because A8.4's aspect band then buys
-    width with the height it has, the opening comes out both taller and wider.
-    A shrunken upper-floor window becomes an entresol arch.
+    allège leaves better than 1.75 m, so the opening comes out taller. **A28
+    changed the other half of that sentence**: it used to end "and because
+    A8.4's aspect band then buys width with the height it has, the opening
+    comes out both taller and wider". The band no longer buys width with
+    height, because the width no longer gives way to it — an entresol light is
+    now ``opening_window``'s full ABSOLUTE width whatever the storey, which is
+    wider still than the A8.4 rule ever made it here. A shrunken upper-floor
+    window becomes an entresol arch.
+
+    **A29 — and it is not on the facade's aspect ladder.** The title of this
+    rule has always said the entresol is sized by its storey; until A29 the
+    code said something else, asking ``aspect_for_rank`` for a proportion and
+    getting the principal floor's 2.000 back. The two only agreed because the
+    storey is short enough to clip it. It now asks for
+    ``catalogue.light_head_room`` — the storey, stated — so the title and the
+    call say the same thing. The realised light does not move.
 
     The sill is restated here, unusually for this layer, because it is not the
     base layer's number being echoed: ``window_in_slot`` may drop a sill it
@@ -458,11 +471,26 @@ def entresol_arcade_is_sized_by_the_storey_it_lights(
         - float(catalogue.lintel_bearing_depth())
         - float(catalogue.floor_band_depth()),
     )
+    slot_h = max(0.0, ctx.slot_h - over_the_head)
     geom = catalogue.window_in_slot(
         ctx.slot_w,
-        max(0.0, ctx.slot_h - over_the_head),
+        slot_h,
         ctx.klass,
-        wanted_aspect=aspect_for_rank(ctx.rank_from_principal),
+        # **The entresol is not on the facade's aspect ladder.** It used to ask
+        # for ``aspect_for_rank(ctx.rank_from_principal)``, which returns 2.000
+        # at the mezzanine — the *principal floor's* own proportion, the
+        # tallest figure the band holds. It never got it: the entresol storey
+        # is short, so ``_fit_height`` clipped the answer back to 1.41-1.57 and
+        # the light came out squat. It was squat because it was clipped, and
+        # nothing said it was allowed to be. Give the storey more room — which
+        # is exactly what fixing the height shortfall would do — and this light
+        # would have climbed toward 2:1 along with the facade windows.
+        #
+        # So it asks for what this function's own first line has always claimed
+        # it asks for: the storey it lights, not a window's share of it. The
+        # realised light is unchanged today, because the storey was already the
+        # binding constraint; what changes is that it is now the *stated* one.
+        wanted_height=catalogue.light_head_room(slot_h),
         sill=sill,
     )
     return Properties(

@@ -46,12 +46,53 @@ technical. This is what the words mean and where each one lives in the code.
 | **agrafe** | the ornamented keystone at an arch crown |
 | **trumeau** | the pier of wall between two openings |
 
+## Dividing the frontage
+
+The horizontal vocabulary, which is the easiest part of this model to muddle
+because three of the words are near-synonyms and one is overloaded. Diagram
+drawn on a real solve: `dev/reference/diagrams/horizontal-nomenclature.svg`.
+
+| term | what it is |
+|---|---|
+| **slot** | the generic unit. *Every* piece of the frontage is a slot — ends, bays, specials, the entrance. The solver's own word, deliberately architecture-free, because the same code fills a height budget with storeys. A `PlacedSlot` is just `name, kind, start, width` |
+| **axis** | the centreline of an opening, running up the facade. **The thing you count.** Every slot carrying an opening has one; end slots and blind panels do not |
+| **bay** | a slot of kind `REPEATING` — the module the rhythm is made of. Measured **centreline to centreline of the filler**: half-pier, opening, half-pier. That definition is why `N` bays is *exactly* `N × pitch` and the only special case is the two ends |
+| **pitch** | the width of a bay, i.e. axis to axis. **The thing you measure.** Bay and pitch are the *same number*; prefer "pitch" in prose |
+| **pier** | the masonry between two openings. `window + pier = pitch`, exactly |
+| **jamb** | the structural minimum masonry beside an opening — the stone its head lands on. ABSOLUTE, set by what it carries. Anything wider than the jamb is ordinary elastic pier |
+| **end** | the two `FLEXIBLE` slots at the extremities. No opening, no axis. The most elastic thing on the frontage: they absorb leftover width **first**, which is why they are often the fattest masonry on a facade |
+| **narrow special** | a half-bay, œil-de-bœuf or blind panel — **off pitch by definition**. Its widest band (1.650 m) sits 0.350 m below the pitch minimum (2.000 m), so the two bands *cannot* overlap. It is the deliberate absorber for a frontage that will not divide evenly, and it is **not counted as an axis** even when it carries a light — so no lucarne stands over one |
+
+**A word to avoid: "bay" in prose.** It names three different things — the
+solver's repeating module, the vestigial `standard_bay` entry in the catalogue
+(never called), and colloquially the opening itself. Say **axis** when counting
+and **pitch** when measuring.
+
+**Off pitch** is a real and useful description. Three things can be:
+
+- a **narrow special**, off pitch *by design* — that is what it is for;
+- a **porte cochère**, off pitch *by necessity* — at 2.60 clear plus two jambs
+  its slot is 3.040 m, wider than most pitches, so it genuinely displaces the
+  rhythm. This is the case the D6 guard is about: "a fixed slot wider than a bay
+  is carried up every storey and costs the building a window on every floor";
+- a **porte piétonne**, off pitch only *by accident* — its 2.350 m slot is
+  narrower than a typical pitch and it has no need to break the rhythm. It did
+  so only because the entrance was built as a rigid slot sitting in an elastic
+  run. **Being corrected (A27):** a door narrower than the pitch is an opening
+  in an ordinary bay, like a window — clear width ABSOLUTE, masonry around it
+  elastic.
+
+The general rule the three cases collapse into: *every axis is a bay; every bay
+carries an opening; the opening's clear width is ABSOLUTE; a bay takes the
+rhythm's pitch unless opening + 2 × jamb will not fit, and only then does that
+one bay grow.*
+
 ## Entrances
 
 | term | what it is |
 |---|---|
-| **porte cochère** | a carriage entrance — wide enough to drive through to the *cour*. 2.60 m clear |
-| **porte piétonne** | a pedestrian door. 1.75 m clear. The commoner of the two |
+| **porte cochère** | a carriage entrance — wide enough to drive through to the *cour*. 2.60 m clear; 3.040 m of frontage with its jambs |
+| **porte piétonne** | a pedestrian door. 1.75 m clear; 2.350 m with its jambs. The commoner of the two — Daly has eight to three in Deuxième Classe, and Troisième has no carriage door at all |
 | **battant** | a door leaf |
 | **cour** | the courtyard behind the carriage passage |
 

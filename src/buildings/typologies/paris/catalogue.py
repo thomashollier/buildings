@@ -187,6 +187,7 @@ __all__ = [
     "ground_floor_surround",
     "opening_aspect_band",
     "OpeningGeometry",
+    "light_head_room",
     "window_in_slot",
     "shopfront_in_slot",
     "carriage_entrance_in_slot",
@@ -1164,23 +1165,61 @@ def opening_aspect_band() -> tuple[float, float]:
     its proportion. That is the whole point -- the grand building's window is
     much bigger than the modest one's and exactly as tall for its width.
 
-    **A8.4.** This is a bound, not a wish, and ``window_in_slot`` now asserts
-    it. It used to be a wish, and the wall paid: 94 % of upper-storey openings
-    fell below 1.70 and the worst of them was 1.00 — a square hole. It was
-    *worse for the grander classes*, because a grand building buys a wider
-    window and then has the same absolute sill and lintel eating the same
-    absolute amount of a storey that is not proportionally taller. A facade
-    full of squares reads as a wall with holes in it, not as a wall with
-    windows in it, which is the single loudest thing wrong with the drawings.
+    **A8.4.** This used to be a wish, and the wall paid: 94 % of upper-storey
+    openings fell below 1.70 and the worst of them was 1.00 — a square hole.
+    It was *worse for the grander classes*, because a grand building buys a
+    wider window and then has the same absolute sill and lintel eating the
+    same absolute amount of a storey that is not proportionally taller. A
+    facade full of squares reads as a wall with holes in it, not as a wall
+    with windows in it, which is the single loudest thing wrong with the
+    drawings.
 
-    Where a storey is too short to give the band at the width the bay would
-    like, the opening gets **narrower, not squatter**. Width is proportional
-    and elastic — the pier beside it simply widens — while the aspect is what
-    carries the reading, and there is no such thing as an elastic proportion.
-    Upper floors still read differently from the noble floor: their openings
-    are shorter and narrower and sit near the bottom of the band rather than
-    at its top, which is a change of size and of proportion within the band,
-    not a collapse out of it.
+    **A28 — what this band governs is the HEIGHT, and only the height.** The
+    value below is untouched; how it is *used* is not. A8.4 made the band a
+    bound on the realised rectangle and had ``window_in_slot`` assert it,
+    buying the proportion by narrowing the opening —
+    ``width = height / low`` — wherever a storey could not carry the declared
+    width at the floor. Storey heights fall as a facade rises, so that tapered
+    every frontage: a real three-axis building came out 1.210 / 1.076 / 0.962
+    / 0.962 m against an ABSOLUTE declared 1.300. The width is not the band's
+    to spend. It answers to a body, not to a storey.
+
+    So the band now reaches one way only. ``qualify.base.aspect_for_rank``
+    reads it as how tall a light *wants* to be — the noble floor at the
+    ceiling, each storey above it a little nearer the floor — and
+    ``window_in_slot`` turns that want into a height, caps it by the storey,
+    and leaves the width alone. Upper floors still read differently from the
+    noble floor: their openings are shorter, at one width, which is what a
+    real frontage does. A storey too short for the floor of the band yields a
+    squatter window rather than a narrower one, so the realised aspect may sit
+    under 1.56 and ``window_in_slot`` no longer asserts that it does not.
+
+    **A29 — which openings this band describes, and which it does not.** It
+    describes the ordinary windows of the facade proper, read down by
+    ``aspect_for_rank``. It does **not** describe two others, and the operator
+    is the source: *"the dormer and entresol windows don't have the same window
+    aspect ratio restrictions. Entresol treatments take all sorts of shapes and
+    sizes -- sometimes there is no window at all, sometimes it is similar to
+    the other windows but squatter, sometimes they are round."*
+
+    - **Dormers** never reached this band and need nothing. ``terminate.py``
+      sizes a lucarne off the comble it stands in, via
+      ``_dormer_face_height(brisis, skirt)``. Across the ten presets they
+      realise 1.08-1.90 and follow the roof, which is the intent.
+    - **The entresol** did reach it, and no longer does. It asked for
+      ``aspect_for_rank`` at the mezzanine, which is **2.000** -- the principal
+      floor's own figure -- and was saved only by its short storey clipping the
+      answer back. Squat by accident is not the same as free to be squat, and
+      a later fix to the height shortfall would have dragged it up toward 2:1.
+      It now names a ``wanted_height`` outright: ``light_head_room``, the
+      storey it lights. Realised output is unchanged, because the storey was
+      already binding; what changed is which fact is doing the work.
+
+    What is *not* yet modelled is the rest of the operator's sentence. The
+    entresol is always an ``opening_type`` of ``"window"``; neither "no window
+    at all" nor "round" is expressible for it, though ``roundel_in_slot``
+    already exists and is wired only to the narrow special. See
+    ``dev/HANDOFF.md``.
 
     **A26 — the FLOOR comes down to 1.56, on the nobile evidence. The ceiling
     does not move.**
@@ -1253,7 +1292,10 @@ class OpeningGeometry:
 
     @property
     def aspect(self) -> float:
-        """Height over width. 1.56--2.0 is the Paris band; see ``opening_aspect_band``."""
+        """Height over width. 1.56--2.0 is the Paris band an opening *wants*;
+        see ``opening_aspect_band``. Since A28 it is not a bound on this
+        number — a storey too short to give it yields a squatter opening
+        rather than a narrower one — so read it as a reading, not a contract."""
         return self.height / self.width if self.width > 0.0 else 0.0
 
 
@@ -1278,6 +1320,25 @@ def _fit_width(slot_w: float, wanted: float, floor_w: float, pier_min: float) ->
     return max(0.0, width)
 
 
+def light_head_room(slot_h: float) -> float:
+    """What is left of one storey for a light, before the sill is taken off.
+
+    The storey less the two ABSOLUTE depths that stand over every opening:
+    ``lintel_bearing_depth`` (the lintel stone and the joist ends bearing on
+    it) and ``floor_band_depth`` (the moulded band carried on the wall in
+    front of that bearing -- A23).
+
+    Named, and public, because it is the answer to "how tall may a light in
+    this storey be", and a caller that wants *the storey itself* rather than a
+    proportion of it has no other way to say so. ``entresol_arcade_is_sized_by
+    _the_storey_it_lights`` is that caller. It was computed inline in two
+    places before; one expression means the two cannot drift.
+    """
+    return max(
+        0.0, slot_h - float(lintel_bearing_depth()) - float(floor_band_depth())
+    )
+
+
 def _fit_height(slot_h: float, sill: float, wanted: float) -> tuple[float, float]:
     """Opening height and the sill it actually sat on, inside one storey.
 
@@ -1290,9 +1351,7 @@ def _fit_height(slot_h: float, sill: float, wanted: float) -> tuple[float, float
     sill, whereas a floor without a lintel over its window is a floor that
     falls down.
     """
-    head_room = max(
-        0.0, slot_h - float(lintel_bearing_depth()) - float(floor_band_depth())
-    )
+    head_room = light_head_room(slot_h)
     min_light = float(minimum_light_height())
     sill_eff = min(sill, max(0.0, head_room - min_light))
     height = max(0.0, min(wanted, head_room - sill_eff))
@@ -1300,7 +1359,13 @@ def _fit_height(slot_h: float, sill: float, wanted: float) -> tuple[float, float
 
 
 def window_in_slot(
-    slot_w: float, slot_h: float, klass: BuildingClass, *, wanted_aspect: float, sill: float
+    slot_w: float,
+    slot_h: float,
+    klass: BuildingClass,
+    *,
+    sill: float,
+    wanted_aspect: float | None = None,
+    wanted_height: float | None = None,
 ) -> OpeningGeometry:
     """An ordinary window, cut in the wall of one slot on one storey.
 
@@ -1331,39 +1396,82 @@ def window_in_slot(
     3. **What the storey can give.** ``_fit_height``: the slot less the
        ABSOLUTE lintel above and the ABSOLUTE sill below, the sill dropping
        first where even that is not enough.
-    4. **The proportion, which does not give way.** If the height in (3) will
-       not carry the width in (1) at ``opening_aspect_band``'s lower bound,
-       the WIDTH comes in until it does.
+    4. **What a storey too short for all that gets.** A squatter window. Not
+       a narrower one.
 
-    (4) is A8.4 and it stands unchanged. It used to stop at (3): height was
-    ``width * wanted_aspect`` capped by the storey, so a storey that could not
-    afford the height simply got a squarer window, and the measured result was
-    94 % of upper openings under the band with a minimum of 1.00. The band is
-    the catalogue's own stated contract about what a Paris opening looks like;
-    a facade may run out of height, but it may not thereby stop being a Paris
-    facade.
+    **A28 — the width holds, on every storey. The aspect band stops
+    constraining it.**
 
-    What gives way instead is the width, and it can still afford to even now
-    that it is ABSOLUTE: the ``Abs`` band has real width (1.04-1.30 m, which
-    is the sixteen-building spread Daly measured), the pier beside it is
-    elastic and absorbs the difference, and the opening stays centred on its
-    bay so the vertical axes of the facade are untouched -- the jambs step in
-    slightly toward the top instead of running dead straight, which is what a
-    real Paris frontage does under its cornice. Moving *inside* a fixed band
-    is not the same thing as scaling with the class, and the difference is
-    visible in the output: every class's windows are drawn from one band.
+    (4) used to read *"the proportion, which does not give way"*: where the
+    height in (3) would not carry the width in (1) at ``opening_aspect_band``'s
+    lower bound, the WIDTH came in until it did — literally
+    ``width = height / low``. Storey heights fall as a facade rises, so the
+    opening narrowed floor by floor. On a 7.21 m ordinary frontage off a 20 m
+    street the four windows above the base came out
 
-    Both mechanisms are still visible: on a tall storey (1)-(3) all fit and
-    the window is the class's full height at the corpus width; on a short one
-    it is a narrower rectangle at the band's lower bound. What can no longer
-    come out of here is a square.
+    ==========  ===============  =============
+    storey      opening (was)    opening (now)
+    ==========  ===============  =============
+    3.95 m      1.210 x 1.888    1.300 x 1.888
+    2.99 m      1.076 x 1.679    1.300 x 1.679
+    2.78 m      0.962 x 1.500    1.300 x 1.500
+    2.60 m      0.962 x 1.500    1.300 x 1.500
+    ==========  ===============  =============
 
-    Where even ``minimum_light_width`` cannot be made to satisfy the band, the
-    slot has no window in it at all -- two ABSOLUTE facts have collided and
-    the honest answer is a blind panel, not a loophole. That is returned as a
+    — the top pair standing **0.338 m under the 1.300 this catalogue
+    declares**, and the whole frontage tapering toward its cornice.
+
+    **The width is ABSOLUTE, and absolute means absolute.** ``opening_window``
+    says the width may not move *with the class*; nothing ever licensed it
+    moving with the STOREY either, and a quantity that answers to whichever
+    storey it lands on is not an absolute — it is a proportion wearing an
+    ``Abs``. A window is a thing a person opens, leans out of and closes the
+    shutters of, and a fourth-floor person is the same size as a first-floor
+    one. What money and what storey may move is the HEIGHT, which is
+    PROPORTIONAL, which is where the class ladder already lives, and which is
+    the half of the aperture that was always meant to give.
+
+    So the width holds at what ``_fit_width`` gives it, and a short storey
+    yields a squatter window. That is a fact about the storey, not a reason to
+    shrink the light. The four aspects above become 1.45 / 1.29 / 1.15 / 1.15
+    — every one of them still taller than it is wide.
+
+    **What A8.4 was right about, and what it over-corrected.** A8.4 measured
+    94 % of upper openings under the band with a minimum of 1.00 — a square
+    hole — and it was right that a wall of squares reads as a wall with holes
+    in it rather than as a wall with windows in it. Its remedy was to buy the
+    proportion with width, which is the one currency that was never the
+    building's to spend. The proportion is bought where it was always paid for
+    instead: the height in (2) is the class's, read down by rank, and the
+    aspect band is what does that reading — ``aspect_for_rank`` turns the band
+    into how tall this storey's light *wants* to be, and (3) caps that by what
+    the storey has. The band still shapes every opening this function cuts. It
+    simply no longer reaches sideways.
+
+    (For context and not as justification: ``opening_aspect_uppers`` in
+    ``dev/reference/daly_measurements.json`` spans 1.14-2.08 for Deuxième, so
+    1.15 sits at the bottom of what was measured rather than outside it. That
+    quantity is rated INSUFFICIENT by the file's own summary and may not carry
+    a bound — see ``opening_aspect_band``, which declined to move on it.)
+
+    **The band is no longer asserted at the end of this function**, because it
+    is no longer a bound on the output, and an assertion restating a repealed
+    rule is worse than no assertion at all. What is asserted is what survives,
+    and its first clause *is* A28: the width that comes out is the one
+    ``_fit_width`` gave — a function of the slot and of an ABSOLUTE, and of
+    neither the storey's height nor the class — it is never wider than the
+    ABSOLUTE it was asked for, and the light never stands in the bearing the
+    lintel needs. A blind panel has no geometry to be wrong about and is
+    excused whole.
+
+    The degenerate ladder below is unchanged in effect and only restated
+    without the width in it. A storey too short to give a light its least
+    height drops its SILL first — the one of the three ABSOLUTE bounds a
+    building may argue with — and where even that will not buy a light, the
+    slot has no window in it at all: two ABSOLUTE facts have collided and the
+    honest answer is a blind panel, not a loophole. That is returned as a
     zero-width opening, and it does not happen on any storey a person lives
-    in: at the shortest, an opening ``minimum_light_height`` tall carries the
-    band at 0.35 m, well under the 0.55 m floor.
+    in.
     """
     low, high = opening_aspect_band()
     # ABSOLUTE: ``to_slot_spec`` calls ``scale_for_class``, which is a
@@ -1373,49 +1481,111 @@ def window_in_slot(
     # that a reader can see the no-op happening instead of inferring it.
     win = opening_window().to_slot_spec(klass)
     pier_min = pier_filler().to_slot_spec(klass).minimum
-    width = _fit_width(slot_w, win.preferred, win.minimum, pier_min)
+    # Named, because A28's whole claim is that this is the width that comes
+    # out — the slot's and the ABSOLUTE's, and nothing else's. The assertion
+    # at the end holds the two together.
+    fitted_w = _fit_width(slot_w, win.preferred, win.minimum, pier_min)
+    width = fitted_w
     # PROPORTIONAL, and the only place in this function class enters at all.
     # ``wanted_aspect`` is the storey's rank expressed as a position in the
     # aspect band; dividing by the band's top turns it into "what fraction of
     # the noble floor's height this storey asks for", which is 1.0 at rank 0
     # and falls upward. The class's noble height then multiplies it.
-    nobile = float(scale_for_class(opening_height_at_the_nobile(), klass))
-    wanted_h = nobile * (wanted_aspect / high) if high > _EPS else nobile
+    if (wanted_aspect is None) == (wanted_height is None):
+        raise ValueError(
+            "window_in_slot wants exactly one of wanted_aspect or wanted_height: "
+            "a proportion to read down the facade, or a height in metres. "
+            f"got wanted_aspect={wanted_aspect!r}, wanted_height={wanted_height!r}"
+        )
+    if wanted_height is not None:
+        # The caller named a height outright. Nothing about the aspect band or
+        # the class ladder enters -- see ``opening_aspect_band``, which says
+        # which openings that ladder describes and which it does not.
+        wanted_h = wanted_height
+    else:
+        nobile = float(scale_for_class(opening_height_at_the_nobile(), klass))
+        wanted_h = nobile * (wanted_aspect / high) if high > _EPS else nobile
+    # Stated once, here, because the ladder below and the assertion at the end
+    # both need it and `_fit_height` computed it privately.
+    head_room = light_head_room(slot_h)
     height, sill_eff = _fit_height(slot_h, sill, wanted_h)
 
-    if height > _EPS and height < width * low - _EPS:
-        # The storey could not carry the class's width at the band. Narrow,
-        # never squat: the widest width this height keeps in proportion.
-        width = height / low
-        floor_w = float(minimum_light_width())
-        if width < floor_w - _EPS:
-            # Even the narrowest light is squat here, so the SILL gives — the
-            # one of the three ABSOLUTE bounds a building may argue with, for
-            # the reason `_fit_height` already gives — and it gives exactly as
-            # far as the band needs and no further. Not to keep the window
-            # WIDE: a sill that dropped for width would put a fifth-floor
-            # opening at ankle height, and the height a body can lean on is
-            # ABSOLUTE precisely so that cannot happen. Only to keep it a
-            # window at all.
-            head_room = max(
-                0.0,
-                slot_h - float(lintel_bearing_depth()) - float(floor_band_depth()),
-            )
-            height = min(head_room, floor_w * low)
-            width = height / low
-            sill_eff = max(0.0, head_room - height)
-        if width < floor_w - _EPS:
+    # A28: no width step here any more. What follows is the degenerate ladder
+    # and nothing else — it decides whether there is a light at all, never how
+    # wide one is.
+    floor_w = float(minimum_light_width())
+    # The shortest light this catalogue has ever cut: the narrowest opening it
+    # admits, at the aspect band's own floor. A28 stopped the band from setting
+    # a WIDTH; this is the band still doing the thing it does, which is to say
+    # how short a light may get before it stops being one. The figure is the
+    # same one the old ladder tripped on, so a storey that went blind before
+    # goes blind now.
+    floor_h = floor_w * low
+    if height > _EPS and height < floor_h - _EPS:
+        # The SILL gives — the one of the three ABSOLUTE bounds a building may
+        # argue with, for the reason `_fit_height` already gives — and it
+        # gives exactly as far as a light needs and no further. Not to keep
+        # the window WIDE: a sill that dropped for width would put a
+        # fifth-floor opening at ankle height, and the height a body can lean
+        # on is ABSOLUTE precisely so that cannot happen. Only to keep it a
+        # window at all.
+        height = min(head_room, floor_h)
+        sill_eff = max(0.0, head_room - height)
+        if height < floor_h - _EPS:
+            # The sill has nothing left to give and the storey still will not
+            # carry a light. Two ABSOLUTE facts have collided and a blind panel
+            # is the honest answer, not a loophole.
+            #
+            # This tests the HEIGHT only, exactly as the rung it replaces did.
+            # A width test was tried here and reverted: the old blind check ran
+            # on a width the aspect band had derived from the height, so a slot
+            # too narrow to carry ``minimum_light_width`` never reached it, and
+            # adding that case turned 640 fuzz openings blind and left an
+            # ironwork node hanging on a light that no longer existed. Whether
+            # a slot too narrow for a light should go blind is a real question
+            # and a separate one; ``block._refit_light`` already answers it
+            # that way for a chamfer. A28 is about the width not moving, and it
+            # stops there.
             width = height = 0.0
 
     geom = OpeningGeometry(
         width=width, height=height, offset_x=(slot_w - width) / 2.0, sill=sill_eff
     )
-    # The stated band, asserted rather than hoped for (A8.4). An opening with
-    # no height is a blind panel and has no proportion to be wrong about.
-    assert geom.height <= _EPS or low - 1e-6 <= geom.aspect, (
-        f"a {geom.width:.4f} x {geom.height:.4f} m opening has aspect "
-        f"{geom.aspect:.3f}, under the {low:.2f} this catalogue states as the Paris "
-        f"band (slot {slot_w:.3f} x {slot_h:.3f} m, sill {sill:.3f} m, class "
+    # **A28.** What stood here was the aspect band — "a bound, not a wish, and
+    # ``window_in_slot`` now asserts it" (A8.4). This change repeals exactly
+    # that band's claim on the width, so restating it would be asserting a rule
+    # the function no longer has. Deleting it and putting nothing back would be
+    # worse: an assertion is what stops the next edit from quietly undoing this
+    # one. So what is asserted is what survives, and the first clause IS A28:
+    #
+    #   * the width that comes out is ``_fit_width``'s — a function of the SLOT
+    #     and of an ABSOLUTE, of neither the storey's height nor the class.
+    #     Nothing between there and here may move it, in either direction;
+    #   * it is never wider than the ABSOLUTE it was asked for, which is the
+    #     same claim stated as a bound so a reader need not go and look;
+    #   * and the light never stands in the bearing the lintel needs.
+    #
+    # Not asserted, deliberately: that the width clears ``minimum_light_width``.
+    # It holds for every ordinary window — 83 467 swept openings, none under it
+    # — but it is not a THEOREM of this function. ``_fit_width`` will honestly
+    # return less on a slot that has no more to give, and one slot does: the
+    # narrow special is 1.10 m wide and its light comes out at 0.455 m. That
+    # predates A28 and is a question about the special, not about the width.
+    # ``block._refit_light`` is where the same question is answered for a
+    # chamfer, by refusing the light.
+    #
+    # A blind panel has no geometry to be wrong about, and is excused whole.
+    assert geom.height <= _EPS or (
+        abs(geom.width - fitted_w) <= 1e-9
+        and geom.width <= float(win.preferred) + 1e-6
+        and geom.sill + geom.height <= head_room + 1e-6
+    ), (
+        f"a {geom.width:.4f} x {geom.height:.4f} m opening on a {geom.sill:.4f} m "
+        f"sill is not something this catalogue can have cut: the width must be "
+        f"the {fitted_w:.4f} m the slot and the ABSOLUTE give it and no more than "
+        f"the {float(win.preferred):.2f} m declared, and the sill plus the height "
+        f"must stand inside the storey's {head_room:.4f} m of head room "
+        f"(slot {slot_w:.3f} x {slot_h:.3f} m, sill asked {sill:.3f} m, class "
         f"{klass.value})"
     )
     return geom

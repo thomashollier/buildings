@@ -1580,20 +1580,51 @@ def test_every_grid_carries_exactly_one_entrance_slot() -> None:
 
 
 def test_the_entrance_slot_is_absolute_and_does_not_scale_with_the_class() -> None:
-    """The door is the ruler. Its slot is the clear opening plus the jamb its
-    head lands on either side, and both are ABSOLUTE — so on one street the
-    slot is the same width for a modest building and a grand one, while the
-    bays beside it are not."""
-    widths: dict[str, set[float]] = {}
+    """The door is the ruler, and A27 moved which part of it is the ruler.
+
+    This test used to assert that the entrance SLOT comes out at exactly
+    ``catalogue.entrance_slot_width`` — "the clear opening plus the jamb its
+    head lands on either side, and both are ABSOLUTE". That was the rigid-slot
+    behaviour, and it is the thing A27 removed on purpose: a slot pinned to its
+    own width while everything beside it is elastic made the masonry next to
+    the biggest hole in the facade the THINNEST masonry on the frontage.
+
+    What is ABSOLUTE is the **clear opening** — the body or the vehicle that
+    has to pass — and ``entrance_slot_width`` is now what it always described
+    itself as, the *minimum* the slot may be. The slot itself takes the
+    frontage's own pitch where the pitch will hold it. So the claim under test
+    is unchanged in substance and sharper in statement:
+
+    * the opening does not move with the class — not by a millimetre;
+    * the slot does not move with the class either;
+    * the slot is never narrower than the opening plus its two jambs;
+    * and the bays beside it DO move with the class, which is the contrast the
+      absolute/proportional split exists to produce.
+    """
+    slots: dict[str, set[float]] = {}
+    clears: dict[str, set[float]] = {}
     bays: set[float] = set()
     for klass in BuildingClass:
         g = solve_structure(_site(street_width=20.0, parcel_width=18.0, klass=klass))
         (door,) = [s for s in g.bays if s.name in catalogue.ENTRANCE_SLOT_NAMES]
-        widths.setdefault(door.name, set()).add(round(door.width, 9))
+        ground_h = g.storeys[0].width
+        slots.setdefault(door.name, set()).add(round(door.width, 9))
+        clears.setdefault(door.name, set()).add(
+            round(catalogue.entrance_in_slot(door.name, door.width, ground_h).width, 9)
+        )
+        # The same door cut in the narrowest slot the catalogue will admit. If
+        # the opening is ABSOLUTE these two are the same number whatever the
+        # slot did, which is the whole claim: the slot grew, the door did not.
+        floor = float(catalogue.entrance_slot_width(door.name))
+        assert door.width >= floor - 1e-9, (door.name, door.width, floor)
+        clears[door.name].add(
+            round(catalogue.entrance_in_slot(door.name, floor, ground_h).width, 9)
+        )
         bays |= {round(s.width, 9) for s in g.bays if s.name == "bay"}
-    for name, seen in widths.items():
+    for name, seen in clears.items():
+        assert len(seen) == 1, f"{name}'s clear opening moved: {seen}"
+    for name, seen in slots.items():
         assert len(seen) == 1, f"{name} changed width with the class: {seen}"
-        assert seen == {round(float(catalogue.entrance_slot_width(name)), 9)}
     assert len(bays) > 1, "the ordinary bays should be moving even though the door is not"
 
 
@@ -1831,8 +1862,19 @@ def test_a_carriage_arch_costs_one_axis_at_most_and_the_class_costs_none() -> No
     # one — at 4 axes either way the 0.69 m no longer crosses a bay boundary —
     # so it is replaced here by 10.0 m, which is. The claim under test is
     # unchanged; only the widths that witness it have moved.
+    #
+    # **A27 moved one of them again, for the same species of reason.** The
+    # pedestrian entrance now stands IN the rhythm, so it takes the frontage's
+    # own pitch rather than its own 2.35 m — which is more frontage, and on
+    # roughly one width in ten it is enough more to cost the pedestrian
+    # building an axis. 20.0 m is one of those: the walked count fell from 8 to
+    # 7 and met the driven count there, so the width stopped witnessing
+    # anything. 20.5 m witnesses it instead. Measured over 8-22 m at half-metre
+    # steps the arch costs exactly one axis at 10.0, 12.5, 18.0 and 20.5 m and
+    # nothing anywhere else, identically for MODEST and GRAND — which is the
+    # claim, and it survived A27 intact.
     for parcel, walked_expected, driven_expected in (
-        (10.0, 4, 3), (18.0, 7, 6), (20.0, 8, 7)
+        (10.0, 4, 3), (18.0, 7, 6), (20.5, 8, 7)
     ):
         for klass in (BuildingClass.MODEST, BuildingClass.GRAND):
             walked, _ = _axes_and_door(

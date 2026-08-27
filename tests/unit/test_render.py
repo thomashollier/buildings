@@ -307,9 +307,13 @@ def test_the_sill_the_ir_states_is_the_sill_that_gets_drawn():
         top_px, height_px = float(rects[0].group(2)), float(rects[0].group(4))
         sill_above_floor = -(top_px + height_px) - storey.props["y"]
         drawn.append((storey.props["y"], storey.props["h"], sill_above_floor))
-        # The glass sits inside the frame reveal, so the drawn body starts at
-        # the stated sill or at most one reveal above it — never below it, and
-        # never at a height derived from the storey.
+        # **A28 dropped the renderer's frame reveal**, so the tolerance either
+        # side of the stated sill is now the same: the glass fills the masonry
+        # opening, and the drawn body starts AT the stated sill rather than at
+        # most one 0.06 m reveal above it. This used to read
+        # ``stated - _tol <= s <= stated + el._HEAD_MARGIN + _tol``; the
+        # asymmetric half of that is gone, which makes the claim tighter, not
+        # looser. Never below it, and never at a height derived from the storey.
         # The canvas rounds each coordinate it emits to the millimetre, and
         # this figure is read off TWO of them (the rect's top and its height),
         # so the rounding budget is two quanta and not one. It used to say
@@ -318,7 +322,7 @@ def test_the_sill_the_ir_states_is_the_sill_that_gets_drawn():
         # holding the moment a storey landed at 13.5031 m. A tolerance that
         # depends on the fixture's numbers being round is not a tolerance.
         _tol = 0.01
-        assert float(stated) - _tol <= sill_above_floor <= float(stated) + el._HEAD_MARGIN + _tol, (
+        assert float(stated) - _tol <= sill_above_floor <= float(stated) + _tol, (
             f"storey at {storey.props['y']:.2f} m (height {storey.props['h']:.2f} m): "
             f"IR says the sill is {stated} m above the floor, drawing puts it at "
             f"{sill_above_floor:.3f} m"
@@ -341,8 +345,11 @@ def test_the_sill_the_ir_states_is_the_sill_that_gets_drawn():
     # keeping this test green with a constant fraction of the storey.
     from buildings.typologies.paris import catalogue
 
+    # A28: was ``abs=el._HEAD_MARGIN + 0.005``, the slack the dropped frame
+    # reveal needed. With the glass filling the opening the drawn sill IS the
+    # stated allège, to the canvas's own millimetre rounding.
     assert drawn[0][2] == pytest.approx(
-        float(catalogue.window_allege_height()), abs=el._HEAD_MARGIN + 0.005
+        float(catalogue.window_allege_height()), abs=0.005
     )
 
 
