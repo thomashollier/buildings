@@ -110,6 +110,20 @@ lights). Paris SVG output is byte-identical before and after.
 
 `python3 dev/harness/soho_sheet.py OUT_DIR --styles` draws all three at one scale.
 
+## Four more: London, Kyoto, New York, Poissy
+
+| Style | Signature | What it exercises |
+|---|---|---|
+| Georgian London terrace | every window one sash wide, its height set by its floor's ratio (1.75 ground, 2.1 piano nobile, 1.6 second, 1.0 third), a parapet storey hiding the roof | proportion as a per-floor rule, not a per-window one |
+| Kyoto machiya | a low loft storey over the ground, tiled pent roofs (`hisashi`) along the front, every light screened by a `Lattice` shape (koshi below, mushiko above) | a screen inserted over a light: the opening stays, the street sees timber |
+| New York setback tower | `tiers_for`: the street wall rises to 1.5x the street's width, tiers step back on a 1:4 plane until the mass is half the frontage, then the tower rises; piers per mass, a spire | massing derived from a regulation; widen the street and the whole tower moves |
+| Corbusian block | pilotis on the posts' grid, and each floor cut `end \| Ribbon \| end` *ignoring* that grid, the ribbon split into panes; an off-axis roof pavilion with a curved screen | the free facade: the one grammar here whose storeys are deliberately not cut by the facade's rhythm |
+
+Renderer additions: `timber_lattice` screens, `tiled` pent-roof eaves, the
+`piloti` order, `spire` and `pavilion` outlines, seven more wall paints.
+`python3 dev/harness/soho_sheet.py OUT_DIR --more` draws them (the tower at
+its own scale).
+
 ## Checking it
 
 ```bash

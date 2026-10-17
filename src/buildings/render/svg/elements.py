@@ -570,6 +570,22 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
     # frontage by it, so a modest attic cornice and a grand entresol's carried
     # the same brackets per metre and only the wall behind them changed size.
     n = _count(props, "ornament_count", 2)
+    if props.get("cornice_ornament") == "tiled":
+        # A pent roof of clay tiles: a sloped band from the wall out to the
+        # drip, its courses read as lines along it.
+        reach = max(0.3, projection)
+        rise = reach * 0.45
+        canvas.polygon(
+            [(x - reach * 0.5, y), (x + w + reach * 0.5, y), (x + w, y + rise), (x, y + rise)],
+            _C["tile"],
+            stroke=_C["tile_line"],
+            stroke_w=0.6,
+        )
+        for k in range(1, 4):
+            ty = y + rise * k / 4.0
+            inset = reach * 0.5 * (1 - k / 4.0)
+            canvas.line(x - inset, ty, x + w + inset, ty, _C["tile_line"], 0.4)
+        return
     if props.get("cornice_ornament") == "bracketed":
         # A deep crowning cornice on scrolled brackets, the frieze between
         # them: the console's size is the cornice's own stated depth.
@@ -611,6 +627,11 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
     if w <= 1e-9 or h <= 1e-9:
         return
     order = props.get("order") or "pilaster"
+    if order == "piloti":
+        # A round concrete post: no base, no capital, a shadow down one side.
+        canvas.rect(x, y, w, h, _C["wall_render_white"], stroke=_C["column_stroke"], stroke_w=0.4)
+        canvas.rect(x + w * 0.62, y, w * 0.38, h, "#D8D6D0", stroke_w=0.0)
+        return
     base_h = min(0.12, h * 0.05)
     cap_h = min(0.30, h * 0.09) if order == "corinthian" else min(0.14, h * 0.05)
     shaft_w = w * (0.78 if order != "pilaster" else 0.9)
@@ -635,7 +656,7 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
 
 
 #: How each gable form finishes along its edge: the coping's weight.
-_GABLE_COPING_W = {"step": 1.6, "neck": 1.2, "bell": 1.2, "straight": 1.0}
+_GABLE_COPING_W = {"step": 1.6, "neck": 1.2, "bell": 1.2, "straight": 1.0, "spire": 0.8, "pavilion": 0.6}
 
 
 def draw_gable_mass(canvas: Canvas, props: Mapping[str, object], wall: str) -> None:
@@ -867,6 +888,17 @@ def draw_ironwork(canvas: Canvas, x: float, y: float, w: float, h: float, props:
     # reason the bar count above is still worked out here while this one is
     # not.
     n_ornaments = _count(props, "ornament_count", 2)
+
+    if pattern == "timber_lattice":
+        # A koshi screen: close-set timber slats between two rails, the slat
+        # count read off the stated gap like any other barrier's.
+        canvas.rect(x, y, w, h, "none", stroke=_C["timber"], stroke_w=0.8)
+        step = w / max(1, n_bays)
+        for i in range(1, n_bays):
+            sx = x + i * step
+            canvas.line(sx, y, sx, y + h, _C["timber"], 1.1)
+        canvas.line(x, y + h * 0.82, x + w, y + h * 0.82, _C["timber"], 0.6)
+        return
 
     top_y = y + h
     canvas.line(x, top_y, x + w, top_y, cap_color, cap_w)

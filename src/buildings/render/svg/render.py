@@ -465,6 +465,13 @@ _WALL_PAINT = {
     "brick_dark": _C["wall_brick_dark"],
     "stucco_rose": _C["wall_stucco_rose"],
     "terracotta": _C["wall_terracotta"],
+    "brick_london": _C["wall_brick_london"],
+    "stucco": _C["wall_stucco"],
+    "timber_dark": _C["wall_timber_dark"],
+    "plaster_white": _C["wall_plaster_white"],
+    "brick_buff": _C["wall_brick_buff"],
+    "render_white": _C["wall_render_white"],
+    "shadow": _C["wall_shadow"],
 }
 
 

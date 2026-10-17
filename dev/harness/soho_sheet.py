@@ -3,7 +3,9 @@
 
 Run:  python3 dev/harness/soho_sheet.py OUT_DIR [--styles]
 
-``--styles`` draws the Amsterdam, Venice and Chicago grammars instead.
+``--styles`` draws the Amsterdam, Venice and Chicago grammars instead, and
+``--more`` the Georgian, Kyoto, Corbusian and Art Deco ones (the tower at its
+own scale, since at one scale everything else would vanish beside it).
 
 Every facade is drawn by the real renderer from the real IR, at the same
 pixels per metre, standing on one ground line, so the proportions compare.
@@ -54,10 +56,25 @@ STREET = [
 ]
 
 
-def sheet(street=None) -> str:
+def _more_styles():
+    from buildings.typologies.deco.grammar import TowerSite, generate_deco
+    from buildings.typologies.georgian.grammar import TerraceSite, generate_georgian
+    from buildings.typologies.kyoto.grammar import MachiyaSite, generate_kyoto
+    from buildings.typologies.modernist.grammar import VillaSite, generate_modernist
+
+    return [
+        ("London, 1790: Georgian terrace", generate_georgian(TerraceSite(7.6, 1790, BuildingClass.COMFORTABLE))[0]),
+        ("Kyoto, 1890: machiya", generate_kyoto(MachiyaSite(6.4, 1890, BuildingClass.ORDINARY))[0]),
+        ("Poissy, 1929: Corbusian block", generate_modernist(VillaSite(19.0, 1929, BuildingClass.COMFORTABLE))[0]),
+        ("New York, 1929: setback tower (own scale)", generate_deco(TowerSite(36.0, 18.0, 1929, BuildingClass.GRAND))[0]),
+    ]
+
+
+def sheet(street=None, *, own_scale: frozenset[str] = frozenset()) -> str:
     panels = []
     for caption, building in street or STREET:
-        width_px = (float(building.props["w"]) + 2 * _MARGIN_M) * PX_PER_M
+        scale = PX_PER_M if caption not in own_scale else 900.0 / float(building.props["h"])
+        width_px = (float(building.props["w"]) + 2 * _MARGIN_M) * scale
         svg = render(building, width_px=int(round(width_px)))
         w, h = (float(v) for v in re.search(r'width="([\d.]+)" height="([\d.]+)"', svg).groups())
         panels.append((caption, svg, w, h))
@@ -85,11 +102,17 @@ def sheet(street=None) -> str:
 
 def main(argv: list[str]) -> int:
     styles = "--styles" in argv
-    argv = [a for a in argv if a != "--styles"]
+    more = "--more" in argv
+    argv = [a for a in argv if a not in ("--styles", "--more")]
     out = Path(argv[0]) if argv else ROOT / "dev" / "logs"
     out.mkdir(parents=True, exist_ok=True)
-    path = out / ("styles_sheet.svg" if styles else "soho_sheet.svg")
-    path.write_text(sheet(_styles() if styles else None))
+    if more:
+        street = _more_styles()
+        path = out / "more_styles_sheet.svg"
+        path.write_text(sheet(street, own_scale=frozenset({street[-1][0]})))
+    else:
+        path = out / ("styles_sheet.svg" if styles else "soho_sheet.svg")
+        path.write_text(sheet(_styles() if styles else None))
     print(path)
     if shutil.which("rsvg-convert"):
         png = path.with_suffix(".png")

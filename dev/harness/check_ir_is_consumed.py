@@ -46,6 +46,10 @@ PRODUCERS = [
     SRC / "typologies" / "venice",
     SRC / "typologies" / "chicago",
     SRC / "typologies" / "common",
+    SRC / "typologies" / "georgian",
+    SRC / "typologies" / "kyoto",
+    SRC / "typologies" / "deco",
+    SRC / "typologies" / "modernist",
     SRC / "block",
 ]
 
