@@ -620,31 +620,31 @@ _BAY_PITCH_PREFERRED = Abs(
     "context, not as its source",
 )
 
-#: **A26 — the third of the operator's figures, and the SOFT one.** How much of
-#: a bay the opening in it should be. OPERATOR-SET at 0.45, and explicitly
-#: *soft*: it has no minimum and no maximum, it may not make any frontage
-#: infeasible, and it may not override the bay band above.
+#: **A31 — the third of the operator's figures, and it is no longer soft.**
+#: How much of a bay the opening in it should be. It lives in ``catalogue`` now
+#: (``window_share_of_its_bay``) because BOTH phases read it, and a second copy
+#: here is exactly how the two would come apart.
 #:
-#: It has to be soft, because **the three figures cannot all hold at once**.
-#: The operator's ideal window is 1.30 m and the ideal bay 2.60 m, and
-#: ``1.30 / 2.60 = 0.500``, not 0.45. Reaching 0.45 with a 1.30 m window needs
-#: a **2.889 m** bay — inside the [2.00, 3.20] band, but 0.29 m above the bay
-#: the same instruction calls ideal. Two of the three can hold and the third
-#: cannot, and the operator settled which one gives way: this one. So at rest
-#: a facade shows a ratio of **0.500** and not 0.45.
+#: Under A26 it could only ever be a tie-break, and the reason was arithmetic:
+#: the operator's ideal window was 1.30 m and the ideal bay 2.60 m, and
+#: ``1.30 / 2.60 = 0.500``, not 0.45. Reaching 0.45 with a 1.30 m window needed
+#: a **2.889 m** bay — inside the band, but 0.29 m above the pitch the same
+#: instruction called ideal. Two of the three could hold and the third could
+#: not, so this one gave way and a facade showed 0.500 at rest.
 #:
-#: What the figure therefore does is exactly one thing: it is handed to the
-#: solver as the bay's ``affinity`` — a lean, not a target — where it breaks
-#: ties between bay counts that are otherwise equally far from the preferred
-#: widths. It never widens a bay on its own account, because doing that would
-#: be preferring 0.45 over the 2.60 that outranks it.
-_WINDOW_BAY_RATIO = Abs(
-    0.45,
-    "OPERATOR-SET and SOFT — the share of a bay its opening wants to be. It cannot "
-    "hold together with the other two ideals (a 1.30 m window in a 2.60 m bay is "
-    "0.500, and 0.45 would need a 2.889 m bay), and it is the one of the three that "
-    "gives way: it only breaks ties between bay counts",
-)
+#: **A31 moved the window instead of the ratio.** The band is now
+#: 1.05 / 1.15 / 1.30, so 0.45 of the preferred 2.60 m pitch is 1.170 m against
+#: a 1.150 m rest position — a 0.02 m disagreement where there was a 0.29 m
+#: one. The ratio is close enough to the other two figures that it no longer
+#: has to give way, and ``catalogue.window_in_slot`` now uses it to SET the
+#: width, clamped to the band: the opening takes its share of the bay and the
+#: pier takes the rest.
+#:
+#: It is still handed to the solver as the bay's ``affinity`` below, and that
+#: still only breaks ties between bay counts. What changed is that the ratio is
+#: now honoured in the width as well, so the affinity and the realised facade
+#: are asking for the same thing rather than for two different things.
+_WINDOW_BAY_RATIO = catalogue.window_share_of_its_bay()
 
 #: **D6, closed (A9.2).** The porte cochère's slot is the one fixed element
 #: standing in the bay run, and it is carried the full height of the facade —

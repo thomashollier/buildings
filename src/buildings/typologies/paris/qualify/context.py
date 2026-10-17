@@ -334,6 +334,26 @@ class QualContext:
     #: fires, in the same species as ``base_block_top`` — and a LEVEL rather
     #: than a floor number, so moving the noble floor moves this by itself.
     principal_level: float
+    #: **A31.** The PITCH of the frontage's repeating module, in metres —
+    #: the width of a ``REPEATING`` bay, which is one number for the whole
+    #: facade. Not the same as ``slot_w``: an entrance slot, a special or an
+    #: end has its own width and is not the rhythm.
+    #:
+    #: It is here because the opening's WIDTH is now read off the rhythm
+    #: (``catalogue.window_share_of_its_bay``), and a slot that is wider than
+    #: the rhythm must not get a wider window for it — the wall beside it
+    #: widens instead. That is D6's claim exactly: the column over a carriage
+    #: arch is an ordinary bay above the pavement, and it stays one because
+    #: its window is the rhythm's window standing in a wider slot.
+    #:
+    #: Defaults to 0.0, which ``window_in_slot`` reads as "unstated" and
+    #: falls back to ``slot_w`` for. That is what a hand-built context in a
+    #: test gets, and it is the pre-A31 behaviour, so a context that does not
+    #: know its rhythm behaves exactly as it did before.
+    #:
+    #: Last in the field list, and defaulted, because ``QualContext`` is a
+    #: positional frozen dataclass and dozens of tests build one by hand.
+    rhythm_pitch: float = 0.0
 
     # -- derived readers ----------------------------------------------------
     #
@@ -552,6 +572,13 @@ def contexts_for(
         max(st.slot.start + st.slot.width for st in base_block) if base_block else 0.0
     )
 
+    # A31: the pitch of the repeating module, read once for the whole facade.
+    # Every bay of kind REPEATING has the same width by construction, so the
+    # first is the pitch; where a grid has none, the rhythm is whatever the
+    # single slot is.
+    _repeating = [b for b in bays if b.kind is SlotKind.REPEATING]
+    rhythm_pitch = _repeating[0].width if _repeating else (bays[0].width if bays else 0.0)
+
     grid: list[tuple[QualContext, ...]] = []
     for st in roled.storeys:
         row: list[QualContext] = []
@@ -560,6 +587,7 @@ def contexts_for(
                 QualContext(
                     slot_h=st.slot.width,
                     slot_w=bay.width,
+                    rhythm_pitch=rhythm_pitch,
                     level_above_pavement=st.slot.start,
                     index_from_bottom=st.index_from_bottom,
                     index_from_top=st.index_from_top,

@@ -797,7 +797,8 @@ def test_the_openings_of_one_facade_stay_centred_and_never_widen_going_up():
       width than the band's ceiling, which A28 did not touch.
     """
     _low, high = catalogue.opening_aspect_band()
-    wanted_w = float(catalogue.opening_window().preferred)
+    spec = catalogue.opening_window()
+    share = float(catalogue.window_share_of_its_bay())
     seen = []
     for r, h in ((0, 3.6), (1, 3.3), (2, 3.0), (3, 2.8)):
         ctx, vals = _window_geometry(rank_from_principal=r, slot_h=h)
@@ -805,9 +806,17 @@ def test_the_openings_of_one_facade_stay_centred_and_never_widen_going_up():
         ht = vals["opening_height"]
         seen.append(w)
         assert vals["opening_offset_x"] == pytest.approx((ctx.slot_w - w) / 2.0, abs=1e-9)
+        # **A31: the width the BAY asks for, not the catalogue's rest
+        # position.** The claim being tested is unchanged and is the one that
+        # matters — the STOREY may not move the width — so the expected value
+        # is read off the pitch, which is the same on every storey, and the
+        # storey height is what varies down this loop.
+        pitch = ctx.rhythm_pitch or ctx.slot_w
+        wanted_w = min(float(spec.maximum), max(float(spec.minimum), share * pitch))
         assert w == pytest.approx(wanted_w, abs=1e-9), (
-            f"rank {r} on a {h} m storey: the storey moved an ABSOLUTE width — "
-            f"{w:.4f} m against the {wanted_w:.4f} m the catalogue declares"
+            f"rank {r} on a {h} m storey: the storey moved a width that answers "
+            f"to the BAY — {w:.4f} m against the {wanted_w:.4f} m a "
+            f"{pitch:.4f} m pitch asks for"
         )
         assert 1.0 < ht / w <= high + 1e-6, (r, w, ht, ht / w)
     assert len({round(w, 9) for w in seen}) == 1, (

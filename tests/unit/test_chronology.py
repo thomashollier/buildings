@@ -748,12 +748,21 @@ class TestDalyCalibration:
         width = catalogue.opening_window()
         for bound in (width.minimum, width.preferred, width.maximum):
             assert bound.kind is Kind.ABSOLUTE, bound
-            assert "OPERATOR-SET" in bound.why, bound
-            assert "SOURCED" not in bound.why, bound
-            assert "Daly 1864" in bound.why, bound  # what it departed from
+            # **A31: the band is partly SOURCED again.** Each bound must still
+            # declare which it is and still cite the corpus — what it may not
+            # do is carry no marker, or claim an authority it does not have.
+            assert ("OPERATOR-SET" in bound.why) or ("SOURCED" in bound.why), bound
+            assert "Daly 1864" in bound.why, bound
+        # The ceiling is the corpus's own printed figure, so it says SOURCED.
+        assert "SOURCED" in width.maximum.why, width.maximum
+        # The floor and the rest position are the operator's, and must say so
+        # rather than borrow the plate's authority.
+        assert "OPERATOR-SET" in width.minimum.why, width.minimum
+        assert "OPERATOR-SET" in width.preferred.why, width.preferred
         widths = {k: width.to_slot_spec(k).preferred for k in BuildingClass}
         assert len(set(widths.values())) == 1, widths
-        assert 1.20 <= float(width.preferred) <= 1.35
+        # Inside the corpus span now (1.04-1.30), where A26's band was not.
+        assert 1.04 <= float(width.preferred) <= 1.30
 
         height = catalogue.opening_height_at_the_nobile()
         assert height.kind is Kind.PROPORTIONAL
@@ -819,16 +828,25 @@ class TestDalyCalibration:
         corpus and the figure they departed from — because "we chose this" is
         only honest when it is next to "and here is what the evidence said".
         """
+        # **A31 narrowed this list to the bounds that are still overrides.**
+        # The maximum went back to the corpus's own printed '1.300' and is
+        # SOURCED again, so holding it to "must not say SOURCED" would now be
+        # asserting the opposite of the truth. The floor and the rest position
+        # remain the operator's and are held to the original standard.
         overridden = [
             catalogue.opening_window().minimum,
             catalogue.opening_window().preferred,
-            catalogue.opening_window().maximum,
         ]
         for q in overridden:
             assert "SOURCED" not in q.why, q
             assert "OPERATOR-SET" in q.why, q
             assert catalogue.DALY_1864 in q.why, q
             assert (catalogue.PRINTED in q.why) or (catalogue.SCALE_BAR in q.why), q
+        # And the one that came back must claim the corpus, not the operator.
+        restored = catalogue.opening_window().maximum
+        assert "SOURCED" in restored.why, restored
+        assert catalogue.DALY_1864 in restored.why, restored
+        assert catalogue.PRINTED in restored.why, restored
 
     def test_the_quantities_daly_could_not_carry_are_still_inferred(self):
         """**The half of A9.4 that is easiest to get wrong.** The measurement

@@ -316,6 +316,67 @@ LAYOUTS: dict[str, Layout] = {
         ),
         daly="39 rue Neuve des Mathurins: cornice 19.82, comble 3.18, 4 etages, two-storey porte cochere 2.57 x 5.00. Also 120 / 63 / 77 bd de Sebastopol and 6 bd Saint-Germain.",
     ),
+    "O": Layout(
+        key="O",
+        title="Ordinary — Daly's Troisieme Classe, no shop and no entresol",
+        site=SiteContext(
+            street_width=14.0, parcel_width=12.0, parcel_depth=13.0, year=1865,
+            klass=BuildingClass.ORDINARY, ground=GroundProgramme.RESIDENTIAL, seed=6,
+        ),
+        expect="RdC + 5 levels, NO entresol, porte pietonne in the rhythm, 6 axes",
+        why=(
+            "The first preset that is not a commercial building, and it is here "
+            "because the other ten were all COMFORTABLE or GRAND — the two "
+            "poorest classes had no canonical case at all, which is how the "
+            "squat-window problem stayed off the contact sheet for so long.\n\n"
+            "Two things make it Troisieme rather than a cheap Deuxieme. There is "
+            "no shop, so no entresol is bought and the base is one storey; and "
+            "the door is a porte pietonne, which since A27 takes an ordinary "
+            "2.625 m slot in the rhythm instead of displacing it. Both are what "
+            "the corpus shows at this class.\n\n"
+            "Note the street stops mattering here. Above about 10 m the cornice "
+            "plateaus at 14.92 m because the STOREY STACK binds before the 1859 "
+            "step table does — an ordinary building does not have the storey "
+            "heights to reach its own legal ceiling. That is the opposite of C3, "
+            "where the envelope decides, and it is worth having one preset of "
+            "each."
+        ),
+        daly=(
+            "Troisieme Classe, both of it: 36/38/40 bd Beaumarchais (Rolland) — "
+            "8.57 m per house, pitch 2.69, cornice 15.93, porte pietonne 1.36, "
+            "aspect_principal 1.96 — and rue de Longchamps (Bourlier) — 12.27 m, "
+            "pitch 2.39, cornice 15.64, aspect 1.93. NEITHER has an entresol and "
+            "both have a porte pietonne. The model reaches 14.92 m of cornice "
+            "against their 15.6-15.9, so it is about 0.8 m short at this class."
+        ),
+    ),
+    "M": Layout(
+        key="M",
+        title="Modest — the street binds, and the corpus runs out",
+        site=SiteContext(
+            street_width=8.0, parcel_width=9.0, parcel_depth=13.0, year=1865,
+            klass=BuildingClass.MODEST, ground=GroundProgramme.RESIDENTIAL, seed=6,
+        ),
+        expect="RdC + 4 levels on an 8 m street, 5 axes, cornice 11.30",
+        why=(
+            "The bottom of the ladder, and the one preset where the STREET binds "
+            "rather than the stack: at 8 m the 1859 step table caps the cornice "
+            "at 11.30 m and the building loses a storey against the same parcel "
+            "on a 10 m street. Every other preset is on a street wide enough that "
+            "something else decides first.\n\n"
+            "**Read this one against O.** Same programme, same seed, one class "
+            "and six metres of street apart, and the difference is the whole "
+            "argument of the model: nobody chose to make this building shorter."
+        ),
+        daly=(
+            "NOT IN THE CORPUS, and this is the honest caveat. Daly has three "
+            "classes and Troisieme is the bottom of them, so MODEST is an "
+            "extrapolation below everything measured — the generic ranges "
+            "extended downward, not a building anybody drew. Treat its numbers "
+            "as the model's opinion rather than as evidence, and do not "
+            "calibrate on it."
+        ),
+    ),
 }
 
 

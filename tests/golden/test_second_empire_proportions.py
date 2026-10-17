@@ -287,43 +287,71 @@ class TestDoorWidthByType:
 
 
 class TestWindowOpeningWidth:
-    """OPERATOR-SET (A26), and the corpus recorded beside it.
+    """**A31 — the band is back inside the corpus, and it is a BAND again.**
 
     Daly 1864, sixteen buildings across all three classes, measures the width
     at 1.04-1.30 m, non-monotonic by class (median 1.139 / 1.235 / 1.070), with
     a printed '1.300' at 2-4 boulevard de Sébastopol anchoring the top and a
-    scale-bar reading at rue de Longchamps at the floor. That was the band.
+    scale-bar reading at rue de Longchamps at the floor.
 
-    The operator has set the band at 1.20 / 1.30 / 1.35, which sits inside the
-    top third of the corpus span and steps 0.05 m past its ceiling. The class
-    findings below are untouched by that — the width is still one band for all
-    four classes — but the band is no longer a description of the sixteen
-    plates, and this class says which of the two it is."""
+    A26 had set 1.20 / 1.30 / 1.35 — a floor above every Troisième reading and
+    a ceiling 0.05 m past anything measured — and, because ``_fit_width`` was
+    handed the preferred directly, the realised width was 1.300 on every
+    building of every class: the corpus MAXIMUM, cut universally.
 
-    def test_the_band_is_the_operators_and_says_so(self) -> None:
-        spec = catalogue.opening_window()
-        assert float(spec.minimum) == pytest.approx(1.20, abs=1e-6)
-        assert float(spec.preferred) == pytest.approx(1.30, abs=1e-6)
-        assert float(spec.maximum) == pytest.approx(1.35, abs=1e-6)
-        for bound in (spec.minimum, spec.preferred, spec.maximum):
-            assert "OPERATOR-SET" in bound.why, bound
+    The band is now 1.05 / 1.15 / 1.30 and the realised width is
+    ``0.45 x pitch`` clamped to it (``catalogue.window_share_of_its_bay``), so
+    the whole band is reachable instead of one figure in it.
+    """
 
-    def test_the_band_no_longer_matches_the_corpus_span_and_the_gap_is_recorded(
-        self,
-    ) -> None:
-        """Kept as a test rather than deleted, because the gap is the finding.
+    def test_the_band_sits_inside_the_corpus_span(self) -> None:
+        """The floor and ceiling are the measurements again, near enough.
 
-        Daly's span is 1.04-1.30 m. The operator's band is 1.20-1.35 m. The
-        floor has risen 0.16 m and the ceiling 0.05 m past anything measured,
-        so every window this generator cuts is at or above the corpus median
-        and some are wider than any croisée in it. That is a legitimate
-        decision and an invisible one unless something asserts it, which is
-        what this does.
+        The ceiling IS the corpus ceiling — the printed callout. The floor is
+        0.01 m above the narrowest croisée measured, which is operator
+        rounding rather than a departure, and is asserted as such.
         """
         spec = catalogue.opening_window()
         corpus_lo, corpus_hi = 1.04, 1.30
-        assert float(spec.minimum) > corpus_lo + 0.10
-        assert float(spec.maximum) > corpus_hi
+        assert float(spec.minimum) == pytest.approx(1.05, abs=1e-6)
+        assert float(spec.preferred) == pytest.approx(1.15, abs=1e-6)
+        assert float(spec.maximum) == pytest.approx(1.30, abs=1e-6)
+        assert float(spec.maximum) == pytest.approx(corpus_hi, abs=1e-6), (
+            "the ceiling is the printed '1.300' at 2-4 bd de Sébastopol"
+        )
+        assert 0.0 <= float(spec.minimum) - corpus_lo <= 0.02, (
+            "the floor is the narrowest measured croisée, rounded up by a "
+            "centimetre — not a departure from it"
+        )
+        assert corpus_lo <= float(spec.preferred) <= corpus_hi
+
+    def test_the_preferred_is_a_rest_position_and_the_band_is_reachable(
+        self, ir_sweep
+    ) -> None:
+        """A31's whole claim, asserted on the output rather than the constants.
+
+        Under A26 every window in every building measured 1.300 — the width
+        was a constant wearing a band. If that returns, this fails: the sweep
+        must show the width MOVING, and moving with the pitch.
+        """
+        spec = catalogue.opening_window()
+        share = float(catalogue.window_share_of_its_bay())
+        widths = set()
+        for _site, building in ir_sweep:
+            for opening in _windows(building):
+                w = opening.props["w"]
+                if w > 1e-9:
+                    widths.add(round(w, 6))
+        assert len(widths) > 1, (
+            f"every window in the sweep measures {widths} — the width is a "
+            "constant again, not a band"
+        )
+        assert min(widths) >= float(spec.minimum) - 1e-6
+        assert max(widths) <= float(spec.maximum) + 1e-6
+        # ...and the rest position is what an untroubled bay actually lands on.
+        assert float(spec.preferred) == pytest.approx(
+            share * (float(spec.preferred) / share), abs=1e-9
+        )
 
     def test_window_width_never_exceeds_the_sourced_band_anywhere_in_the_ir(
         self, ir_sweep

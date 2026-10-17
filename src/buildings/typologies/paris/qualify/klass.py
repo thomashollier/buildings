@@ -357,6 +357,7 @@ def window_size_is_what_the_bay_and_the_owner_allow(
         ctx.klass,
         wanted_aspect=aspect_for_rank(ctx.rank_from_principal),
         sill=sill,
+        rhythm_pitch=ctx.rhythm_pitch,
     )
     return Properties(
         _geometry_props(geom, sill),
@@ -492,6 +493,7 @@ def entresol_arcade_is_sized_by_the_storey_it_lights(
         # binding constraint; what changes is that it is now the *stated* one.
         wanted_height=catalogue.light_head_room(slot_h),
         sill=sill,
+        rhythm_pitch=ctx.rhythm_pitch,
     )
     return Properties(
         _geometry_props(geom, sill),
@@ -525,6 +527,7 @@ def a_narrow_special_is_sized_off_its_own_module(
         ctx.klass,
         wanted_aspect=aspect_for_rank(ctx.rank_from_principal),
         sill=sill,
+        rhythm_pitch=ctx.rhythm_pitch,
     )
     if kind == "oeil_de_boeuf":
         geom = catalogue.roundel_in_slot(

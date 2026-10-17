@@ -130,6 +130,70 @@ four goldens the same holds; the `special` nodes that moved carry
    *grows* as the building gets grander, which was the original defect (a 16 m
    frontage reading 5 / 5 / 4 / 4 down the ladder).
 
+### The opening takes its share of the bay, and the pier takes the rest (A31)
+
+**The band is now `1.05 / 1.15 / 1.30`**, and the realised width is
+`clamp(0.45 x pitch, 1.05, 1.30)` rather than a constant.
+
+A26 had set `1.20 / 1.30 / 1.35` — a floor above every Troisieme reading and a
+ceiling 0.05 m past anything measured — and because `_fit_width` was handed the
+preferred directly, **the realised width was 1.300 on every building of every
+class**: the corpus MAXIMUM, cut universally. Daly's 16 buildings run 1.04-1.30,
+median 1.210, and only ONE of the sixteen reaches 1.30. The class the model was
+squattest on, Troisieme, measures 1.100 and 1.040.
+
+The ratio that now decides it existed already as `structure._WINDOW_BAY_RATIO`,
+demoted to a tie-break between bay counts because it could not agree with a
+1.30 m window: `1.30 / 2.60 = 0.500`, and 0.45 needed a 2.889 m bay. At 1.15 the
+disagreement is 0.02 m instead of 0.29 m, so **the ratio no longer has to give
+way** and has moved to `catalogue.window_share_of_its_bay()`, read by both
+phases so no second copy can drift.
+
+    pitch 2.000 -> window 1.050  pier 0.950   at the FLOOR
+    pitch 2.333 -> window 1.050  pier 1.283   0.45 begins to hold
+    pitch 2.600 -> window 1.170  pier 1.430   0.45
+    pitch 2.889 -> window 1.300  pier 1.589   at the CEILING
+    pitch 3.200 -> window 1.300  pier 1.900   pier takes everything
+
+Swept 10 358 openings over 4 classes x 6 streets x 3 programmes x 4 parcels:
+**100 % hold the ratio at exactly 0.450**, 5 distinct realised widths spanning
+1.076-1.170. Neither clamp binds in practice — realised pitches run 2.39-2.60,
+inside the 2.333-2.889 window where the ratio holds — so the clamps are there
+for the edges rather than doing the work.
+
+**It is the RHYTHM's pitch, not the slot's own width**, and that distinction is
+D6. Taking 0.45 of the 3.040 m carriage slot gave the arch column a 1.300 m
+light beside neighbours of 1.130, and the entrance read as special all the way
+up the facade;
+`test_the_column_over_a_carriage_arch_is_an_ordinary_bay_above_the_pavement`
+caught it. `QualContext.rhythm_pitch` (A31, last field, defaults to 0.0 =
+"unstated" so hand-built contexts behave as before) carries the repeating
+module's width, and a slot wider than the rhythm gets wider MASONRY, not a
+wider window.
+
+**A28 is not weakened.** The pitch is one number for a whole facade and
+`_BAY_PITCH_CLASS_SPREAD` is 0.0, so a width read off it varies with neither
+the storey nor the class — the two things A28 forbade. What it varies with is
+the BAY, which is a compositional fact about the frontage.
+
+Tests changed rather than patched, and two were asserting the *opposite* of the
+new truth:
+
+- `test_the_band_no_longer_matches_the_corpus_span_and_the_gap_is_recorded`
+  existed to pin A26's deliberate departure from Daly. The band matches the
+  corpus again, so it was replaced by `test_the_band_sits_inside_the_corpus_span`
+  plus `test_the_preferred_is_a_rest_position_and_the_band_is_reachable`, which
+  fails if the width ever collapses back to one value.
+- `test_a_quantity_the_operator_overrode_stops_claiming_the_corpus` held all
+  three bounds to "must NOT say SOURCED". The maximum went back to the printed
+  '1.300' and IS sourced, so the list narrowed to the floor and the rest
+  position, and the maximum is now asserted to claim the corpus.
+
+**Still open, and A31 does not touch it:** the vertical taper. Ordinary still
+runs 1.85 -> 1.15 in aspect up a facade because the fixed sill+lintel+band
+deduction takes a bigger share of each shorter storey. A31 lifts the whole
+ladder; it does not flatten it. See the deduction note below.
+
 ## Open, and none of it is blocking
 
 **The carriage jamb is PROVISIONAL.** `carriage_jamb_width` is 0.22, marked

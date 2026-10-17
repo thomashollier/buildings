@@ -188,6 +188,7 @@ __all__ = [
     "opening_aspect_band",
     "OpeningGeometry",
     "light_head_room",
+    "window_share_of_its_bay",
     "window_in_slot",
     "shopfront_in_slot",
     "carriage_entrance_in_slot",
@@ -350,28 +351,81 @@ def opening_window() -> ModuleSpec:
         name="opening_window",
         slot_kind=SlotKind.FLEXIBLE,
         minimum=Abs(
-            1.20,
-            f"OPERATOR-SET — the narrowest croisée this generator will cut. NOT a "
-            f"corpus reading: {DALY_1864} measures the narrowest typical croisée at "
-            f"1.04 m (rue de Longchamps, Troisième Classe; {SCALE_BAR}), which is "
-            f"0.16 m under this floor",
+            1.05,
+            f"OPERATOR-SET, and 0.01 m above the corpus floor: {DALY_1864} measures "
+            f"the narrowest typical croisée at 1.04 m (rue de Longchamps, Troisième "
+            f"Classe; {SCALE_BAR}). A26 had raised this to 1.20, which stood above "
+            f"every Troisième reading in the corpus",
         ),
         preferred=Abs(
-            1.30,
-            f"OPERATOR-SET — the croisée width this generator rests at. NOT the "
-            f"corpus median: {DALY_1864}'s 16 buildings run 1.04-1.30 m with medians "
-            f"1.139 / 1.235 / 1.070 by class (non-monotonic, which is why the "
-            f"quantity is ABSOLUTE). This figure equals the corpus MAXIMUM, the "
-            f"printed croisée callout '1.300' at 2-4 boulevard de Sébastopol "
-            f"({PRINTED}), not its middle",
+            1.15,
+            f"OPERATOR-SET — the croisée width this generator rests at when nothing "
+            f"else decides. **A31 made it a rest position rather than the answer**: "
+            f"the realised width now tracks the pitch at "
+            f"``window_share_of_its_bay`` and this figure is where that lands at a "
+            f"2.556 m bay. It replaces 1.30, which equalled the corpus MAXIMUM — the "
+            f"printed callout '1.300' at 2-4 boulevard de Sébastopol ({PRINTED}) — "
+            f"and so put the widest croisée Daly printed on every building of every "
+            f"class. {DALY_1864}'s 16 buildings run 1.04-1.30 m, median 1.210, with "
+            f"medians 1.139 / 1.235 / 1.070 by class: non-monotonic, which is why "
+            f"this quantity is ABSOLUTE and why no class ladder may be read into it",
         ),
         maximum=Abs(
-            1.35,
-            f"OPERATOR-SET — NOT a corpus reading: the widest typical croisée "
-            f"{DALY_1864} shows is the printed '1.300' at 2-4 boulevard de "
-            f"Sébastopol ({PRINTED}), 0.05 m under this ceiling",
+            1.30,
+            f"SOURCED — the widest typical croisée in the corpus: the printed "
+            f"'1.300' at 2-4 boulevard de Sébastopol ({DALY_1864}; {PRINTED}). "
+            f"A26 had set 1.35, which stood 0.05 m above anything measured",
         ),
         elasticity=1.0,
+    )
+
+
+def window_share_of_its_bay() -> Quantity:
+    """What share of its bay a croisée wants to be: 0.45.
+
+    **A31 — this is now a RULE, not only a tie-break.** It used to live in
+    ``structure`` as ``_WINDOW_BAY_RATIO``, where its one job was to give the
+    bay an ``affinity``: a lean toward ``window / 0.45`` that broke ties
+    between bay counts otherwise equally far from the preferred pitch. It
+    never decided a width. The consequence was that one ABSOLUTE width was cut
+    into every bay whatever the bay measured, so a 2.00 m bay and a 3.20 m bay
+    carried the same opening and the wide one came out as a narrow window in a
+    great expanse of masonry.
+
+    It now sets the width. ``window_in_slot`` asks this ratio of the pitch it
+    was handed, and clamps the answer to ``opening_window``'s band:
+
+        wanted = clamp(0.45 x pitch, 1.05, 1.30)
+
+    So the opening grows with its bay between a 2.333 m pitch and a 2.889 m
+    one, and **outside that range the PIER takes the difference** — which is
+    the operator's rule, and is what the ABSOLUTE band means. Below 2.333 m
+    the window is at its floor and the pier thins to its own minimum; above
+    2.889 m the window is at its ceiling and every further millimetre of pitch
+    is masonry. The band is what protects the proportion: at the 1.30 ceiling
+    even a modest building's noble light still reads 1.57, inside the aspect
+    band, where an unclamped 0.45 of a 3.20 m bay would be 1.44 m wide and
+    read 1.42.
+
+    **It stays class-flat and storey-flat, which is A28's claim and is not
+    weakened here.** The pitch is one number for a whole facade, and
+    ``_BAY_PITCH_CLASS_SPREAD`` is 0.0, so a width derived from the pitch does
+    not vary by storey and does not vary by class. What it varies with is the
+    BAY, which is a compositional fact about the frontage rather than a fact
+    about money or about which floor you are on. Those were the two things
+    A28 forbade the width to answer to, and it still answers to neither.
+
+    ABSOLUTE: a ratio is dimensionless and survives ``scale_for_class``
+    untouched by construction, which is the same reason
+    ``opening_aspect_band`` is a bare pair rather than a ``Quantity``.
+    """
+    return Abs(
+        0.45,
+        "OPERATOR-SET — the share of a bay its opening wants to be. At the "
+        "preferred pitch of 2.60 m it asks for 1.170 m and the band rests at "
+        "1.150 m, so the two now very nearly agree; under the old 1.30 m width "
+        "they did not, and this figure was demoted to a tie-break to hide the "
+        "gap",
     )
 
 
@@ -1366,6 +1420,7 @@ def window_in_slot(
     sill: float,
     wanted_aspect: float | None = None,
     wanted_height: float | None = None,
+    rhythm_pitch: float | None = None,
 ) -> OpeningGeometry:
     """An ordinary window, cut in the wall of one slot on one storey.
 
@@ -1484,7 +1539,34 @@ def window_in_slot(
     # Named, because A28's whole claim is that this is the width that comes
     # out — the slot's and the ABSOLUTE's, and nothing else's. The assertion
     # at the end holds the two together.
-    fitted_w = _fit_width(slot_w, win.preferred, win.minimum, pier_min)
+    # **A31 — the opening takes its share of the bay, and the PIER takes the
+    # rest.** ``win.preferred`` used to be handed straight to ``_fit_width``,
+    # so one width was cut into every bay whatever the bay measured: a 2.00 m
+    # bay and a 3.20 m bay carried the same opening, and the wide one read as
+    # a narrow window lost in masonry. The ratio that decides it existed
+    # already — it was ``structure._WINDOW_BAY_RATIO``, demoted to a tie-break
+    # between bay counts because it could not agree with a 1.30 m window.
+    #
+    # Clamped to the ABSOLUTE band, which is where the operator's rule lives:
+    # once the opening reaches 1.30 it stops growing and the pier widens
+    # instead. The clamp is also what keeps the PROPORTION — see
+    # ``window_share_of_its_bay`` for the arithmetic.
+    #
+    # Class-flat and storey-flat still: the pitch is one number for a whole
+    # facade and carries no class trend (``_BAY_PITCH_CLASS_SPREAD`` is 0.0),
+    # so a width read off it varies with the BAY and with nothing else.
+    #
+    # **It is the RHYTHM's pitch, not this slot's own width.** A slot wider
+    # than the rhythm -- a carriage arch's column, a special -- does not get a
+    # wider window for it; the masonry beside it widens instead. That is D6's
+    # claim: above the pavement the entrance column is an ordinary bay, and it
+    # stays one because it carries the rhythm's own window. Taking 0.45 of the
+    # 3.040 m arch slot instead gave it a 1.300 m light beside neighbours of
+    # 1.130 m, and the entrance read as special all the way up the facade.
+    share = float(window_share_of_its_bay())
+    pitch = slot_w if rhythm_pitch is None or rhythm_pitch <= _EPS else rhythm_pitch
+    wanted_w = min(float(win.maximum), max(float(win.minimum), share * pitch))
+    fitted_w = _fit_width(slot_w, wanted_w, win.minimum, pier_min)
     width = fitted_w
     # PROPORTIONAL, and the only place in this function class enters at all.
     # ``wanted_aspect`` is the storey's rank expressed as a position in the
@@ -1575,16 +1657,23 @@ def window_in_slot(
     # chamfer, by refusing the light.
     #
     # A blind panel has no geometry to be wrong about, and is excused whole.
+    # **A31 moved the second clause from ``preferred`` to ``maximum``.** Under
+    # A28 the preferred WAS the answer, so it was also the ceiling. It is now
+    # a rest position: the width tracks the pitch and may legitimately stand
+    # above the preferred, but never above the ABSOLUTE band's own top, which
+    # is the corpus's widest printed croisée. The first clause is unchanged
+    # and is still the tripwire that matters — nothing between ``_fit_width``
+    # and the return may move the width in either direction.
     assert geom.height <= _EPS or (
         abs(geom.width - fitted_w) <= 1e-9
-        and geom.width <= float(win.preferred) + 1e-6
+        and geom.width <= float(win.maximum) + 1e-6
         and geom.sill + geom.height <= head_room + 1e-6
     ), (
         f"a {geom.width:.4f} x {geom.height:.4f} m opening on a {geom.sill:.4f} m "
         f"sill is not something this catalogue can have cut: the width must be "
         f"the {fitted_w:.4f} m the slot and the ABSOLUTE give it and no more than "
-        f"the {float(win.preferred):.2f} m declared, and the sill plus the height "
-        f"must stand inside the storey's {head_room:.4f} m of head room "
+        f"the {float(win.maximum):.2f} m the band allows, and the sill plus the "
+        f"height must stand inside the storey's {head_room:.4f} m of head room "
         f"(slot {slot_w:.3f} x {slot_h:.3f} m, sill asked {sill:.3f} m, class "
         f"{klass.value})"
     )
