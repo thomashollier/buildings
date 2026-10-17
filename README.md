@@ -186,10 +186,12 @@ src/buildings/
   site.py         the situation
   ir/             node vocabulary + lossless serialisation
   solver/         the fitting solver and its absorption ladder
+  cga/            the split-grammar engine: shapes, split/fit/insert, scoped overrides
   typologies/paris/
     reglement.py  the regulations, ported unchanged and sourced
     structure.py  roles.py  chronology.py  catalogue.py
     qualify/  compose.py  terminate.py  generate.py
+    grammar.py    the same building as a split grammar (dev/CGA.md)
   block/          frontage subdivision, adjacency, shared datums
   render/svg/     the renderer, which decides nothing arguable
 tests/
@@ -205,6 +207,8 @@ python3 dev/harness/first_building.py                # one building, fully trace
 python3 dev/harness/contact_sheets.py                # visual sweeps
 python3 dev/harness/check_no_period_branching.py     # guard
 python3 dev/harness/check_renderer_dumb.py           # guard
+python3 dev/harness/cga_equivalence.py               # grammar == pipeline, 3000 cases
+python3 dev/harness/cga_blast_radius.py              # local changes stay local
 open dev/reference/review.html                       # reference corpus selection
 ```
 
