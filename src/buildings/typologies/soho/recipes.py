@@ -69,7 +69,11 @@ class Recipe:
     ground_material: str
     ground_storey: Quantity
     first_upper: Quantity
-    taper: float  # metres lost per storey going up
+    #: Each upper storey is this fraction of the one below it. Lofts were let
+    #: floor by floor and the best rent was low down, so the ceilings fall as
+    #: the stair gets longer: the second floor is the tall one, the top the
+    #: shortest. Proportional, so it reads the same on any storey count.
+    taper: Quantity
     upper_storeys: int
     # The bay module and the end pier, as (min, preferred, max).
     bay_pitch: tuple[float, float, float]
@@ -96,7 +100,7 @@ def _federal(site: SohoSite) -> Recipe:
         ground_material="brick",
         ground_storey=Abs(3.35, "INFERRED -- a raised parlour floor over its basement"),
         first_upper=Abs(3.05, "INFERRED -- the chamber floor"),
-        taper=0.0,
+        taper=Prop(1.0, "one chamber floor over the parlour: nothing to taper"),
         upper_storeys=1,
         bay_pitch=(1.9, 2.1, 2.5),
         end_pier=(0.6, 0.85, 1.3),
@@ -121,8 +125,8 @@ def _cast_iron(site: SohoSite) -> Recipe:
         wall_material="cast_iron",
         ground_material="cast_iron",
         ground_storey=Abs(5.4 if grand else 4.9, "INFERRED -- a store with a mezzanine-height ceiling"),
-        first_upper=Abs(4.5 if grand else 4.2, "INFERRED -- a loft lit from the street end only"),
-        taper=0.15,
+        first_upper=Abs(4.7 if grand else 4.4, "INFERRED -- the best-let loft, lit from the street end only"),
+        taper=Prop(0.93, "INFERRED -- an iron loft loses about 7% a floor, 4.4 m to about 3.3 m at the top"),
         upper_storeys=5 if site.year >= 1870 else 4,
         bay_pitch=(2.3, 2.55, 2.9),
         end_pier=(0.3, 0.42, 0.7),
@@ -146,8 +150,8 @@ def _brick_loft(site: SohoSite) -> Recipe:
         wall_material="brick",
         ground_material="cast_iron",
         ground_storey=Abs(4.6, "INFERRED -- a cast-iron storefront under brick"),
-        first_upper=Abs(3.8, "INFERRED"),
-        taper=0.10,
+        first_upper=Abs(3.9, "INFERRED -- the tallest loft floor, over the store"),
+        taper=Prop(0.94, "INFERRED -- a brick loft loses about 6% a floor, 3.9 m to about 3.0 m at the top"),
         upper_storeys=5,
         bay_pitch=(1.7, 1.95, 2.3),
         end_pier=(0.45, 0.6, 0.9),

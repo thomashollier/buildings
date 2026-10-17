@@ -98,7 +98,7 @@ def _lot(lot: Shape, d: Derivation) -> None:
     """A facade stands on the lot; a dwelling of its date also has a roof."""
     r = _recipe(lot)
     heights = [float(r.ground_storey)] + [
-        float(r.first_upper) - i * r.taper for i in range(r.upper_storeys)
+        float(r.first_upper) * float(r.taper) ** i for i in range(r.upper_storeys)
     ]
     lot.attrs["storey_heights"] = heights
     facade_h = math.fsum(heights)

@@ -81,3 +81,13 @@ def test_every_part_stands_inside_the_part_it_refines():
         for shape in lot.walk():
             if shape.parent is not None and shape.label not in ("Cornice", "Chimney"):
                 assert shape.parent.scope.contains(shape.scope), shape
+
+
+def test_storeys_get_shorter_as_they_climb():
+    for site in (IRON, IRON_WIDE, BRICK):
+        building, _ = generate_soho(site)
+        heights = [n.props["h"] for n in building.children if n.kind == "storey"]
+        uppers = heights[1:]
+        assert heights[0] > uppers[0], heights
+        assert all(a > b for a, b in zip(uppers, uppers[1:])), heights
+        assert uppers[-1] / uppers[0] < 0.85, heights
