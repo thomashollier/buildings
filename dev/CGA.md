@@ -65,6 +65,30 @@ functions (`emit_opening`, `emit_surround`, `emit_keystone`, `emit_rail`, ...)
 live in `compose.py` and are shared with the pipeline, so there is one copy of
 each.
 
+## A second typology: SoHo
+
+`src/buildings/typologies/soho/` is New York's cast-iron district on the same
+engine. There are three types, chosen by date and programme
+(`recipes.recipe_for`):
+
+- **Federal rowhouse** (to c. 1835): brick, three bays, a pitched roof with
+  dormers and end chimneys.
+- **Cast-iron loft** (1848 to 1880): mostly glass between iron columns, an
+  entablature on every floor, and a deep bracketed cornice. Window heads go
+  from round to segmental to flat as the date moves.
+- **Brick store-and-loft** (1880s): brick piers over a cast-iron storefront,
+  with a fire escape.
+
+The grammar has the same shape as Paris. Only the data and two productions
+(Column, FireEscape) differ, and the bay rhythm is sized by the engine's own
+`fit`. Its numbers are **INFERRED** round figures, not measured like the Paris
+ones. `dev/harness/soho_sheet.py` draws a street of them at one scale beside
+a Paris immeuble.
+
+The renderer gained three things for it, each keyed by a name the IR states:
+`wall_material` (stone, cast iron, brick), a `column` node with an `order`, and
+a `bracketed` cornice.
+
 ## Checking it
 
 ```bash

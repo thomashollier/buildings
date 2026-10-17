@@ -41,6 +41,7 @@ SRC = ROOT / "src" / "buildings"
 RENDER = SRC / "render"
 PRODUCERS = [
     SRC / "typologies" / "paris",
+    SRC / "typologies" / "soho",
     SRC / "block",
 ]
 

@@ -448,6 +448,14 @@ def _draw_chamfer(canvas: Canvas, chamfer: Node) -> None:
     canvas.line(w, 0.0, w, h, _C["pier_line"], 0.3)
 
 
+#: Wall paint keyed by the material a storey states (``wall_material``).
+_WALL_PAINT = {
+    "stone": _C["wall"],
+    "cast_iron": _C["wall_cast_iron"],
+    "brick": _C["wall_brick"],
+}
+
+
 def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) -> None:
     y = _num(storey.props, "y")
     h = _num(storey.props, "h")
@@ -461,7 +469,9 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
     if storey.props.get("on_the_stone_facade") is False:
         return
 
-    canvas.rect(0.0, y, facade_w, h, _C["wall"], stroke_w=0.4)
+    # Wall paint follows the material the storey states; stone where it states none.
+    wall = _WALL_PAINT.get(storey.props.get("wall_material") or "stone", _C["wall"])
+    canvas.rect(0.0, y, facade_w, h, wall, stroke_w=0.4)
 
     for child in storey.children:
         if child.kind == "socle":
@@ -474,6 +484,10 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
             el.draw_cornice(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), child.props)
         elif child.kind == "bay":
             _draw_bay(canvas, child)
+    # Columns stand in front of the bays they divide, so they are drawn after.
+    for child in storey.children:
+        if child.kind == "column":
+            el.draw_column(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
 
     canvas.line(0.0, y, facade_w, y, _C["outline"], 0.5)
 

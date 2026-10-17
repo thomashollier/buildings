@@ -560,6 +560,25 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
     # frontage by it, so a modest attic cornice and a grand entresol's carried
     # the same brackets per metre and only the wall behind them changed size.
     n = _count(props, "ornament_count", 2)
+    if props.get("cornice_ornament") == "bracketed":
+        # A deep crowning cornice on scrolled brackets, the frieze between
+        # them: the console's size is the cornice's own stated depth.
+        frieze = depth * 1.3
+        canvas.rect(x, y - frieze, w, frieze, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.4)
+        spacing = w / max(1, n - 1)
+        bw = min(0.30, spacing * 0.3)
+        for i in range(n):
+            bx = x + i * spacing
+            canvas.polygon(
+                [(bx - bw / 2, y), (bx + bw / 2, y), (bx + bw / 4, y - frieze * 1.15), (bx - bw / 4, y - frieze * 1.15)],
+                _C["ornament"],
+                stroke=_C["cornice_stroke"],
+                stroke_w=0.4,
+            )
+        lip = min(projection * 0.35, 0.35)
+        canvas.rect(x - lip, y, w + 2 * lip, depth * 0.45, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.4)
+        canvas.rect(x - lip * 1.2, y + depth * 0.45, w + 2.4 * lip, depth * 0.3, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.5)
+        return
     if props.get("cornice_ornament") == "modillioned":
         # Modillions: chunky brackets, evenly spread along the run.
         spacing = w / n
@@ -573,6 +592,36 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
             canvas.rect(dx, y - shadow_h - 0.04, 0.06, 0.04, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.3)
     canvas.rect(x - overhang, y, w + 2 * overhang, depth, _C["cornice"], stroke_w=0.0)
     canvas.rect(x - overhang, y, w + 2 * overhang, depth, "none", stroke=_C["cornice_stroke"], stroke_w=0.3)
+
+
+def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
+    """An engaged column or pilaster standing on a pier, ``(x, y, w, h)`` being
+    its own rectangle. ``order`` says what its capital is; nothing here
+    decides where it stands or how wide it is."""
+    if w <= 1e-9 or h <= 1e-9:
+        return
+    order = props.get("order") or "pilaster"
+    base_h = min(0.12, h * 0.05)
+    cap_h = min(0.30, h * 0.09) if order == "corinthian" else min(0.14, h * 0.05)
+    shaft_w = w * (0.78 if order != "pilaster" else 0.9)
+    sx = x + (w - shaft_w) / 2.0
+    canvas.rect(x, y, w, base_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
+    canvas.rect(sx, y + base_h, shaft_w, h - base_h - cap_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
+    if order != "pilaster":
+        # Fluting reads as two hairlines on a shaft this narrow.
+        for f in (0.33, 0.67):
+            fx = sx + shaft_w * f
+            canvas.line(fx, y + base_h + 0.05, fx, y + h - cap_h - 0.05, _C["column_stroke"], 0.25)
+    if order == "corinthian":
+        canvas.polygon(
+            [(sx, y + h - cap_h), (sx + shaft_w, y + h - cap_h), (x + w, y + h), (x, y + h)],
+            _C["ornament"],
+            stroke=_C["column_stroke"],
+            stroke_w=0.4,
+        )
+        canvas.line(x + w * 0.2, y + h - cap_h * 0.45, x + w * 0.8, y + h - cap_h * 0.45, _C["column_stroke"], 0.3)
+    else:  # doric and pilaster: a plain block capital
+        canvas.rect(x, y + h - cap_h, w, cap_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
 
 
 def draw_string_course(canvas: Canvas, x: float, y: float, w: float, props: Mapping[str, object]) -> None:

@@ -61,4 +61,10 @@ COLORS: dict[str, str] = {
     "sky": "#D6E8F0",
     "ground": "#8A9A7A",
     "outline": "#4A4038",
+    # Wall paint by the material the IR states (``wall_material``). Stone is
+    # the default above; these are the two a New York loft street adds.
+    "wall_cast_iron": "#D9D3C3",
+    "wall_brick": "#9E5440",
+    "column": "#CFC8B6",
+    "column_stroke": "#7A7262",
 }

@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""A street of SoHo types at one scale, beside a Paris immeuble for contrast.
+
+Run:  python3 dev/harness/soho_sheet.py OUT_DIR
+
+Every facade is drawn by the real renderer from the real IR, at the same
+pixels per metre, standing on one ground line, so the proportions compare.
+"""
+from __future__ import annotations
+
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "src"))
+
+from buildings.render.svg.render import _MARGIN_M, render  # noqa: E402
+from buildings.site import BuildingClass, GroundProgramme, SiteContext  # noqa: E402
+from buildings.typologies.paris.grammar import generate_cga  # noqa: E402
+from buildings.typologies.soho.grammar import generate_soho  # noqa: E402
+from buildings.typologies.soho.recipes import Programme, SohoSite  # noqa: E402
+
+PX_PER_M = 26.0
+
+STREET = [
+    ("Federal rowhouse, 1825", generate_soho(SohoSite(1, 1825, Programme.DWELLING, BuildingClass.ORDINARY))[0]),
+    ("Cast-iron loft, 1858", generate_soho(SohoSite(1, 1858, Programme.LOFT, BuildingClass.COMFORTABLE))[0]),
+    ("Cast-iron loft, 1872, three lots", generate_soho(SohoSite(3, 1872, Programme.LOFT, BuildingClass.GRAND))[0]),
+    ("Brick store-and-loft, 1886", generate_soho(SohoSite(1, 1886, Programme.LOFT, BuildingClass.ORDINARY))[0]),
+    ("Brick store-and-loft, 1888, two lots", generate_soho(SohoSite(2, 1888, Programme.LOFT, BuildingClass.ORDINARY, seed=2))[0]),
+    (
+        "For contrast: Paris, 1865",
+        generate_cga(SiteContext(20.0, 14.0, 14.0, 1865, BuildingClass.COMFORTABLE, GroundProgramme.SHOP, seed=8))[0],
+    ),
+]
+
+
+def sheet() -> str:
+    panels = []
+    for caption, building in STREET:
+        width_px = (float(building.props["w"]) + 2 * _MARGIN_M) * PX_PER_M
+        svg = render(building, width_px=int(round(width_px)))
+        w, h = (float(v) for v in re.search(r'width="([\d.]+)" height="([\d.]+)"', svg).groups())
+        panels.append((caption, svg, w, h))
+    gap, top, bottom = 18, 30, 40
+    total_w = sum(p[2] for p in panels) + gap * (len(panels) + 1)
+    max_h = max(p[3] for p in panels)
+    total_h = max_h + top + bottom
+    out = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_w:.0f}" height="{total_h:.0f}" '
+        f'viewBox="0 0 {total_w:.0f} {total_h:.0f}">',
+        f'<rect width="{total_w:.0f}" height="{total_h:.0f}" fill="#ffffff"/>',
+    ]
+    x = gap
+    for caption, svg, w, h in panels:
+        y = top + (max_h - h)  # stand every building on the same ground line
+        out.append(svg.replace("<svg ", f'<svg x="{x:.1f}" y="{y:.1f}" ', 1))
+        out.append(
+            f'<text x="{x + w / 2:.1f}" y="{top + max_h + 24:.1f}" font-size="13" text-anchor="middle" '
+            f'font-family="Helvetica, Arial" fill="#111827">{caption}</text>'
+        )
+        x += w + gap
+    out.append("</svg>")
+    return "\n".join(out)
+
+
+def main(argv: list[str]) -> int:
+    out = Path(argv[0]) if argv else ROOT / "dev" / "logs"
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / "soho_sheet.svg"
+    path.write_text(sheet())
+    print(path)
+    if shutil.which("rsvg-convert"):
+        png = out / "soho_sheet.png"
+        subprocess.run(["rsvg-convert", "-b", "white", str(path), "-o", str(png)], check=True)
+        print(png)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
