@@ -263,8 +263,8 @@ _BAY_ORDER = ("opening", "shopfront", "surround", "keystone", "balcony", "ironwo
 def write_cell(cell: Shape, below: Sequence[Node], d) -> list[Node]:
     # A colonnette between two lights stands on the storey, like any column;
     # everything else belongs to the bay.
-    columns = [n for n in below if n.kind == "column"]
-    own = [n for n in below if n.kind != "column"]
+    columns = [n for n in below if n.kind in ("column", "brace")]
+    own = [n for n in below if n.kind not in ("column", "brace")]
     return [
         BayNode(
             id=cell.id,
@@ -302,6 +302,7 @@ def write_entablature(shape: Shape, below, d) -> list[Node]:
                 "h": s.h,
                 "course_kind": shape.attr("course_kind", "entablature"),
                 "projection": s.h,
+                "ornament_count": max(2, round(s.w / 0.5)),
             },
         )
     ]
@@ -350,7 +351,7 @@ def write_storey(storey: Shape, below: Sequence[Node], d) -> list[Node]:
     rails = [n for n in below if n.kind == "ironwork"]
     on_storey = [n for n in below if n.kind != "ironwork"]
     # Draw order: bays, then the lines and columns that stand in front of them.
-    rank = {"bay": 0, "string_course": 1, "balcony": 2, "column": 3, "cornice": 4}
+    rank = {"bay": 0, "string_course": 1, "balcony": 2, "column": 3, "brace": 3, "cornice": 4}
     node = StoreyNode(
         id=storey.id,
         kind="storey",
@@ -370,13 +371,14 @@ def write_roof(roof: Shape, below: Sequence[Node], d) -> list[Node]:
     """A pitched roof seen from the street: one slope from eaves to ridge."""
     s = roof.scope
     eaves, ridge = s.y, s.y + s.h
-    run = s.h / math.tan(math.radians(40.0))
+    pitch = float(roof.attr("pitch", 40.0))
+    run = s.h / math.tan(math.radians(pitch))
     return [
         RoofNode(
             id=roof.id,
             kind="roof",
             trace=tuple(roof.trace),
-            props={**xywh(s), "material": "slate", "seam_count": 6, "lower_angle_deg": 40.0, "upper_angle_deg": 40.0, "break_pct": 1.0},
+            props={**xywh(s), "material": roof.attr("roof_material", "slate"), "seam_count": 6, "lower_angle_deg": pitch, "upper_angle_deg": pitch, "break_pct": 1.0},
         ),
         SilhouetteNode(
             id=f"{roof.id}/silhouette",
@@ -389,7 +391,14 @@ def write_roof(roof: Shape, below: Sequence[Node], d) -> list[Node]:
 
 
 def write_dormer(shape: Shape, below, d) -> list[Node]:
-    return [DormerNode(id=shape.id, kind="dormer", trace=tuple(shape.trace), props={**xywh(shape.scope), "form": "pedimented"})]
+    return [
+        DormerNode(
+            id=shape.id,
+            kind="dormer",
+            trace=tuple(shape.trace),
+            props={**xywh(shape.scope), "form": shape.attr("dormer_form", "pedimented")},
+        )
+    ]
 
 
 def write_chimney(shape: Shape, below, d) -> list[Node]:

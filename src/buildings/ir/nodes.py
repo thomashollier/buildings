@@ -184,6 +184,13 @@ class GableNode(Node):
     __post_init__ = _fixed_kind("gable")
 
 
+@dataclass(frozen=True)
+class BraceNode(Node):
+    """A diagonal member of a timber frame, corner to corner of its rectangle."""
+
+    __post_init__ = _fixed_kind("brace")
+
+
 CONCRETE_NODE_KINDS: tuple[type[Node], ...] = (
     BuildingNode,
     StoreyNode,
@@ -204,4 +211,5 @@ CONCRETE_NODE_KINDS: tuple[type[Node], ...] = (
     SpecialNode,
     ColumnNode,
     GableNode,
+    BraceNode,
 )

@@ -50,6 +50,8 @@ PRODUCERS = [
     SRC / "typologies" / "kyoto",
     SRC / "typologies" / "deco",
     SRC / "typologies" / "modernist",
+    SRC / "typologies" / "victorian",
+    SRC / "typologies" / "normandy",
     SRC / "block",
 ]
 

@@ -124,6 +124,19 @@ Renderer additions: `timber_lattice` screens, `tiled` pent-roof eaves, the
 `python3 dev/harness/soho_sheet.py OUT_DIR --more` draws them (the tower at
 its own scale).
 
+## San Francisco and Normandy
+
+| Style | Signature | What it exercises |
+|---|---|---|
+| San Francisco Victorian | every storey split `BayZone \| EntryZone`; over the basement the bay is three faces whose side share is the type (slanted Italianate 0.2, square Stick 0.07); a stoop; a false front, or a Queen Anne gable with a corner turret on a grand house; paint by seed | one number (side share) separating two types; asymmetric crowning |
+| Normandy colombage | the frame as a grammar over the openings: posts at the setting's spacing, never across a light, a post either side of it, braces in end panels, a Saint Andrew's cross in each upstairs breast; town houses jettied (each floor a storey wider than the one below) under a street gable, country houses close-set under a 60 degree thatch with dormers | a structural layer laid over the window grammar; per-floor widths from a rule |
+
+Writing the Normandy rules, the engine caught a genuine conflict (a country
+loft's knee wall claimed by both "a window between posts" and "no window")
+and refused to pick; the fix was the narrower rule's specificity.
+
+`python3 dev/harness/soho_sheet.py OUT_DIR --sf-normandy` draws them.
+
 ## Checking it
 
 ```bash

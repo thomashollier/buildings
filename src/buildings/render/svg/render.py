@@ -247,17 +247,26 @@ def draw_building(canvas: Canvas, building: Node, labels: bool = False) -> None:
             head_y = base_y + _num(special.props, "h")
             el.draw_chimney(canvas, sx, base_y, sw, max(0.0, head_y - base_y))
 
-    gables = _children_of_kind(building, "gable")
+    # A stoop stands in front of the wall it climbs; every other outline is
+    # the wall itself, behind its storeys.
+    every = _children_of_kind(building, "gable")
+    gables = [g for g in every if g.props.get("form") != "stoop"]
+    stoops = [g for g in every if g.props.get("form") == "stoop"]
     for gable in gables:
         el.draw_gable_mass(canvas, gable.props, _WALL_PAINT.get(gable.props.get("wall_material") or "stone", _C["wall"]))
     for storey in _children_of_kind(building, "storey"):
         _draw_storey(canvas, storey, facade_w, labels)
     for gable in gables:
         el.draw_gable_coping(canvas, gable.props)
+    for stoop in stoops:
+        el.draw_gable_mass(canvas, stoop.props, _C["stoop"])
+        el.draw_gable_coping(canvas, stoop.props)
     # Piers that run through several storeys belong to the building, and stand
     # in front of every storey they cross.
     for column in _children_of_kind(building, "column"):
         el.draw_column(canvas, _num(column.props, "x"), _num(column.props, "y"), _num(column.props, "w"), _num(column.props, "h"), column.props)
+    for brace in _children_of_kind(building, "brace"):
+        el.draw_brace(canvas, _num(brace.props, "x"), _num(brace.props, "y"), _num(brace.props, "w"), _num(brace.props, "h"), brace.props)
 
     for dormer in _children_of_kind(building, "dormer"):
         el.draw_dormer(
@@ -472,7 +481,16 @@ _WALL_PAINT = {
     "brick_buff": _C["wall_brick_buff"],
     "render_white": _C["wall_render_white"],
     "shadow": _C["wall_shadow"],
+    "clapboard_sage": _C["wall_clapboard_sage"],
+    "clapboard_blue": _C["wall_clapboard_blue"],
+    "clapboard_cream": _C["wall_clapboard_cream"],
+    "clapboard_rose": _C["wall_clapboard_rose"],
+    "plaster_ochre": _C["wall_plaster_ochre"],
 }
+
+#: Materials laid in horizontal boards, drawn as a line every board.
+_BOARDED = frozenset({"clapboard_sage", "clapboard_blue", "clapboard_cream", "clapboard_rose"})
+_BOARD = 0.2
 
 
 def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) -> None:
@@ -494,6 +512,11 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
     sx = _num(storey.props, "x", 0.0)
     sw = _num(storey.props, "w", facade_w)
     canvas.rect(sx, y, sw, h, wall, stroke_w=0.4)
+    if storey.props.get("wall_material") in _BOARDED:
+        k = 1
+        while k * _BOARD < h - 1e-9:
+            canvas.line(sx, y + k * _BOARD, sx + sw, y + k * _BOARD, _C["clapboard_line"], 0.4)
+            k += 1
 
     for child in storey.children:
         if child.kind == "socle":
@@ -506,10 +529,13 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
             el.draw_cornice(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), child.props)
         elif child.kind == "bay":
             _draw_bay(canvas, child)
-    # Columns stand in front of the bays they divide, so they are drawn after.
+    # Columns and timbers stand in front of the bays they divide, so they are
+    # drawn after them.
     for child in storey.children:
         if child.kind == "column":
             el.draw_column(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
+        elif child.kind == "brace":
+            el.draw_brace(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
 
     canvas.line(sx, y, sx + sw, y, _C["outline"], 0.5)
 

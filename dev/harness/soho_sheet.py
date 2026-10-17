@@ -70,6 +70,20 @@ def _more_styles():
     ]
 
 
+def _sf_normandy():
+    from buildings.typologies.normandy.grammar import NormandySite, generate_normandy
+    from buildings.typologies.victorian.grammar import VictorianSite, generate_victorian
+
+    return [
+        ("San Francisco, 1875: Italianate", generate_victorian(VictorianSite(1875, BuildingClass.ORDINARY, 0))[0]),
+        ("San Francisco, 1885: Stick", generate_victorian(VictorianSite(1885, BuildingClass.ORDINARY, 1))[0]),
+        ("San Francisco, 1892: Queen Anne", generate_victorian(VictorianSite(1892, BuildingClass.ORDINARY, 2))[0]),
+        ("San Francisco, 1895: Queen Anne, turret", generate_victorian(VictorianSite(1895, BuildingClass.GRAND, 3))[0]),
+        ("Rouen, 1620: jettied town house", generate_normandy(NormandySite("town", 1620, BuildingClass.COMFORTABLE))[0]),
+        ("Pays d'Auge, 1700: thatched house", generate_normandy(NormandySite("country", 1700, BuildingClass.ORDINARY))[0]),
+    ]
+
+
 def sheet(street=None, *, own_scale: frozenset[str] = frozenset()) -> str:
     panels = []
     for caption, building in street or STREET:
@@ -103,10 +117,14 @@ def sheet(street=None, *, own_scale: frozenset[str] = frozenset()) -> str:
 def main(argv: list[str]) -> int:
     styles = "--styles" in argv
     more = "--more" in argv
-    argv = [a for a in argv if a not in ("--styles", "--more")]
+    sfn = "--sf-normandy" in argv
+    argv = [a for a in argv if a not in ("--styles", "--more", "--sf-normandy")]
     out = Path(argv[0]) if argv else ROOT / "dev" / "logs"
     out.mkdir(parents=True, exist_ok=True)
-    if more:
+    if sfn:
+        path = out / "sf_normandy_sheet.svg"
+        path.write_text(sheet(_sf_normandy()))
+    elif more:
         street = _more_styles()
         path = out / "more_styles_sheet.svg"
         path.write_text(sheet(street, own_scale=frozenset({street[-1][0]})))

@@ -620,6 +620,15 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
     canvas.rect(x - overhang, y, w + 2 * overhang, depth, "none", stroke=_C["cornice_stroke"], stroke_w=0.3)
 
 
+def draw_brace(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
+    """A diagonal timber across its own rectangle, rising left to right or
+    falling, as the IR says."""
+    if props.get("direction") == "rising":
+        canvas.line(x, y, x + w, y + h, _C["timber"], 2.2)
+    else:
+        canvas.line(x, y + h, x + w, y, _C["timber"], 2.2)
+
+
 def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
     """An engaged column or pilaster standing on a pier, ``(x, y, w, h)`` being
     its own rectangle. ``order`` says what its capital is; nothing here
@@ -627,6 +636,14 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
     if w <= 1e-9 or h <= 1e-9:
         return
     order = props.get("order") or "pilaster"
+    if order == "timber":
+        # A post of a timber frame: oak, dark, square-edged, no base or cap.
+        canvas.rect(x, y, w, h, _C["timber"], stroke_w=0.0)
+        return
+    if order == "corner_board":
+        # The painted board that closes a timber-clad corner.
+        canvas.rect(x, y, w, h, _C["wall_clapboard_cream"], stroke=_C["column_stroke"], stroke_w=0.3)
+        return
     if order == "piloti":
         # A round concrete post: no base, no capital, a shadow down one side.
         canvas.rect(x, y, w, h, _C["wall_render_white"], stroke=_C["column_stroke"], stroke_w=0.4)
@@ -656,7 +673,16 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
 
 
 #: How each gable form finishes along its edge: the coping's weight.
-_GABLE_COPING_W = {"step": 1.6, "neck": 1.2, "bell": 1.2, "straight": 1.0, "spire": 0.8, "pavilion": 0.6}
+_GABLE_COPING_W = {
+    "step": 1.6,
+    "neck": 1.2,
+    "bell": 1.2,
+    "straight": 1.0,
+    "spire": 0.8,
+    "pavilion": 0.6,
+    "front_gable": 1.4,
+    "stoop": 0.5,
+}
 
 
 def draw_gable_mass(canvas: Canvas, props: Mapping[str, object], wall: str) -> None:
@@ -708,6 +734,14 @@ def draw_string_course(canvas: Canvas, x: float, y: float, w: float, props: Mapp
     """
     course_kind = props.get("course_kind") or "bandeau"
     depth = max(0.06, _num(props, "projection", 0.05))
+    if course_kind == "timber_beam":
+        # The sill beam a jettied storey stands on, its joist ends showing.
+        canvas.rect(x, y - depth, w, depth, _C["timber"], stroke_w=0.0)
+        n = _count(props, "ornament_count", 2)
+        for i in range(n + 1):
+            jx = x + w * i / n
+            canvas.rect(jx - 0.05, y - depth - 0.08, 0.10, 0.08, _C["timber"], stroke_w=0.0)
+        return
     if course_kind == "entablature":
         overhang = 0.06
         corona = min(depth * 0.30, 0.12)
@@ -1071,7 +1105,7 @@ def draw_roof_mass(
     if not profile:
         return
     material = props.get("material") or "slate"
-    fill = _C["roof_zinc"] if material == "zinc_roofing" else _C["roof_slate"]
+    fill = {"zinc_roofing": _C["roof_zinc"], "thatch": _C["roof_thatch"]}.get(str(material), _C["roof_slate"])
     ends = props.get("ends")
 
     pts = [(float(inset), float(h)) for inset, h in profile]
