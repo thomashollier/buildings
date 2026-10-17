@@ -34,6 +34,7 @@ from __future__ import annotations
 import ast
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1].parent
@@ -183,6 +184,25 @@ def main() -> int:
                     if isinstance(v, ast.Constant) and isinstance(v.value, str) \
                             and STR_RE.match(v.value):
                         produced_values.setdefault(names[0], set()).add(v.value)
+
+        # (c) rule files: a style written as data states its kinds in TOML,
+        #     as literal values of the same discriminating keys.
+        for path in sorted(base.rglob("*.toml")):
+            with path.open("rb") as fh:
+                data = tomllib.load(fh)
+
+            def walk(node):
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        if k in DISCRIMINATING and isinstance(v, str) and not v.startswith("=") \
+                                and STR_RE.match(v):
+                            produced_values.setdefault(k, set()).add(v)
+                        walk(v)
+                elif isinstance(node, list):
+                    for v in node:
+                        walk(v)
+
+            walk(data)
 
     total = 0
 

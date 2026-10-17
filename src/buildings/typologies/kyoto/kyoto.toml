@@ -1,0 +1,112 @@
+# The Kyoto machiya, as rules.
+#
+# A merchant's townhouse on a narrow, deep lot: two storeys, the upper one a
+# low loft (zushi-nikai), a tiled pent roof (hisashi) along the front between
+# them, every light screened -- koshi lattices below, mushiko slats above.
+# Numbers are INFERRED round figures for the Meiji-era stock.
+
+[style]
+name = "kyoto"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 20 }
+overhangs = ["Cornice"]
+describe = { rule = "kyoto.machiya", phase = "structure", detail = "f'machiya, {width:.1f} m frontage, {year}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Lattice = "kyoto.lattice"
+
+[params]
+ground = 3.1
+loft = 2.05            # the low upper storey: a loft, not a floor to live on
+roof_rise = 1.7
+bay = [1.5, 1.8, 2.1]  # about one ken between posts
+end = [0.2, 0.3, 0.5]
+
+[[production]]
+id = "kyoto.lot"
+label = "Lot"
+doc = "A two-storey front and a tiled roof over it."
+let = { front = "ground + loft" }
+do = [
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Roof", at = ["0.0", "front", "w", "roof_rise"], name = "roof" },
+]
+
+[[production]]
+id = "kyoto.facade"
+label = "Facade"
+doc = "The posts are fitted once, a ken apart; then the ground and the loft."
+do = [
+  { fit = "x", end = "end", bay = "bay", as = "rhythm" },
+  { split = "y", id_base = "parent", parts = [
+      { label = "Storey", size = "ground", name = "s0" },
+      { label = "Storey", size = "loft", name = "s1" },
+  ] },
+]
+
+[[production]]
+id = "kyoto.storey"
+label = "Storey"
+doc = "A storey is cut at the posts; a tiled pent roof runs along the head of the ground floor, and another at the eaves of the loft."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.9 if index == 0 else 0.7"], name = "hisashi", attrs = { cornice_ornament = "tiled" } },
+]
+
+[[production]]
+id = "kyoto.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "kyoto.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "kyoto.light"
+label = "Light"
+doc = "A light on a machiya front is screened: a koshi on the ground floor, a mushiko on the loft."
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Lattice", at = ["x", "y", "w", "h"], name = "lattice", when = "has('screen_gap') and screen_gap" },
+]
+
+[[rule]]
+id = "kyoto.roles.ground_and_loft"
+label = "Storey"
+layer = "roles"
+doc = "The ground floor is timber, the loft over it plaster."
+set = { role = "= 'base' if index == 0 else 'loft'", wall_material = "= 'timber_dark' if index == 0 else 'plaster_white'" }
+
+[[rule]]
+id = "kyoto.base.end_posts_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "kyoto.base.a_koshi_between_posts"
+label = "Cell"
+doc = "On the ground floor each bay between posts is open, behind a koshi of slats a hand apart."
+when = "is_bay() and role == 'base'"
+set = { opening_type = "window", head = "flat", light_width = "= w - 0.12", sill = 0.35, light_height = "= h - 0.35 - 0.45", surround_kind = "none", keystone_present = false, screen_gap = 0.055 }
+
+[[rule]]
+id = "kyoto.base.the_mushiko_window"
+label = "Cell"
+doc = "The loft looks out through low slatted windows set in the plaster."
+when = "is_bay() and role == 'loft'"
+set = { opening_type = "window", head = "flat", light_width = "= w * 0.7", sill = 0.6, light_height = 0.75, surround_kind = "none", keystone_present = false, screen_gap = 0.09 }
+
+[[rule]]
+id = "kyoto.base.the_sliding_door"
+label = "Cell"
+doc = "One bay at the side is the door into the passage through the house: a sliding timber door, unscreened."
+when = "is_bay() and role == 'base' and is_last_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= w - 0.25", sill = 0.0, light_height = "= h - 0.5", screen_gap = "= None" }

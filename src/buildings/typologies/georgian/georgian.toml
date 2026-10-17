@@ -1,0 +1,123 @@
+# The Georgian London terrace house, as rules.
+#
+# Built to the Building Act of 1774's "rates" and a Palladian rule of
+# proportion. Every window is one sash wide, so the axes read straight up the
+# house; what changes floor to floor is the height, by ratio.
+# Numbers are INFERRED round figures for a second-rate house (Bedford Square,
+# Gower Street), not measured plates.
+
+[style]
+name = "georgian"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 40 }
+overhangs = ["Cornice"]
+describe = { rule = "georgian.terrace_house", phase = "structure", detail = "f'Georgian terrace house, {width:.1f} m, {year}'" }
+
+[lot_props]
+year = "= year"
+
+[params]
+# Storey heights by floor, and the window's height-to-width ratio on each:
+# the one table this style is.
+floors = [
+  { name = "ground", h = 3.5, ratio = 1.75 },
+  { name = "first",  h = 4.1, ratio = 2.1 },
+  { name = "second", h = 3.3, ratio = 1.6 },
+  { name = "third",  h = 2.7, ratio = 1.0 },
+]
+parapet = 1.0
+bay = [1.9, 2.2, 2.7]
+end = [0.5, 0.7, 1.2]
+window_w = 1.05          # ABSOLUTE -- one sash width, the same on every floor
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "georgian.lot"
+label = "Lot"
+doc = "The house front is its four floors and the parapet over them."
+do = [
+  { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(column(floors, 'h')) + parapet"], name = "facade" },
+]
+
+[[production]]
+id = "georgian.facade"
+label = "Facade"
+doc = "Three bays on a second-rate front, fitted once; four floors and a parapet."
+do = [
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", max_bays = 5 },
+  { split = "y", id_base = "parent", parts = [
+      { repeat = "floors", label = "Storey", size = "item.h", name = "s{n}", attrs = { floor = "= item.name", ratio = "= item.ratio" } },
+      { label = "Storey", size = "parapet", name = "s{n}", attrs = { floor = "parapet" } },
+  ] },
+]
+
+[[production]]
+id = "georgian.storey"
+label = "Storey"
+doc = "A floor is cut by the rhythm; a band marks the top of the stucco base, and the cornice runs under the parapet."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Entablature", at = ["x", "y + h - 0.18", "w", "0.18"], name = "band", attrs = { course_kind = "bandeau" }, when = "floor == 'ground'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.4"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "floor == 'third'" },
+]
+
+[[production]]
+id = "georgian.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "georgian.light_bay"
+label = "LightBay"
+doc = "The light, and on the piano nobile a railing across its foot."
+do = [
+  { call = "kit.split_light_bay" },
+  { insert = "Balconette", at = ["x", "y + sill", "w", "0.9"], name = "railing", when = "railing" },
+]
+
+[[production]]
+id = "georgian.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "georgian.roles.the_floor_and_its_material"
+label = "Storey"
+layer = "roles"
+doc = "Its floor names its role; the base is stucco, the rest London stock."
+set = { role = "= floor", wall_material = "= 'stucco' if floor == 'ground' else 'brick_london'" }
+
+[[rule]]
+id = "georgian.base.wall"
+label = "Cell"
+doc = "The party-wall ends, and the whole parapet, are wall."
+when = "not (is_bay() and floor != 'parapet')"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "georgian.base.the_window_of_its_floor"
+label = "Cell"
+doc = "Every window is one sash wide; its height is that width times the ratio its floor is built to."
+when = "is_bay() and floor != 'parapet'"
+let = { height = "min(window_w * ratio, h - 0.3)", nobile = "floor == 'first'" }
+set = { opening_type = "window", head = "flat", light_width = "= window_w", sill = "= 0.1 if nobile else max(0.25, (h - height) * 0.55)", light_height = "= height", surround_kind = "none", keystone_present = "= floor == 'ground'", railing = "= nobile" }
+
+[[rule]]
+id = "georgian.base.the_fanlit_door"
+label = "Cell"
+doc = "The door is in the outer bay, under a semicircular fanlight in a rusticated arch."
+when = "is_bay() and floor == 'ground' and is_first_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = 1.1, sill = 0.0, light_height = 3.0, surround_kind = "moulded_architrave", keystone_present = true, railing = false }

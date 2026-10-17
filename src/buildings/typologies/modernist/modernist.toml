@@ -1,0 +1,133 @@
+# The Corbusian block, as rules: the five points written as what may be
+# split from what. The posts have a grid; the floors are deliberately NOT cut
+# by it -- the free facade -- so the ribbon runs across it.
+# Numbers are INFERRED round figures (Villa Savoye, Pessac, Weissenhof).
+
+[style]
+name = "modernist"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 30 }
+describe = { rule = "modernist.five_points", phase = "structure", detail = "f'Corbusian block, {width:.1f} m, {year}, {floors_by_class[klass]} floor(s) on pilotis'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Pavilion = "modernist.pavilion"
+
+[params]
+pilotis = 3.1
+floor_h = 3.0
+pane = 1.2             # one sliding pane of the ribbon
+piloti_w = 0.32
+pavilion_share = 0.38
+pavilion_h = 2.7
+floors_by_class = { modest = 1, ordinary = 2, comfortable = 2, grand = 3 }
+grid_end = [0.3, 0.6, 1.2]
+grid_bay = [4.2, 4.8, 5.6]
+
+[[production]]
+id = "modernist.lot"
+label = "Lot"
+doc = "The block stands on its posts, and a pavilion stands on its roof, off the axis, where the plan wants it."
+let = { front = "pilotis + floors_by_class[klass] * floor_h" }
+do = [
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Pavilion", at = ["w * 0.52", "front", "w * pavilion_share", "pavilion_h"], name = "pavilion" },
+]
+
+[[production]]
+id = "modernist.facade"
+label = "Facade"
+doc = "The posts' grid is fitted once; the pilotis and the floors are cut."
+do = [
+  { fit = "x", end = "grid_end", bay = "grid_bay", as = "grid" },
+  { split = "y", id_base = "parent", parts = [
+      { label = "Storey", size = "pilotis", name = "s{n}" },
+      { repeat = "range(floors_by_class[klass])", label = "Storey", size = "floor_h", name = "s{n}" },
+  ] },
+]
+
+[[production]]
+id = "modernist.storey"
+label = "Storey"
+doc = "The pilotis storey is cut by the posts' grid and has a post on every grid line. A floor above is cut by nothing of the kind: a wall at each end and one ribbon between."
+do = [
+  { split = "x", by = "grid", label = "Cell", when = "role == 'pilotis'" },
+  { each = "joints(grid, x)", when = "role == 'pilotis'", do = [
+      { insert = "Column", at = ["item - piloti_w / 2.0", "y", "piloti_w", "h"], name = "piloti{i}", attrs = { order = "piloti" } },
+  ] },
+  { split = "x", when = "role != 'pilotis'", parts = [
+      { label = "Cell", size = "0.7", name = "x0", slot = "end" },
+      { label = "Cell", size = "w - 2 * 0.7", name = "x1", slot = "bay" },
+      { label = "Cell", size = "0.7", name = "x2", slot = "end" },
+  ] },
+]
+
+[[production]]
+id = "modernist.pavilion"
+label = "Pavilion"
+doc = "The pavilion is one more floor, short, with its own strip of glass."
+do = [ { insert = "Storey", at = ["x", "y", "w", "h"], name = "storey", attrs = { role = "pavilion" } } ]
+
+[[production]]
+id = "modernist.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "modernist.light_bay"
+label = "LightBay"
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+]
+
+[[production]]
+id = "modernist.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[rule]]
+id = "modernist.roles.pavilion"
+label = "Storey"
+layer = "roles"
+when = "has('role') and role == 'pavilion'"
+set = { wall_material = "render_white" }
+
+[[rule]]
+id = "modernist.roles.pilotis_floors_pavilion"
+label = "Storey"
+layer = "roles"
+doc = "The bottom storey is the pilotis, open and in shadow; the floors over it are white render."
+when = "not (has('role') and role == 'pavilion')"
+set = { role = "= 'pilotis' if index == 0 else 'floor'", wall_material = "= 'shadow' if index == 0 else 'render_white'" }
+
+[[rule]]
+id = "modernist.base.the_ground_is_open"
+label = "Cell"
+doc = "Under the pilotis there is no wall to open."
+when = "role == 'pilotis' and not (is_bay() and is_middle_bay())"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "modernist.base.the_glazed_entrance"
+label = "Cell"
+doc = "The glazed entrance, set back in the shadow, in one bay of the grid."
+when = "role == 'pilotis' and is_bay() and is_middle_bay()"
+set = { opening_type = "window", head = "flat", light_width = "= w * 0.7", sill = 0.0, light_height = "= h - 0.35", lights = "= (1.0, 1.0, 1.0)", divider = "Mullion", divider_width = 0.06, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "modernist.base.end_walls"
+label = "Cell"
+when = "role in ('floor', 'pavilion') and not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "modernist.base.the_ribbon_window"
+label = "Cell"
+doc = "A floor's middle cell is one strip of glass its whole length, cut into sliding panes."
+when = "role in ('floor', 'pavilion') and is_bay()"
+let = { panes = "max(2, round(w / pane))", pav = "role == 'pavilion'" }
+set = { opening_type = "window", head = "flat", light_width = "= w", sill = "= 0.9 if not pav else 0.6", light_height = "= 1.1 if not pav else 1.4", lights = "= (1.0,) * panes", divider = "Mullion", divider_width = 0.05, surround_kind = "none", keystone_present = false }

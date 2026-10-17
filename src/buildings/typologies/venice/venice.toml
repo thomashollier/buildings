@@ -1,0 +1,146 @@
+# The Venetian Gothic palazzo, as rules.
+#
+# Tripartite: every storey is cut wing | centre | wing. The centre is the end
+# of the portego, opening on the nobile floors through a polifora of ogee
+# lights on colonnettes, and on the water storey through the gate.
+# Numbers are INFERRED round figures (Ca' Foscari, Ca' d'Oro, Pisani-Moretta).
+
+[style]
+name = "venice"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 40 }
+overhangs = ["Cornice"]
+describe = { rule = "venice.palazzo", phase = "structure", detail = "f'Gothic palazzo, {width:.1f} m on the canal, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[params]
+# Water storey, piano nobile, second nobile, mezzanine under the roof.
+heights = [4.6, 5.8, 5.0, 2.9]
+centre_share = 0.40
+wing_bay = [1.8, 2.2, 2.8]
+wing_end = [0.5, 0.9, 1.4]
+
+[[production]]
+id = "venice.lot"
+label = "Lot"
+doc = "The palazzo stands its whole front on the canal."
+do = [ { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(heights)"], name = "facade" } ]
+
+[[production]]
+id = "venice.facade"
+label = "Facade"
+doc = "Four storeys, the piano nobile the tallest."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "heights", label = "Storey", size = "item", name = "s{i}" } ] } ]
+
+[[production]]
+id = "venice.storey"
+label = "Storey"
+doc = "Every storey is cut the same way: wing, centre, wing. A string course crowns each one; the top carries a dentilled cornice."
+let = { centre = "w * centre_share" }
+do = [
+  { split = "x", parts = [
+      { label = "Wing", size = "(w - centre) / 2.0", name = "wing_left" },
+      { label = "Centre", size = "centre", name = "centre" },
+      { label = "Wing", size = "(w - centre) / 2.0", name = "wing_right" },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.45"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "role == 'attic'" },
+  { insert = "Entablature", at = ["x", "y + h - 0.16", "w", "0.16"], name = "string_course", attrs = { course_kind = "bandeau" }, when = "role != 'attic'" },
+]
+
+[[production]]
+id = "venice.wing"
+label = "Wing"
+doc = "A wing is wall with single windows in it, fitted to its own width."
+do = [
+  { fit = "x", end = "wing_end", bay = "wing_bay", as = "wing_rhythm", max_bays = 3 },
+  { split = "x", by = "wing_rhythm" },
+]
+
+[[production]]
+id = "venice.centre"
+label = "Centre"
+doc = "The centre is the portego's end: on the nobile floors one wide cell for the polifora, on the water storey the gate between two lights, under the roof a row of small windows."
+do = [
+  { split = "x", when = "role == 'nobile'", parts = [
+      { label = "Cell", size = "0.45", name = "x0", slot = "end" },
+      { label = "Cell", size = "w - 2 * 0.45", name = "x1", slot = "bay" },
+      { label = "Cell", size = "0.45", name = "x2", slot = "end" },
+  ] },
+  { split = "x", when = "role != 'nobile'", parts = [
+      { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
+      { repeat = "range(3)", label = "Cell", size = "(w - 2 * 0.4) / 3", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
+  ] },
+]
+
+[[production]]
+id = "venice.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "venice.light_bay"
+label = "LightBay"
+doc = "A light bay with several lights becomes an arcade; any light bay on a nobile floor gets a balcony across its foot."
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+  { insert = "Balconette", at = ["x", "y + sill", "w", "0.9"], name = "balcony", when = "has('balcony') and balcony" },
+]
+
+[[production]]
+id = "venice.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[rule]]
+id = "venice.roles.the_storey_knows_its_floor"
+label = "Storey"
+layer = "roles"
+doc = "Water storey at the bottom, mezzanine at the top, nobile between."
+set = { role = "= 'water' if index == 0 else 'attic' if index == count - 1 else 'nobile'", wall_material = "stucco_rose" }
+
+[[rule]]
+id = "venice.base.end_piers_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "venice.base.mezzanine_lights"
+label = "Cell"
+when = "is_bay() and role == 'attic'"
+set = { opening_type = "window", head = "flat", light_width = 0.75, sill = 0.9, light_height = 0.95, surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "venice.base.water_storey_lights"
+label = "Cell"
+when = "is_bay() and role == 'water'"
+set = { opening_type = "window", head = "round", light_width = 0.9, sill = 1.6, light_height = 1.6, surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "venice.base.an_ogee_window"
+label = "Cell"
+doc = "A wing bay holds one tall ogee-headed light in a stone frame, with a balconette on the nobile floors."
+when = "is_bay() and role == 'nobile'"
+set = { opening_type = "window", head = "ogee", light_width = 1.1, sill = 0.15, light_height = "= h - 0.15 - 1.2", surround_kind = "moulded_architrave", keystone_present = false, balcony = true }
+
+[[rule]]
+id = "venice.base.the_polifora"
+label = "Cell"
+doc = "On a nobile floor the centre is one opening of many ogee lights on colonnettes."
+when = "is_bay() and in_parent('Centre') and role == 'nobile'"
+specificity = 10
+let = { n = "(5 if klass == 'grand' else 4) - (0 if index_of('Storey') == 1 else 1)" }
+set = { opening_type = "window", head = "ogee", light_width = "= w", sill = 0.15, light_height = "= h - 0.15 - 1.2", lights = "= (1.0,) * n", divider = "Column", divider_width = 0.24, order = "corinthian", surround_kind = "none", balcony = true }
+
+[[rule]]
+id = "venice.base.the_water_gate"
+label = "Cell"
+doc = "The middle of the water storey is the gate the boats come in by."
+when = "is_bay() and in_parent('Centre') and role == 'water' and is_middle_bay()"
+specificity = 20
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= w * 0.8", sill = 0.0, light_height = "= h - 0.7", surround_kind = "moulded_architrave" }
