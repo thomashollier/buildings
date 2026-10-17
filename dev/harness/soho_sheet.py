@@ -84,6 +84,22 @@ def _sf_normandy():
     ]
 
 
+def _paris_pair():
+    from buildings.typologies.common.rulefile import load_style
+    from buildings.typologies.paris.generate import generate
+
+    rules = load_style(ROOT / "src" / "buildings" / "typologies" / "paris" / "haussmann.toml")
+    out = []
+    for caption, site in (
+        ("1865, 20 m boulevard, comfortable, shop", SiteContext(20.0, 14.0, 14.0, 1865, BuildingClass.COMFORTABLE, GroundProgramme.SHOP, seed=8)),
+        ("1868, 30 m avenue, grand", SiteContext(30.0, 20.0, 18.0, 1868, BuildingClass.GRAND, GroundProgramme.CARRIAGE, seed=3)),
+        ("1890, 12 m street, modest, shop", SiteContext(12.0, 10.0, 12.0, 1890, BuildingClass.MODEST, GroundProgramme.SHOP, seed=4)),
+    ):
+        out.append((f"measured: {caption}", generate(site)[0]))
+        out.append((f"rule file: {caption}", rules.generate(site)[0]))
+    return out
+
+
 def sheet(street=None, *, own_scale: frozenset[str] = frozenset()) -> str:
     panels = []
     for caption, building in street or STREET:
@@ -118,10 +134,14 @@ def main(argv: list[str]) -> int:
     styles = "--styles" in argv
     more = "--more" in argv
     sfn = "--sf-normandy" in argv
-    argv = [a for a in argv if a not in ("--styles", "--more", "--sf-normandy")]
+    paris = "--paris" in argv
+    argv = [a for a in argv if a not in ("--styles", "--more", "--sf-normandy", "--paris")]
     out = Path(argv[0]) if argv else ROOT / "dev" / "logs"
     out.mkdir(parents=True, exist_ok=True)
-    if sfn:
+    if paris:
+        path = out / "paris_rules_sheet.svg"
+        path.write_text(sheet(_paris_pair()))
+    elif sfn:
         path = out / "sf_normandy_sheet.svg"
         path.write_text(sheet(_sf_normandy()))
     elif more:

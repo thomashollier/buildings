@@ -1,0 +1,185 @@
+# The Paris immeuble, as rules -- the same kind of file as every other style.
+#
+# This is NOT the measured Paris generator (generate.py, which reads Daly's
+# plates through 14 000 lines of structure, qualification and termination).
+# It is the Haussmann building written the way Georgian, Kyoto or Venice are:
+# the regulations as step tables, the class as an ambition, the storeys and
+# the bays fitted, and the vocabulary laid on by rules. Expect it to agree
+# with the measured generator on shape and to differ in the second decimal.
+
+[style]
+name = "haussmann"
+site = ["street_width", "parcel_width", "year", "klass", "ground", "corner", "seed"]
+axiom = { w = "parcel_width", h = 40 }
+overhangs = ["Cornice", "Chimney"]
+describe = { rule = "haussmann.reglement", phase = "regulation", detail = "f'Paris immeuble, {street_width:.0f} m street, legal cornice {step(steps_1859 if year < 1884 else steps_1884, street_width) if year >= 1859 else step(steps_royal, street_width):.2f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[params]
+# The facade height a street allows, as each regulation's step table:
+# [street width up to, cornice height].
+steps_royal = [[7.8, 11.7], [9.75, 14.62], [999.0, 17.55]]     # 1783
+steps_1859  = [[7.8, 11.7], [9.75, 14.62], [20.0, 17.55], [999.0, 20.0]]
+steps_1884  = [[7.8, 12.0], [9.75, 15.0], [20.0, 18.0], [999.0, 20.0]]
+# How much of that the owner built: ambition, by class. INFERRED.
+ambition = { modest = 0.86, ordinary = 0.9, comfortable = 0.95, grand = 0.98 }
+shop_ground = 4.0
+house_ground = 3.6
+entresol = 2.8
+principal = 3.6
+upper = 3.2
+taper = 0.95                    # each letting floor this fraction of the one below
+bay = [2.0, 2.6, 3.2]           # the masonry's rhythm
+end = [0.2, 0.35, 0.75]
+window_share = 0.45             # the opening's share of its bay (A31)
+mansard = { before_1884 = 3.2, after_1884 = 4.6 }
+
+# --- productions ---------------------------------------------------------------
+
+[[production]]
+id = "haussmann.lot"
+label = "Lot"
+doc = "The legal envelope: the cornice the street allows, built to the owner's ambition, and a mansard over it."
+let = { legal = "step(steps_royal, street_width) if year < 1859 else step(steps_1859 if year < 1884 else steps_1884, street_width)", shop = "ground in ('shop', 'cafe')" }
+do = [
+  { let = { base = "(shop_ground + entresol) if shop else house_ground", target = "legal * ambition[klass]" } },
+  { let = { lettings = "max(1, round((target - base - principal) / (upper * 0.95)))" } },
+  { set = { base_h = "= base", lettings = "= lettings", shop = "= shop" } },
+  { let = { front = "base + principal + fsum(geometric(upper, taper, lettings))" } },
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2 },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Roof", at = ["0.0", "front", "w", "mansard.before_1884 if year < 1884 else mansard.after_1884"], name = "roof", attrs = { pitch = 72.0, roof_material = "zinc_roofing", dormer_form = "pedimented" } },
+]
+
+[[production]]
+id = "haussmann.facade"
+label = "Facade"
+doc = "The storeys: the base, the noble floor and the letting floors, which shorten as they climb."
+do = [
+  { split = "y", id_base = "parent", parts = [
+      { label = "Storey", size = "shop_ground if shop else house_ground", name = "s{n}", attrs = { floor = "ground" } },
+      { repeat = "[1] if shop else []", label = "Storey", size = "entresol", name = "s{n}", attrs = { floor = "entresol" } },
+      { label = "Storey", size = "principal", name = "s{n}", attrs = { floor = "principal" } },
+      { repeat = "geometric(upper, taper, lettings)", label = "Storey", size = "item", name = "s{n}", attrs = { floor = "letting" } },
+  ] },
+]
+
+[[production]]
+id = "haussmann.storey"
+label = "Storey"
+doc = "A storey is cut by the one rhythm. The base block is crowned by an entablature, a band runs under the noble floor, a balcon filant fronts the noble floor and the top one, and the cornice crowns the stone."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Entablature", at = ["x", "y + h - 0.45", "w", "0.45"], name = "base_entablature", attrs = { course_kind = "entablature" }, when = "role == 'base' and index == base_top" },
+  { insert = "Balconette", at = ["x", "y", "w", "1.0"], name = "balcon_filant", when = "role == 'principal' or (role == 'upper' and index == count - 1)" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.6"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "index == count - 1" },
+]
+
+[[production]]
+id = "haussmann.roof"
+label = "Roof"
+doc = "A lucarne stands over every window axis of the stone below, and a stack on each party wall."
+do = [
+  { each = "bay_centres(rhythm, x)", do = [
+      { insert = "Dormer", at = ["item - 0.6", "y + 0.4", "1.2", "min(1.9, h - 0.8)"], name = "dormer{i}" },
+  ] },
+  { insert = "Chimney", at = ["0.1", "y + h", "0.9", "1.1"], name = "chimney0" },
+  { insert = "Chimney", at = ["w - 1.0", "y + h", "0.9", "1.1"], name = "chimney1" },
+]
+
+[[production]]
+id = "haussmann.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "haussmann.light_bay"
+label = "LightBay"
+doc = "The light, and a garde-corps across a porte-fenetre that has no balcony before it."
+do = [
+  { call = "kit.split_light_bay" },
+  { insert = "Balconette", at = ["x", "y + sill", "w", "0.9"], name = "garde_corps", when = "has('garde_corps') and garde_corps" },
+]
+
+[[production]]
+id = "haussmann.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- roles: identity from the stack ---------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[layer]]
+name = "class"
+order = 20
+
+[[rule]]
+id = "haussmann.roles.from_the_stack"
+label = "Storey"
+layer = "roles"
+doc = "The ground floor and any entresol are the base; the noble floor is the principal; the rest let."
+set = { role = "= 'base' if floor in ('ground', 'entresol') else 'principal' if floor == 'principal' else 'upper'", wall_material = "stone", base_top = "= 1 if shop else 0" }
+
+# --- the cells -------------------------------------------------------------------
+
+[[rule]]
+id = "haussmann.base.end_piers_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "haussmann.base.window_takes_its_share_of_the_bay"
+label = "Cell"
+doc = "Every window is 0.45 of its bay; the noble floor's are porte-fenetres to the floor, the letting floors' stand on an allege and shorten as they climb."
+when = "is_bay() and role in ('principal', 'upper')"
+let = { sill_h = "0.1 if role == 'principal' or index == count - 1 else 0.85" }
+set = { opening_type = "window", head = "flat", light_width = "= w * window_share", sill = "= sill_h", light_height = "= h - sill_h - 0.65", surround_kind = "moulded_architrave", keystone_present = true }
+
+[[rule]]
+id = "haussmann.base.the_shop"
+label = "Cell"
+doc = "A shop's ground floor is glass between the piers, under a fascia."
+when = "is_bay() and floor == 'ground' and shop"
+set = { opening_type = "shop_bay", head = "flat", light_width = "= w * 0.86", sill = 0.3, light_height = "= h - 0.3 - 0.9", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "haussmann.base.entresol_lights"
+label = "Cell"
+doc = "The entresol is lit by squat windows in the base's own stone, segmental-headed."
+when = "is_bay() and floor == 'entresol'"
+set = { opening_type = "window", head = "segmental", light_width = "= w * window_share", sill = 0.5, light_height = "= h - 0.5 - 0.55", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "haussmann.base.house_ground"
+label = "Cell"
+doc = "A house's ground floor has windows on an allege, round-headed."
+when = "is_bay() and floor == 'ground' and not shop"
+set = { opening_type = "window", head = "round", light_width = "= w * window_share", sill = 1.0, light_height = "= h - 1.0 - 0.55", surround_kind = "none", keystone_present = true }
+
+[[rule]]
+id = "haussmann.base.the_porte_cochere"
+label = "Cell"
+doc = "The entrance is on the middle axis: a porte cochere under a round arch on a grand or comfortable house, a porte pietonne otherwise."
+when = "is_bay() and floor == 'ground' and is_middle_bay()"
+specificity = 20
+let = { cochere = "klass in ('grand', 'comfortable')" }
+set = { opening_type = "pedestrian_entrance", head = "= 'round' if cochere else 'flat'", light_width = "= 2.6 if cochere else 1.4", sill = 0.0, light_height = "= h - 0.35", surround_kind = "moulded_architrave", keystone_present = "= cochere" }
+
+[[rule]]
+id = "haussmann.class.the_noble_floor_is_pedimented"
+label = "Cell"
+layer = "class"
+doc = "A comfortable or grand owner crowns the noble floor's windows with pediments."
+when = "is_bay() and role == 'principal' and klass in ('grand', 'comfortable')"
+set = { surround_kind = "pedimented" }
