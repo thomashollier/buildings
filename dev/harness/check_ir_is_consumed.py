@@ -42,6 +42,10 @@ RENDER = SRC / "render"
 PRODUCERS = [
     SRC / "typologies" / "paris",
     SRC / "typologies" / "soho",
+    SRC / "typologies" / "amsterdam",
+    SRC / "typologies" / "venice",
+    SRC / "typologies" / "chicago",
+    SRC / "typologies" / "common",
     SRC / "block",
 ]
 

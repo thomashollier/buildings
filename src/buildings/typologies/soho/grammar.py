@@ -28,7 +28,7 @@ operator, not by a typology size function.
 from __future__ import annotations
 
 import math
-from typing import Callable, Sequence
+from typing import Callable
 
 from buildings.cga import (
     Attrs,
@@ -45,29 +45,20 @@ from buildings.cga import (
     derive,
     interpret,
 )
-from buildings.ir.nodes import (
-    BalconyNode,
-    BayNode,
-    BuildingNode,
-    ColumnNode,
-    CorniceNode,
-    DormerNode,
-    IronworkNode,
-    KeystoneNode,
-    Node,
-    OpeningNode,
-    RoofNode,
-    ShopfrontNode,
-    SilhouetteNode,
-    SpecialNode,
-    StoreyNode,
-    StringCourseNode,
-    SurroundNode,
-)
+from buildings.ir.nodes import BuildingNode
 from buildings.rng import DecisionStream
 from buildings.site import BuildingClass
 from buildings.solver.fitting import SlotKind, SlotSpec
 from buildings.trace import TraceEntry, TraceLog
+from buildings.typologies.common.kit import (
+    INTERPRETERS,
+    dress_the_light,
+    is_bay,
+    log_of,
+    split_cell_around_its_light,
+    split_light_bay,
+    write_lot,
+)
 from buildings.typologies.soho.recipes import Recipe, SohoSite, recipe_for
 
 __all__ = ["soho_grammar", "derive_soho", "generate_soho"]
@@ -149,9 +140,9 @@ def _storey(storey: Shape, d: Derivation) -> None:
     if role == "base" or (r.entablature_every_floor and role != "top"):
         d.insert(storey, "Entablature", Scope(s.x, s.y + s.h - _ENTABLATURE, s.w, _ENTABLATURE), "entablature")
     if role == "top" and not r.pitched_roof:
-        d.insert(storey, "Cornice", Scope(s.x, s.y + s.h, s.w, float(r.cornice_projection)), "cornice")
+        d.insert(storey, "Cornice", Scope(s.x, s.y + s.h, s.w, float(r.cornice_projection)), "cornice", {"cornice_ornament": r.cornice_ornament})
     if role == "top" and r.pitched_roof:
-        d.insert(storey, "Cornice", Scope(s.x, s.y + s.h, s.w, float(r.cornice_projection)), "cornice")
+        d.insert(storey, "Cornice", Scope(s.x, s.y + s.h, s.w, float(r.cornice_projection)), "cornice", {"cornice_ornament": r.cornice_ornament})
     if r.fire_escape and role != "base":
         bays = [c for c in cells if _is_bay(c)]
         if len(bays) >= 2:
@@ -160,48 +151,6 @@ def _storey(storey: Shape, d: Derivation) -> None:
             x0 = left.scope.x + left.scope.w * 0.08
             x1 = right.scope.x + right.scope.w * 0.92
             d.insert(storey, "FireEscape", Scope(x0, s.y, x1 - x0, _FIRE_ESCAPE_RAIL), "fire_escape")
-
-
-def _cell(cell: Shape, d: Derivation) -> None:
-    """A bay is cut into a jamb either side of a column of light."""
-    a = cell.attrs
-    width = min(a["light_width"], cell.scope.w - 0.10)
-    jamb = (cell.scope.w - width) / 2.0
-    d.split(
-        cell,
-        X,
-        [Part("Jamb", jamb, "jamb_left"), Part("LightBay", width, "light_bay"), Part("Jamb", jamb, "jamb_right")],
-    )
-
-
-def _light_bay(column: Shape, d: Derivation) -> None:
-    """The column of light is cut into breast, light and lintel; a store front
-    stands in it on the ground floor."""
-    a = column.parent.attrs
-    h = column.scope.h
-    sill = a["sill"]
-    light_h = min(a["light_height"], h - sill)
-    d.split(
-        column,
-        Y,
-        [
-            Part("Breast", sill, "breast"),
-            Part("Light", light_h, "light"),
-            Part("Lintel", h - sill - light_h, "lintel"),
-        ],
-    )
-    if a["opening_type"] == "shop_bay":
-        d.insert(column, "Shopfront", column.scope, "shopfront")
-
-
-def _light(light: Shape, d: Derivation) -> None:
-    """The light carries its surround and its keystone."""
-    a = light.attr("surround_kind"), light.attr("keystone_present")
-    s = light.scope
-    if a[0] not in (None, "none"):
-        d.insert(light, "Surround", s, "surround")
-    if a[1]:
-        d.insert(light, "Keystone", Scope(s.x, s.y + s.h, s.w, 0.0), "keystone")
 
 
 def _roof(roof: Shape, d: Derivation) -> None:
@@ -239,9 +188,7 @@ def iron_order_follows_money(storey: Shape, rng: DecisionStream) -> Attrs | None
     return Attrs({"order": "corinthian" if grand else "doric"}, rule="soho.class.iron_order")
 
 
-def _is_bay(cell: Shape) -> bool:
-    slot = cell.attrs.get("slot")
-    return cell.label == "Cell" and slot is not None and slot.name == "bay"
+_is_bay = is_bay
 
 
 def _door_cell(cell: Shape) -> bool:
@@ -344,249 +291,23 @@ SOHO_LAYERS = (
 # ===========================================================================
 
 
-def _trace(shape: Shape, *keys: str) -> tuple[TraceEntry, ...]:
-    """The rules that made this shape, then the ones that set what it shows."""
-    out = list(shape.trace)
-    cell = shape if shape.label == "Cell" else next(
-        (a for a in _ancestors(shape) if a.label == "Cell"), None
+def _describe(lot: Shape) -> TraceEntry:
+    site, r = _site(lot), _recipe(lot)
+    return TraceEntry(
+        rule="soho.recipes.recipe_for",
+        phase="structure",
+        detail=f"{r.name}: {site.lots} lot(s), {site.year}, {site.programme.value}, {site.klass.value}",
     )
-    res = cell.resolution if cell is not None else None
-    for key in keys:
-        win = res.winners.get(key) if res is not None else None
-        if win is not None:
-            out.append(
-                TraceEntry(rule=win.rule, phase="qualification", detail=f"{key} = {win.value!r}")
-            )
-    return tuple(out)
 
 
-def _ancestors(shape: Shape):
-    node = shape.parent
-    while node is not None:
-        yield node
-        node = node.parent
-
-
-def _xywh(s: Scope) -> dict[str, float]:
-    return {"x": s.x, "y": s.y, "w": s.w, "h": s.h}
-
-
-def _bid(shape: Shape) -> str:
-    cell = shape if shape.label == "Cell" else next(a for a in _ancestors(shape) if a.label == "Cell")
-    return cell.id
-
-
-def _write_light(light: Shape, below: Sequence[Node], d: Derivation) -> list[Node]:
-    a = light.attr("opening_type"), light.attr("head")
-    s = light.scope
-    props: dict[str, object] = {**_xywh(s), "opening_type": a[0], "head": a[1]}
-    if a[1] == "round":
-        props["head_rise"] = s.w / 2.0
-    if a[0] == "shop_bay":
-        props["pane_max_span"] = 1.8
-    return [OpeningNode(id=f"{_bid(light)}/opening", kind="opening", trace=_trace(light, "opening_type", "head"), props=props), *below]
-
-
-def _write_surround(shape: Shape, below, d) -> list[Node]:
-    return [
-        SurroundNode(
-            id=f"{_bid(shape)}/surround",
-            kind="surround",
-            trace=_trace(shape, "surround_kind"),
-            props={**_xywh(shape.scope), "surround_kind": shape.attr("surround_kind"), "richness": 0.4},
-        )
-    ]
-
-
-def _write_keystone(shape: Shape, below, d) -> list[Node]:
-    return [
-        KeystoneNode(
-            id=f"{_bid(shape)}/keystone",
-            kind="keystone",
-            trace=_trace(shape, "keystone_present"),
-            props={**_xywh(shape.scope), "keystone_kind": "plain"},
-        )
-    ]
-
-
-def _write_shopfront(shape: Shape, below, d) -> list[Node]:
-    return [
-        ShopfrontNode(
-            id=f"{_bid(shape)}/shopfront",
-            kind="shopfront",
-            trace=_trace(shape, "opening_type"),
-            props={
-                **_xywh(shape.scope),
-                "shopfront_style": "cast_iron_larger_panes",
-                "treatment": "cast_iron_larger_panes",
-                "threshold_height": 0.45,
-                "fascia_depth": 0.85,
-            },
-        )
-    ]
-
-
-_ORDER = ("opening", "shopfront", "surround", "keystone")
-
-
-def _write_cell(cell: Shape, below: Sequence[Node], d) -> list[Node]:
-    return [
-        BayNode(
-            id=cell.id,
-            kind="bay",
-            trace=_trace(cell, "opening_type"),
-            children=tuple(sorted(below, key=lambda n: _ORDER.index(n.kind))),
-            props={**_xywh(cell.scope), "slot_name": cell.attrs["slot"].name, "is_special": False},
-        )
-    ]
-
-
-def _write_column(shape: Shape, below, d) -> list[Node]:
-    return [
-        ColumnNode(
-            id=shape.id,
-            kind="column",
-            trace=tuple(shape.trace) + tuple(shape.parent.trace[:1]),
-            props={**_xywh(shape.scope), "order": shape.attr("order")},
-        )
-    ]
-
-
-def _write_entablature(shape: Shape, below, d) -> list[Node]:
-    s = shape.scope
-    return [
-        StringCourseNode(
-            id=shape.id,
-            kind="string_course",
-            trace=tuple(shape.trace),
-            props={"x": s.x, "y": s.y + s.h, "w": s.w, "h": s.h, "course_kind": "entablature", "projection": s.h},
-        )
-    ]
-
-
-def _write_cornice(shape: Shape, below, d) -> list[Node]:
-    s = shape.scope
-    r = _recipe(shape)
-    return [
-        CorniceNode(
-            id=shape.id,
-            kind="cornice",
-            trace=tuple(shape.trace),
-            props={
-                **_xywh(s),
-                "projection": s.h,
-                "cornice_ornament": r.cornice_ornament,
-                "ornament_count": max(3, round(s.w / 0.9) + 1),
-            },
-        )
-    ]
-
-
-def _write_fire_escape(shape: Shape, below, d) -> list[Node]:
-    s = shape.scope
-    return [
-        BalconyNode(
-            id=f"{shape.id}/platform",
-            kind="balcony",
-            trace=tuple(shape.trace),
-            props={**_xywh(s), "continuous": False, "projection": 0.9, "bracket_count": 3},
-        ),
-        IronworkNode(
-            id=f"{shape.id}/rail",
-            kind="ironwork",
-            trace=tuple(shape.trace),
-            props={**_xywh(s), "guards": "balcon_filant", "max_gap": 0.11, "ornament_count": 2},
-        ),
-    ]
-
-
-def _write_storey(storey: Shape, below: Sequence[Node], d) -> list[Node]:
+def materials_of_the_front(storey: Shape, rng: DecisionStream) -> Attrs:
+    """A store front is iron whatever the floors over it are made of."""
     r = _recipe(storey)
-    material = r.ground_material if storey.attrs["role"] == "base" else r.wall_material
-    rails = [n for n in below if n.kind == "ironwork"]
-    on_storey = [n for n in below if n.kind != "ironwork"]
-    # Draw order: bays, then the lines and columns that stand in front of them.
-    rank = {"bay": 0, "string_course": 1, "balcony": 2, "column": 3, "cornice": 4}
-    node = StoreyNode(
-        id=storey.id,
-        kind="storey",
-        trace=tuple(storey.trace),
-        children=tuple(sorted(on_storey, key=lambda n: rank.get(n.kind, 9))),
-        props={
-            **_xywh(storey.scope),
-            "role": storey.attrs["role"],
-            "wall_material": material,
-            "on_the_stone_facade": True,
-        },
+    return Attrs(
+        {"wall_material": r.ground_material if storey.attrs.get("role") == "base" or storey.index == 0 else r.wall_material},
+        rule="soho.base.materials_of_the_front",
     )
-    return [node, *rails]
 
-
-def _write_roof(roof: Shape, below: Sequence[Node], d) -> list[Node]:
-    s = roof.scope
-    eaves, ridge = s.y, s.y + s.h
-    run = s.h / math.tan(math.radians(40.0))
-    return [
-        RoofNode(
-            id=roof.id,
-            kind="roof",
-            trace=tuple(roof.trace),
-            props={**_xywh(s), "material": "slate", "seam_count": 6, "lower_angle_deg": 40.0, "upper_angle_deg": 40.0, "break_pct": 1.0},
-        ),
-        SilhouetteNode(
-            id=f"{roof.id}/silhouette",
-            kind="silhouette",
-            trace=tuple(roof.trace),
-            props={"x": 0.0, "y": 0.0, "w": s.w, "h": ridge, "eaves_height": eaves, "ridge_height": ridge, "points": ((0.0, eaves), (run, ridge))},
-        ),
-        *below,
-    ]
-
-
-def _write_dormer(shape: Shape, below, d) -> list[Node]:
-    return [DormerNode(id=shape.id, kind="dormer", trace=tuple(shape.trace), props={**_xywh(shape.scope), "form": "pedimented"})]
-
-
-def _write_chimney(shape: Shape, below, d) -> list[Node]:
-    s = shape.scope
-    # A stack starts inside the roof and stands clear of the ridge.
-    return [
-        SpecialNode(
-            id=shape.id,
-            kind="special",
-            trace=tuple(shape.trace),
-            props={"x": s.x, "y": s.y - 1.2, "w": s.w, "h": s.h + 1.2, "element": "chimney_stack"},
-        )
-    ]
-
-
-def _write_lot(lot: Shape, below: Sequence[Node], d) -> list[Node]:
-    site = _site(lot)
-    r = _recipe(lot)
-    facade = lot.children[0]
-    eaves = facade.scope.h
-    top = eaves + (_ROOF_RISE + _CHIMNEY[1] if r.pitched_roof else float(r.cornice_projection))
-    return [
-        BuildingNode(
-            id=lot.id,
-            kind="building",
-            trace=tuple(lot.trace)
-            + (
-                TraceEntry(
-                    rule="soho.recipes.recipe_for",
-                    phase="structure",
-                    detail=f"{r.name}: {site.lots} lot(s), {site.year}, {site.programme.value}, {site.klass.value}",
-                ),
-            ),
-            children=tuple(below),
-            props={"x": 0.0, "y": 0.0, "w": lot.scope.w, "h": top, "eaves_height": eaves, "year": site.year},
-        )
-    ]
-
-
-# ===========================================================================
-# The grammar
-# ===========================================================================
 
 
 def soho_grammar() -> Grammar:
@@ -596,36 +317,24 @@ def soho_grammar() -> Grammar:
             Production("soho.lot", "Lot", _lot),
             Production("soho.facade", "Facade", _facade),
             Production("soho.storey", "Storey", _storey),
-            Production("soho.cell", "Cell", _cell, guard=lambda c: c.attrs["opening_type"] != "none"),
-            Production("soho.light_bay", "LightBay", _light_bay),
-            Production("soho.light", "Light", _light),
+            Production("soho.cell", "Cell", split_cell_around_its_light, guard=lambda c: c.attrs["opening_type"] != "none"),
+            Production("soho.light_bay", "LightBay", split_light_bay),
+            Production("soho.light", "Light", dress_the_light),
             Production("soho.roof", "Roof", _roof),
         ),
         stages=(
             AttributeStage(
                 "Storey",
                 (
-                    Layer("roles", 0, (the_stack_says_where_you_are,)),
+                    Layer("roles", 0, (the_stack_says_where_you_are, materials_of_the_front)),
                     Layer("class", 20, (iron_order_follows_money,)),
                 ),
             ),
             AttributeStage("Cell", SOHO_LAYERS),
         ),
         interpreters={
-            "Light": _write_light,
-            "Surround": _write_surround,
-            "Keystone": _write_keystone,
-            "Shopfront": _write_shopfront,
-            "Cell": _write_cell,
-            "Column": _write_column,
-            "Entablature": _write_entablature,
-            "Cornice": _write_cornice,
-            "FireEscape": _write_fire_escape,
-            "Storey": _write_storey,
-            "Roof": _write_roof,
-            "Dormer": _write_dormer,
-            "Chimney": _write_chimney,
-            "Lot": _write_lot,
+            **INTERPRETERS,
+            "Lot": write_lot(_describe, lambda lot: {"year": _site(lot).year}),
         },
         # A cornice oversails the wall it crowns, and a chimney stands clear
         # of the roof it rises through: both are declared, nothing else is.
@@ -657,14 +366,4 @@ def generate_soho(
 ) -> tuple[BuildingNode, TraceLog]:
     lot, derivation = derive_soho(site, refine=refine)
     (root,) = interpret(lot, derivation)
-    log = TraceLog()
-
-    def _walk(n: Node):
-        yield n
-        for c in n.children:
-            yield from _walk(c)
-
-    for node in _walk(root):
-        for entry in node.trace:
-            log.record(node.id, entry)
-    return root, log
+    return root, log_of(root)

@@ -177,6 +177,13 @@ class ColumnNode(Node):
     __post_init__ = _fixed_kind("column")
 
 
+@dataclass(frozen=True)
+class GableNode(Node):
+    """A shaped gable's outline: the wall a gable's tiers stand in."""
+
+    __post_init__ = _fixed_kind("gable")
+
+
 CONCRETE_NODE_KINDS: tuple[type[Node], ...] = (
     BuildingNode,
     StoreyNode,
@@ -196,4 +203,5 @@ CONCRETE_NODE_KINDS: tuple[type[Node], ...] = (
     KeystoneNode,
     SpecialNode,
     ColumnNode,
+    GableNode,
 )

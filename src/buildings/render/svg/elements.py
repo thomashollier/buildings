@@ -119,6 +119,16 @@ def _draw_head(
     elif head_form == "segmental":
         pts = _arch_points(x, x + w, y_spring, head_h * 0.55)
         canvas.polygon(pts, fill, stroke=line, stroke_w=0.6)
+    elif head_form == "ogee":
+        # Two reversed curves meeting in a point: convex at the springing,
+        # concave into the apex.
+        steps = 12
+        left = [
+            (x + (w / 2.0) * (i / steps), y_spring + head_h * (0.5 - 0.5 * math.cos(math.pi * i / steps)))
+            for i in range(steps + 1)
+        ]
+        right = [(x + w - (px - x), py) for px, py in reversed(left[:-1])]
+        canvas.polygon([(x, y_spring), *left, *right, (x + w, y_spring)], fill, stroke=line, stroke_w=0.6)
     elif head_form == "irregular":
         # A head the mason did not square — drawn as a skewed lintel, not a
         # decision about why it is skewed.
@@ -130,7 +140,7 @@ def _draw_head(
         )
         canvas.line(x, y_spring, x + w, y_spring - head_h * 0.3, line, 0.6)
     # "flat" and anything unrecognised: no separate head, the body runs to y_top.
-    return y_spring if head_form in ("round", "segmental") else y_top
+    return y_spring if head_form in ("round", "segmental", "ogee") else y_top
 
 
 def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
@@ -331,7 +341,7 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
     # glass lost 0.120 m of height as well as of width; the light now runs
     # from the stated sill to the stated head.
     body_bot = y
-    body_top = y + h - (head_h if head_form in ("round", "segmental") else 0.0)
+    body_top = y + h - (head_h if head_form in ("round", "segmental", "ogee") else 0.0)
     body_top = max(body_bot, body_top)
     canvas.rect(body_x, body_bot, body_w, body_top - body_bot, _C["window"], stroke=_C["window_frame"], stroke_w=0.8)
     springing = _draw_head(canvas, body_x, y + h, body_w, head_h, head_form, _C["window"])
@@ -622,6 +632,34 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
         canvas.line(x + w * 0.2, y + h - cap_h * 0.45, x + w * 0.8, y + h - cap_h * 0.45, _C["column_stroke"], 0.3)
     else:  # doric and pilaster: a plain block capital
         canvas.rect(x, y + h - cap_h, w, cap_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
+
+
+#: How each gable form finishes along its edge: the coping's weight.
+_GABLE_COPING_W = {"step": 1.6, "neck": 1.2, "bell": 1.2, "straight": 1.0}
+
+
+def draw_gable_mass(canvas: Canvas, props: Mapping[str, object], wall: str) -> None:
+    """The gable's outline, filled with its wall, drawn under the storeys that
+    stand in it -- the scrolls, claws and crown are whatever the outline the
+    IR states encloses beyond those storeys."""
+    pts = [(float(a), float(b)) for a, b in (props.get("points") or ())]
+    if len(pts) >= 3:
+        canvas.polygon(pts, wall, stroke_w=0.0)
+
+
+def draw_gable_coping(canvas: Canvas, props: Mapping[str, object]) -> None:
+    """The stone edge along the gable's outline, and the hoisting beam."""
+    pts = [(float(a), float(b)) for a, b in (props.get("points") or ())]
+    form = props.get("form") or "straight"
+    width = _GABLE_COPING_W.get(form, 1.0)
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        canvas.line(x0, y0, x1, y1, _C["gable_coping"], width + 0.8)
+        canvas.line(x0, y0, x1, y1, _C["cornice_stroke"], 0.3)
+    beam = props.get("hoist_beam")
+    if beam:
+        bx, by = (float(v) for v in beam)
+        canvas.rect(bx - 0.09, by, 0.18, 0.55, _C["hoist_beam"], stroke_w=0.0)
+        canvas.line(bx, by, bx, by - 1.2, _C["iron"], 0.4)
 
 
 def draw_string_course(canvas: Canvas, x: float, y: float, w: float, props: Mapping[str, object]) -> None:

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """A street of SoHo types at one scale, beside a Paris immeuble for contrast.
 
-Run:  python3 dev/harness/soho_sheet.py OUT_DIR
+Run:  python3 dev/harness/soho_sheet.py OUT_DIR [--styles]
+
+``--styles`` draws the Amsterdam, Venice and Chicago grammars instead.
 
 Every facade is drawn by the real renderer from the real IR, at the same
 pixels per metre, standing on one ground line, so the proportions compare.
@@ -25,6 +27,20 @@ from buildings.typologies.soho.recipes import Programme, SohoSite  # noqa: E402
 
 PX_PER_M = 26.0
 
+
+def _styles():
+    from buildings.typologies.amsterdam.grammar import CanalSite, generate_amsterdam
+    from buildings.typologies.chicago.grammar import OfficeSite, generate_chicago
+    from buildings.typologies.venice.grammar import PalazzoSite, generate_venice
+
+    return [
+        ("Amsterdam, 1625: step gable", generate_amsterdam(CanalSite(6.6, 1625, BuildingClass.COMFORTABLE))[0]),
+        ("Amsterdam, 1670: neck gable", generate_amsterdam(CanalSite(7.2, 1670, BuildingClass.COMFORTABLE))[0]),
+        ("Amsterdam, 1750: bell gable", generate_amsterdam(CanalSite(5.8, 1750, BuildingClass.ORDINARY))[0]),
+        ("Venice, 1430: Gothic palazzo", generate_venice(PalazzoSite(19.0, 1430, BuildingClass.GRAND))[0]),
+        ("Chicago, 1895: base, shaft, capital", generate_chicago(OfficeSite(20.5, 1895, BuildingClass.COMFORTABLE))[0]),
+    ]
+
 STREET = [
     ("Federal rowhouse, 1825", generate_soho(SohoSite(1, 1825, Programme.DWELLING, BuildingClass.ORDINARY))[0]),
     ("Cast-iron loft, 1858", generate_soho(SohoSite(1, 1858, Programme.LOFT, BuildingClass.COMFORTABLE))[0]),
@@ -38,9 +54,9 @@ STREET = [
 ]
 
 
-def sheet() -> str:
+def sheet(street=None) -> str:
     panels = []
-    for caption, building in STREET:
+    for caption, building in street or STREET:
         width_px = (float(building.props["w"]) + 2 * _MARGIN_M) * PX_PER_M
         svg = render(building, width_px=int(round(width_px)))
         w, h = (float(v) for v in re.search(r'width="([\d.]+)" height="([\d.]+)"', svg).groups())
@@ -68,13 +84,15 @@ def sheet() -> str:
 
 
 def main(argv: list[str]) -> int:
+    styles = "--styles" in argv
+    argv = [a for a in argv if a != "--styles"]
     out = Path(argv[0]) if argv else ROOT / "dev" / "logs"
     out.mkdir(parents=True, exist_ok=True)
-    path = out / "soho_sheet.svg"
-    path.write_text(sheet())
+    path = out / ("styles_sheet.svg" if styles else "soho_sheet.svg")
+    path.write_text(sheet(_styles() if styles else None))
     print(path)
     if shutil.which("rsvg-convert"):
-        png = out / "soho_sheet.png"
+        png = path.with_suffix(".png")
         subprocess.run(["rsvg-convert", "-b", "white", str(path), "-o", str(png)], check=True)
         print(png)
     return 0

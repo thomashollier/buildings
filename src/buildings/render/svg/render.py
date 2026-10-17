@@ -247,8 +247,17 @@ def draw_building(canvas: Canvas, building: Node, labels: bool = False) -> None:
             head_y = base_y + _num(special.props, "h")
             el.draw_chimney(canvas, sx, base_y, sw, max(0.0, head_y - base_y))
 
+    gables = _children_of_kind(building, "gable")
+    for gable in gables:
+        el.draw_gable_mass(canvas, gable.props, _WALL_PAINT.get(gable.props.get("wall_material") or "stone", _C["wall"]))
     for storey in _children_of_kind(building, "storey"):
         _draw_storey(canvas, storey, facade_w, labels)
+    for gable in gables:
+        el.draw_gable_coping(canvas, gable.props)
+    # Piers that run through several storeys belong to the building, and stand
+    # in front of every storey they cross.
+    for column in _children_of_kind(building, "column"):
+        el.draw_column(canvas, _num(column.props, "x"), _num(column.props, "y"), _num(column.props, "w"), _num(column.props, "h"), column.props)
 
     for dormer in _children_of_kind(building, "dormer"):
         el.draw_dormer(
@@ -453,6 +462,9 @@ _WALL_PAINT = {
     "stone": _C["wall"],
     "cast_iron": _C["wall_cast_iron"],
     "brick": _C["wall_brick"],
+    "brick_dark": _C["wall_brick_dark"],
+    "stucco_rose": _C["wall_stucco_rose"],
+    "terracotta": _C["wall_terracotta"],
 }
 
 
@@ -471,7 +483,10 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
 
     # Wall paint follows the material the storey states; stone where it states none.
     wall = _WALL_PAINT.get(storey.props.get("wall_material") or "stone", _C["wall"])
-    canvas.rect(0.0, y, facade_w, h, wall, stroke_w=0.4)
+    # A storey is as wide as it says: the full frontage, or one tier of a gable.
+    sx = _num(storey.props, "x", 0.0)
+    sw = _num(storey.props, "w", facade_w)
+    canvas.rect(sx, y, sw, h, wall, stroke_w=0.4)
 
     for child in storey.children:
         if child.kind == "socle":
@@ -489,13 +504,24 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
         if child.kind == "column":
             el.draw_column(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
 
-    canvas.line(0.0, y, facade_w, y, _C["outline"], 0.5)
+    canvas.line(sx, y, sx + sw, y, _C["outline"], 0.5)
 
     if labels:
         canvas.text(-0.8, y + h / 2.0, f"{h:.2f}m", size=8, fill="#888888")
 
 
 _PIER_KINDS = frozenset({"pier_end", "special", "porte_cochere"})
+
+
+def _rect_of(node: Node, fallback: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+    """The rectangle a node states, or ``fallback`` where it states none."""
+    fx, fy, fw, fh = fallback
+    return (
+        _num(node.props, "x", fx),
+        _num(node.props, "y", fy),
+        _num(node.props, "w", fw),
+        _num(node.props, "h", fh),
+    )
 
 
 def _draw_bay(canvas: Canvas, bay: Node) -> None:
@@ -531,13 +557,15 @@ def _draw_bay(canvas: Canvas, bay: Node) -> None:
             # frontage, piers included, is gone (A4.1).
             el.draw_shopfront(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
         elif child.kind == "opening":
-            el.draw_opening(canvas, ox, oy, ow, oh, child.props)
+            # Each opening at its own rectangle: a bay may hold several lights.
+            el.draw_opening(canvas, *_rect_of(child, (ox, oy, ow, oh)), child.props)
         elif child.kind == "surround":
             # Wraps the light, not the cell — a moulded architrave sized to
             # the whole bay would float untethered from the window it frames.
-            el.draw_surround(canvas, ox, oy, ow, oh, child.props)
+            el.draw_surround(canvas, *_rect_of(child, (ox, oy, ow, oh)), child.props)
         elif child.kind == "keystone":
-            el.draw_keystone(canvas, ox + ow / 2.0, oy + oh, child.props)
+            kx, ky, kw, _kh = _rect_of(child, (ox, oy + oh, ow, 0.0))
+            el.draw_keystone(canvas, kx + kw / 2.0, ky, child.props)
         elif child.kind == "balcony":
             el.draw_balcony_slab(canvas, x, _num(child.props, "y"), w, child.props)
         elif child.kind == "ironwork":

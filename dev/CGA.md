@@ -89,6 +89,27 @@ The renderer gained three things for it, each keyed by a name the IR states:
 `wall_material` (stone, cast iron, brick), a `column` node with an `order`, and
 a `bracketed` cornice.
 
+## Three more: Amsterdam, Venice, Chicago
+
+Each was picked because its signature pushes the grammar somewhere the
+others do not. All three share `typologies/common/kit.py` (the anatomy of a
+window and the writing of IR, which SoHo now uses too), so each style is its
+rules plus its signature productions.
+
+| Style | Signature production | What it exercises |
+|---|---|---|
+| Amsterdam canal house | `Gable --> split(y){ GableTier* \| Crown }`, each tier a narrower storey with its own fit of bays, and an outline drawn around the tiers: step (to 1640), neck with claw scrolls (to 1720), bell (to 1790), or a straight cornice after | a sub-grammar on top of the facade; the outline follows the tiers, never the reverse |
+| Venetian Gothic palazzo | `Storey --> split(x){ Wing \| Centre \| Wing }` on every floor; the nobile centre is one cell holding a **polifora**, a row of ogee lights on colonnettes, five on the first nobile and four on the second | a tripartite split inside each storey; multi-light cells |
+| Chicago School block | base x2, a uniform shaft, capital x2; **Piers** inserted on the facade that run the whole shaft; every shaft bay a **Chicago window**, sash \| fixed \| sash at 1:2:1 | shapes that span several storeys; the same multi-light cell as Venice, different numbers |
+
+The renderer gained, each keyed by a name the IR states: the `ogee` head,
+`gable` nodes (outline, coping, hoisting beam), building-level `column`s, a
+storey that may be narrower than the frontage, three more wall paints, and
+drawing each bay element at its own rectangle (a bay may now hold several
+lights). Paris SVG output is byte-identical before and after.
+
+`python3 dev/harness/soho_sheet.py OUT_DIR --styles` draws all three at one scale.
+
 ## Checking it
 
 ```bash

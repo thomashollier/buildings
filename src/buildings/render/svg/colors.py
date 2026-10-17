@@ -65,6 +65,11 @@ COLORS: dict[str, str] = {
     # the default above; these are the two a New York loft street adds.
     "wall_cast_iron": "#D9D3C3",
     "wall_brick": "#9E5440",
+    "wall_brick_dark": "#6B3A2C",
+    "wall_stucco_rose": "#D8A08E",
+    "wall_terracotta": "#C7A07A",
+    "gable_coping": "#E6DED0",
+    "hoist_beam": "#3B2E26",
     "column": "#CFC8B6",
     "column_stroke": "#7A7262",
 }
