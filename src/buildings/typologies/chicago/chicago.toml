@@ -1,0 +1,133 @@
+# The Chicago School office block, as rules.
+#
+# Sullivan's column: a base of two shop storeys, a shaft of identical floors,
+# a capital of arched pairs and roundels under a deep cornice. The frame shows
+# as piers running the whole shaft, and every shaft bay is a Chicago window:
+# a fixed pane twice the width of the sash either side of it.
+# Numbers are INFERRED round figures (Reliance, Carson Pirie Scott, Gage).
+
+[style]
+name = "chicago"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 120 }
+overhangs = ["Cornice"]
+describe = { rule = "chicago.office_block", phase = "structure", detail = "f'Chicago School office block, {width:.1f} m, {year}, {klass}: {shaft_by_class[klass] + (2 if year >= 1900 else 0)} shaft floors'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Pier = "kit.column"
+
+[params]
+bay = [5.4, 6.1, 6.8]        # the frame's bay: about 20 feet
+end = [0.7, 1.0, 1.5]
+base = [5.6, 4.4]            # shops, then their mezzanine
+shaft_storey = 3.75          # every shaft floor the same: the point of a shaft
+capital = [3.9, 2.4]         # the arcaded top floor, the attic
+pier = 0.8
+# Height is what the money and the elevator allow; later buildings climb two
+# floors higher than early ones.
+shaft_by_class = { modest = 6, ordinary = 7, comfortable = 9, grand = 11 }
+
+[[production]]
+id = "chicago.lot"
+label = "Lot"
+doc = "The block stands on its whole lot."
+do = [
+  { set = { storey_heights = "= base + [shaft_storey] * (shaft_by_class[klass] + (2 if year >= 1900 else 0)) + capital" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(storey_heights)"], name = "facade" },
+]
+
+[[production]]
+id = "chicago.facade"
+label = "Facade"
+doc = "The frame's bays are fitted once; the storeys are cut; and a pier is stood on every frame line, from the top of the base to the foot of the capital."
+do = [
+  { fit = "x", end = "end", bay = "bay", as = "rhythm" },
+  { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] },
+  { let = { bottom = "starts(storey_heights, y)[len(base)]", top = "starts(storey_heights, y)[len(storey_heights) - len(capital)]" } },
+  { each = "frame_lines(rhythm, x, pier)", do = [
+      { insert = "Pier", at = ["item.x", "bottom", "item.w", "top - bottom"], name = "pier{i}", attrs = { order = "pilaster" } },
+  ] },
+]
+
+[[production]]
+id = "chicago.storey"
+label = "Storey"
+doc = "A storey is cut by the frame; a belt course closes the base and opens the capital; the attic carries the cornice."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Entablature", at = ["x", "y + h - 0.5", "w", "0.5"], name = "belt", attrs = { course_kind = "entablature" }, when = "index == len(base) - 1 or index == count - len(capital) - 1" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "1.5"], name = "cornice", attrs = { cornice_ornament = "bracketed" }, when = "role == 'attic'" },
+]
+
+[[production]]
+id = "chicago.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "chicago.light_bay"
+label = "LightBay"
+doc = "A bay of several lights becomes a row of them."
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+]
+
+[[production]]
+id = "chicago.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[rule]]
+id = "chicago.roles.base_shaft_capital"
+label = "Storey"
+layer = "roles"
+doc = "Two storeys of base, two of capital, and the shaft between."
+let = { r = "'base' if index < len(base) else 'attic' if index == count - 1 else 'capital' if index >= count - len(capital) else 'shaft'" }
+set = { role = "= r", wall_material = "= 'stone' if r == 'base' else 'terracotta'" }
+
+[[rule]]
+id = "chicago.base.end_piers_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "chicago.base.the_chicago_window"
+label = "Cell"
+doc = "A shaft bay is almost all glass: a fixed pane twice the width of the sash either side of it, under a spandrel."
+when = "is_bay() and role == 'shaft'"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.3", sill = 0.8, light_height = "= h - 0.8 - 0.75", lights = "= (1.0, 2.0, 1.0)", divider = "Mullion", divider_width = 0.14, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.shops_in_the_base"
+label = "Cell"
+doc = "The base is shops, and the floor over them is their showroom: glass between the piers, full width."
+when = "is_bay() and role == 'base'"
+let = { ground = "index_of('Storey') == 0" }
+set = { opening_type = "= 'shop_bay' if ground else 'window'", head = "flat", light_width = "= w - 0.9", sill = "= 0.45 if ground else 0.6", light_height = "= h - (0.45 + 0.9 if ground else 0.6 + 0.9)", lights = "= None if ground else (1.0, 2.0, 1.0)", divider = "Mullion", divider_width = 0.14, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.the_way_in"
+label = "Cell"
+doc = "The office entrance is the middle bay of the ground floor, under a round arch the full height of the shop storey."
+when = "is_bay() and index_of('Storey') == 0 and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = 2.6, sill = 0.0, light_height = "= h - 0.6", lights = "= None", surround_kind = "moulded_architrave" }
+
+[[rule]]
+id = "chicago.base.attic_roundels"
+label = "Cell"
+when = "is_bay() and role == 'attic'"
+set = { opening_type = "oeil_de_boeuf", head = "flat", light_width = 1.1, sill = 0.3, light_height = 1.1, lights = "= None", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.the_arcaded_capital"
+label = "Cell"
+doc = "The capital's floor opens in round-arched pairs."
+when = "is_bay() and role == 'capital'"
+set = { opening_type = "window", head = "round", light_width = "= w - pier - 0.8", sill = 0.8, light_height = "= h - 0.8 - 0.4", lights = "= (1.0, 1.0)", divider = "Column", divider_width = 0.3, order = "doric", surround_kind = "none", keystone_present = false }

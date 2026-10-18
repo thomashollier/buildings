@@ -78,11 +78,15 @@ from buildings.solver.fitting import PlacedSlot, SlotKind, SlotSpec
 from buildings.trace import TraceEntry, TraceLog
 from buildings.typologies.common import kit
 
-__all__ = ["RuleFileError", "Style", "load_style", "register_writer", "register_production"]
+__all__ = ["Refused", "RuleFileError", "Style", "load_style", "register_writer", "register_production"]
 
 
 class RuleFileError(ValueError):
     """A rule file is malformed: an unknown verb, a missing field, a bad name."""
+
+
+class Refused(ValueError):
+    """A rule file declined a situation it does not model (``refuse``)."""
 
 
 #: Python productions a rule file may ``call`` by name.
@@ -145,6 +149,7 @@ def _functions(shape: Shape) -> dict[str, Callable[..., Any]]:
         # Where the shape stands in the tree.
         "in_parent": lambda label: shape.parent is not None and shape.parent.label == label,
         "index_of": lambda label: shape.ancestor(label).index,
+        "is_last": lambda label: _is_last(shape if shape.label == label else shape.ancestor(label)),
         # Running positions along a fitted run: the joints between its parts,
         # starting from ``start`` and added part by part.
         "joints": _joints,
@@ -155,6 +160,31 @@ def _functions(shape: Shape) -> dict[str, Callable[..., Any]]:
         "geometric": lambda first, ratio, n: [first * ratio**k for k in range(int(n))],
         # The middle of every window bay of a fitted run, from ``start``.
         "bay_centres": _bay_centres,
+        # Where each part of a run starts, added part by part from ``start``.
+        "starts": _starts,
+        # The frame lines of a fitted run -- every joint between two bays, and
+        # with ``ends`` the middle of each end pier -- as the {x, w} of a pier
+        # ``width`` wide centred on each (an end pier's no wider than itself).
+        "frame_lines": _frame_lines,
+        # A value stepped down by ``step`` until the next step would reach
+        # ``floor``: the widths a setback law leaves, tier by tier.
+        "stepping": _stepping,
+        "size_of": lambda part: part.size,
+        # A column on every joint of a run and on the middle of its two end
+        # parts, ``width`` wide (the end ones no wider than the first part).
+        "column_lines": _column_lines,
+        # The {x, w} of every window bay of a run, from ``start``.
+        "bay_spans": _bay_spans,
+        # The scope of this shape's first child with a label, once split.
+        "child": lambda label: next(c.scope for c in shape.children if c.label == label),
+        "every_other": lambda items: list(items)[::2],
+        # The axes (centres) of the window bays of the shape with this id,
+        # wherever it is in the tree.
+        "bay_axes": lambda shape_id: _bay_axes(shape, shape_id),
+        # Timber-frame posts across a run: at ``spacing`` from its start, none
+        # across ``light`` (a scope, or None), one either side of it, and one
+        # closing the run where ``last``; clamped inside the run.
+        "frame_posts": _frame_posts,
     }
 
 
@@ -164,6 +194,91 @@ def _joints(parts, start: float) -> list[float]:
         x += p.size
         out.append(x)
     return out
+
+
+def _is_last(shape: Shape) -> bool:
+    same = [s for s in shape.siblings if s.label == shape.label]
+    return shape.index == len(same) - 1
+
+
+def _starts(sizes, start: float) -> list[float]:
+    out, x = [], start
+    for size in sizes:
+        out.append(x)
+        x += size
+    out.append(x)
+    return out
+
+
+def _frame_lines(parts, start: float, width: float, ends: bool = True) -> list[dict]:
+    parts = list(parts)
+    edges, x = [], start
+    for p in parts:
+        edges.append((x, x + p.size, p.attrs["slot"].name))
+        x += p.size
+    joints = [e[1] for e, f in zip(edges, edges[1:]) if e[2] == "bay" and f[2] == "bay"]
+    if not ends:
+        return [{"x": cx - width / 2.0, "w": width} for cx in joints]
+    lines = [(edges[0][0] + edges[0][1]) / 2.0, *joints, (edges[-1][0] + edges[-1][1]) / 2.0]
+    out = []
+    for i, cx in enumerate(lines):
+        w = min(width, parts[0].size) if i in (0, len(lines) - 1) else width
+        out.append({"x": cx - w / 2.0, "w": w})
+    return out
+
+
+def _column_lines(parts, start: float, width: float) -> list[dict]:
+    parts = list(parts)
+    xs, x = [], start
+    for p in parts:
+        xs.append(x)
+        x += p.size
+    first_w = parts[0].size
+    lines = [xs[0] + first_w / 2.0, *xs[1:], xs[-1] + parts[-1].size / 2.0]
+    out = []
+    for i, cx in enumerate(lines):
+        w = min(width, first_w if i in (0, len(lines) - 1) else width)
+        out.append({"x": cx - w / 2.0, "w": w})
+    return out
+
+
+def _bay_axes(shape: Shape, shape_id: str) -> list[float]:
+    root = shape
+    while root.parent is not None:
+        root = root.parent
+    target = next(s for s in root.walk() if s.id == shape_id)
+    return [c.scope.x + c.scope.w / 2.0 for c in target.children if kit.is_bay(c)]
+
+
+def _frame_posts(x0: float, w: float, spacing: float, post: float, light, last: bool) -> list[float]:
+    xs, x = [], x0
+    while x < x0 + w - post * 0.5:
+        if light is None or not (light.x - post < x < light.x + light.w):
+            xs.append(x)
+        x += spacing
+    if light is not None:
+        xs += [light.x - post, light.x + light.w]
+    if last:
+        xs.append(x0 + w - post)
+    return [min(max(px, x0), x0 + w - post) for px in sorted(set(round(v, 6) for v in xs))]
+
+
+def _bay_spans(parts, start: float) -> list[dict]:
+    out, x = [], start
+    for p in parts:
+        if p.attrs.get("slot") is not None and p.attrs["slot"].name == "bay":
+            out.append({"x": x, "w": p.size})
+        x += p.size
+    return out
+
+
+def _stepping(start: float, step: float, floor: float) -> list[float]:
+    out, v = [], start
+    while True:
+        v -= step
+        if v <= floor:
+            return out
+        out.append(v)
 
 
 def _bay_centres(parts, start: float) -> list[float]:
@@ -272,7 +387,7 @@ class _Op:
     """One verb of a production body, compiled."""
 
     def __init__(self, spec: Mapping[str, Any], where: str) -> None:
-        verbs = [v for v in ("set", "let", "fit", "split", "insert", "each", "call") if v in spec]
+        verbs = [v for v in ("set", "let", "fit", "split", "insert", "each", "call", "refuse") if v in spec]
         if len(verbs) != 1:
             raise RuleFileError(f"{where}: an operation has exactly one verb, got {verbs or list(spec)}")
         self.verb = verbs[0]
@@ -286,7 +401,8 @@ class _Op:
         elif v == "fit":
             self.axis = _AXES[spec["fit"]]
             self.budget = _expr(spec.get("budget", "w" if spec["fit"] == "x" else "h"), where)
-            self.end, self.bay = spec["end"], spec["bay"]
+            self.end = _expr(spec["end"], f"{where}.end")
+            self.bay = _expr(spec["bay"], f"{where}.bay")
             self.label = spec.get("label", "Cell")
             self.store = spec["as"]
             self.min_bays = spec.get("min_bays", 1)
@@ -311,6 +427,8 @@ class _Op:
         elif v == "each":
             self.items = _expr(spec["each"], where)
             self.body = [_Op(o, f"{where}.do[{i}]") for i, o in enumerate(spec["do"])]
+        elif v == "refuse":
+            self.message = spec["refuse"]
         elif v == "call":
             if spec["call"] not in PRODUCTIONS:
                 raise RuleFileError(f"{where}: no production named {spec['call']!r}")
@@ -338,7 +456,7 @@ class _Op:
         elif v == "let":
             env = _lets(env, self.lets)
         elif v == "fit":
-            end, bay = env.lookup(self.end), env.lookup(self.bay)
+            end, bay = _run(env, self.end), _run(env, self.bay)
             parts, _ = d.fit(
                 _run(env, self.budget),
                 self.label,
@@ -360,6 +478,8 @@ class _Op:
                     inner = op.run(shape, d, inner)
         elif v == "call":
             self.fn(shape, d)
+        elif v == "refuse":
+            raise Refused(self.message)
         return env
 
     def _id_base(self, shape: Shape) -> str | None:
@@ -488,10 +608,57 @@ class Style:
         return root, kit.log_of(root)
 
 
+_KEYS = {
+    "production": {"id", "label", "when", "priority", "doc", "let", "do"},
+    "rule": {"id", "label", "layer", "when", "let", "set", "specificity", "doc"},
+    "layer": {"name", "order"},
+}
+_TOP = {"style", "params", "lot_props", "emit", "production", "rule", "layer"}
+
+
+def _check(data: Mapping[str, Any], path: Path) -> None:
+    """Refuse what the loader would otherwise silently ignore: an unknown
+    section or key, and an attribute that a parameter of the same name would
+    hide (names resolve to a parameter before an attribute, so such an
+    attribute could be written and never read)."""
+    unknown = set(data) - _TOP
+    if unknown:
+        raise RuleFileError(f"{path.name}: unknown section(s) {sorted(unknown)}")
+    for section, allowed in _KEYS.items():
+        for i, entry in enumerate(data.get(section, ())):
+            extra = set(entry) - allowed
+            if extra:
+                raise RuleFileError(f"{path.name}: {section} {entry.get('id', entry.get('name', i))}: unknown key(s) {sorted(extra)}")
+    params = set(data.get("params") or {})
+    written: set[str] = set()
+
+    def ops(items):
+        for op in items:
+            written.update((op.get("set") or {}).keys())
+            written.update((op.get("attrs") or {}).keys())
+            for part in op.get("parts", ()):
+                written.update((part.get("attrs") or {}).keys())
+            if "as" in op:
+                written.add(op["as"])
+            ops(op.get("do", ()))
+
+    for prod in data.get("production", ()):
+        ops(prod.get("do", ()))
+    for rule in data.get("rule", ()):
+        written.update((rule.get("set") or {}).keys())
+    shadowed = sorted(written & params)
+    if shadowed:
+        raise RuleFileError(
+            f"{path.name}: attribute(s) {shadowed} share a name with a parameter; a name "
+            "resolves to the parameter first, so the attribute would never be read -- rename one"
+        )
+
+
 def load_style(path: str | Path) -> Style:
     path = Path(path)
     with path.open("rb") as fh:
         data = tomllib.load(fh)
+    _check(data, path)
     meta = data.get("style") or {}
     name = meta.get("name") or path.stem
     params = dict(data.get("params") or {})

@@ -1,0 +1,142 @@
+# The New York Art Deco setback tower, as rules -- a style that IS a law.
+#
+# The 1916 Zoning Resolution let a building rise straight from the street
+# line only to a multiple of the street's width; above that it stayed behind a
+# sloping sky-exposure plane, stepping back as it climbed, until its floor
+# plate was a quarter of the lot, and then it could rise without limit.
+# The district multiplier and the plane are simplified to one district.
+
+[style]
+name = "deco"
+site = ["width", "street_width", "year", "klass", "seed"]
+axiom = { w = "width", h = 260 }
+describe = { rule = "deco.tiers_for", phase = "regulation", detail = "f'setback tower on a {street_width:.0f} m street: street wall {district * street_width:.1f} m ({district_why}), {len(setbacks)} setback tier(s) on a 1:{plane:g} plane, tower {tower_w:.1f} m wide x {tower_by_class[klass]} floors'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Pier = "kit.column"
+Crown = "deco.spire"
+
+[params]
+district = 1.5               # Zoning Resolution 1916: a 1.5-times height district
+district_why = "Zoning Resolution 1916 -- a 1.5-times height district (simplified)"
+plane = 4.0                  # the sky-exposure plane: rise per unit of setback
+tower_share = 0.5            # a tower over 25% of the lot: half a square frontage
+storey = 3.7
+ground = 5.4
+tier_floors = 3
+pier = 0.55
+mass_end = [0.5, 0.9, 1.6]
+mass_bay = [2.6, 3.1, 3.6]
+tower_by_class = { modest = 6, ordinary = 10, comfortable = 14, grand = 20 }
+
+[[production]]
+id = "deco.lot"
+label = "Lot"
+doc = "The lot is cut into the tiers the zoning envelope leaves, and a spire."
+do = [
+  # The street wall: as many floors as the multiple of the street allows.
+  { let = { base_floors = "max(2, 1 + int((district * street_width - ground) // storey))" } },
+  # Each setback steps in by rise / plane on each side, until the next step
+  # would take the mass under the quarter-lot.
+  { set = { setbacks = "= stepping(width, 2.0 * (tier_floors * storey) / plane, tower_share * width)" } },
+  { set = { tower_w = "= min(([width] + setbacks)[-1], tower_share * width)" } },
+  { let = { sizes = "[base_floors * storey + (ground - storey)] + [tier_floors * storey + 0.0] * len(setbacks) + [tower_by_class[klass] * storey + 0.0, 2 * storey + 0.0, 2 * storey + 0.0]" } },
+  { split = "y", parts = [
+      { label = "Tier", size = "sizes[0]", name = "tier{n}", attrs = { tier_role = "street_wall", floors = "= base_floors", mass_w = "= width" } },
+      { repeat = "setbacks", label = "Tier", size = "tier_floors * storey + 0.0", name = "tier{n}", attrs = { tier_role = "setback", floors = "= tier_floors", mass_w = "= item" } },
+      { label = "Tier", size = "tower_by_class[klass] * storey + 0.0", name = "tier{n}", attrs = { tier_role = "tower", floors = "= tower_by_class[klass]", mass_w = "= tower_w" } },
+      { label = "Tier", size = "2 * storey + 0.0", name = "tier{n}", attrs = { tier_role = "crown", floors = 2, mass_w = "= tower_w * 0.72" } },
+      { label = "Tier", size = "2 * storey + 0.0", name = "tier{n}", attrs = { tier_role = "crown", floors = 2, mass_w = "= tower_w * 0.48" } },
+      { label = "Crown", size = "9.0", name = "spire" },
+      { label = "Sky", size = "h - fsum(sizes) - 9.0", name = "sky" },
+  ] },
+]
+
+[[production]]
+id = "deco.tier"
+label = "Tier"
+doc = "Each tier stands a mass as wide as the law allows, centred."
+do = [ { insert = "Mass", at = ["x + (w - mass_w) / 2.0", "y", "mass_w", "h"], name = "mass" } ]
+
+[[production]]
+id = "deco.mass"
+label = "Mass"
+doc = "A mass is fitted with bays, cut into floors, and has a pier stood on every frame line, its full height."
+do = [
+  { fit = "x", end = "mass_end", bay = "mass_bay", as = "rhythm" },
+  { let = { first = "index_of('Tier') == 0" } },
+  { split = "y", id_base = "parent", parts = [
+      { label = "Storey", size = "ground if first else storey", name = "s{n}" },
+      { repeat = "range(floors - 1)", label = "Storey", size = "storey", name = "s{n}" },
+  ] },
+  { let = { y0 = "y + (ground if first else 0.0)" } },
+  { each = "frame_lines(rhythm, x, pier, False)", do = [
+      { insert = "Pier", at = ["item.x", "y0", "item.w", "y + h - y0"], name = "pier{i}", attrs = { order = "pilaster" } },
+  ] },
+]
+
+[[production]]
+id = "deco.storey"
+label = "Storey"
+doc = "A floor is cut by its mass's rhythm; the top floor of each tier is capped with a coping where the next tier steps back."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Entablature", at = ["x", "y + h - 0.45", "w", "0.45"], name = "coping", attrs = { course_kind = "entablature" }, when = "index == count - 1" },
+]
+
+[[production]]
+id = "deco.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "deco.light_bay"
+label = "LightBay"
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+]
+
+[[production]]
+id = "deco.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[rule]]
+id = "deco.roles.the_tier_says_what_you_are"
+label = "Storey"
+layer = "roles"
+doc = "A floor takes its tier's role; the shop floor at the bottom is stone."
+let = { street = "index_of('Tier') == 0 and index == 0" }
+set = { role = "= 'base' if street else tier_role", wall_material = "= 'stone' if street else 'brick_buff'" }
+
+[[rule]]
+id = "deco.base.end_piers_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "deco.base.paired_windows_over_a_spandrel"
+label = "Cell"
+doc = "A bay holds a pair of windows; under them a dark spandrel, so the piers read as the only continuous lines on the front."
+when = "is_bay()"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.2", sill = 0.95, light_height = "= h - 0.95 - 0.45", lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.18, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "deco.base.the_lobby_door"
+label = "Cell"
+when = "is_bay() and role == 'base' and is_middle_bay()"
+specificity = 20
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 2.2, sill = 0.0, light_height = "= h - 1.0", lights = "= None", surround_kind = "moulded_architrave" }
+
+[[rule]]
+id = "deco.base.shops_on_the_street"
+label = "Cell"
+when = "is_bay() and role == 'base' and not is_middle_bay()"
+specificity = 10
+set = { opening_type = "shop_bay", head = "flat", light_width = "= w - 0.5", sill = 0.45, light_height = "= h - 0.45 - 1.0", lights = "= None" }

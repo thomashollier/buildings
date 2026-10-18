@@ -180,3 +180,26 @@ def test_the_engine_still_enforces_locality_on_rule_files(tmp_path):
 def test_a_malformed_rule_file_is_refused_when_loaded(tmp_path, broken, message):
     with pytest.raises((RuleFileError, ExprError)):
         _style(tmp_path, BOX.replace(broken, message, 1))
+
+
+def test_an_unknown_key_is_refused_rather_than_ignored(tmp_path):
+    with pytest.raises(RuleFileError):
+        _style(tmp_path, BOX.replace('id = "box.window"', 'id = "box.window"\nwhenn = "True"', 1))
+
+
+def test_an_attribute_a_parameter_would_hide_is_refused(tmp_path):
+    # 'bay' is a parameter; an attribute of the same name could be written
+    # and never read, because names resolve to parameters first.
+    with pytest.raises(RuleFileError):
+        _style(tmp_path, BOX.replace('set = { opening_type = "none" }', 'set = { opening_type = "none", bay = 1.0 }', 1))
+
+
+def test_a_refusal_is_a_value_error(tmp_path):
+    from buildings.typologies.common.rulefile import Refused
+
+    style = _style(tmp_path, BOX.replace(
+        'do = [ { insert = "Facade"',
+        'do = [ { refuse = "too narrow", when = "w < 5.0" }, { insert = "Facade"', 1))
+    with pytest.raises(Refused):
+        style.generate(Site(4.0))
+    style.generate(Site(9.0))

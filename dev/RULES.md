@@ -5,12 +5,23 @@ says how each shape is split (`[[production]]`) and what each shape is given
 (`[[rule]]`). It is loaded by `typologies/common/rulefile.py` into the same
 `Grammar` a hand-written module builds, and derived by the same engine.
 
-Four styles are now rule files: `georgian/georgian.toml`, `kyoto/kyoto.toml`,
-`modernist/modernist.toml` and `venice/venice.toml`. Before the Python
-versions were replaced, each rule file was checked byte for byte against its
-Python original: 144 Georgian, 120 Kyoto, 120 Modernist and 96 Venetian
-situations, all identical. The module beside each file now holds only its site
-type, any special drawing the file names, and `generate_*` / `derive_*`.
+Every style is a rule file: Amsterdam, Chicago, Art Deco, Georgian, Kyoto,
+Modernist, Normandy, SoHo, Venice, Victorian, and Paris (`haussmann.toml`).
+Each of the first ten was checked byte for byte against its Python original
+before the Python was replaced, refusals included:
+
+| Style | Situations | | Style | Situations |
+|---|---:|---|---|---:|
+| Georgian | 144 | | Chicago | 120 |
+| Kyoto | 120 | | Art Deco | 80 |
+| Modernist | 120 | | Amsterdam | 96 |
+| Venice | 96 | | SoHo | 448 |
+| Victorian | 240 | | Normandy | 120 |
+
+All identical. The module beside each file holds only its site type, the
+drawings the file names by writer, and `generate_*` / `derive_*`. Helpers that
+tests use (`gable_form`, `victorian_type`, `tiers_for`, `recipe_for`) are
+read back from a derivation, so the rule file is the only statement of them.
 
 Paris has a rule file too, `paris/haussmann.toml` (`typologies/paris/rules.py`).
 Unlike the four above it is **not** a port. The measured generator stays as it
@@ -73,11 +84,12 @@ do = [ ...operations... ]
 |---|---|
 | `{ split = "x", parts = [ {label, size, name, attrs, slot} ... ] }` | Cuts the shape into consecutive parts. The sizes must add up. `slot = "bay"` / `"end"` marks a part as a window bay or a wall end. A part may be `{ repeat = "list", ... }`, with `item` and `i` bound and `{n}` as its position in the name. |
 | `{ split = "x", by = "rhythm" }` | Cuts by a fitted run stored earlier, on this shape or an ancestor. |
-| `{ fit = "x", end = "end", bay = "bay", as = "rhythm", max_bays = 5 }` | Sizes a run with the fitting solver. `end` and `bay` name `[min, preferred, max]` params. |
+| `{ fit = "x", end = "end", bay = "bay", as = "rhythm", max_bays = 5 }` | Sizes a run with the fitting solver. `end` and `bay` are expressions giving `[min, preferred, max]`, usually a param's name. `budget` defaults to the shape's extent. |
 | `{ insert = "Cornice", at = [x, y, w, h], name = "cornice", attrs = {...} }` | Adds a child that does not partition its parent. |
 | `{ each = "joints(grid, x)", do = [...] }` | Repeats operations with `item` and `i` bound. |
 | `{ set = {...} }`, `{ let = {...} }` | Writes the shape in hand; binds names for later operations. |
 | `{ call = "kit.split_cell_around_its_light" }` | Runs a named Python production: the shared window anatomy. |
+| `{ refuse = "message" }` | Declines a situation the style does not model (with a `when`), raising `Refused`, a `ValueError`. |
 
 Any operation may carry its own `when`.
 
@@ -106,27 +118,43 @@ A name resolves to the first of these that has it:
 4. an attribute of the shape or of the nearest ancestor that has it. This is
    how a cell reads its storey's `role`, or a site field such as `year`.
 
-Functions: `min max abs round len sum fsum float int range column(rows, key)`,
-`step(table, value)` (a regulation's step table), `geometric(first, ratio, n)`,
-`bay_centres(parts, start)`,
-`sin cos pi()`, `is_bay() is_first_bay() is_last_bay() is_middle_bay()`,
-`has(name) in_parent(label) index_of(label) joints(parts, start)`.
+Functions:
+
+- arithmetic and lists: `min max abs round len sum fsum float int range
+  column(rows, key) every_other(items) sin cos pi()`;
+- regulation and proportion: `step(table, value)` (a step table read the way
+  a decree is), `stepping(start, step, floor)` (a setback law's widths),
+  `geometric(first, ratio, n)` (storeys that taper);
+- where a shape stands: `is_bay() is_first_bay() is_last_bay()
+  is_middle_bay() is_last(label) has(name) in_parent(label) index_of(label)
+  child(label)`;
+- runs and frames: `joints(parts, start) starts(sizes, start)
+  bay_centres(parts, start) bay_spans(parts, start) bay_axes(id)
+  frame_lines(parts, start, width, ends) column_lines(parts, start, width)
+  frame_posts(x, w, spacing, post, light, last) size_of(part)`.
 
 The expression language is Python expression syntax, checked before it is run.
 It allows arithmetic, comparisons, `and` / `or` / `not`, `a if c else b`,
 literals, lists and tuples, indexing, `item.h` on tables, and f-strings. It
 allows no imports, lambdas, comprehensions or attribute access beyond that.
-An unknown function name is refused when the file is loaded.
+When the file is loaded, the loader refuses:
+
+- an unknown function name;
+- an unknown section or key, which would otherwise be silently ignored;
+- an attribute that shares its name with a parameter. A name resolves to the
+  parameter first, so the attribute would be written and never read. This is
+  exactly the mistake converting Amsterdam produced, before the check existed.
 
 ## What stays in Python
 
 - **The engine and the shared kit:** window anatomy and IR writers.
-- **Drawings a file names by writer:** a gable outline, a lattice, a pavilion
-  screen.
-- **The other six styles.** They have not been converted yet. Amsterdam,
-  Victorian, Normandy and Chicago would each need one or two more named
-  writers or functions (the gable outline, the stoop, post placement around a
-  light), and Paris still runs on its own Python.
+- **Drawings a file names by writer:** Amsterdam's gable outline (step, neck,
+  bell), the Victorian false-front gable, turret cone and stoop, Normandy's
+  braces and gable, Kyoto's lattice, the Corbusian pavilion screen, the Art
+  Deco spire. These are outlines drawn around shapes the rules placed, not
+  decisions.
+- **The measured Paris generator.** By design, it reads Daly through its own
+  pipeline. `haussmann.toml` is the rule-file Paris.
 
 The locality guarantees are the engine's, so they hold for rule files
 unchanged. A rule can write only its own shape, and a part must stay inside

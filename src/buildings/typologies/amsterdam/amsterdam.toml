@@ -1,0 +1,146 @@
+# The Amsterdam canal house, as rules.
+#
+# Narrow, deep, tall brick, taxed by its frontage. The street front rises into
+# a gable that is a grammar of its own: tiers that narrow as they climb, each
+# holding fewer windows, and an outline whose shape tells its date -- step to
+# 1640, neck to 1720, bell to 1790, a straight cornice after. The outline is
+# drawn by a named writer around the tiers the rules place.
+# Numbers are INFERRED round figures (Herengracht, Keizersgracht).
+
+[style]
+name = "amsterdam"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 40 }
+overhangs = ["Cornice"]
+describe = { rule = "amsterdam.canal_house", phase = "structure", detail = "f'canal house, {width:.1f} m frontage, {year}, {form} gable'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Gable = "amsterdam.gable"
+
+[params]
+bay = [1.45, 1.75, 2.15]          # a tall cross-window and its pier
+end = [0.35, 0.55, 0.9]
+gable_bay = [1.2, 1.75, 2.15]     # a gable tier squeezes harder: it is a loft
+gable_end = [0.2, 0.45, 0.9]
+window_share = 0.62               # a deep house is lit from its two ends
+ground = 3.7                      # a raised ground floor over a half-basement
+first = 3.3
+taper = 0.93
+uppers = 3
+# Per gable form: [height, width as a share of the frontage] for each tier,
+# and the crown over the last one.
+tiers = { step = [[2.6, 0.80], [2.4, 0.56], [2.1, 0.32]], neck = [[2.8, 0.56], [2.3, 0.44]], bell = [[3.0, 0.52]], straight = [] }
+crowns = { step = 0.0, neck = 1.2, bell = 1.6, straight = 0.0 }
+
+[[production]]
+id = "amsterdam.lot"
+label = "Lot"
+doc = "A facade on the lot and, unless the date has put a cornice there, a gable on the facade."
+do = [
+  # The gable's outline follows fashion, and fashion follows the date.
+  { set = { form = "= 'step' if year < 1640 else 'neck' if year < 1720 else 'bell' if year < 1790 else 'straight'", storey_heights = "= [ground] + geometric(first, taper, uppers)" } },
+  { let = { front = "fsum(storey_heights)" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Gable", at = ["0.0", "front", "w", "fsum(column(tiers[form], 0)) + crowns[form]"], name = "gable", attrs = { form = "= form" }, when = "len(tiers[form]) > 0" },
+]
+
+[[production]]
+id = "amsterdam.facade"
+label = "Facade"
+doc = "Three bays at most, fitted once; then the storeys."
+do = [
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 3 },
+  { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] },
+]
+
+[[production]]
+id = "amsterdam.storey"
+label = "Storey"
+doc = "A storey is cut by its rhythm; the top storey of a house with no gable carries the cornice."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.6"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "role == 'top' and form == 'straight'" },
+]
+
+[[production]]
+id = "amsterdam.gable"
+label = "Gable"
+doc = "The gable is cut into its tiers, bottom-up, and the crown over them."
+do = [ { split = "y", parts = [
+    { repeat = "tiers[form]", label = "GableTier", size = "item[0]", name = "tier{i}", attrs = { share = "= item[1]" } },
+    { repeat = "[crowns[form]] if crowns[form] else []", label = "Crown", size = "item", name = "crown" },
+] } ]
+
+[[production]]
+id = "amsterdam.gable_tier"
+label = "GableTier"
+doc = "Each tier holds a storey narrower than the one below, centred, with as many windows as its own width fits."
+let = { tw = "w * share" }
+do = [
+  { fit = "x", budget = "tw", end = "gable_end", bay = "gable_bay", as = "tier_rhythm", max_bays = 3 },
+  { insert = "Storey", at = ["x + (w - tw) / 2.0", "y", "tw", "h"], name = "storey", attrs = { role = "gable", rhythm = "= tier_rhythm" } },
+]
+
+[[production]]
+id = "amsterdam.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "amsterdam.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "amsterdam.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[rule]]
+id = "amsterdam.roles.position_in_the_stack"
+label = "Storey"
+layer = "roles"
+doc = "Base at the bottom, top at the top, upper between. A gable storey already knows what it is."
+when = "not has('role')"
+set = { role = "= 'base' if index == 0 else 'top' if index == count - 1 else 'upper'" }
+
+[[rule]]
+id = "amsterdam.base.brick"
+label = "Storey"
+layer = "roles"
+doc = "The whole front is the same dark brick, gable and all."
+set = { wall_material = "brick_dark" }
+
+[[rule]]
+id = "amsterdam.base.end_piers_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "amsterdam.base.a_bay_holds_a_tall_window"
+label = "Cell"
+doc = "Every bay holds a tall window under a stone lintel: the front is as much glass as brick can carry."
+when = "is_bay()"
+let = { sill_h = "0.55 if role != 'gable' else 0.45" }
+set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = "= sill_h", light_height = "= h - sill_h - 0.45", surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "amsterdam.base.the_door_up_the_stoop"
+label = "Cell"
+doc = "The door is in the bay beside the stair down to the street, up a stoop over the half-basement, under a transom light."
+when = "is_bay() and role == 'base' and is_first_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.05, sill = 0.45, light_height = "= h - 0.45 - 0.35" }
+
+[[rule]]
+id = "amsterdam.base.the_attic_hatch"
+label = "Cell"
+doc = "The top tier of a gable is the loft, and its middle opening is the hatch goods are hoisted through."
+when = "is_bay() and role == 'gable' and is_last('GableTier') and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", light_height = "= h - 0.45 - 0.25", head = "flat" }

@@ -1,0 +1,254 @@
+# SoHo, as rules: three building types on the 25-foot Manhattan lot, chosen
+# by date and programme, not taste.
+#
+#  Federal rowhouse (to c. 1835), cast-iron loft (c. 1848-1880, comfortable
+#  and grand owners), brick store-and-loft (the 1880s, and the cheaper lofts
+#  before). Numbers are INFERRED round figures (LPC district report 1973;
+#  Gayle and Gillon 1974), not measured plates.
+
+[style]
+name = "soho"
+site = ["lots", "year", "programme", "klass", "seed"]
+axiom = { w = "lots * lot_width", h = 40 }
+overhangs = ["Cornice", "Chimney"]
+describe = { rule = "soho.recipes.recipe_for", phase = "structure", detail = "f'{type}: {lots} lot(s), {year}, {programme}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[params]
+lot_width = 7.62               # the Commissioners' Plan lot: 25 ft
+column_w = 0.36                # an engaged iron column on a loft front
+entablature = 0.42             # the iron entablature crowning each floor
+door_w = 1.15                  # a door a person and a parcel pass through
+fire_escape_rail = 0.95        # a guard a body leans on
+roof_rise = 3.0                # a half-storey garret under a 40 degree roof
+dormer_w = 1.15
+dormer_h = 1.9
+chimney_w = 0.7
+chimney_h = 1.4
+
+# Each type's vocabulary and proportions. Where money or date changes a value
+# within a type, both values are listed.
+[params.types.federal_rowhouse]
+wall_material = "brick"
+ground_material = "brick"
+ground_storey = 3.35          # a raised parlour floor over its basement
+ground_storey_grand = 3.35
+first_upper = 3.05            # the chamber floor
+first_upper_grand = 3.05
+taper = 1.0
+upper_storeys = 1
+upper_storeys_1870 = 1
+bay = [1.9, 2.1, 2.5]
+end = [0.6, 0.85, 1.3]
+window_share = 0.46           # a 6-over-6 sash in a load-bearing brick wall
+sill = 0.80
+head_gap = 0.55               # a splayed stone lintel and the brick over it
+columns = false
+entablature_every_floor = false
+cornice_projection = 0.35     # a wooden dentilled eaves cornice
+cornice_ornament = "modillioned"
+pitched_roof = true
+fire_escape = false
+fire_escape_grand = false
+shopfront = false
+door_side = "left"
+
+[params.types.cast_iron_loft]
+wall_material = "cast_iron"
+ground_material = "cast_iron"
+ground_storey = 4.9           # a store with a mezzanine-height ceiling
+ground_storey_grand = 5.4
+first_upper = 4.4             # the best-let loft, lit from the street end only
+first_upper_grand = 4.7
+taper = 0.93                  # an iron loft loses about 7% a floor
+upper_storeys = 4
+upper_storeys_1870 = 5
+bay = [2.3, 2.55, 2.9]
+end = [0.3, 0.42, 0.7]
+window_share = 0.70           # iron carries the front, so the front is glass
+sill = 0.75
+head_gap = 0.70               # the entablature and the spandrel under it
+columns = true
+entablature_every_floor = true
+cornice_projection = 1.0      # a cast or pressed bracketed cornice
+cornice_ornament = "bracketed"
+pitched_roof = false
+fire_escape = true
+fire_escape_grand = false
+shopfront = true
+door_side = "right"
+
+[params.types.brick_store_and_loft]
+wall_material = "brick"
+ground_material = "cast_iron"
+ground_storey = 4.6           # a cast-iron storefront under brick
+ground_storey_grand = 4.6
+first_upper = 3.9             # the tallest loft floor, over the store
+first_upper_grand = 3.9
+taper = 0.94                  # a brick loft loses about 6% a floor
+upper_storeys = 5
+upper_storeys_1870 = 5
+bay = [1.7, 1.95, 2.3]
+end = [0.45, 0.6, 0.9]
+window_share = 0.52           # brick piers between stone-linteled windows
+sill = 0.80
+head_gap = 0.55               # a stone lintel and a brick course
+columns = false
+entablature_every_floor = false
+cornice_projection = 0.85     # a pressed-metal bracketed cornice
+cornice_ornament = "bracketed"
+pitched_roof = false
+fire_escape = true
+fire_escape_grand = true
+shopfront = true
+door_side = "right"
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "soho.lot"
+label = "Lot"
+doc = "A facade stands on the lot; a dwelling of its date also has a roof."
+do = [
+  { refuse = "only the Federal dwelling is modelled; it stops being built c. 1835", when = "programme == 'dwelling' and year > 1840" },
+  { refuse = "lofts on this street are a product of the 1850s; none before c. 1848", when = "programme == 'loft' and year < 1848" },
+  # Date and programme choose the type; money only chooses within it.
+  { set = { type = "= 'federal_rowhouse' if programme == 'dwelling' else 'cast_iron_loft' if 1848 <= year < 1880 and klass in ('comfortable', 'grand') else 'brick_store_and_loft'" } },
+  { set = { r = "= types[type]" } },
+  { let = { grand = "klass == 'grand'" } },
+  { set = { storey_heights = "= [r.ground_storey_grand if grand else r.ground_storey] + geometric(r.first_upper_grand if grand else r.first_upper, r.taper, r.upper_storeys_1870 if year >= 1870 else r.upper_storeys)", fire_escape = "= r.fire_escape_grand if grand else r.fire_escape" } },
+  { fit = "x", end = "r.end", bay = "r.bay", as = "rhythm", min_bays = 2 },
+  { let = { front = "fsum(storey_heights)" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Roof", at = ["0.0", "front", "w", "roof_rise"], name = "roof", when = "r.pitched_roof" },
+]
+
+[[production]]
+id = "soho.facade"
+label = "Facade"
+doc = "The frontage is fitted with one rhythm of bays, then cut into storeys."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] } ]
+
+[[production]]
+id = "soho.storey"
+label = "Storey"
+doc = "A storey is cut by the facade's rhythm; columns stand on its piers, an entablature crowns it, and the top one carries the cornice."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { each = "column_lines(rhythm, x, column_w)", when = "r.columns", do = [
+      { insert = "Column", at = ["item.x", "y", "item.w", "h - entablature"], name = "column{i}" },
+  ] },
+  { insert = "Entablature", at = ["x", "y + h - entablature", "w", "entablature"], name = "entablature", when = "role == 'base' or (r.entablature_every_floor and role != 'top')" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "r.cornice_projection"], name = "cornice", attrs = { cornice_ornament = "= r.cornice_ornament" }, when = "role == 'top'" },
+  { let = { spans = "bay_spans(rhythm, x)" } },
+  { insert = "FireEscape", at = ["spans[len(spans) // 2 - 1].x + spans[len(spans) // 2 - 1].w * 0.08", "y", "(spans[len(spans) // 2].x + spans[len(spans) // 2].w * 0.92) - (spans[len(spans) // 2 - 1].x + spans[len(spans) // 2 - 1].w * 0.08)", "fire_escape_rail"], name = "fire_escape", when = "fire_escape and role != 'base' and len(spans) >= 2" },
+]
+
+[[production]]
+id = "soho.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "soho.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "soho.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[production]]
+id = "soho.roof"
+label = "Roof"
+doc = "A pitched roof carries a dormer over each outer window axis and a chimney stack on each party wall."
+do = [
+  { let = { axes = "bay_centres(rhythm, 0.0)" } },
+  { each = "[axes[0], axes[-1]] if len(axes) > 1 else axes", do = [
+      { insert = "Dormer", at = ["item - dormer_w / 2.0", "y + 0.35", "dormer_w", "dormer_h"], name = "dormer{i}" },
+  ] },
+  { insert = "Chimney", at = ["0.15", "y + h", "chimney_w", "chimney_h"], name = "chimney0" },
+  { insert = "Chimney", at = ["w - 0.15 - chimney_w", "y + h", "chimney_w", "chimney_h"], name = "chimney1" },
+]
+
+# --- rules ---------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[layer]]
+name = "period"
+order = 10
+
+[[layer]]
+name = "class"
+order = 20
+
+[[rule]]
+id = "soho.roles.position_in_the_stack"
+label = "Storey"
+layer = "roles"
+doc = "Base at the bottom, top at the top, upper between: read off the siblings."
+set = { role = "= 'base' if index == 0 else 'top' if index == count - 1 else 'upper'" }
+
+[[rule]]
+id = "soho.base.materials_of_the_front"
+label = "Storey"
+layer = "roles"
+doc = "A store front is iron whatever the floors over it are made of."
+set = { wall_material = "= r.ground_material if index == 0 else r.wall_material" }
+
+[[rule]]
+id = "soho.class.iron_order"
+label = "Storey"
+layer = "class"
+doc = "A grand iron front is Corinthian; an ordinary one is a plain Doric."
+when = "r.columns"
+set = { order = "= 'corinthian' if klass == 'grand' else 'doric'" }
+
+[[rule]]
+id = "soho.base.end_piers_are_wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "soho.base.a_bay_holds_a_window"
+label = "Cell"
+doc = "Every bay above the street holds a window, its share of the bay set by what the front is made of."
+when = "is_bay()"
+set = { opening_type = "window", head = "flat", light_width = "= r.window_share * w", sill = "= r.sill", light_height = "= h - r.sill - r.head_gap", surround_kind = "= 'moulded_architrave' if r.wall_material == 'brick' else 'none'", keystone_present = "= type == 'federal_rowhouse'" }
+
+[[rule]]
+id = "soho.base.the_ground_floor_is_a_store"
+label = "Cell"
+doc = "On a store-and-loft the ground floor is a store: glass from a low bulkhead to a transom and sign band."
+when = "is_bay() and role == 'base' and r.shopfront"
+specificity = 10
+set = { opening_type = "shop_bay", head = "flat", light_width = "= w * 0.86", sill = 0.45, light_height = "= h - 0.45 - 0.85", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "soho.base.the_door"
+label = "Cell"
+doc = "One bay of the ground floor is the door: to the stair at the side of a loft, or under a fanlight to one side of a rowhouse."
+when = "is_bay() and role == 'base' and (is_first_bay() if r.door_side == 'left' else is_last_bay())"
+specificity = 20
+let = { federal = "type == 'federal_rowhouse'" }
+set = { opening_type = "pedestrian_entrance", head = "= 'round' if federal else 'flat'", light_width = "= door_w", sill = 0.0, light_height = "= min(h - 0.35, 2.95 if federal else h - 0.85)", surround_kind = "= 'moulded_architrave' if federal else 'none'", keystone_present = "= federal" }
+
+[[rule]]
+id = "soho.period.iron_heads_of_their_date"
+label = "Cell"
+layer = "period"
+doc = "An iron front's window heads follow its date: round to the early 1860s, segmental to the early 1870s, flat after."
+when = "type == 'cast_iron_loft' and is_bay() and role != 'base'"
+set = { head = "= 'round' if year < 1862 else 'segmental' if year < 1872 else 'flat'" }
