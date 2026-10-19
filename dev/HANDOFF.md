@@ -1,8 +1,33 @@
-# Where this stands — 2026-08-25
+# Where this stands — 2026-10-18
 
 Read this first on a fresh session, then `README.md` for the invariants and the
 construction ladder, `dev/GLOSSARY.md` for vocabulary and `dev/CONTRACTS.md` for
 the binding spec.
+
+## 2026-10-18: the split-grammar engine and twelve rulesets
+
+Read `dev/CGA.md` and `dev/RULES.md` after this.
+
+- **Engine.** `src/buildings/cga/` is a split-grammar engine: shapes with
+  scopes, split / fit / insert, productions, layered attribute rules, and
+  interpretation to IR. It enforces locality: a rule writes only its own
+  shape, a part stays inside its parent, and overrides take an address.
+- **Paris on the engine.** `typologies/paris/grammar.py` produces the
+  measured generator's IR byte for byte on the fuzzer's 3000 situations
+  (`dev/harness/cga_equivalence.py`, reference in `dev/logs/cga_reference.json`).
+  `generate()` is still the pipeline.
+- **Rule files.** Every other style is a TOML rule file loaded by
+  `typologies/common/rulefile.py`, on the shared window kit
+  `typologies/common/kit.py`: Amsterdam, Chicago, Art Deco, Georgian, Kyoto,
+  Modernist, Normandy, SoHo, Venice, Victorian, and `paris/haussmann.toml`
+  (Paris written the same way, not a port). Each converted style was checked
+  byte for byte against the Python it replaced.
+- **Renderer** gained wall materials, columns, braces, gables, ogee heads,
+  lattices, tiled eaves, multi-light bays, and storeys narrower than the
+  frontage. Paris SVG output is unchanged.
+- **The open item** is the one at the top of `dev/CGA.md`: the measured Paris
+  sizes still come from `structure.py`, called once as the grammar's size
+  function.
 
 ## Repo state
 

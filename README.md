@@ -45,6 +45,89 @@ Every element can name the rule that produced it:
 trace.explain(node.id)   # -> the ordinance, the reason, the inputs
 ```
 
+## One engine, many styles
+
+The generator began as Paris only. It is now a **split-grammar engine**
+(`src/buildings/cga/`, in the manner of CGA, Müller and Wonka's *Computer
+Generated Architecture*) and twelve rulesets written on it. A building is a
+tree of shapes: a lot holds a facade, the facade is split into storeys,
+storeys into bays, a bay into its piers and its light, the light carries its
+surround and keystone. Each shape has a scope, and rules either split it
+(productions) or give it properties (layered attribute rules, the same
+later-layer-wins, specificity-breaks-ties, a-tie-raises machinery Paris always
+had).
+
+**Changes stay where they are made.** The engine refuses a rule that writes
+any shape but its own, and a part that strays outside the part it refines.
+Overrides and changes of look can be addressed to one floor, one axis or one
+building (`with_override`, `with_interpreter`). `dev/harness/cga_blast_radius.py`
+applies such changes across hundreds of buildings and confirms each touched
+only what it named.
+
+**Styles are rule files.** Every ruleset is a TOML file beside its module:
+`[[production]]` for how shapes split, `[[rule]]` for what they are given,
+geometry and conditions as small expressions in a whitelisted language. Each
+was checked byte for byte against the Python it replaced. The format is in
+[dev/RULES.md](dev/RULES.md); the engine and the Paris port in
+[dev/CGA.md](dev/CGA.md).
+
+**Paris is unchanged.** The measured generator still produces exactly what it
+did -- the grammar version of it is byte-identical on the fuzzer's 3000
+situations (`dev/harness/cga_equivalence.py`) -- and its numbers are still
+answerable to Daly. The other rulesets' numbers are INFERRED round figures
+for their type and say so.
+
+Six buildings from each ruleset, one scale per strip
+(`python3 dev/harness/readme_strips.py` regenerates them):
+
+**Paris, measured** — the original generator, answerable to Daly's plates: the 1783/1859/1884 height steps, the entresol, the noble floor, garrets and brisis windows in the mansard.
+
+![paris_measured](docs/strips/paris_measured.png)
+
+**Paris as a rule file** (`haussmann.toml`) — the same building written the way every other style is: decree step tables, class as ambition, tapering letting floors. It agrees on shape and differs in detail; the stone never rises above the legal cornice.
+
+![haussmann](docs/strips/haussmann.png)
+
+**Amsterdam canal house** — a narrow front rising into a gable that is a grammar of narrowing tiers; the outline follows the date: step, neck, bell, then a straight cornice.
+
+![amsterdam](docs/strips/amsterdam.png)
+
+**Venetian Gothic palazzo** — every storey cut wing | centre | wing; the noble floor opens in a polifora of ogee lights on colonnettes.
+
+![venice](docs/strips/venice.png)
+
+**Chicago School** — base, a shaft of identical floors, a capital; piers running the whole shaft; every bay a Chicago window, sash | fixed | sash.
+
+![chicago](docs/strips/chicago.png)
+
+**New York setback tower** — the 1916 Zoning Resolution as rules: the street wall rises to a multiple of the street's width, tiers step back on the sky-exposure plane, the tower takes a quarter of the lot.
+
+![deco](docs/strips/deco.png)
+
+**SoHo** — the type comes from date and programme: Federal rowhouse, cast-iron loft (mostly glass, a column on every pier), brick store-and-loft with its fire escape.
+
+![soho](docs/strips/soho.png)
+
+**San Francisco Victorian** — a bay-window zone beside an entry zone; how much of the bay its angled faces take separates the slanted Italianate from the square Stick; a Queen Anne gable and, on a grand house, a turret.
+
+![victorian](docs/strips/victorian.png)
+
+**Georgian London terrace** — every window one sash wide; its height is set by its floor's ratio, double square on the piano nobile, square at the top.
+
+![georgian](docs/strips/georgian.png)
+
+**Normandy half-timbering** — the frame is a grammar laid over the openings: posts at a spacing, never across a window, braces, Saint Andrew's crosses; jettied town houses and thatched country houses.
+
+![normandy](docs/strips/normandy.png)
+
+**Kyoto machiya** — a low loft over a timber ground floor, tiled pent roofs along the front, every opening screened by a lattice.
+
+![kyoto](docs/strips/kyoto.png)
+
+**Corbusian block** — pilotis on the structural grid and ribbon windows that deliberately ignore it: the free facade.
+
+![modernist](docs/strips/modernist.png)
+
 ## Design
 
 Four phases, each reading strictly backwards, never mutating what an earlier
@@ -186,12 +269,18 @@ src/buildings/
   site.py         the situation
   ir/             node vocabulary + lossless serialisation
   solver/         the fitting solver and its absorption ladder
-  cga/            the split-grammar engine: shapes, split/fit/insert, scoped overrides
-  typologies/paris/
-    reglement.py  the regulations, ported unchanged and sourced
-    structure.py  roles.py  chronology.py  catalogue.py
-    qualify/  compose.py  terminate.py  generate.py
-    grammar.py    the same building as a split grammar (dev/CGA.md)
+  cga/            the split-grammar engine: shapes, split/fit/insert, scoped
+                  overrides, locality checks, the rule-file expression language
+  typologies/
+    paris/        the measured generator: reglement.py structure.py roles.py
+                  chronology.py catalogue.py qualify/ compose.py terminate.py
+                  generate.py; grammar.py (the same building on the engine);
+                  haussmann.toml + rules.py (Paris as a rule file)
+    common/       kit.py (window anatomy, IR writers), rulefile.py (the loader)
+    amsterdam/ chicago/ deco/ georgian/ kyoto/ modernist/ normandy/
+    soho/ venice/ victorian/
+                  each: <style>.toml (the rules) + grammar.py (site type,
+                  named drawings, generate/derive)
   block/          frontage subdivision, adjacency, shared datums
   render/svg/     the renderer, which decides nothing arguable
 tests/
@@ -207,18 +296,22 @@ python3 dev/harness/first_building.py                # one building, fully trace
 python3 dev/harness/contact_sheets.py                # visual sweeps
 python3 dev/harness/check_no_period_branching.py     # guard
 python3 dev/harness/check_renderer_dumb.py           # guard
-python3 dev/harness/cga_equivalence.py               # grammar == pipeline, 3000 cases
-python3 dev/harness/cga_blast_radius.py              # local changes stay local
 open dev/reference/review.html                       # reference corpus selection
+python3 dev/harness/cga_equivalence.py               # the grammar builds what the pipeline builds
+python3 dev/harness/cga_blast_radius.py              # local changes stay local
+python3 dev/harness/readme_strips.py                 # the strips above
+python3 dev/harness/soho_sheet.py OUT [--styles|--more|--sf-normandy|--paris]
 ```
 
 Python 3.11+. No runtime dependencies.
 
 ## Scope
 
-First and only typology is Paris, 1820–1902. Deliberately not in this stage: a
-second typology, a rule DSL, a general binding system for block relation, a 3-D
-backend, or an override system separate from rule layering.
+Paris, 1820–1902, is the measured typology: every number answerable to a
+source. The eleven other rulesets show the engine generalising, with
+inferred proportions; calibrating any of them against measured plates would be
+its own piece of work. Still not in scope: a general binding system for block
+relation, a 3-D backend, or an override system separate from rule layering.
 
 Interiors, structure, services and photoreal materials are out of scope
 permanently. This does one vocabulary well.
