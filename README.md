@@ -77,6 +77,10 @@ situations (`dev/harness/cga_equivalence.py`) -- and its numbers are still
 answerable to Daly. The other rulesets' numbers are INFERRED round figures
 for their type and say so.
 
+Every ruleset on one sheet (`python3 dev/harness/style_sheet.py`):
+
+![all styles](docs/all_styles.png)
+
 Six buildings from each ruleset, one scale per strip
 (`python3 dev/harness/readme_strips.py` regenerates them):
 
