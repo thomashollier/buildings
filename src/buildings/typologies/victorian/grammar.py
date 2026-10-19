@@ -19,6 +19,7 @@ from buildings.cga import Grammar, Shape
 from buildings.ir.nodes import BuildingNode, GableNode
 from buildings.site import BuildingClass
 from buildings.trace import TraceLog
+from buildings.typologies.common import kit
 from buildings.typologies.common.rulefile import load_style, register_writer
 
 LOT = 7.62  # 25 ft
@@ -64,23 +65,9 @@ def write_turret(turret: Shape, below, d) -> list:
     ]
 
 
-def write_stoop(stoop: Shape, below, d) -> list:
-    """The stair up to the parlour door, drawn as its stepped profile."""
-    s = stoop.scope
-    n = 8
-    pts = [(s.x, s.y)]
-    for k in range(n):
-        x = s.x + s.w * k / n
-        y = s.y + s.h * (k + 1) / n
-        pts += [(x, y), (x + s.w / n, y)]
-    pts += [(s.x + s.w, s.y)]
-    return [GableNode(id=stoop.id, kind="gable", trace=tuple(stoop.trace),
-                      props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "form": "stoop", "points": tuple(pts),
-                             "hoist_beam": None, "wall_material": "stone"})]
-
 register_writer("victorian.top", write_top)
 register_writer("victorian.turret", write_turret)
-register_writer("victorian.stoop", write_stoop)
+register_writer("victorian.stoop", kit.write_stoop)
 
 STYLE = load_style(Path(__file__).with_name("victorian.toml"))
 

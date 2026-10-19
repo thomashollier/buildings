@@ -45,7 +45,7 @@ def test_the_gable_follows_the_date_and_narrows_as_it_climbs():
     widths = [t.children[0].scope.w for t in gable.children if t.label == "GableTier"]
     assert len(widths) == 3 and widths == sorted(widths, reverse=True)
     building, _ = generate_amsterdam(CanalSite(6.6, 1800, BuildingClass.ORDINARY))
-    assert not any(n.kind == "gable" for n in walk(building))
+    assert not any(n.kind == "gable" and n.props["form"] != "stoop" for n in walk(building))
 
 
 def test_every_venetian_storey_is_wing_centre_wing_and_the_nobile_opens_in_a_polifora():

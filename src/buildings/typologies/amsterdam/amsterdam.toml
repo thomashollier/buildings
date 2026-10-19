@@ -19,40 +19,48 @@ year = "= year"
 
 [emit]
 Gable = "amsterdam.gable"
+Stoop = "kit.stoop"
 
 [params]
-bay = [1.45, 1.75, 2.15]          # a tall cross-window and its pier
-end = [0.35, 0.55, 0.9]
+bay = [1.8, 2.2, 2.6]             # a tall cross-window and its pier
+end = [0.3, 0.5, 0.9]
 gable_bay = [1.2, 1.75, 2.15]     # a gable tier squeezes harder: it is a loft
 gable_end = [0.2, 0.45, 0.9]
 window_share = 0.62               # a deep house is lit from its two ends
-ground = 3.7                      # a raised ground floor over a half-basement
-first = 3.3
+basement = 1.5                    # the half-sunk souterrain, lit just over the street
+ground = 3.6                      # the raised ground floor, up the stoop
+first = 3.4
 taper = 0.93
 uppers = 3
 # Per gable form: [height, width as a share of the frontage] for each tier,
 # and the crown over the last one.
-tiers = { step = [[2.6, 0.80], [2.4, 0.56], [2.1, 0.32]], neck = [[2.8, 0.56], [2.3, 0.44]], bell = [[3.0, 0.52]], straight = [] }
-crowns = { step = 0.0, neck = 1.2, bell = 1.6, straight = 0.0 }
+# Seen in photographs: a step gable climbs in small steps through two tiers
+# of windows to a narrow top; a neck gable is one window wide, a tall neck on
+# low claw-piece shoulders under a pediment; a bell gable is a wide bell.
+tiers = { step = [[2.6, 0.78], [2.4, 0.52], [1.9, 0.32]], neck = [[2.6, 0.4], [2.3, 0.4]], bell = [[3.0, 0.62]], straight = [] }
+crowns = { step = 0.0, neck = 1.1, bell = 1.4, straight = 0.0 }
 
 [[production]]
 id = "amsterdam.lot"
 label = "Lot"
-doc = "A facade on the lot and, unless the date has put a cornice there, a gable on the facade."
+doc = "Two or three bays fitted to the frontage, a facade on the lot, a stoop up to its door and, unless the date has put a cornice there, a gable on the facade."
 do = [
   # The gable's outline follows fashion, and fashion follows the date.
-  { set = { form = "= 'step' if year < 1640 else 'neck' if year < 1720 else 'bell' if year < 1790 else 'straight'", storey_heights = "= [ground] + geometric(first, taper, uppers)" } },
+  { set = { form = "= 'step' if year < 1640 else 'neck' if year < 1720 else 'bell' if year < 1790 else 'straight'", storey_heights = "= [basement, ground] + geometric(first, taper, uppers)" } },
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 3 },
   { let = { front = "fsum(storey_heights)" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  # The stoop climbs from the street to the door, over the souterrain.
+  { let = { door = "bay_spans(rhythm, 0.0)[0]" } },
+  { insert = "Stoop", at = ["door.x", "0.0", "door.w", "basement"], name = "stoop" },
   { insert = "Gable", at = ["0.0", "front", "w", "fsum(column(tiers[form], 0)) + crowns[form]"], name = "gable", attrs = { form = "= form" }, when = "len(tiers[form]) > 0" },
 ]
 
 [[production]]
 id = "amsterdam.facade"
 label = "Facade"
-doc = "Three bays at most, fitted once; then the storeys."
+doc = "The storeys, each cut by the one rhythm fitted to the frontage."
 do = [
-  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 3 },
   { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] },
 ]
 
@@ -104,9 +112,9 @@ do = [ { call = "kit.dress_the_light" } ]
 id = "amsterdam.roles.position_in_the_stack"
 label = "Storey"
 layer = "roles"
-doc = "Base at the bottom, top at the top, upper between. A gable storey already knows what it is."
+doc = "The souterrain at the bottom, the raised base over it, top at the top, upper between. A gable storey already knows what it is."
 when = "not has('role')"
-set = { role = "= 'base' if index == 0 else 'top' if index == count - 1 else 'upper'" }
+set = { role = "= 'basement' if index == 0 else 'base' if index == 1 else 'top' if index == count - 1 else 'upper'" }
 
 [[rule]]
 id = "amsterdam.base.brick"
@@ -130,12 +138,20 @@ let = { sill_h = "0.55 if role != 'gable' else 0.45", clear = "0.5 if role == 't
 set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = "= sill_h", light_height = "= h - sill_h - 0.45 - clear", surround_kind = "moulded_architrave", keystone_present = false }
 
 [[rule]]
+id = "amsterdam.base.the_souterrain_lights"
+label = "Cell"
+doc = "The half-basement is lit by low windows just over the street."
+when = "is_bay() and role == 'basement'"
+specificity = 10
+set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = 0.3, light_height = "= h - 0.3 - 0.25", surround_kind = "none", keystone_present = false }
+
+[[rule]]
 id = "amsterdam.base.the_door_up_the_stoop"
 label = "Cell"
 doc = "The door is in the bay beside the stair down to the street, up a stoop over the half-basement, under a transom light."
 when = "is_bay() and role == 'base' and is_first_bay()"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.05, sill = 0.45, light_height = "= h - 0.45 - 0.35" }
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.1, sill = 0.0, light_height = "= h - 0.9" }
 
 [[rule]]
 id = "amsterdam.base.the_attic_hatch"

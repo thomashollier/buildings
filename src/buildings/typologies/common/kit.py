@@ -24,6 +24,7 @@ from typing import Callable, Sequence
 
 from buildings.cga import Attrs, Derivation, Part, Scope, Shape, X, Y
 from buildings.ir.nodes import (
+    GableNode,
     BalconyNode,
     BayNode,
     BuildingNode,
@@ -454,6 +455,21 @@ def write_lot(
     return write
 
 
+def write_stoop(stoop: Shape, below, d) -> list:
+    """The stair up to a raised front door, drawn as its stepped profile."""
+    s = stoop.scope
+    n = 8
+    pts = [(s.x, s.y)]
+    for k in range(n):
+        x = s.x + s.w * k / n
+        y = s.y + s.h * (k + 1) / n
+        pts += [(x, y), (x + s.w / n, y)]
+    pts += [(s.x + s.w, s.y)]
+    return [GableNode(id=stoop.id, kind="gable", trace=tuple(stoop.trace),
+                      props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "form": "stoop", "points": tuple(pts),
+                             "hoist_beam": None, "wall_material": "stone"})]
+
+
 INTERPRETERS = {
     "Light": write_light,
     "Surround": write_surround,
@@ -469,6 +485,7 @@ INTERPRETERS = {
     "Roof": write_roof,
     "Dormer": write_dormer,
     "Chimney": write_chimney,
+    "Stoop": write_stoop,
 }
 
 

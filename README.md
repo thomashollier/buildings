@@ -88,7 +88,7 @@ Six buildings from each ruleset, one scale per strip
 
 ![haussmann](docs/strips/haussmann.png)
 
-**Amsterdam canal house** — a narrow front rising into a gable that is a grammar of narrowing tiers; the outline follows the date: step, neck, bell, then a straight cornice.
+**Amsterdam canal house** — a narrow front of two or three bays over a half-sunk souterrain, with a stoop up to the door, rising into a gable that is a grammar of narrowing tiers. The outline follows the date: a step gable climbing in small steps, a one-window neck on low claw-piece shoulders, a bell, then a straight cornice.
 
 ![amsterdam](docs/strips/amsterdam.png)
 

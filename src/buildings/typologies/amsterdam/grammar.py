@@ -28,6 +28,9 @@ class CanalSite:
     klass: BuildingClass
     seed: int = 0
 
+STEP_RISE = 0.75  # one step of a stepped gable, INFERRED from photographs
+
+
 def _curve(x0, y0, x1, y1, profile, steps=10):
     return [(x0 + (x1 - x0) * i / steps, y0 + (y1 - y0) * profile(i / steps)) for i in range(1, steps + 1)]
 
@@ -43,16 +46,25 @@ def _outline(gable: Shape) -> tuple[list[tuple[float, float]], tuple[float, floa
     cx = g.x + g.w / 2.0
     pts: list[tuple[float, float]] = [(g.x, g.y)]
     if form == "step":
+        # Many small steps, not one per tier: each tier's edge climbs in a
+        # staircase from the tier below to its own wall.
         for st in storeys:
-            pts += [(st.scope.x, pts[-1][1]), (st.scope.x, st.scope.y + st.scope.h)]
+            x0, y0 = pts[-1][0], st.scope.y
+            n = max(1, round(st.scope.h / STEP_RISE))
+            for k in range(1, n + 1):
+                pts += [(x0 + (st.scope.x - x0) * (k - 1) / n, y0 + st.scope.h * k / n),
+                        (x0 + (st.scope.x - x0) * k / n, y0 + st.scope.h * k / n)]
         top = storeys[-1].scope
         apex_y = top.y + top.h
         pts.append((cx, apex_y))
         return pts, (cx, apex_y - 0.75)
     first = storeys[0].scope
     if form == "neck":
-        # A claw piece: a concave scroll from the eaves up into the neck.
-        pts += _curve(g.x, g.y, first.x, g.y + first.h * 0.8, lambda t: math.sin(t * math.pi / 2.0))
+        # A short ledge at the eaves, then a claw piece: a concave scroll
+        # that rises ever more steeply against the neck.
+        ledge = g.x + (first.x - g.x) * 0.25
+        pts.append((ledge, g.y))
+        pts += _curve(ledge, g.y, first.x, g.y + first.h * 0.65, lambda t: 1.0 - math.sqrt(1.0 - t * t))
         for st in storeys:
             pts += [(st.scope.x, max(pts[-1][1], st.scope.y)), (st.scope.x, st.scope.y + st.scope.h)]
         top = storeys[-1].scope.y + storeys[-1].scope.h
