@@ -21,6 +21,7 @@ heights = [4.6, 5.8, 5.0, 2.9]
 centre_share = 0.40
 wing_bay = [1.8, 2.2, 2.8]
 wing_end = [0.5, 0.9, 1.4]
+polifora_min_light = 0.95     # INFERRED -- the narrowest arch of a polifora, about a wing window
 
 [[production]]
 id = "venice.lot"
@@ -134,8 +135,11 @@ label = "Cell"
 doc = "On a nobile floor the centre is one opening of many ogee lights on colonnettes."
 when = "is_bay() and in_parent('Centre') and role == 'nobile'"
 specificity = 10
-let = { n = "(5 if klass == 'grand' else 4) - (0 if index_of('Storey') == 1 else 1)" }
-set = { opening_type = "window", head = "ogee", light_width = "= w", sill = 0.15, light_height = "= h - 0.15 - 1.2", lights = "= (1.0,) * n", divider = "Column", divider_width = 0.24, order = "corinthian", surround_kind = "none", balcony = true }
+# As many lights as the house can afford, but never so many that a light
+# comes out narrower than polifora_min_light: a narrow palazzo opens in
+# fewer, wider arches rather than in slits.
+let = { want = "(5 if klass == 'grand' else 4) - (0 if index_of('Storey') == 1 else 1)", fits = "int((w + 0.24) // (polifora_min_light + 0.24))" }
+set = { opening_type = "window", head = "ogee", light_width = "= w", sill = 0.15, light_height = "= h - 0.15 - 1.2", lights = "= (1.0,) * max(2, min(want, fits))", divider = "Column", divider_width = 0.24, order = "corinthian", surround_kind = "none", balcony = true }
 
 [[rule]]
 id = "venice.base.the_water_gate"

@@ -156,16 +156,16 @@ set = { opening_type = "shop_bay", head = "flat", light_width = "= w * 0.86", si
 [[rule]]
 id = "haussmann.base.entresol_lights"
 label = "Cell"
-doc = "The entresol is lit by squat windows in the base's own stone, segmental-headed."
+doc = "The entresol is lit by squat, square-headed windows in the base's own stone."
 when = "is_bay() and floor == 'entresol'"
-set = { opening_type = "window", head = "segmental", light_width = "= w * window_share", sill = 0.5, light_height = "= h - 0.5 - 0.55", surround_kind = "none", keystone_present = false }
+set = { opening_type = "window", head = "flat", light_width = "= w * window_share", sill = 0.5, light_height = "= h - 0.5 - 0.55", surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "haussmann.base.house_ground"
 label = "Cell"
-doc = "A house's ground floor has windows on an allege, round-headed."
+doc = "A house's ground floor has square-headed windows on an allege."
 when = "is_bay() and floor == 'ground' and not shop"
-set = { opening_type = "window", head = "round", light_width = "= w * window_share", sill = 1.0, light_height = "= h - 1.0 - 0.55", surround_kind = "none", keystone_present = true }
+set = { opening_type = "window", head = "flat", light_width = "= w * window_share", sill = 1.0, light_height = "= h - 1.0 - 0.55", surround_kind = "none", keystone_present = true }
 
 [[rule]]
 id = "haussmann.base.the_porte_cochere"
