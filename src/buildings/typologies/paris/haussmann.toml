@@ -80,10 +80,13 @@ do = [
 [[production]]
 id = "haussmann.roof"
 label = "Roof"
-doc = "A lucarne stands over every window axis of the stone below, and a stack on each party wall."
+doc = "A lucarne stands over every window axis of the stone below, and a stack on each party wall. After 1884 the taller arc holds a second storey of chambres de bonne, lit by a second, smaller row in the terrasson."
 do = [
   { each = "bay_centres(rhythm, x)", do = [
       { insert = "Dormer", at = ["item - 0.6", "y + 0.4", "1.2", "min(1.9, h - 0.8)"], name = "dormer{i}" },
+  ] },
+  { each = "bay_centres(rhythm, x)", when = "year >= 1884", do = [
+      { insert = "Dormer", at = ["item - 0.45", "y + 2.65", "0.9", "1.35"], name = "upper_dormer{i}", attrs = { dormer_form = "segmental" } },
   ] },
   { insert = "Chimney", at = ["0.1", "y + h", "0.9", "1.1"], name = "chimney0" },
   { insert = "Chimney", at = ["w - 1.0", "y + h", "0.9", "1.1"], name = "chimney1" },

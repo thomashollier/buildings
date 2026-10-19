@@ -69,7 +69,17 @@ do = [
       { label = "Cell", size = "w - 2 * 0.45", name = "x1", slot = "bay" },
       { label = "Cell", size = "0.45", name = "x2", slot = "end" },
   ] },
-  { split = "x", when = "role != 'nobile'", parts = [
+  # The water gate takes its width from the polifora over it -- half its span,
+  # and never less than a boat needs -- and the two lights share the rest.
+  { let = { gate = "max(1.8, (w - 0.9) * 0.5)" } },
+  { split = "x", when = "role == 'water'", parts = [
+      { label = "Cell", size = "0.4", name = "x0", slot = "end" },
+      { label = "Cell", size = "(w - 0.8 - gate) / 2.0", name = "x1", slot = "bay" },
+      { label = "Cell", size = "gate", name = "x2", slot = "bay" },
+      { label = "Cell", size = "(w - 0.8 - gate) / 2.0", name = "x3", slot = "bay" },
+      { label = "Cell", size = "0.4", name = "x4", slot = "end" },
+  ] },
+  { split = "x", when = "role == 'attic'", parts = [
       { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
       { repeat = "range(3)", label = "Cell", size = "(w - 2 * 0.4) / 3", name = "x{n}", slot = "bay" },
       { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
@@ -147,4 +157,4 @@ label = "Cell"
 doc = "The middle of the water storey is the gate the boats come in by."
 when = "is_bay() and in_parent('Centre') and role == 'water' and is_middle_bay()"
 specificity = 20
-set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= w * 0.8", sill = 0.0, light_height = "= h - 0.7", surround_kind = "moulded_architrave" }
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= w - 0.3", sill = 0.0, light_height = "= h - 0.7", surround_kind = "moulded_architrave" }
