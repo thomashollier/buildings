@@ -126,8 +126,8 @@ id = "amsterdam.base.a_bay_holds_a_tall_window"
 label = "Cell"
 doc = "Every bay holds a tall window under a stone lintel: the front is as much glass as brick can carry."
 when = "is_bay()"
-let = { sill_h = "0.55 if role != 'gable' else 0.45" }
-set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = "= sill_h", light_height = "= h - sill_h - 0.45", surround_kind = "moulded_architrave", keystone_present = false }
+let = { sill_h = "0.55 if role != 'gable' else 0.45", clear = "0.5 if role == 'top' and form == 'straight' else 0.3 if role == 'gable' else 0.0" }
+set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = "= sill_h", light_height = "= h - sill_h - 0.45 - clear", surround_kind = "moulded_architrave", keystone_present = false }
 
 [[rule]]
 id = "amsterdam.base.the_door_up_the_stoop"
@@ -143,4 +143,4 @@ label = "Cell"
 doc = "The top tier of a gable is the loft, and its middle opening is the hatch goods are hoisted through."
 when = "is_bay() and role == 'gable' and is_last('GableTier') and is_middle_bay()"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", light_height = "= h - 0.45 - 0.25", head = "flat" }
+set = { opening_type = "pedestrian_entrance", light_height = "= h - 0.45 - 0.55", head = "flat" }

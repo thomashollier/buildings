@@ -224,9 +224,10 @@ set = { opening_type = "none" }
 [[rule]]
 id = "soho.base.a_bay_holds_a_window"
 label = "Cell"
-doc = "Every bay above the street holds a window, its share of the bay set by what the front is made of."
+doc = "Every bay above the street holds a window, its share of the bay set by what the front is made of; under a deep cornice the top floor's windows stop short of its frieze."
 when = "is_bay()"
-set = { opening_type = "window", head = "flat", light_width = "= r.window_share * w", sill = "= r.sill", light_height = "= h - r.sill - r.head_gap", surround_kind = "= 'moulded_architrave' if r.wall_material == 'brick' else 'none'", keystone_present = "= type == 'federal_rowhouse'" }
+let = { clear = "r.cornice_projection * 0.65 + 0.15 if role == 'top' and not r.pitched_roof else 0.0" }
+set = { opening_type = "window", head = "flat", light_width = "= r.window_share * w", sill = "= r.sill", light_height = "= h - r.sill - r.head_gap - clear", surround_kind = "= 'moulded_architrave' if r.wall_material == 'brick' else 'none'", keystone_present = "= type == 'federal_rowhouse'" }
 
 [[rule]]
 id = "soho.base.the_ground_floor_is_a_store"

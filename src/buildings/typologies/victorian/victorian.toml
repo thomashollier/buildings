@@ -21,48 +21,67 @@ year = "= year"
 Top = "victorian.top"
 Turret = "victorian.turret"
 Stoop = "victorian.stoop"
+Patio = "kit.balconette"
 
 [params]
 heights = [2.1, 3.6, 3.3]       # raised basement, parlour floor, chamber floor
-bay_zone = 0.55                 # the bay's share of the front
 # How much of the bay zone each angled face takes, seen from the street.
 side_share = { italianate = 0.2, stick = 0.07, queen_anne = 0.2 }
 paints = ["clapboard_sage", "clapboard_blue", "clapboard_cream", "clapboard_rose"]
 corner_board = 0.14
+extra_floor = 3.1               # a second chamber floor
+patio_w = 1.3                   # a side yard behind a fence, beside the entry
+# The layouts a lot of its width allows. The seed stands for the builder.
+#   single_left / single_right: one bay window, the entry beside it
+#   double: a bay either side of a central entry, on a wide lot
 
 # --- productions -------------------------------------------------------------
 
 [[production]]
 id = "victorian.lot"
 label = "Lot"
-doc = "The house front, what crowns it, and the stoop up to the door."
+doc = "The house front, its layout, what crowns it, the stoop up to the door, and a side yard where the builder left one."
 do = [
   { set = { kind = "= 'italianate' if year < 1880 else 'stick' if year < 1888 else 'queen_anne'" } },
-  { let = { front = "fsum(heights)", bw = "w * bay_zone" } },
-  # With a turret over the bay, the gable crowns only the entry side.
-  { let = { turret = "kind == 'queen_anne' and klass in ('comfortable', 'grand')" } },
-  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
-  { insert = "Top", at = ["bw if turret else 0.0", "front", "w - (bw if turret else 0.0)", "1.6 if kind != 'queen_anne' else 3.4"], name = "top", attrs = { kind = "= kind" } },
-  { insert = "Turret", at = ["0.15", "front - heights[2]", "bw - 0.3", "heights[2] + 2.6 + 3.2"], name = "turret", when = "turret" },
-  { insert = "Stoop", at = ["w * bay_zone + 0.25", "0.0", "w - w * bay_zone - 0.5", "heights[0]"], name = "stoop" },
+  { set = { layout = "= 'double' if w >= 8.4 else ('single_left' if seed % 2 == 0 else 'single_right')", storey_heights = "= heights + ([extra_floor] if (seed % 3 == 2 or klass == 'grand') else [])" } },
+  { let = { patio = "patio_w if (seed % 4 == 3 and layout != 'double' and w >= 6.8) else 0.0" } },
+  # The facade stands beside the side yard, which is on the entry's side.
+  { let = { fx = "patio if layout == 'single_right' else 0.0", fw = "w - patio", front = "fsum(storey_heights)" } },
+  { set = { bay_x = "= fx + fw * 0.45 if layout == 'single_right' else fx", bay_w = "= fw * (0.36 if layout == 'double' else 0.55)", entry_x = "= fx if layout == 'single_right' else fx + fw * (0.36 if layout == 'double' else 0.55)", entry_w = "= fw * (0.28 if layout == 'double' else 0.45)" } },
+  # With a turret over the bay, the gable crowns only the rest of the front.
+  { let = { turret = "kind == 'queen_anne' and klass in ('comfortable', 'grand')", bay_right = "layout == 'single_right'" } },
+  { insert = "Facade", at = ["fx", "0.0", "fw", "front"], name = "facade" },
+  { insert = "Top", at = ["fx", "front", "fw", "1.6 if kind != 'queen_anne' else 3.4"], name = "top", attrs = { kind = "= kind" }, when = "not turret" },
+  { insert = "Top", at = ["fx if bay_right else bay_x + bay_w", "front", "(bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)", "3.4"], name = "top", attrs = { kind = "= kind" }, when = "turret" },
+  { insert = "Turret", at = ["bay_x + 0.15", "front - storey_heights[-1]", "bay_w - 0.3", "storey_heights[-1] + 2.6 + 3.2"], name = "turret", when = "turret" },
+  { insert = "Stoop", at = ["entry_x + 0.25", "0.0", "entry_w - 0.5", "heights[0]"], name = "stoop" },
+  { insert = "Patio", at = ["(0.0 if bay_right else fx + fw) + 0.1", "0.0", "patio - 0.2", "1.5"], name = "patio", when = "patio > 0" },
 ]
 
 [[production]]
 id = "victorian.facade"
 label = "Facade"
-doc = "Basement, parlour, chamber."
-do = [ { split = "y", id_base = "parent", parts = [ { repeat = "heights", label = "Storey", size = "item", name = "s{i}" } ] } ]
+doc = "Basement, parlour, a chamber floor or two."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] } ]
 
 [[production]]
 id = "victorian.storey"
 label = "Storey"
 do = [
-  # A facade floor: the bay's zone and the entry's, a cornice over the bay.
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret')", parts = [
-      { label = "BayZone", size = "w * bay_zone", name = "bay_zone" },
-      { label = "EntryZone", size = "w - w * bay_zone", name = "entry" },
+  # A facade floor is cut by the layout: the bay's zone and the entry's.
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'single_left'", parts = [
+      { label = "BayZone", size = "w * 0.55", name = "bay_zone" },
+      { label = "EntryZone", size = "w - w * 0.55", name = "entry" },
   ] },
-  { insert = "Entablature", at = ["x", "y + h - 0.32", "w * bay_zone", "0.32"], name = "bay_cornice", attrs = { course_kind = "entablature" }, when = "role not in ('parapet', 'attic', 'turret', 'basement')" },
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'single_right'", parts = [
+      { label = "EntryZone", size = "w * 0.45", name = "entry" },
+      { label = "BayZone", size = "w - w * 0.45", name = "bay_zone" },
+  ] },
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'double'", parts = [
+      { label = "BayZone", size = "w * 0.36", name = "bay_zone" },
+      { label = "EntryZone", size = "w * 0.28", name = "entry" },
+      { label = "BayZone", size = "w - w * 0.36 - w * 0.28", name = "bay_zone_2" },
+  ] },
   # The false front: boards over a frieze and a bracketed cornice.
   { split = "x", when = "role == 'parapet'", parts = [ { label = "Cell", size = "w", name = "x0", slot = "end" } ] },
   { insert = "Entablature", at = ["x", "y", "w", "0.5"], name = "frieze", attrs = { course_kind = "entablature" }, when = "role == 'parapet'" },
@@ -91,6 +110,7 @@ do = [
       { label = "Cell", size = "w - 2 * side", name = "x1", slot = "bay", attrs = { face = "front" } },
       { label = "Cell", size = "side", name = "x2", slot = "bay", attrs = { face = "side" } },
   ] },
+  { insert = "Entablature", at = ["x", "y + h - 0.32", "w", "0.32"], name = "bay_cornice", attrs = { course_kind = "entablature" }, when = "role != 'basement'" },
   { each = "[x, x + side, x + w - side, x + w]", when = "role != 'basement'", do = [
       { insert = "Column", at = ["min(max(item - corner_board / 2.0, x), x + w - corner_board)", "y", "corner_board", "h - 0.32"], name = "corner{i}", attrs = { order = "corner_board" } },
   ] },
@@ -120,7 +140,7 @@ do = [
 id = "victorian.turret"
 label = "Turret"
 doc = "A corner turret rises out of the bay through the chamber floor and a storey of its own, under a conical roof."
-do = [ { insert = "Storey", at = ["x", "y + heights[2]", "w", "2.6"], name = "storey", attrs = { role = "turret" } } ]
+do = [ { insert = "Storey", at = ["x", "y + storey_heights[-1]", "w", "2.6"], name = "storey", attrs = { role = "turret" } } ]
 
 [[production]]
 id = "victorian.cell"
@@ -156,7 +176,7 @@ id = "victorian.roles.floor_and_paint"
 label = "Storey"
 layer = "roles"
 doc = "Basement, parlour, chamber -- or the role a crowning storey was given -- and one paint for the whole house, chosen by its seed."
-set = { role = "= role if has('role') else ['basement', 'parlour', 'chamber'][index]", wall_material = "= paints[seed % len(paints)]" }
+set = { role = "= role if has('role') else ['basement', 'parlour', 'chamber', 'chamber'][index]", wall_material = "= paints[seed % len(paints)]" }
 
 [[rule]]
 id = "victorian.base.wall"
