@@ -84,7 +84,7 @@ Six buildings from each ruleset, one scale per strip
 
 ![paris_measured](docs/strips/paris_measured.png)
 
-**Paris as a rule file** (`haussmann.toml`) — the same building written the way every other style is: decree step tables, class as ambition, tapering letting floors. It agrees on shape and differs in detail; the stone never rises above the legal cornice.
+**Paris as a rule file** (`haussmann.toml`) — the same building written the way every other style is: decree step tables, class as ambition, tapering letting floors, square-headed ground-floor windows, and after 1884 a second row of roof windows. It agrees on shape and differs in detail; the stone never rises above the legal cornice.
 
 ![haussmann](docs/strips/haussmann.png)
 
@@ -92,15 +92,15 @@ Six buildings from each ruleset, one scale per strip
 
 ![amsterdam](docs/strips/amsterdam.png)
 
-**Venetian Gothic palazzo** — every storey cut wing | centre | wing; the noble floor opens in a polifora of ogee lights on colonnettes.
+**Venetian Gothic palazzo** — every storey cut wing | centre | wing; the noble floor opens in a polifora of ogee lights on colonnettes -- never so many that an arch comes out under 0.95 m -- and the water gate below takes its width from the polifora.
 
 ![venice](docs/strips/venice.png)
 
-**Chicago School** — base, a shaft of identical floors, a capital; piers running the whole shaft; every bay a Chicago window, sash | fixed | sash.
+**Chicago School** — base, a shaft of identical floors, a capital; piers running the whole shaft. The architect (the seed) picks the skin (terracotta, white glazed, dark or red brick), the shaft window (Chicago 1:2:1, Wainwright pairs, three equal sashes) and the capital (arcade with roundels, plain attic band, or Sullivan's one arch a bay under oculi).
 
 ![chicago](docs/strips/chicago.png)
 
-**New York setback tower** — the 1916 Zoning Resolution as rules: the street wall rises to a multiple of the street's width, tiers step back on the sky-exposure plane, the tower takes a quarter of the lot.
+**New York setback tower** — the 1916 Zoning Resolution as rules: the street wall rises to a multiple of the street's width, tiers step back on the sky-exposure plane, the tower takes a quarter of the lot. The law fixes the envelope; the architect (the seed) picks the crown -- stepped spire, ziggurat or lantern -- the skin, and paired, strip or punched windows.
 
 ![deco](docs/strips/deco.png)
 
@@ -108,7 +108,7 @@ Six buildings from each ruleset, one scale per strip
 
 ![soho](docs/strips/soho.png)
 
-**San Francisco Victorian** — a bay-window zone beside an entry zone; how much of the bay its angled faces take separates the slanted Italianate from the square Stick; a Queen Anne gable and, on a grand house, a turret.
+**San Francisco Victorian** — a bay-window zone beside an entry zone; how much of the bay its angled faces take separates the slanted Italianate from the square Stick; a Queen Anne gable and, on a grand house, a turret. The builder and the lot choose the layout: bay left or right, two bays round a central entry on a wide lot, a side yard behind a fence, an extra floor.
 
 ![victorian](docs/strips/victorian.png)
 
