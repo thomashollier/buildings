@@ -64,7 +64,7 @@ def test_every_venetian_storey_is_wing_centre_wing_and_the_nobile_opens_in_a_pol
 
 
 def test_the_chicago_shaft_is_uniform_its_piers_run_through_and_its_windows_are_1_2_1():
-    building, _ = generate_chicago(OfficeSite(20.5, 1895, BuildingClass.COMFORTABLE))
+    building, _ = generate_chicago(OfficeSite(20.5, 1895, BuildingClass.COMFORTABLE, seed=0))
     storeys = [n for n in building.children if n.kind == "storey"]
     shaft = [s for s in storeys if s.props["role"] == "shaft"]
     assert len({round(s.props["h"], 6) for s in shaft}) == 1
@@ -74,3 +74,19 @@ def test_the_chicago_shaft_is_uniform_its_piers_run_through_and_its_windows_are_
     lights = sorted((o for o in bay.children if o.kind == "opening"), key=lambda o: o.props["x"])
     w = [o.props["w"] for o in lights]
     assert len(w) == 3 and w[1] == pytest.approx(2 * w[0]) and w[0] == pytest.approx(w[2])
+
+
+def test_the_seed_dresses_the_same_frame_differently():
+    from buildings.typologies.deco.grammar import TowerSite, derive_deco
+
+    chicago = {
+        tuple(derive_chicago(OfficeSite(20.5, 1895, BuildingClass.COMFORTABLE, seed=s))[0].attrs[k] for k in ("skin", "window", "crown"))
+        for s in range(6)
+    }
+    deco = {
+        tuple(derive_deco(TowerSite(36.0, 18.0, 1929, BuildingClass.GRAND, seed=s))[0].attrs[k] for k in ("crown", "skin", "fenestration"))
+        for s in range(6)
+    }
+    assert len(chicago) == 6 and len(deco) == 6
+    assert {c[2] for c in chicago} == {"arcade", "attic_band", "oculi"}
+    assert {d[0] for d in deco} == {"spire", "ziggurat", "lantern"}

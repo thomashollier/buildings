@@ -29,12 +29,24 @@ pier = 0.8
 # Height is what the money and the elevator allow; later buildings climb two
 # floors higher than early ones.
 shaft_by_class = { modest = 6, ordinary = 7, comfortable = 9, grand = 11 }
+rank = { modest = 0, ordinary = 1, comfortable = 2, grand = 3 }
+
+# --- the styling the frame leaves free -----------------------------------------
+# The frame decides the bays and the shaft; how it is clad and crowned is the
+# architect's. The seed stands for the architect, so the picks follow it.
+skins = ["terracotta", "stucco", "brick_dark", "brick"]   # buff terracotta, white glazed, dark brick, red brick
+windows = ["chicago", "paired", "triple"]
+capitals = ["arcade", "attic_band", "oculi"]
+# Per capital: the cornice's ornament and projection.
+cornices = { arcade = ["bracketed", 1.5], attic_band = ["modillioned", 0.8], oculi = ["bracketed", 2.0] }
 
 [[production]]
 id = "chicago.lot"
 label = "Lot"
 doc = "The block stands on its whole lot."
 do = [
+  # The seed stands for the architect: same frame, same law, a different hand.
+  { set = { skin = "= skins[seed % 4]", window = "= windows[(seed * 2) % 3]", crown = "= capitals[(seed * 2 + seed // 3) % 3]" } },
   { set = { storey_heights = "= base + [shaft_storey] * (shaft_by_class[klass] + (2 if year >= 1900 else 0)) + capital" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(storey_heights)"], name = "facade" },
 ]
@@ -59,7 +71,7 @@ doc = "A storey is cut by the frame; a belt course closes the base and opens the
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
   { insert = "Entablature", at = ["x", "y + h - 0.5", "w", "0.5"], name = "belt", attrs = { course_kind = "entablature" }, when = "index == len(base) - 1 or index == count - len(capital) - 1" },
-  { insert = "Cornice", at = ["x", "y + h", "w", "1.5"], name = "cornice", attrs = { cornice_ornament = "bracketed" }, when = "role == 'attic'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "cornices[crown][1]"], name = "cornice", attrs = { cornice_ornament = "= cornices[crown][0]" }, when = "role == 'attic'" },
 ]
 
 [[production]]
@@ -88,7 +100,7 @@ label = "Storey"
 layer = "roles"
 doc = "Two storeys of base, two of capital, and the shaft between."
 let = { r = "'base' if index < len(base) else 'attic' if index == count - 1 else 'capital' if index >= count - len(capital) else 'shaft'" }
-set = { role = "= r", wall_material = "= 'stone' if r == 'base' else 'terracotta'" }
+set = { role = "= r", wall_material = "= 'stone' if r == 'base' else skin" }
 
 [[rule]]
 id = "chicago.base.end_piers_are_wall"
@@ -100,8 +112,22 @@ set = { opening_type = "none" }
 id = "chicago.base.the_chicago_window"
 label = "Cell"
 doc = "A shaft bay is almost all glass: a fixed pane twice the width of the sash either side of it, under a spandrel."
-when = "is_bay() and role == 'shaft'"
+when = "is_bay() and role == 'shaft' and window == 'chicago'"
 set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.3", sill = 0.8, light_height = "= h - 0.8 - 0.75", lights = "= (1.0, 2.0, 1.0)", divider = "Mullion", divider_width = 0.14, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.paired_sashes"
+label = "Cell"
+doc = "A shaft bay holds two tall sashes either side of a thin intermediate pier: the Wainwright rhythm, a vertical line every half bay."
+when = "is_bay() and role == 'shaft' and window == 'paired'"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.6", sill = 0.9, light_height = "= h - 0.9 - 0.7", lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.45, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.three_equal_sashes"
+label = "Cell"
+doc = "A shaft bay holds three equal sashes: the plainer office front."
+when = "is_bay() and role == 'shaft' and window == 'triple'"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.5", sill = 0.85, light_height = "= h - 0.85 - 0.75", lights = "= (1.0, 1.0, 1.0)", divider = "Mullion", divider_width = 0.18, surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "chicago.base.shops_in_the_base"
@@ -122,12 +148,34 @@ set = { opening_type = "pedestrian_entrance", head = "round", light_width = 2.6,
 [[rule]]
 id = "chicago.base.attic_roundels"
 label = "Cell"
-when = "is_bay() and role == 'attic'"
-set = { opening_type = "oeil_de_boeuf", head = "flat", light_width = 1.1, sill = 0.3, light_height = 1.1, lights = "= None", surround_kind = "none", keystone_present = false }
+doc = "Under an arcaded or Sullivan capital, the attic opens in a roundel to a bay."
+when = "is_bay() and role == 'attic' and crown != 'attic_band'"
+set = { opening_type = "oeil_de_boeuf", head = "flat", light_width = "= 1.1 if crown == 'arcade' else 1.5", sill = 0.3, light_height = "= 1.1 if crown == 'arcade' else 1.5", lights = "= None", surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "chicago.base.the_arcaded_capital"
 label = "Cell"
 doc = "The capital's floor opens in round-arched pairs."
-when = "is_bay() and role == 'capital'"
+when = "is_bay() and role == 'capital' and crown == 'arcade'"
 set = { opening_type = "window", head = "round", light_width = "= w - pier - 0.8", sill = 0.8, light_height = "= h - 0.8 - 0.4", lights = "= (1.0, 1.0)", divider = "Column", divider_width = 0.3, order = "doric", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.one_arch_a_bay"
+label = "Cell"
+doc = "Sullivan's capital: one round arch to a bay, under a frieze of oculi and a deep slab."
+when = "is_bay() and role == 'capital' and crown == 'oculi'"
+set = { opening_type = "window", head = "round", light_width = "= w - pier - 1.4", sill = 0.6, light_height = "= h - 0.6 - 0.3", lights = "= None", surround_kind = "moulded_architrave", keystone_present = true }
+
+[[rule]]
+id = "chicago.base.the_capital_continues_the_shaft"
+label = "Cell"
+doc = "Under a plain attic band the capital floor is one more shaft floor."
+when = "is_bay() and role == 'capital' and crown == 'attic_band'"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.5", sill = 0.85, light_height = "= h - 0.85 - 0.75", lights = "= (1.0, 1.0, 1.0)", divider = "Mullion", divider_width = 0.18, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "chicago.base.the_attic_band"
+label = "Cell"
+doc = "A plain attic band: a row of small square lights under a modillioned cornice."
+when = "is_bay() and role == 'attic' and crown == 'attic_band'"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 1.2", sill = 0.55, light_height = 1.0, lights = "= (1.0, 1.0, 1.0)", divider = "Mullion", divider_width = 0.3, surround_kind = "none", keystone_present = false }
