@@ -1,0 +1,274 @@
+# The Romanesque church front, as rules.
+#
+# Round arches, stacked. The master mason (the seed) builds one of two fronts:
+#   pisan     the Pisan screen (Pisa Duomo, 1118; San Michele in Foro, Lucca;
+#             San Paolo a Ripa d'Arno): a tall blind arcade on half-columns
+#             over the three portals, a lozenge in each arch; over it open
+#             galleries of small arches on colonnettes, the first across the
+#             whole front with the aisle roofs sloping in beside the rest,
+#             the others across the nave only, under the nave's pediment;
+#   fortress  the twin-tower front (Porto and Lisbon cathedrals, the
+#             westworks of Worms and Speyer): two square towers rising in
+#             stages, each stage lit by more arches than the one below and
+#             closed by a Lombard band of small hanging arches, pilaster
+#             strips at the corners; between them a portal of round orders,
+#             an oculus, a dwarf gallery; battlements (Porto, Lisbon) or helm
+#             roofs over gables (Worms, Speyer), by the seed again.
+# The class sets how many galleries a screen rises through, how deep a
+# portal's orders go and how tall the towers stand.
+# Numbers are INFERRED from photographs: Pisa's front is about 35 m wide and
+# as tall, its ground arcade a third of that in seven arches of 5 m, its
+# galleries about 4 m each; Porto's towers are each about a third of a 30 m
+# front, the centre about as tall as the front is wide.
+
+[style]
+name = "romanesque"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = "width * 3" }
+overhangs = ["Cornice"]
+describe = { rule = "romanesque.front", phase = "structure", detail = "f'Romanesque {kind} front, {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "romanesque.storey"
+Wall = "romanesque.storey"
+Cell = "romanesque.cell"
+Gallery = "romanesque.gallery"
+Arch = "romanesque.blind_arch"
+Portal = "romanesque.portal"
+CorbelTable = "romanesque.corbel_table"
+Top = "romanesque.top"
+
+[params]
+fronts = ["pisan", "fortress"]
+tops = ["battlements", "helm"]          # Porto and Lisbon; Worms and Speyer
+walls = { pisan = "marble_white", fortress = "stone" }   # marble; granite or sandstone
+# --- the Pisan screen ---
+nave_share = 0.52             # the nave between the aisles
+arcade_k = 0.34               # the ground arcade, of the front's width
+gallery_k = 0.125             # each gallery, of the front's width
+galleries = { modest = 1, ordinary = 2, comfortable = 3, grand = 4 }
+aisle_pitch = 0.45            # rise over run of the aisle roofs
+nave_pitch = 0.5
+arcade_bay_k = [0.11, 0.14, 0.18]       # Pisa: seven arches of 5 m on 35 m
+arcade_end = [0.6, 0.7, 0.8]     # a corner half-column
+half_column = 0.6
+# A gallery's arches: as wide as about a third of its height.
+loggia_bay_k = [0.28, 0.36, 0.46]
+loggia_end = [0.1, 0.2, 0.3]
+colonnette = 0.28
+# --- the fortress front ---
+tower_share = 0.3
+centre_k = 0.82               # the centre block's height, of the front's width
+tower_k = { modest = 1.0, ordinary = 1.15, comfortable = 1.3, grand = 1.45 }
+stages = { modest = 3, ordinary = 4, comfortable = 5, grand = 5 }
+# Lights a tower stage opens in, bottom-up: a slit, one arch, a bifora, a trifora.
+stage_lights = [0, 1, 1, 2, 3]
+portal_share = 0.72
+orders_by_class = { modest = 2, ordinary = 3, comfortable = 4, grand = 5 }
+corbel = 0.9                  # a Lombard band's depth and an arch's span
+lesene = 0.07                 # pilaster strips, of a tower's width
+helm_k = 1.4                  # a helm roof's height, of its tower's width
+battlement_h = 2.2
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "romanesque.lot"
+label = "Lot"
+doc = "The master mason's front: a Pisan screen of galleries over a blind arcade, or a centre between two towers."
+let = { nave = "w * nave_share", g = "w * gallery_k", tw = "w * tower_share" }
+do = [
+  { set = { kind = "= fronts[seed % 2]", top = "= tops[(seed // 2) % 2]" } },
+  # The Pisan screen.
+  { let = { n = "galleries[klass]", ground = "w * arcade_k", side = "(w - nave) / 2.0" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "ground"], name = "facade", when = "kind == 'pisan'" },
+  { each = "range(n)", when = "kind == 'pisan'", do = [
+      { insert = "Gallery", at = ["0.0 if i == 0 else side", "ground + i * g", "w if i == 0 else nave", "g"], name = "gallery{i}" },
+  ] },
+  { insert = "Top", at = ["0.0", "ground + g", "side", "side * aisle_pitch"], name = "aisle_l", attrs = { top = "shoulder_left", wall_material = "= walls[kind]" }, when = "kind == 'pisan' and n > 1" },
+  { insert = "Top", at = ["w - side", "ground + g", "side", "side * aisle_pitch"], name = "aisle_r", attrs = { top = "shoulder_right", wall_material = "= walls[kind]" }, when = "kind == 'pisan' and n > 1" },
+  { insert = "Top", at = ["0.0 if n == 1 else side", "ground + n * g", "w if n == 1 else nave", "(w if n == 1 else nave) / 2.0 * nave_pitch"], name = "pediment", attrs = { top = "gable", wall_material = "= walls[kind]" }, when = "kind == 'pisan'" },
+  # The fortress front.
+  { let = { cb = "w * centre_k", th = "w * tower_k[klass]" } },
+  { insert = "Facade", at = ["tw", "0.0", "w - 2 * tw", "cb"], name = "facade", when = "kind == 'fortress'" },
+  { insert = "Top", at = ["tw", "cb", "w - 2 * tw", "battlement_h if top == 'battlements' else (w - 2 * tw) / 2.0 * nave_pitch"], name = "centre_top", attrs = { top = "= 'battlements' if top == 'battlements' else 'gable'", merlons = "= max(3, round((w - 2 * tw) / 2.4))", wall_material = "= walls[kind]" }, when = "kind == 'fortress'" },
+  { insert = "Tower", at = ["0.0", "0.0", "tw", "th"], name = "tower_l", when = "kind == 'fortress'" },
+  { insert = "Tower", at = ["w - tw", "0.0", "tw", "th"], name = "tower_r", when = "kind == 'fortress'" },
+  { insert = "Top", at = ["0.0", "th", "tw", "battlement_h if top == 'battlements' else tw * helm_k"], name = "tower_l_top", attrs = { top = "= top", merlons = "= max(3, round(tw / 2.4))", wall_material = "= walls[kind]" }, when = "kind == 'fortress'" },
+  { insert = "Top", at = ["w - tw", "th", "tw", "battlement_h if top == 'battlements' else tw * helm_k"], name = "tower_r_top", attrs = { top = "= top", merlons = "= max(3, round(tw / 2.4))", wall_material = "= walls[kind]" }, when = "kind == 'fortress'" },
+]
+
+[[production]]
+id = "romanesque.facade_pisan"
+label = "Facade"
+when = "kind == 'pisan'"
+doc = "The Pisan ground storey: the blind arcade."
+do = [ { split = "y", id_base = "parent", parts = [ { label = "Storey", size = "h", name = "arcade", attrs = { register = "arcade" } } ] } ]
+
+[[production]]
+id = "romanesque.facade_fortress"
+label = "Facade"
+when = "kind == 'fortress'"
+doc = "The centre between the towers: the portal, the oculus over it, a dwarf gallery."
+do = [ { split = "y", id_base = "parent", parts = [
+    { label = "Register", size = "h * 0.45", name = "portal" },
+    { label = "Storey", size = "h * 0.4", name = "rose", attrs = { register = "rose" } },
+    { label = "Gallery", size = "h * 0.15", name = "dwarf_gallery" },
+] } ]
+
+[[production]]
+id = "romanesque.register"
+label = "Register"
+doc = "The portal stands in the middle of its wall."
+do = [ { split = "x", parts = [
+    { label = "Wall", size = "w * (1 - portal_share) / 2.0", name = "wall0" },
+    { label = "Portal", size = "w * portal_share", name = "portal" },
+    { label = "Wall", size = "w * (1 - portal_share) / 2.0", name = "wall1" },
+] } ]
+
+[[production]]
+id = "romanesque.portal"
+label = "Portal"
+doc = "Inside its orders a portal is a door up to the springing, under the tympanum."
+do = [ { insert = "Storey", at = ["x + margin + rings * ring_w", "y", "w - 2 * margin - 2 * rings * ring_w", "spring"], name = "door", attrs = { register = "door" } } ]
+
+[[production]]
+id = "romanesque.gallery"
+label = "Gallery"
+doc = "A gallery: arches fitted to it, a colonnette under every springing, standing on a plinth."
+do = [
+  { fit = "x", end = "loggia_end", bay = "[h * loggia_bay_k[0], h * loggia_bay_k[1], h * loggia_bay_k[2]]", as = "arcade", max_bays = 60 },
+  { set = { posts = "= frame_lines(arcade, x, colonnette, False)", post_w = "= colonnette", plinth = "= h * 0.1", spring = "= h * 0.72", marble = "= walls[kind]" } },
+  { each = "posts", do = [ { insert = "Column", at = ["item.x", "y + h * 0.1", "item.w", "h * 0.62"], name = "colonnette{i}", attrs = { order = "corinthian" } } ] },
+  { insert = "Column", at = ["x", "y + h * 0.1", "colonnette", "h * 0.62"], name = "colonnette_first", attrs = { order = "corinthian" } },
+  { insert = "Column", at = ["x + w - colonnette", "y + h * 0.1", "colonnette", "h * 0.62"], name = "colonnette_last", attrs = { order = "corinthian" } },
+]
+
+[[production]]
+id = "romanesque.tower"
+label = "Tower"
+doc = "A tower rises in stages."
+do = [ { split = "y", parts = [ { repeat = "range(stages[klass])", label = "Storey", size = "h / stages[klass]", name = "stage{i}", attrs = { register = "stage", level = "= i" } } ] } ]
+
+[[production]]
+id = "romanesque.storey"
+label = "Storey"
+doc = "The blind arcade is fitted to the front, a half-column on every frame line; a tower stage is one bay between pilaster strips under a Lombard band; the oculus and the door are one bay each."
+do = [
+  { set = { arc_spring = "= h - w * arcade_bay_k[2] / 2.0 - 0.6" }, when = "register == 'arcade'" },
+  { fit = "x", end = "arcade_end", bay = "[w * arcade_bay_k[0], w * arcade_bay_k[1], w * arcade_bay_k[2]]", as = "rhythm", min_bays = 3, max_bays = 11, when = "register == 'arcade'" },
+  { split = "x", by = "rhythm", when = "register == 'arcade'" },
+  { each = "frame_lines(rhythm, x, half_column)", when = "register == 'arcade'", do = [
+      { insert = "Column", at = ["item.x", "y", "item.w", "arc_spring"], name = "half_column{i}", attrs = { order = "corinthian" } },
+  ] },
+  { insert = "Entablature", at = ["x", "y + h - 0.4", "w", "0.4"], name = "cornice", attrs = { course_kind = "entablature" }, when = "register in ('arcade', 'stage', 'rose')" },
+  { split = "x", when = "register == 'stage'", parts = [
+      { label = "Cell", size = "w * 0.2", name = "x0", slot = "end" },
+      { label = "Cell", size = "w * 0.6", name = "x1", slot = "bay" },
+      { label = "Cell", size = "w * 0.2", name = "x2", slot = "end" },
+  ] },
+  { insert = "CorbelTable", at = ["x", "y + h - 0.4 - corbel", "w", "corbel"], name = "lombard_band", attrs = { arches = "= max(3, round(w / corbel))" }, when = "register in ('stage', 'rose')" },
+  { insert = "Column", at = ["x", "y", "w * lesene", "h - 0.4"], name = "lesene_l", attrs = { order = "pilaster" }, when = "register == 'stage'" },
+  { insert = "Column", at = ["x + w - w * lesene", "y", "w * lesene", "h - 0.4"], name = "lesene_r", attrs = { order = "pilaster" }, when = "register == 'stage'" },
+  { split = "x", when = "register in ('rose', 'door')", parts = [ { label = "Cell", size = "w", name = "x0", slot = "bay" } ] },
+]
+
+[[production]]
+id = "romanesque.cell"
+label = "Cell"
+when = "is_bay() or opening_type != 'none'"
+doc = "A bay is cut around its light, and in the blind arcade an arch is turned over it, a lozenge in the tympanum."
+do = [
+  { call = "kit.split_cell_around_its_light", when = "opening_type != 'none'" },
+  { insert = "Arch", at = ["x", "y + arc_spring", "w", "w / 2.0 + 0.1"], name = "arch", attrs = { lozenge = "= opening_type == 'none'" }, when = "register == 'arcade'" },
+]
+
+[[production]]
+id = "romanesque.light_bay"
+label = "LightBay"
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+]
+
+[[production]]
+id = "romanesque.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "romanesque.roles.register"
+label = "Storey"
+layer = "roles"
+doc = "A storey is its register, in the front's stone; a door stands in the shadow of its portal."
+set = { role = "= register", wall_material = "= 'shadow' if register == 'door' else walls[kind]" }
+
+[[rule]]
+id = "romanesque.roles.wall"
+label = "Wall"
+layer = "roles"
+set = { role = "portal_wall", wall_material = "= walls[kind]" }
+
+[[rule]]
+id = "romanesque.base.the_portal"
+label = "Portal"
+doc = "A portal's round orders, more of them for a richer church; the door is what they leave, up to the springing."
+let = { span = "w * 0.92", n = "orders_by_class[klass]" }
+set = { margin = "= w * 0.04", rings = "= n", ring_w = "= span * 0.45 / 2.0 / n", spring = "= h - span / 2.0 - 0.6" }
+
+[[rule]]
+id = "romanesque.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "romanesque.base.a_blind_arch"
+label = "Cell"
+doc = "The ground arcade is blind: wall under an arch on half-columns."
+when = "is_bay() and register == 'arcade'"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "romanesque.base.the_portals"
+label = "Cell"
+doc = "Three of the arches hold the portals: the middle one and the second either side of it, square-headed bronze doors."
+when = "is_bay() and register == 'arcade' and (nth - 1 == (count - 2) // 2 or (count - 2 >= 5 and abs(nth - 1 - (count - 2) // 2) == 2))"
+specificity = 10
+let = { central = "nth - 1 == (count - 2) // 2" }
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= w * (0.56 if central else 0.46)", sill = 0.0, light_height = "= arc_spring * (0.82 if central else 0.7)", surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "romanesque.base.the_oculus"
+label = "Cell"
+doc = "Over the portal, an oculus half as wide as the centre."
+when = "is_bay() and register == 'rose'"
+let = { dia = "min(w * 0.5, h * 0.75)" }
+set = { opening_type = "oeil_de_boeuf", head = "flat", light_width = "= dia", sill = "= (h - dia) / 2.0", light_height = "= dia", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "romanesque.base.the_door"
+label = "Cell"
+when = "is_bay() and register == 'door'"
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= w", sill = 0.0, light_height = "= h - 0.3", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "romanesque.base.a_tower_stage"
+label = "Cell"
+doc = "Each stage of a tower opens wider than the one below: a slit, one arch, a bifora, a trifora at the bells."
+when = "is_bay() and register == 'stage'"
+let = { n = "stage_lights[min(level, len(stage_lights) - 1)] if level < stages[klass] - 1 else 3" }
+set = { opening_type = "window", head = "round", light_width = "= 0.35 if n == 0 else min(w - 0.4, 1.1 * n + 0.3 * (n - 1))", sill = "= h * 0.3", light_height = "= h * 0.2 if n == 0 else h * 0.42", lights = "= (1.0,) * n if n > 1 else None", divider = "Column", divider_width = 0.3, order = "corinthian", surround_kind = "none", keystone_present = false }

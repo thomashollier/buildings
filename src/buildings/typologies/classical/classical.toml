@@ -1,0 +1,235 @@
+# The classical temple front, as rules -- and its Greek Revival use.
+#
+# A pedimented portico of four, six or eight columns (tetrastyle, hexastyle,
+# octastyle). Its order sets every proportion from one module, the column's
+# lower diameter D: the clear space between columns, the column's height, an
+# entablature a quarter of the column (deeper in the Doric), and a pediment
+# rising 12 to 15 degrees. Given the frontage and the column count the module
+# follows, and the whole front with it.
+# Before 1000 the front is a temple: Greek on a stepped crepidoma, Roman (from
+# 150 BC) on a podium with a stair up its front. After 1000 it is a Greek
+# Revival building: a custom house or bank whose portico is the whole front
+# (New Bedford Custom House, 1836) or stands across the middle of a plain
+# block with two floors of windows, on a raised basement (Savannah Custom
+# House, 1852; the GSA's Greek Revival list); the windows behind the portico
+# look out between its columns.
+# The architect (the seed) picks the order and the layout; the class how many
+# columns.
+# Numbers: Vitruvius (eustyle 2.25 D, systyle 2 D; Ionic 9 D, Corinthian 10 D
+# tall) and Vignola (entablature a quarter of the column), checked against
+# photographs and measured figures of the Parthenon (octastyle Doric, D about
+# 1.9 m, columns 5.5 D, 1.3 D clear, the pediment 13.5 degrees), the
+# Hephaisteion (hexastyle Doric), the temple of Athena Nike (tetrastyle
+# Ionic), the Maison Carree (hexastyle Corinthian on a podium a third of its
+# columns' height) and the New Bedford and Savannah custom houses.
+
+[style]
+name = "classical"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = "width * 2" }
+overhangs = ["Cornice"]
+describe = { rule = "classical.portico", phase = "structure", detail = "f'{use} front, {columns}-column {column_order} portico, module {module:.2f} m, {year}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "classical.storey"
+Pediment = "classical.pediment"
+Triglyph = "classical.triglyph"
+Volutes = "classical.volutes"
+Treads = "classical.treads"
+
+[params]
+revival_from = 1000
+roman_from = -150             # Roman temples stand on podia
+orders = ["doric", "ionic", "corinthian"]
+corinthian_from = -200        # no Corinthian temple front before Rome
+# Columns by class; an ordinary front has four or six as its architect chose.
+column_counts = { modest = [4, 4], ordinary = [4, 6], comfortable = [6, 6], grand = [8, 6] }
+# Clear space between columns, in diameters (Vitruvius's intercolumniations).
+clear = { doric = 1.3, ionic = 2.25, corinthian = 2.0 }
+# Column height in diameters; the Greek Revival's Doric is a little slenderer.
+height_d = { doric = 5.5, ionic = 9.0, corinthian = 10.0 }
+revival_doric = 6.0
+# Entablature as a share of the column's height.
+entablature_share = { doric = 0.32, ionic = 0.25, corinthian = 0.25 }
+edge = 0.5                    # the stylobate beyond the outer column's face, in diameters
+pitch_deg = { temple = 13.0, revival = 15.0 }
+# What the IR can draw: the renderer has no Ionic capital, so an Ionic column
+# is drawn fluted with a plain cap and its volutes are drawn over it.
+drawn_order = { doric = "doric", ionic = "doric", corinthian = "corinthian" }
+cornices = { doric = "plain", ionic = "dentilled", corinthian = "modillioned" }
+greek_steps = 3
+greek_riser = 0.28            # of a diameter: the crepidoma is giant steps
+revival_steps = 7
+revival_riser = 0.17          # a stair a person climbs
+podium_share = 0.3            # of the column's height
+portico_share = 0.5           # of a block's frontage
+wing_bay = [2.2, 2.8, 3.4]
+wing_end = [0.8, 1.2, 2.0]
+wall = { temple = "stone", revival = "stone" }
+shade = "shadow"              # the wall in the portico's shadow
+tympanum_shade = "brick_buff"  # the tympanum, set back behind the raking cornices
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "classical.lot"
+label = "Lot"
+doc = "The architect picks the order and the layout; the class the column count; the frontage and the order then give the module, and the module the whole front."
+let = { o = "orders[(seed // 2) % 3]" }
+do = [
+  { set = { use = "= 'temple' if year < revival_from else 'revival'", column_order = "= 'ionic' if (o == 'corinthian' and year < corinthian_from) else o", columns = "= column_counts[klass][(seed // 6) % 2]" } },
+  { set = { layout = "= 'temple' if use == 'temple' else ['temple_front', 'portico_on_block'][seed % 2]" } },
+  { set = { base = "= ('podium' if year >= roman_from else 'steps') if use == 'temple' else ('steps' if layout == 'temple_front' else 'podium')" } },
+  { let = { pw = "w * portico_share if layout == 'portico_on_block' else w" } },
+  { set = { module = "= pw / ((columns - 1) * (1 + clear[column_order]) + 1 + 2 * edge)" } },
+  { set = { column_h = "= module * (revival_doric if (use == 'revival' and column_order == 'doric') else height_d[column_order])" } },
+  { set = { entablature_h = "= column_h * entablature_share[column_order]", base_h = "= (greek_steps * greek_riser * module if use == 'temple' else revival_steps * revival_riser) if base == 'steps' else column_h * podium_share" } },
+  { let = { front = "base_h + column_h + entablature_h", px = "(w - pw) / 2.0", pitch = "pitch_deg[use] * pi() / 180.0" } },
+  { insert = "Portico", at = ["px", "0.0", "pw", "front"], name = "portico", attrs = { part = "portico" } },
+  # The pediment stands on the horizontal cornice, whose depth is half its band.
+  { insert = "Pediment", at = ["px", "front + entablature_h * 0.275", "pw", "pw / 2.0 * sin(pitch) / cos(pitch)"], name = "pediment", attrs = { raking = "= entablature_h * 0.15", tympanum = "= tympanum_shade" } },
+  { insert = "Wing", at = ["0.0", "0.0", "px", "front"], name = "wing_l", attrs = { part = "wing", side = "left" }, when = "layout == 'portico_on_block'" },
+  { insert = "Wing", at = ["px + pw", "0.0", "px", "front"], name = "wing_r", attrs = { part = "wing", side = "right" }, when = "layout == 'portico_on_block'" },
+]
+
+[[production]]
+id = "classical.portico"
+label = "Portico"
+doc = "The portico: its base, the colonnade, the entablature."
+do = [ { split = "y", parts = [
+    { label = "Base", size = "base_h", name = "base" },
+    { label = "Colonnade", size = "column_h", name = "colonnade" },
+    { label = "Storey", size = "entablature_h", name = "entablature", attrs = { role = "entablature" } },
+] } ]
+
+[[production]]
+id = "classical.base"
+label = "Base"
+doc = "Steps the whole width, each set back from the one below; or a podium with a stair up its middle, between cheek walls."
+let = { n = "greek_steps if use == 'temple' else revival_steps", inset = "module * 0.12 if use == 'temple' else 0.0" }
+do = [
+  { each = "range(n)", when = "base == 'steps'", do = [
+      { insert = "Storey", at = ["x + i * inset", "y + i * h / n", "w - 2 * i * inset", "h / n"], name = "step{i}", attrs = { role = "step" } },
+  ] },
+  { let = { stair = "w - 2 * module if use == 'temple' else w * 0.7" } },
+  { split = "x", when = "base == 'podium'", parts = [
+      { label = "Storey", size = "(w - stair) / 2.0", name = "podium_l", attrs = { role = "podium" } },
+      { label = "Storey", size = "stair", name = "stair", attrs = { role = "stair" } },
+      { label = "Storey", size = "(w - stair) / 2.0", name = "podium_r", attrs = { role = "podium" } },
+  ] },
+]
+
+[[production]]
+id = "classical.colonnade"
+label = "Colonnade"
+doc = "The colonnade: the wall behind -- one storey of a temple's porch, two of a revival building's windows -- and the columns standing in front of it, on the module's spacing; volutes on an Ionic capital."
+let = { a = "module * (1 + clear[column_order])", c0 = "x + edge * module + module / 2.0" }
+do = [
+  { split = "y", parts = [ { repeat = "range(1 if use == 'temple' else 2)", label = "Storey", size = "h / (1 if use == 'temple' else 2)", name = "floor{i}", attrs = { role = "= 'pronaos' if use == 'temple' else ['lower', 'upper'][i]" } } ] },
+  { each = "range(columns)", do = [
+      { insert = "Column", at = ["c0 + i * a - module / 2.0", "y", "module", "h"], name = "column{i}", attrs = { order = "= drawn_order[column_order]" } },
+  ] },
+  { each = "range(columns)", when = "column_order == 'ionic'", do = [
+      { insert = "Volutes", at = ["c0 + i * a - module * 0.72", "y + h - module * 0.42", "module * 1.44", "module * 0.42"], name = "capital{i}" },
+  ] },
+]
+
+[[production]]
+id = "classical.wing"
+label = "Wing"
+doc = "A wing of the block: a raised basement, two floors of windows to the portico's entablature, an anta at its corner."
+do = [
+  { split = "y", parts = [
+      { label = "Storey", size = "base_h", name = "basement", attrs = { role = "basement" } },
+      { label = "Storey", size = "column_h / 2.0", name = "lower", attrs = { role = "lower" } },
+      { label = "Storey", size = "column_h / 2.0", name = "upper", attrs = { role = "upper" } },
+      { label = "Storey", size = "entablature_h", name = "entablature", attrs = { role = "entablature" } },
+  ] },
+  { insert = "Column", at = ["x if side == 'left' else x + w - module * 0.8", "y + base_h", "module * 0.8", "column_h"], name = "anta", attrs = { order = "pilaster" } },
+]
+
+[[production]]
+id = "classical.storey"
+label = "Storey"
+doc = "A floor behind the portico is cut on the columns' axes; a wing's floor is fitted with windows; the entablature carries its architrave, the Doric frieze's triglyphs, and the cornice."
+let = { a = "module * (1 + clear[column_order])", c0 = "edge * module + module / 2.0" }
+do = [
+  { split = "x", when = "part == 'portico' and role in ('pronaos', 'lower', 'upper')", parts = [
+      { label = "Cell", size = "c0", name = "x0", slot = "end" },
+      { repeat = "range(columns - 1)", label = "Cell", size = "a", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "c0", name = "x{n}", slot = "end" },
+  ] },
+  { fit = "x", end = "wing_end", bay = "wing_bay", as = "windows", max_bays = 8, when = "part == 'wing' and role in ('basement', 'lower', 'upper')" },
+  { split = "x", by = "windows", when = "part == 'wing' and role in ('basement', 'lower', 'upper')" },
+  { insert = "Entablature", at = ["x", "y", "w", "h * 0.34"], name = "architrave", attrs = { course_kind = "entablature" }, when = "role == 'entablature'" },
+  { each = "range(2 * columns - 1)", when = "role == 'entablature' and part == 'portico' and column_order == 'doric'", do = [
+      { insert = "Triglyph", at = ["x + c0 + i * a / 2.0 - module / 4.0", "y + h * 0.36", "module / 2.0", "h * 0.34"], name = "triglyph{i}" },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "h * 0.55"], name = "cornice", attrs = { cornice_ornament = "= cornices[column_order]" }, when = "role == 'entablature'" },
+  { insert = "Entablature", at = ["x", "y + h - 0.3", "w", "0.3"], name = "coping", attrs = { course_kind = "entablature" }, when = "role in ('podium', 'basement')" },
+  { insert = "Treads", at = ["x", "y", "w", "h"], name = "treads", attrs = { risers = "= max(3, round(h / revival_riser))" }, when = "role == 'stair'" },
+]
+
+[[production]]
+id = "classical.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "classical.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "classical.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "classical.roles.wall"
+label = "Storey"
+layer = "roles"
+doc = "The front is its stone; the wall behind the columns stands in the portico's shadow."
+set = { wall_material = "= shade if (part == 'portico' and role in ('pronaos', 'lower', 'upper')) else wall[use]" }
+
+[[rule]]
+id = "classical.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "classical.base.the_cella_door"
+label = "Cell"
+doc = "A temple's porch is blank but for the cella's great door on the axis."
+when = "is_bay() and role == 'pronaos'"
+set = { opening_type = "= 'pedestrian_entrance' if is_middle_bay() else 'none'", head = "flat", light_width = "= (w - module) * 0.8", sill = 0.0, light_height = "= h * 0.62", surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "classical.base.a_window"
+label = "Cell"
+doc = "A revival building's windows: tall sashes on both floors, low ones in the basement, all in plain architraves."
+when = "is_bay() and role in ('lower', 'upper', 'basement')"
+set = { opening_type = "window", head = "flat", light_width = "= min(1.3, (w - (module if part == 'portico' else 0.0)) * 0.55)", sill = "= 0.9 if role == 'lower' else 0.6", light_height = "= h * (0.4 if role == 'basement' else 0.55)", surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "classical.base.the_door"
+label = "Cell"
+doc = "The door is on the axis, behind the portico."
+when = "is_bay() and role == 'lower' and part == 'portico' and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= min(2.2, (w - module) * 0.7)", sill = 0.0, light_height = "= h * 0.78", surround_kind = "moulded_architrave", keystone_present = false }

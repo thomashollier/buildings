@@ -1,0 +1,71 @@
+# The civic programme: courthouse, city hall, federal building, post office
+# -- PWA Moderne and its zigzag forerunners (1925-1942).
+#
+# From the research brief and photographs: Outagamie County (Appleton WI,
+# 1940-42), Mackinac County (MI, 1936), Raleigh County (Beckley WV,
+# 1936-37), Winnebago County (Oshkosh WI, 1938-39), the Galveston federal
+# building (1937), Oklahoma County (1936-37), Buffalo City Hall (1931).
+#
+# * 3 to 7 storeys by class (3 Appleton, Mackinac, Beckley; 5 Oshkosh; 7 on a
+#   raised base at Galveston); the grand and wide one carries a tower stage
+#   of setbacks over its block (Buffalo, Oklahoma County -- the limit case).
+# * A planar front in three divisions: a centre and two slightly lower wings,
+#   the entry in the centre (Raleigh County: 12 bays in 3 divisions).
+# * Smooth stone between full-height piers; windows stacked into tall bands
+#   that run through the floors as columns of glass, an aluminium spandrel
+#   plate at each floor line (30-50% of a window's height; pier : window
+#   1:1 to 1:2).
+# * A granite plinth (0.6-1.8 m) and granite steps up to the entry; the
+#   portal framed by fluted piers; a stepped parapet or a penthouse setback.
+# * One light wall stone by region (the seed): buff Indiana limestone, grey
+#   limestone, pink sandstone, Texas Cordova cream; the plinth darker.
+
+[params]
+civic_storeys = { modest = 3, ordinary = 4, comfortable = 5, grand = 7 }
+civic_stones = ["stone", "cast_iron", "stucco_rose", "stucco"]
+civic_plinth = 1.2             # granite plinth, within the brief's 0.6-1.8 m
+civic_tower_from = 45.0        # a frontage this wide, built grand, takes a tower stage
+
+[[rule]]
+id = "deco.civic.three_divisions"
+label = "Lot"
+layer = "programme"
+doc = "A civic front is three divisions, the centre a third of it; a grand wide one gives the centre a tower stage."
+when = "programme == 'civic'"
+let = { tower = "klass == 'grand' and width >= civic_tower_from" }
+set = { composition = "= [['wing', 0.3], ['centre', 0.4], ['wing', 0.3]] if tower else [['wing', 0.33], ['centre', 0.34], ['wing', 0.33]]", massing = "= f'{civic_storeys[klass]} storeys in three divisions' + (', a tower stage' if tower else '')" }
+
+[[rule]]
+id = "deco.civic.a_division"
+label = "Block"
+layer = "programme"
+doc = "Every division: piers the full height, tall bands of glass between them with aluminium plates at the floor lines, on a granite plinth."
+when = "programme == 'civic'"
+set = { floors = "= civic_storeys[klass] - 1", ground_h = "= 4.0 + civic_plinth", floor_h = 3.9, parapet_h = 1.4, block_end = [0.5, 0.8, 1.6], block_bay = [2.0, 2.4, 2.9], glazing_ground = "raised", glazing_upper = "band", spandrel = "metal", piers = true, pier_w = 0.95, pier_order = "pilaster", door = "none", plinth = "= civic_plinth", stripes = 0, eyebrows = false, crest = "flat" }
+
+[[rule]]
+id = "deco.civic.the_centre"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "The centre division stands a little higher, its piers fluted and brought down to the plinth to frame the portal, steps rising to it; a penthouse sets back over it on a larger building; before 1933 it is crowned by a stepped parapet."
+when = "programme == 'civic' and part == 'centre'"
+let = { tower = "klass == 'grand' and width >= civic_tower_from" }
+set = { parapet_h = 2.6, door = "centre", stoop = "= civic_plinth", pier_order = "doric", piers_from_ground = true, setbacks = "= [[3, 0.8], [3, 0.62], [2, 0.44]] if tower else ([[1, 0.6]] if klass in ('comfortable', 'grand') else [])", crest = "= 'stepped' if tower or year <= zigzag_until else 'flat'", crest_h = "= 6.0 if tower else 1.6", crest_steps = "= 4 if tower else 2", crest_reach = "= 0.3 if tower else 0.5" }
+
+[[rule]]
+id = "deco.civic.the_stone_of_the_region"
+label = "Block"
+layer = "hand"
+doc = "One light stone for the walls, the region's (the seed); a darker granite plinth."
+when = "programme == 'civic'"
+set = { wall = "= civic_stones[seed % 4]", base_wall = "= civic_stones[seed % 4]", plinth_paint = "= 'cast_iron' if civic_stones[seed % 4] == 'stucco_rose' else 'stucco_rose'" }
+
+[[rule]]
+id = "deco.civic.the_portal"
+label = "Cell"
+layer = "programme"
+specificity = 10
+doc = "The portal: tall bronze doors under a grille nearly the height of the ground floor, standing on the plinth at the head of the steps."
+when = "in_parent('Floor') and is_bay() and programme == 'civic' and role == 'ground' and door == 'centre' and is_middle_bay()"
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= min(w - 0.3, 2.6)", sill = "= civic_plinth", light_height = "= h - civic_plinth - 0.5", lights = "= None", surround_kind = "moulded_architrave" }

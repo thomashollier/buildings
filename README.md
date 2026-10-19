@@ -49,7 +49,7 @@ trace.explain(node.id)   # -> the ordinance, the reason, the inputs
 
 The generator began as Paris only. It is now a **split-grammar engine**
 (`src/buildings/cga/`, in the manner of CGA, Müller and Wonka's *Computer
-Generated Architecture*) and twelve rulesets written on it. A building is a
+Generated Architecture*) and over thirty rulesets written on it. A building is a
 tree of shapes: a lot holds a facade, the facade is split into storeys,
 storeys into bays, a bay into its piers and its light, the light carries its
 surround and keystone. Each shape has a scope, and rules either split it
@@ -96,13 +96,37 @@ Six buildings from each ruleset, one scale per strip
 
 ![venice](docs/strips/venice.png)
 
+**Veneto-Byzantine palazzo** — the same rule file before 1300: the casa-fondaco, a portico of round arches across the water storey and an arcade of twice as many stilted arches above, and on a wide front two corner towers (torreselle) rising past the cornice, crenellated on the grandest (Fondaco dei Turchi).
+
+![venice_byzantine](docs/strips/venice_byzantine.png)
+
 **Chicago School** — base, a shaft of identical floors, a capital; piers running the whole shaft. The architect (the seed) picks the skin (terracotta, white glazed, dark or red brick), the shaft window (Chicago 1:2:1, Wainwright pairs, three equal sashes) and the capital (arcade with roundels, plain attic band, or Sullivan's one arch a bay under oculi).
 
 ![chicago](docs/strips/chicago.png)
 
-**New York setback tower** — the 1916 Zoning Resolution as rules: the street wall rises to a multiple of the street's width, tiers step back on the sky-exposure plane, the tower takes a quarter of the lot. The law fixes the envelope; the architect (the seed) picks the crown -- stepped spire, ziggurat or lantern -- the skin, and paired, strip or punched windows.
+**New York setback tower** — the 1916 Zoning Resolution as rules: the street wall rises to a multiple of the street's width, tiers step back on the sky-exposure plane, the tower takes a quarter of the lot. The law fixes the envelope; the architect (the seed) picks the crown -- stepped spire, ziggurat, lantern, Chrysler's stepped arches, an Empire State mast, or a clock stage over terracotta or dark-granite piers (Eastern Columbia, Carbide & Carbon) -- the skin, and paired, strip or punched windows.
 
 ![deco](docs/strips/deco.png)
+
+**The Art Deco family** — Art Deco as one vocabulary (glazing kinds, piers, spandrel plates, eyebrows, stripes, crests) shared by every programme, in `deco/vocabulary.toml`, with one rule file per programme beside it. The programme composes the front from blocks; four rule layers dress each block: the vocabulary, then the date (zigzag Deco to 1932, Streamline and PWA Moderne after), then the programme and part, then the architect's hand (the seed). Class sets the floors, the seed the stone. The civic rules follow the PWA courthouses (Outagamie, Raleigh, Winnebago, Galveston, Oklahoma County): a three-part block with a shallow raised centre, glass bands two or three storeys tall between piers with aluminium spandrels, a granite plinth and steps, a fluted portal, and a tower stage on the grandest.
+
+![deco_civic](docs/strips/deco_civic.png)
+
+![deco_commercial](docs/strips/deco_commercial.png)
+
+![deco_office](docs/strips/deco_office.png)
+
+![deco_institutional](docs/strips/deco_institutional.png)
+
+![deco_religious_works](docs/strips/deco_religious_works.png)
+
+**Miami Beach hotel** — side | centre | side on the shared vocabulary, the centre raised in a fin carrying the name, an eyebrow over every window. The date turns Tropical Deco's stepped parapet and vertical fins into streamline racing stripes and portholes; a corner lot rounds its corner and the seed paints it.
+
+![miami_deco](docs/strips/miami_deco.png)
+
+**Movie palace** — a bank of doors under a projecting marquee and a tall panel over them, with a lettered blade sign standing far above the parapet. The seed picks the panel (mosaic, flutes or glass) and the sign (centre, a pair, or the corner); a wider lot sets the front in a block of shops.
+
+![movie_palace](docs/strips/movie_palace.png)
 
 **SoHo** — the type comes from date and programme: Federal rowhouse, cast-iron loft (mostly glass, a column on every pier), brick store-and-loft with its fire escape.
 
@@ -127,6 +151,78 @@ Six buildings from each ruleset, one scale per strip
 **Corbusian block** — pilotis on the structural grid and ribbon windows that deliberately ignore it: the free facade.
 
 ![modernist](docs/strips/modernist.png)
+
+### Churches, temples and palaces
+
+**Renaissance palazzo** — three storeys cut by one fitted rhythm under a crowning cornice. Before 1510 the architect (the seed) dresses the front as Rucellai (one order of pilasters a floor, paired arched lights), Medici (rustication graded rough to smooth as it climbs) or Strozzi (rusticated to the top); from 1510 it is the Roman Farnese: plain wall, rusticated quoins, aedicule windows with alternating pediments.
+
+![renaissance](docs/strips/renaissance.png)
+
+**Gothic cathedral west front** — a three-part screen between four buttresses: three portals of nested pointed rings, the central widest, the gallery of kings, a rose over the central portal, an open gallery, then twin towers and the nave gable. From 1220 the portals grow taller under gablets; money sets the rings and the tower height; the seed ends the towers flat, pinnacled, spired, or with a single spire.
+
+![gothic_cathedral](docs/strips/gothic_cathedral.png)
+
+**Romanesque church front** — round arches stacked in tiers: either a Pisan screen of blind arcading under one to four open galleries, or a fortress front of two towers whose openings widen from a slit to a trifora as they climb, under battlements or helm roofs.
+
+![romanesque](docs/strips/romanesque.png)
+
+**Baroque church front** — a wide lower order and a narrower upper one joined by volutes under a pediment, each cut into planes that step forward to the centre, pilasters on the back planes and columns on the front. The date turns the flat Gesù into Santa Susanna's steps and then broken pediments; the seed can trade the volutes for twin bell towers, and a grand front shows its dome.
+
+![baroque](docs/strips/baroque.png)
+
+**Classical temple front and Greek Revival** — the order sets every proportion from the column diameter: spacing, column height, an entablature a quarter of the column, a 13–15° pediment. Before 1000 it is a temple, Greek on its steps or Roman on a podium; after, a Greek Revival custom house, all portico or a portico across a windowed block.
+
+![classical](docs/strips/classical.png)
+
+### American civic and row houses
+
+**Second Empire** — the front is cut into ranges and pavilions by its length, every section on a rusticated basement with single or paired columns on each storey, under a mansard whose pavilions rise above the ranges in a convex, straight or concave curve; the date turns round heads to segmental to square.
+
+![second_empire](docs/strips/second_empire.png)
+
+**Beaux-Arts and Renaissance Revival** — two grammars on one rusticated base: a palazzo that goes storey by storey under one heavy cornice, or a giant Corinthian order through two or three storeys between end pavilions, with an attic over the main cornice and, on a grand front, a sculpture group.
+
+![beaux_arts](docs/strips/beaux_arts.png)
+
+**Spanish Colonial Revival** — unequal masses (a bell tower, the main block, a low loggia wing) in white stucco under low hipped tile roofs, in the order the seed chose; arcades below, small grilled windows and iron balconies above, and a carved portal until the Depression plainens it.
+
+![spanish_colonial](docs/strips/spanish_colonial.png)
+
+**Brooklyn brownstone** — every floor cut into the door's bay and the windows' zone, a stoop over the English basement to the parlour door. The date chooses the dress: Italianate hoods, Neo-Grec incised lintels, then Romanesque rock-face and round arches; a wide late lot swells into a bay front.
+
+![brownstone](docs/strips/brownstone.png)
+
+### Middle East and Asia
+
+**Sana'a tower house** — dark stone storeys under brick ones, each standing on a white gypsum frieze, every window a light under its alabaster fanlight (qamariya), the top room under white merlons. Money adds storeys; the family (seed) picks single, paired or shared fanlights, a set-back top room, or a plain mud tower in the manner of Shibam.
+
+![sanaa](docs/strips/sanaa.png)
+
+**Cairo house front** — a blind stone ground floor with a bent entrance under a muqarnas hood, upper floors on a timber beam with mashrabiya oriels on stepped corbels, and stepped merlons on top; the seed picks Cairo ashlar or Rashid brick, striped ablaq courses, and where the oriels hang.
+
+![cairo](docs/strips/cairo.png)
+
+**Straits shophouse** — a row of narrow units, the shop set back behind the five-foot way between piers, tall shuttered windows above. The date picks one of six styles from Early to Early Modern, and with it the windows, pilasters, fanlights, eaves or parapet; money adds a storey and each owner paints his own unit.
+
+![shophouse](docs/strips/shophouse.png)
+
+**Pagoda** — tiers on a stone podium, each narrower than the one below under its own roof: in the Japanese manner deep upturned eaves, railed balconies and a ringed finial; in the Chinese brick manner many tall tiers with shallow corbelled eaves. Size sets three, five or seven tiers.
+
+![pagoda](docs/strips/pagoda.png)
+
+### Housing
+
+**Lisbon Pombaline building** — the post-1755 standard elevation: the street's rank sets the floors and the balconies, and every window above the stone shop doors is one width on one rhythm, under a cornice and a tiled mansard; later owners clad the front in azulejos and raise it a floor.
+
+![pombaline](docs/strips/pombaline.png)
+
+**Soviet panel housing** — a run of identical sections, every bay of every floor one factory panel, so the joints show. The date picks the series (K-7, 1-464, II-49, P-44) and with it the height, the lift room, balconies or loggias; the stair panels sit half a floor out of step over each entrance canopy.
+
+![soviet_panel](docs/strips/soviet_panel.png)
+
+**English Tudor house** — black-and-white framing: close studding on a town house, square panels with lozenges on a manor or cottage, and every window a row of mullioned lights in diamond leaded panes. The town house is jettied under one or two steep gables, the manor cross-gabled as far as its money goes, the cottage under thatch; from the 1840s the Revival puts the frame over brick.
+
+![tudor](docs/strips/tudor.png)
 
 ## Design
 
@@ -277,8 +373,11 @@ src/buildings/
                   generate.py; grammar.py (the same building on the engine);
                   haussmann.toml + rules.py (Paris as a rule file)
     common/       kit.py (window anatomy, IR writers), rulefile.py (the loader)
-    amsterdam/ chicago/ deco/ georgian/ kyoto/ modernist/ normandy/
-    soho/ venice/ victorian/
+    amsterdam/ baroque/ beaux_arts/ brownstone/ cairo/ chicago/
+    classical/ deco/ georgian/ gothic_cathedral/ kyoto/ miami_deco/
+    modernist/ movie_palace/ normandy/ pagoda/ pombaline/ renaissance/
+    romanesque/ sanaa/ second_empire/ shophouse/ soho/ soviet_panel/
+    spanish_colonial/ tudor/ venice/ victorian/
                   each: <style>.toml (the rules) + grammar.py (site type,
                   named drawings, generate/derive)
   block/          frontage subdivision, adjacency, shared datums
@@ -308,7 +407,7 @@ Python 3.11+. No runtime dependencies.
 ## Scope
 
 Paris, 1820–1902, is the measured typology: every number answerable to a
-source. The eleven other rulesets show the engine generalising, with
+source. The other rulesets show the engine generalising, with
 inferred proportions; calibrating any of them against measured plates would be
 its own piece of work. Still not in scope: a general binding system for block
 relation, a 3-D backend, or an override system separate from rule layering.

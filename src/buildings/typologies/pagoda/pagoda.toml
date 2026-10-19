@@ -1,0 +1,234 @@
+# The pagoda, as rules.
+#
+# A stack of tiers on a stone podium, each a storey narrower than the one
+# below, each under a roof of its own, and a finial on top. The number of
+# tiers is odd and grows with size: three, five or seven in Japan, up to
+# thirteen in China. The seed stands for the builder's tradition:
+#   Japanese timber (Horyu-ji, c. 700; Yakushi-ji East Pagoda, 730; To-ji,
+#     1644): very deep eaves on brackets, the roofs nearly as deep at the top
+#     as at the bottom, so the upper roofs look large; the drip line turned
+#     up at the corners; white plaster walls between timber posts, a door in
+#     the middle bay, balconies with railings on the upper tiers; a bronze
+#     sorin of nine rings a third as tall as the body; on a grand pagoda a
+#     pent skirt (mokoshi) round the first tier.
+#   Chinese brick (Big Wild Goose Pagoda, 652/704; Small Wild Goose, 707):
+#     tall square tiers tapering steadily, the first tallest, shallow
+#     corbelled eaves, each face divided by pilasters with one arched
+#     opening in the middle, a short gourd on top.
+# Numbers are INFERRED from photographs (Commons "Five-storied Pagoda -
+# Horyu-ji", "Giant Wild Goose Pagoda"): at Horyu-ji the first roof spans
+# about 1.8 times its wall, the top tier's wall is about half the first's,
+# a tier with its roof is about 0.7 of the first wall's width high; at the
+# Big Wild Goose the top tier is about 0.6 of the first.
+
+[style]
+name = "pagoda"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width * lot_share", h = 120 }
+overhangs = ["Cornice"]
+describe = { rule = "pagoda.pagoda", phase = "structure", detail = "f'{tradition} pagoda of {tiers} tiers, {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Podium = "kit.storey"
+Tier = "kit.storey"
+Skirt = "kit.storey"
+Eave = "pagoda.eave"
+Finial = "pagoda.finial"
+Rail = "pagoda.rail"
+Lattice = "pagoda.lattice"
+Stoop = "kit.stoop"
+
+[params]
+lot_share = 2.0                    # the lot is twice the first wall: room for the eaves
+# How many tiers: Japanese by size, Chinese by money.
+japanese_tiers = [[5.0, 3], [9.5, 5], [99.0, 7]]
+chinese_tiers = { modest = 7, ordinary = 7, comfortable = 9, grand = 13 }
+# Per tradition: the top tier's wall as a share of the first's; a tier's
+# height (wall, brackets, roof) as a share of the first wall's width and how
+# fast it shrinks; how much of a tier is wall, how much bracket zone; how far
+# the eaves reach past the wall (a share of the first wall) and how fast
+# that shrinks; the first storey's extra height; the podium.
+top_share = { japanese = 0.52, chinese = 0.6 }
+tier_share = { japanese = 0.66, chinese = 0.36 }
+tier_taper = { japanese = 0.93, chinese = 0.95 }
+wall_share = { japanese = 0.42, chinese = 1.0 }
+bracket_share = { japanese = 0.22, chinese = 0.0 }
+reach_share = { japanese = 0.42, chinese = 0.08 }
+reach_taper = { japanese = 0.97, chinese = 0.97 }
+upturn_share = { japanese = 0.06, chinese = 0.03 }
+lip_share = 0.035                  # the thickness of the roof's edge
+first_extra = { japanese = 0.22, chinese = 0.3 }
+cap_rise = { japanese = 0.0, chinese = 0.16 }   # the top roof of a brick pagoda, which has no other
+podium_share = { japanese = 0.2, chinese = 0.18 }
+podium_reach = { japanese = 0.4, chinese = 0.18 }   # past the first wall, a share of it each side
+roof_materials = { japanese = "slate", chinese = "slate" }
+walls = { japanese = "plaster_white", chinese = "brick_buff" }
+# The finial: a sorin about a third of the body's height, or a short gourd.
+finial_share = { japanese = 0.36, chinese = 0.08 }
+finial_width = { japanese = 0.14, chinese = 0.12 }
+sorin_rings = 9
+post = 0.05                         # a timber post, as a share of its tier's wall
+rail_h = 0.75
+rail_spacing = 0.28
+lattice_gap = 0.09
+door_share = 0.62                   # the door's width in the middle bay
+skirt_out = 0.2                     # the mokoshi stands out this share of the first wall
+skirt_share = 0.55                  # and rises this share of the first storey
+brick_bay = [1.4, 2.0, 2.6]
+brick_end = [0.3, 0.5, 0.9]
+pilaster = 0.22
+corbel_projection = 0.07            # a brick eave's projection, a share of the first wall
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "pagoda.lot"
+label = "Lot"
+doc = "The tradition and the number of tiers; then the podium, each tier and its roof bottom-up, each narrower than the last, and the finial on top."
+do = [
+  { set = { tradition = "= 'chinese' if seed % 3 == 2 else 'japanese'" } },
+  { set = { tiers = "= step(japanese_tiers, width) if tradition == 'japanese' else chinese_tiers[klass]" } },
+  { let = { t = "tradition", n = "tiers" } },
+  { set = { widths = "= geometric(width, top_share[t] ** (1.0 / (n - 1)), n)", totals = "= geometric(width * tier_share[t], tier_taper[t], n)", reaches = "= geometric(width * reach_share[t], reach_taper[t], n)" } },
+  { let = { cx = "w / 2.0", base_h = "width * podium_share[t]", extra = "width * first_extra[t]" } },
+  { let = { floors = "starts(totals, base_h + extra)" } },
+  { insert = "Podium", at = ["cx - width * (0.5 + podium_reach[t])", "0.0", "width * (1.0 + 2 * podium_reach[t])", "base_h"], name = "podium" },
+  { insert = "Stoop", at = ["cx - width * 0.2", "0.0", "width * 0.4", "base_h"], name = "steps" },
+  { each = "range(n)", do = [
+      { let = { tw = "widths[item]", floor = "base_h if item == 0 else floors[item]", wall = "totals[item] * wall_share[t] + (extra if item == 0 else 0.0)", rest = "totals[item] * (1.0 - wall_share[t])" } },
+      { let = { roof = "max(rest, width * cap_rise[t]) if item == n - 1 else rest" } },
+      { insert = "Tier", at = ["cx - tw / 2.0", "floor", "tw", "wall"], name = "tier{i}", attrs = { tier = "= item" } },
+      { insert = "Eave", at = ["cx - tw / 2.0 - reaches[item]", "floor + wall", "tw + 2 * reaches[item]", "roof"], name = "eave{i}", attrs = { wall_w = "= tw", next_w = "= widths[item + 1] if item + 1 < n else width * finial_width[t]", bracket_h = "= totals[item] * bracket_share[t]", upturn = "= width * upturn_share[t]", lip = "= width * lip_share", roof_material = "= roof_materials[t]" }, when = "roof > 0" },
+  ] },
+  { let = { top_floor = "base_h if n == 1 else floors[n - 1]", top_wall = "totals[n - 1] * wall_share[t] + (extra if n == 1 else 0.0)", top_rest = "totals[n - 1] * (1.0 - wall_share[t])" } },
+  { let = { top = "top_floor + top_wall + max(top_rest, width * cap_rise[t])", body = "top_floor + top_wall + max(top_rest, width * cap_rise[t]) - base_h" } },
+  { insert = "Finial", at = ["cx - width * finial_width[t] / 2.0", "top", "width * finial_width[t]", "body * finial_share[t]"], name = "finial", attrs = { finial_form = "= 'sorin' if t == 'japanese' else 'gourd'", rings = "= sorin_rings", finial_material = "shadow" } },
+  { insert = "Skirt", at = ["cx - width * (0.5 + skirt_out)", "base_h", "width * (1.0 + 2 * skirt_out)", "(totals[0] * wall_share[t] + extra) * skirt_share"], name = "mokoshi", when = "t == 'japanese' and klass == 'grand'" },
+]
+
+[[production]]
+id = "pagoda.tier"
+label = "Tier"
+doc = "A Japanese tier is three bays between timber posts under a tie beam, a balcony rail at its foot above the first; a Chinese tier is its own fit of bays between brick pilasters, under a corbelled eave."
+do = [
+  { split = "x", when = "tradition == 'japanese'", parts = [
+      { label = "Cell", size = "0.0001", name = "x0", slot = "end" },
+      { repeat = "range(3)", label = "Cell", size = "(w - 0.0002) / 3.0", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "0.0001", name = "x4", slot = "end" },
+  ] },
+  { each = "range(4)", when = "tradition == 'japanese'", do = [
+      { insert = "Column", at = ["min(max(x + i * w / 3.0 - w * post / 2.0, x), x + w - w * post)", "y", "w * post", "h"], name = "post{i}", attrs = { order = "timber" } },
+  ] },
+  { insert = "Entablature", at = ["x", "y + h - 0.06 * w", "w", "0.06 * w"], name = "tie_beam", attrs = { course_kind = "timber_beam" }, when = "tradition == 'japanese'" },
+  { insert = "Rail", at = ["x", "y", "w", "rail_h"], name = "rail", attrs = { rail_gap = "= rail_spacing" }, when = "tradition == 'japanese' and tier > 0" },
+  { fit = "x", end = "brick_end", bay = "brick_bay", as = "tier_rhythm", max_bays = 9, when = "tradition == 'chinese'" },
+  { split = "x", by = "tier_rhythm", when = "tradition == 'chinese'" },
+  { each = "frame_lines(tier_rhythm, x, pilaster, False)", when = "tradition == 'chinese'", do = [
+      { insert = "Column", at = ["item.x", "y", "item.w", "h"], name = "pilaster{i}", attrs = { order = "pilaster" } },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "width * corbel_projection"], name = "eave", attrs = { cornice_ornament = "modillioned" }, when = "tradition == 'chinese'" },
+]
+
+[[production]]
+id = "pagoda.skirt"
+label = "Skirt"
+doc = "The mokoshi: a pent skirt round the first tier, five latticed bays under a tiled pent roof."
+do = [
+  { split = "x", parts = [
+      { label = "Cell", size = "0.0001", name = "x0", slot = "end" },
+      { repeat = "range(5)", label = "Cell", size = "(w - 0.0002) / 5.0", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "0.0001", name = "x6", slot = "end" },
+  ] },
+  { each = "range(6)", do = [
+      { insert = "Column", at = ["min(max(x + i * w / 5.0 - 0.12, x), x + w - 0.24)", "y", "0.24", "h"], name = "post{i}", attrs = { order = "timber" } },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "width * 0.18"], name = "pent_roof", attrs = { cornice_ornament = "tiled" } },
+]
+
+[[production]]
+id = "pagoda.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "pagoda.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "pagoda.light"
+label = "Light"
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Lattice", at = ["x", "y", "w", "h"], name = "lattice", when = "has('screen_gap') and screen_gap" },
+]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "pagoda.roles.podium"
+label = "Podium"
+layer = "roles"
+set = { role = "podium", wall_material = "stone" }
+
+[[rule]]
+id = "pagoda.roles.tier"
+label = "Tier"
+layer = "roles"
+doc = "Plaster between timber in Japan, brick in China."
+set = { role = "tier", wall_material = "= walls[tradition]" }
+
+[[rule]]
+id = "pagoda.roles.skirt"
+label = "Skirt"
+layer = "roles"
+set = { role = "skirt", wall_material = "plaster_white" }
+
+[[rule]]
+id = "pagoda.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "pagoda.base.plaster_panel"
+label = "Cell"
+doc = "A side bay of a timber tier is a plaster panel."
+when = "is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "pagoda.base.the_door"
+label = "Cell"
+doc = "The middle bay of every timber tier is a pair of plank doors."
+when = "is_bay() and role == 'tier' and tradition == 'japanese' and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= w * door_share", sill = "= 0.0 if tier == 0 else min(rail_h, h * 0.2)", light_height = "= (h - (0.0 if tier == 0 else min(rail_h, h * 0.2))) * 0.8", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "pagoda.base.a_lattice_window"
+label = "Cell"
+doc = "On the first tier, and in the skirt, the side bays hold lattice windows."
+when = "is_bay() and ((role == 'tier' and tradition == 'japanese' and tier == 0 and not is_middle_bay()) or role == 'skirt')"
+specificity = 5
+set = { opening_type = "window", head = "flat", light_width = "= w * 0.7", sill = "= h * 0.3", light_height = "= h * 0.5", surround_kind = "none", keystone_present = false, screen_gap = "= lattice_gap" }
+
+[[rule]]
+id = "pagoda.base.the_arched_opening"
+label = "Cell"
+doc = "On a brick tier, the middle bay of each face opens in one round-headed arch."
+when = "is_bay() and role == 'tier' and tradition == 'chinese' and is_middle_bay()"
+specificity = 10
+set = { opening_type = "window", head = "round", light_width = "= min(w * 0.55, 1.2)", sill = "= h * 0.32", light_height = "= min(h * 0.42, 2.4)", surround_kind = "none", keystone_present = false }

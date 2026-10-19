@@ -1,0 +1,219 @@
+# The Art Deco vocabulary, shared by every programme of the family.
+#
+# A rule file of its own with no [style]: it is composed with a programme's
+# file (deco.toml, commercial.toml, civic.toml, ..., ../miami_deco,
+# ../movie_palace) by deco/family.py. It says how a BLOCK of a deco building
+# is built, whatever the building is for:
+#
+#   Block   --> split(y){ Floor(ground) | Floor(upper)* | Floor(parapet) | Setback* | Crest | Sky }
+#               + Pier* standing on the frame lines through the upper floors
+#   Setback --> a narrower Stage, centred, of its own floors (the ziggurat)
+#   Floor   --> split(x) by the block's rhythm into Cells
+#               + eyebrows over the windows, spandrel plates under them,
+#                 racing stripes across the head zone
+#   Cell    --> the kit's window anatomy, its light from the glazing table
+#
+# What a block is -- how many floors, how tall, which glazing, piers or
+# none, which crest, which paint -- is given to the Block by RULES, in four
+# layers that override each other per property:
+#
+#   vocabulary (0)  the defaults below
+#   date       (1)  zigzag (to 1932) or streamline / PWA moderne (from 1933)
+#   programme  (2)  what the building is for, and which part of it this is
+#   hand       (3)  the architect (the seed): paint, crest variants
+#
+# Numbers are INFERRED round figures from photographs: the Kress, Bullocks
+# Wilshire and I. Magnin stores, the Guardian, Penobscot and Carbide &
+# Carbon offices, Barclay-Vesey, Buffalo and Los Angeles city halls, PWA
+# courthouses (Outagamie, Winnebago, Raleigh County, Galveston federal
+# building), Boston Avenue Methodist (Tulsa), the Hoover Dam intake towers,
+# and the Ocean Drive hotels (Colony, Carlyle, Tides).
+
+[emit]
+Floor = "deco.floor"
+Panel = "deco.panel"
+Crest = "deco.crest"
+Pier = "kit.column"
+Spandrel = "kit.column"
+Porthole = "kit.dormer"
+Stoop = "kit.stoop"
+
+[params]
+zigzag_until = 1932          # the Zigzag Moderne's last year; Streamline / PWA Moderne after
+# Glazing kinds a floor may take: the share of a bay its light fills, its
+# sill, the wall left over its head, how many lights side by side, the head.
+glazing_kinds = { punched = { share = 0.44, sill = 0.9, gap = 0.6, lights = 1, head = "flat" }, paired = { share = 0.78, sill = 0.9, gap = 0.55, lights = 2, head = "flat" }, ribbon = { share = 0.94, sill = 0.95, gap = 0.75, lights = 3, head = "flat" }, band = { share = 0.66, sill = 0.0, gap = 0.0, lights = 2, head = "flat" }, strip = { share = 0.62, sill = 0.5, gap = 0.3, lights = 3, head = "flat" }, slot = { share = 0.24, sill = 1.2, gap = 0.9, lights = 1, head = "flat" }, tall = { share = 0.5, sill = 0.7, gap = 0.7, lights = 1, head = "round" }, glass_block = { share = 0.5, sill = 0.5, gap = 0.5, lights = 6, head = "flat" }, show = { share = 0.92, sill = 0.45, gap = 1.0, lights = 1, head = "flat" }, raised = { share = 0.44, sill = 1.9, gap = 0.7, lights = 2, head = "flat" }, blind = { share = 0.0, sill = 0.0, gap = 0.0, lights = 0, head = "flat" } }
+mullion_w = 0.09
+eyebrow_d = 0.16             # a concrete eyebrow's edge: thin, a hand's depth seen from the street
+eyebrow_over = 0.3           # how far it runs past the window each side
+stripe_h = 0.12              # a racing stripe
+stripe_pitch = 0.26          # three stripes to a band, a hand apart
+plate_h = 1.1                # a spandrel plate at the floor line: 30-50% of a window's height (PWA courthouses)
+spandrel_orders = { dark = "timber", metal = "piloti", light = "corner_board" }
+door_w = 1.9
+door_h = 3.0
+crest_kinds = ["flat", "stepped", "chevron", "fin", "spire", "rounded"]
+
+[[layer]]
+name = "vocabulary"
+order = 0
+
+[[layer]]
+name = "date"
+order = 1
+
+[[layer]]
+name = "programme"
+order = 2
+
+[[layer]]
+name = "hand"
+order = 3
+
+# --- the defaults ------------------------------------------------------------
+
+[[rule]]
+id = "deco.vocabulary.a_block"
+label = "Block"
+layer = "vocabulary"
+doc = "A deco block by default: a ground floor of shops under punched windows, between end piers, flat-topped."
+set = { floors = 2, ground_h = 4.6, floor_h = 3.6, parapet_h = 1.2, block_end = [0.6, 1.0, 1.8], block_bay = [2.4, 3.0, 3.8], setbacks = "= []", crest = "flat", crest_h = 0.0, crest_steps = 3, crest_reach = 0.4, glazing_ground = "show", glazing_upper = "punched", door = "centre", piers = false, pier_order = "pilaster", pier_w = 0.5, pier_rise = 0.0, spandrel = "none", eyebrows = false, stripes = 0, wall = "stone", base_wall = "stone", accent = "stucco", stoop = 0.0, plinth = 0.0, plinth_paint = "cast_iron", piers_from_ground = false }
+
+[[rule]]
+id = "deco.date.streamline"
+label = "Block"
+layer = "date"
+doc = "After 1932 the zigzag gives way to the streamline: horizontal bands and eyebrows, no crest."
+when = "year > zigzag_until"
+set = { stripes = 3, eyebrows = true, crest = "flat" }
+
+[[rule]]
+id = "deco.vocabulary.a_floor"
+label = "Floor"
+layer = "vocabulary"
+doc = "A floor takes the block's glazing for its place, and its wall."
+set = { glazing = "= glazing_ground if role == 'ground' else ('blind' if role == 'parapet' else glazing_upper)", wall_material = "= base_wall if role == 'ground' else wall" }
+
+[[rule]]
+id = "deco.vocabulary.end_piers_are_wall"
+label = "Cell"
+layer = "vocabulary"
+when = "in_parent('Floor') and not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "deco.vocabulary.the_window_of_its_glazing"
+label = "Cell"
+layer = "vocabulary"
+doc = "A bay's light is the glazing table's: so wide a share of the bay, on such a sill, so many lights between mullions."
+when = "in_parent('Floor') and is_bay()"
+let = { g = "glazing_kinds[glazing]" }
+set = { opening_type = "= 'window' if g.lights > 0 else 'none'", head = "= g.head", light_width = "= max(0.3, w * g.share)", sill = "= g.sill", light_height = "= max(0.3, h - g.sill - g.gap)", lights = "= (1.0,) * g.lights if g.lights > 1 else None", divider = "Mullion", divider_width = "= 0.04 if g.lights > 4 else mullion_w", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "deco.vocabulary.show_windows"
+label = "Cell"
+layer = "date"
+doc = "A shop floor's bays are show windows on a low bulkhead, under a sign band."
+when = "in_parent('Floor') and is_bay() and glazing == 'show'"
+set = { opening_type = "shop_bay", lights = "= None" }
+
+[[rule]]
+id = "deco.vocabulary.the_door"
+label = "Cell"
+layer = "programme"
+doc = "The block's door: in its middle bay, or in every bay of an arcade of doors."
+when = "in_parent('Floor') and is_bay() and role == 'ground' and ((door == 'centre' and is_middle_bay()) or door == 'all')"
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= min(w - 0.3, door_w * (2 if w > 3.6 else 1))", sill = 0.0, light_height = "= min(h - 0.5, door_h)", lights = "= None", surround_kind = "moulded_architrave" }
+
+# --- the productions -----------------------------------------------------------
+
+[[production]]
+id = "deco.front"
+label = "Lot"
+when = "has('composition')"
+doc = "The front is composed of blocks side by side, as the programme lays them out."
+do = [ { split = "x", parts = [ { repeat = "composition", label = "Block", size = "w * item[1]", name = "block{n}", attrs = { part = "= item[0]", side = "= 'left' if i == 0 else ('right' if i == len(composition) - 1 else 'middle')" } } ] } ]
+
+[[production]]
+id = "deco.block"
+label = "Block"
+doc = "A block is fitted with bays, then stacked: a ground floor, its upper floors, a parapet, any setbacks, its crest."
+do = [
+  # A block too narrow for its bays takes one bay as wide as it is.
+  { fit = "x", end = "block_end", bay = "[min(block_bay[0], w - 2 * block_end[0]), block_bay[1], max(block_bay[2], w - 2 * block_end[0])]", as = "rhythm" },
+  { let = { body = "ground_h + floors * floor_h + parapet_h" } },
+  { let = { tiers_h = "fsum(column(setbacks, 0)) * floor_h" } },
+  { let = { top_share = "(setbacks[len(setbacks) - 1][1]) if len(setbacks) > 0 else 1.0" } },
+  { split = "y", parts = [
+      { label = "Floor", size = "ground_h", name = "f{n}", attrs = { role = "ground" } },
+      { repeat = "range(floors)", label = "Floor", size = "floor_h", name = "f{n}", attrs = { role = "upper" } },
+      { label = "Floor", size = "parapet_h", name = "f{n}", attrs = { role = "parapet" } },
+      { repeat = "setbacks", label = "Setback", size = "item[0] * floor_h", name = "setback{n}", attrs = { stage_floors = "= item[0]", share = "= item[1]" } },
+      { repeat = "[crest_h] if crest != 'flat' and crest_h > 0 else []", label = "Crest", size = "item", name = "crest", attrs = { share = "= top_share" } },
+      { label = "Sky", size = "h - body - tiers_h - (crest_h if crest != 'flat' else 0.0)", name = "sky" },
+  ] },
+  { each = "frame_lines(rhythm, x, pier_w, True)", when = "piers", do = [
+      { insert = "Pier", at = ["item.x", "y + (plinth if piers_from_ground else ground_h)", "item.w", "floors * floor_h + parapet_h + pier_rise + (ground_h - plinth if piers_from_ground else 0.0)"], name = "pier{i}", attrs = { order = "= pier_order" } },
+  ] },
+  { insert = "Panel", at = ["x", "y", "w", "plinth"], name = "plinth", attrs = { paint = "= plinth_paint" }, when = "plinth > 0" },
+  { insert = "Stoop", at = ["x + w / 2.0 - 0.5 * min(w * 0.6, 3.0 + 3.0 * stoop)", "y", "min(w * 0.6, 3.0 + 3.0 * stoop)", "stoop"], name = "steps", when = "stoop > 0" },
+  # Whatever a programme dresses a block with -- a marquee, a name panel,
+  # portholes -- is its own production on this shape.
+  { insert = "Dress", at = ["x", "y", "w", "h"], name = "dress" },
+]
+
+[[production]]
+id = "deco.setback"
+label = "Setback"
+doc = "A setback stands a narrower stage, centred, on the floors below."
+do = [ { insert = "Stage", at = ["x + w * (1.0 - share) / 2.0", "y", "w * share", "h"], name = "stage" } ]
+
+[[production]]
+id = "deco.stage"
+label = "Stage"
+doc = "A stage is fitted with its own bays and cut into its floors."
+do = [
+  { fit = "x", end = "[0.2, block_end[0], max(block_end[0], 0.2)]", bay = "[min(block_bay[0], w - 0.4), block_bay[1], max(block_bay[2], w - 0.4)]", as = "rhythm" },
+  { split = "y", parts = [ { repeat = "range(stage_floors)", label = "Floor", size = "floor_h", name = "f{n}", attrs = { role = "upper" } } ] },
+]
+
+[[production]]
+id = "deco.floor"
+label = "Floor"
+doc = "A floor is cut by its block's rhythm; eyebrows shade its windows, plates fill its spandrels, stripes run across its head zone, and the parapet is coped."
+let = { g = "glazing_kinds[glazing]" }
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { each = "bay_spans(rhythm, x)", when = "eyebrows and role != 'parapet' and g.lights > 0 and h - g.gap + eyebrow_d < h", do = [
+      { let = { lw = "max(0.3, item.w * g.share)" } },
+      { insert = "Entablature", at = ["max(x, item.x + (item.w - lw) / 2.0 - eyebrow_over)", "y + h - g.gap", "min(lw + 2 * eyebrow_over, x + w - max(x, item.x + (item.w - lw) / 2.0 - eyebrow_over))", "eyebrow_d"], name = "eyebrow{i}", attrs = { course_kind = "entablature" } },
+  ] },
+  { each = "bay_spans(rhythm, x)", when = "spandrel != 'none' and role == 'upper' and g.lights > 0", do = [
+      { let = { lw = "max(0.3, item.w * g.share)" } },
+      { insert = "Spandrel", at = ["item.x + (item.w - lw) / 2.0", "y + 0.04", "lw", "min(plate_h, max(0.3, g.sill - 0.08)) if g.sill > 0.3 else plate_h"], name = "spandrel{i}", attrs = { order = "= spandrel_orders[spandrel]" } },
+  ] },
+  { each = "range(stripes)", when = "role != 'ground' and stripes > 0 and h > 0.5 + stripes * stripe_pitch", do = [
+      { insert = "Panel", at = ["x", "y + h - 0.12 - (i + 1) * stripe_pitch", "w", "stripe_h"], name = "stripe{i}", attrs = { paint = "= accent" } },
+  ] },
+  { insert = "Entablature", at = ["x", "y + h - 0.3", "w", "0.3"], name = "coping", attrs = { course_kind = "entablature" }, when = "role == 'parapet'" },
+]
+
+[[production]]
+id = "deco.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "deco.light_bay"
+label = "LightBay"
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+]
+
+[[production]]
+id = "deco.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]

@@ -1,0 +1,54 @@
+# The office programme: the deco office block of a downtown street, below
+# the skyscraper and outside the zoning's setback law (or on a street wide
+# enough not to need it).
+#
+# From photographs: the Penobscot (Detroit, 1928), the Guardian (Detroit,
+# 1929, orange brick and tile), Carbide & Carbon (Chicago, 1929, black
+# granite and dark green terracotta), the Kansas City Power & Light (1931),
+# Barclay-Vesey (New York, 1926: a long block with lower wings).
+# * a two-storey base of stone or granite (lobby and shops);
+# * a shaft of continuous piers with dark recessed spandrels between them
+#   (zigzag), or ribbon windows between racing bands (streamline);
+# * one to three setbacks and a stepped top; a grand wide one has lower
+#   wings either side (Barclay-Vesey).
+# Numbers are INFERRED round figures from those photographs.
+
+[params]
+office_floors = { modest = 6, ordinary = 9, comfortable = 12, grand = 16 }
+office_walls = ["brick_buff", "brick", "shadow", "stone"]
+office_wings_from = 34.0
+
+[[rule]]
+id = "deco.office.the_block"
+label = "Lot"
+layer = "programme"
+doc = "An office front is one block; a grand wide one has lower wings either side."
+when = "programme == 'office'"
+let = { wings = "klass == 'grand' and width >= office_wings_from" }
+set = { composition = "= [['wing', 0.26], ['office', 0.48], ['wing', 0.26]] if wings else [['office', 1.0]]", massing = "= f'{office_floors[klass]}-floor office block' + (' with wings' if wings else '')" }
+
+[[rule]]
+id = "deco.office.a_shaft"
+label = "Block"
+layer = "programme"
+doc = "A stone base of shops and lobby, a shaft of piers and dark spandrels (or ribbons and bands after 1932), setbacks by class, a stepped top."
+when = "programme == 'office'"
+let = { zig = "year <= zigzag_until" }
+set = { floors = "= office_floors[klass]", ground_h = 5.6, floor_h = 3.7, parapet_h = 1.4, block_bay = [2.4, 3.0, 3.6], block_end = [0.7, 1.1, 1.8], glazing_upper = "= 'paired' if zig else 'ribbon'", piers = "= zig", pier_w = 0.55, spandrel = "= 'dark' if zig else 'none'", eyebrows = false, stripes = "= 0 if zig else 2", base_wall = "stone", setbacks = "= [[2, 0.82], [2, 0.64], [2, 0.46]] if klass == 'grand' else ([[2, 0.8], [2, 0.6]] if klass == 'comfortable' else ([[2, 0.76]] if klass == 'ordinary' else []))", crest = "stepped", crest_h = "= 3.0 + rank[klass]", crest_steps = 3, crest_reach = 0.34 }
+
+[[rule]]
+id = "deco.office.lower_wings"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "Barclay-Vesey's wings: half the shaft's height, one setback."
+when = "programme == 'office' and part == 'wing'"
+set = { floors = "= office_floors[klass] // 2", setbacks = "= [[2, 0.8]]", crest = "flat" }
+
+[[rule]]
+id = "deco.office.the_architects_skin"
+label = "Block"
+layer = "hand"
+doc = "Buff brick, Guardian orange brick, Carbide's dark granite with a granite base, or limestone."
+when = "programme == 'office'"
+set = { wall = "= office_walls[seed % 4]", base_wall = "= 'shadow' if office_walls[seed % 4] == 'shadow' else 'stone'", pier_order = "= 'timber' if office_walls[seed % 4] == 'shadow' else 'pilaster'", accent = "stucco" }

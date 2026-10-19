@@ -1,0 +1,62 @@
+# The institutional programme: the deco school, hospital, library, telephone
+# exchange -- a long low front of classrooms or wards, symmetrical about an
+# entrance pavilion.
+#
+# From photographs: Allegheny High School and other WPA-era schools (1930s),
+# Bell Telephone exchanges (Pittsburgh), 1930s hospitals, the Kennedy-Warren
+# (Washington, 1931).
+# * wings of big classroom or ward windows -- paired between brick piers
+#   (zigzag), or long ribbon windows under eyebrows and stripes (streamline);
+# * an entrance pavilion one floor higher, its glass in tall bands between
+#   piers that rise past the parapet, steps up to the door, a stepped top;
+# * a larger one closes its wings with end pavilions;
+# * red or buff brick, or limestone, by the architect's hand.
+# Numbers are INFERRED round figures from those photographs.
+
+[params]
+inst_floors = { modest = 2, ordinary = 2, comfortable = 3, grand = 4 }
+inst_walls = ["brick", "brick_buff", "stone", "brick_london"]
+inst_pavilions_from = 40.0
+
+[[rule]]
+id = "deco.institutional.symmetrical"
+label = "Lot"
+layer = "programme"
+doc = "Wings either side of an entrance pavilion; a large one closes them with end pavilions."
+when = "programme == 'institutional'"
+let = { ends = "rank[klass] >= 2 and width >= inst_pavilions_from" }
+set = { composition = "= [['pavilion', 0.13], ['wing', 0.26], ['entrance', 0.22], ['wing', 0.26], ['pavilion', 0.13]] if ends else [['wing', 0.36], ['entrance', 0.28], ['wing', 0.36]]", massing = "= f'{inst_floors[klass]}-storey wings' + (' and end pavilions' if ends else '') + ' about an entrance'" }
+
+[[rule]]
+id = "deco.institutional.wings"
+label = "Block"
+layer = "programme"
+doc = "Wings of classrooms or wards: big windows, the ground floor lit like the rest."
+when = "programme == 'institutional'"
+let = { zig = "year <= zigzag_until" }
+set = { floors = "= inst_floors[klass] - 1", ground_h = 4.0, floor_h = 3.8, parapet_h = 1.0, block_bay = [2.6, 3.2, 3.9], block_end = [0.5, 0.8, 1.4], glazing_ground = "= 'paired' if zig else 'ribbon'", glazing_upper = "= 'paired' if zig else 'ribbon'", door = "none", piers = "= zig", pier_w = 0.5, spandrel = "= 'light' if zig else 'none'", base_wall = "stone" }
+
+[[rule]]
+id = "deco.institutional.the_entrance"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "The entrance pavilion: one floor higher, tall bands of glass between piers that run on past the parapet, steps to the door, a stepped top (zigzag) or a fin (streamline)."
+when = "programme == 'institutional' and part == 'entrance'"
+set = { floors = "= inst_floors[klass]", parapet_h = 1.8, glazing_upper = "band", glazing_ground = "raised", spandrel = "light", piers = true, pier_rise = 1.6, door = "centre", stoop = 0.9, block_bay = [1.8, 2.2, 2.8], crest = "= 'stepped' if year <= zigzag_until else 'fin'", crest_h = 2.6, crest_steps = 3, crest_reach = "= 0.34 if year <= zigzag_until else 0.14", eyebrows = false, stripes = 0 }
+
+[[rule]]
+id = "deco.institutional.end_pavilions"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "End pavilions close the wings: as high as the wings, a little more wall, a chevron crest before 1933."
+when = "programme == 'institutional' and part == 'pavilion'"
+set = { parapet_h = 1.6, glazing_upper = "punched", glazing_ground = "punched", crest = "= 'chevron' if year <= zigzag_until else 'flat'", crest_h = 0.9, crest_steps = 5 }
+
+[[rule]]
+id = "deco.institutional.brick_or_stone"
+label = "Block"
+layer = "hand"
+when = "programme == 'institutional'"
+set = { wall = "= inst_walls[seed % 4]", accent = "= 'stone' if inst_walls[seed % 4] != 'stone' else 'brick_buff'" }

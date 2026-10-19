@@ -1,0 +1,223 @@
+# The Beaux-Arts and Renaissance Revival civic building, as rules.
+#
+# Two ways American public buildings of 1880-1920 were dressed in the Italian
+# manner, and the seed (the architect's training) with the date chooses one:
+#
+# * the Renaissance-Revival palazzo block, storey by storey: a rusticated
+#   ground floor of arched windows, a piano nobile under pediments, shorter
+#   floors above it, string courses between, perhaps a pilaster order on each
+#   storey, and one heavy crowning cornice in proportion to the whole height
+#   (Palazzo Strozzi's rule, about a sixteenth);
+# * full Beaux-Arts: a rusticated base of arched openings, then a GIANT order
+#   of columns standing through two or three storeys in a central colonnade
+#   between end pavilions, the main entablature over it, an attic storey above
+#   the main cornice, and on a grand building a sculpture group crowning the
+#   centre.
+#
+# Numbers are INFERRED round figures from photographs: the Alexander Hamilton
+# U.S. Custom House, New York (Cass Gilbert, 1902-07: a 6 m rusticated base,
+# twelve Corinthian columns about 1.2 m across rising through three storeys,
+# a tall attic, the sculpture group over the centre); the New York Public
+# Library (Carrere & Hastings, 1897-1911: end pavilions, a central portico of
+# paired columns); Grand Central (1913: a sculpture group over the centre);
+# and, for the palazzo, the Villard Houses, the Boston Public Library and the
+# University Club (McKim, Mead & White, 1880s-1890s).
+
+[style]
+name = "beaux_arts"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 70 }
+overhangs = ["Cornice"]
+describe = { rule = "beaux_arts.civic_building", phase = "structure", detail = "f'{\"Beaux-Arts giant order\" if mode == \"giant\" else \"Renaissance-Revival palazzo\"}, {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "beaux_arts.storey"
+Socle = "beaux_arts.socle"
+Flight = "beaux_arts.flight"
+Sculpture = "beaux_arts.sculpture"
+
+[params]
+# The ground floor, the base everything stands on: taller for a richer client.
+base_h = { modest = 4.6, ordinary = 5.0, comfortable = 5.6, grand = 6.2 }
+# Giant order: storeys behind the colonnade, how many it spans by class.
+giant_h = 4.0
+giant_floors = { modest = 2, ordinary = 2, comfortable = 3, grand = 3 }
+giant_col = 1.1                 # column diameter, about a tenth of its height
+frieze_h = 1.5                  # architrave and frieze of the main entablature
+attic_h = 3.4
+main_cornice_h = 1.1
+# Palazzo: the piano nobile nearly as tall as the base, each floor over it shorter.
+nobile_share = 0.95
+second_share = 0.82
+third_share = 0.72
+mezz_h = 2.6                    # a frieze of small windows under the cornice
+palazzo_frieze_h = 1.2
+cornice_share = 0.065           # the crowning cornice, a share of the whole height
+pilaster_w = 0.55
+# Rhythm. The Custom House's columns stand about 4.3 m on centres.
+colonnade_bay = [3.6, 4.3, 5.0]
+colonnade_end = [0.8, 1.1, 1.6]
+pavilion_w = 8.5
+pavilion_bay = [3.0, 4.0, 5.0]
+pavilion_end = [1.6, 2.4, 3.2]
+palazzo_bay = [3.2, 3.8, 4.6]
+palazzo_end = [1.2, 1.7, 2.6]
+flight_h = 1.0                  # the base stands on a podium a few steps up
+flight_w = 5.0
+sculpture_h = 4.6
+# What the seed chooses: the walls of a palazzo, and whether its storeys carry orders.
+palazzo_walls = ["stone", "brick_buff", "stone"]
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "beaux_arts.lot"
+label = "Lot"
+doc = "The architect's training (the seed) and the date choose the manner. A giant order wants a long front for end pavilions; a palazzo is one block. The storeys follow from the manner and the purse; steps climb to the podium and, on a grand Beaux-Arts front, a sculpture group crowns the centre."
+do = [
+  { set = { mode = "= 'giant' if ((year >= 1895 and seed % 3 != 2) or (year >= 1885 and seed % 3 == 0)) else 'palazzo'", orders = "= seed % 2 == 1", stone = "= palazzo_walls[seed % 3]" } },
+  { set = { kinds = "= (['pavilion', 'colonnade', 'pavilion'] if (w >= 2 * pavilion_w + 3 * colonnade_bay[1] and klass != 'modest') else ['colonnade']) if mode == 'giant' else ['range']" } },
+  { set = { sizes = "= [pavilion_w, w - 2 * pavilion_w, pavilion_w] if len(kinds) == 3 else [w]" } },
+  { fit = "x", budget = "pavilion_w", end = "pavilion_end", bay = "pavilion_bay", as = "pavilion_rhythm", max_bays = 2 },
+  { fit = "x", budget = "sizes[len(kinds) // 2]", end = "colonnade_end", bay = "colonnade_bay", as = "colonnade_rhythm", min_bays = 3 },
+  { fit = "x", budget = "w", end = "palazzo_end", bay = "palazzo_bay", as = "palazzo_rhythm", min_bays = 3 },
+  { let = { b = "base_h[klass]", n = "base_h[klass] * nobile_share" } },
+  { set = { floors = "= ([['base', b]] + [['giant', giant_h]] * giant_floors[klass] + [['frieze', frieze_h], ['attic', attic_h]]) if mode == 'giant' else ([['base', b], ['nobile', n], ['second', n * second_share]] + ([['third', n * third_share]] if klass in ('comfortable', 'grand') else []) + ([['mezzanine', mezz_h]] if klass == 'grand' else []) + [['frieze', palazzo_frieze_h]])" } },
+  { let = { front = "fsum(column(floors, 1))" } },
+  { set = { crown_h = "= min(2.2, front * cornice_share)" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { let = { mid = "len(kinds) // 2" } },
+  { let = { erh = "pavilion_rhythm if kinds[mid] == 'pavilion' else (colonnade_rhythm if kinds[mid] == 'colonnade' else palazzo_rhythm)" } },
+  { let = { cs = "bay_centres(erh, starts(sizes, 0.0)[mid])" } },
+  { insert = "Flight", at = ["cs[len(cs) // 2] - flight_w / 2.0", "0.0", "flight_w", "flight_h"], name = "flight" },
+  { insert = "Sculpture", at = ["w / 2.0 - min(10.0, w * 0.24) / 2.0", "front", "min(10.0, w * 0.24)", "sculpture_h"], name = "sculpture", when = "mode == 'giant' and klass == 'grand'" },
+]
+
+[[production]]
+id = "beaux_arts.facade"
+label = "Facade"
+doc = "The front, section by section: pavilions and a colonnade, or the one block of a palazzo."
+do = [ { split = "x", parts = [ { repeat = "range(len(kinds))", label = "Section", size = "sizes[item]", name = "sec{n}", attrs = { kind = "= kinds[item]", entry = "= item == len(kinds) // 2" } } ] } ]
+
+[[production]]
+id = "beaux_arts.section"
+label = "Section"
+doc = "The storeys; and through the giant storeys of the colonnade a column on every pier, its full height, the pavilions marked by pilasters."
+let = { rh = "pavilion_rhythm if kind == 'pavilion' else (colonnade_rhythm if kind == 'colonnade' else palazzo_rhythm)", giant = "giant_h * giant_floors[klass]" }
+do = [
+  { split = "y", parts = [ { repeat = "floors", label = "Storey", size = "item[1]", name = "s{i}", attrs = { floor = "= item[0]" } } ] },
+  { each = "frame_lines(rh, x, giant_col, True)", when = "kind == 'colonnade'", do = [
+      { insert = "Column", at = ["item.x", "y + base_h[klass]", "item.w", "giant"], name = "giant{i}", attrs = { order = "corinthian" } },
+  ] },
+  { each = "frame_lines(rh, x, pilaster_w * 1.4, True)", when = "kind == 'pavilion'", do = [
+      { insert = "Column", at = ["item.x", "y + base_h[klass]", "item.w", "giant"], name = "pilaster{i}", attrs = { order = "pilaster" } },
+  ] },
+]
+
+[[production]]
+id = "beaux_arts.storey"
+label = "Storey"
+doc = "A storey is cut by its section's rhythm. The base is rusticated; the palazzo's floors are parted by string courses and may carry their own pilasters; the frieze carries the main entablature, and the crowning cornice stands on it -- on the attic's foot when there is an attic over it."
+let = { rh = "pavilion_rhythm if kind == 'pavilion' else (colonnade_rhythm if kind == 'colonnade' else palazzo_rhythm)", top = "index == count - 1" }
+# The balcony stands on the door's axis.
+do = [
+  { split = "x", by = "rh", label = "Cell" },
+  { insert = "Socle", at = ["x", "y", "w", "h"], name = "socle", attrs = { rustication = "= 'raised_bossage' if mode == 'giant' else 'flat_incised_refends'" }, when = "floor == 'base'" },
+  { insert = "Entablature", at = ["x", "y + h - 0.35", "w", "0.35"], name = "band", attrs = { course_kind = "bandeau" }, when = "floor in ('base', 'nobile', 'second', 'third')" },
+  { insert = "Entablature", at = ["x", "y", "w", "h"], name = "entablature", attrs = { course_kind = "entablature" }, when = "floor == 'frieze'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "crown_h"], name = "cornice", attrs = { cornice_ornament = "bracketed" }, when = "floor == 'frieze' and top" },
+  { insert = "Cornice", at = ["x", "y", "w", "main_cornice_h"], name = "main_cornice", attrs = { cornice_ornament = "modillioned" }, when = "floor == 'attic'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.5"], name = "attic_cornice", attrs = { cornice_ornament = "dentilled" }, when = "floor == 'attic'" },
+  { each = "frame_lines(rh, x, pilaster_w, True)", when = "mode == 'palazzo' and orders and floor in ('nobile', 'second', 'third')", do = [
+      { insert = "Column", at = ["item.x", "y", "item.w", "h - 0.35"], name = "pilaster{i}", attrs = { order = "pilaster" } },
+  ] },
+  { let = { axes = "bay_centres(rh, x)" } },
+  { insert = "Balconette", at = ["axes[len(axes) // 2] - 1.3", "y", "2.6", "1.0"], name = "balcony", when = "floor == 'nobile' and entry and klass in ('comfortable', 'grand')" },
+]
+
+[[production]]
+id = "beaux_arts.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "beaux_arts.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "beaux_arts.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "beaux_arts.roles.floor_and_walls"
+label = "Storey"
+layer = "roles"
+doc = "Its floor names its role. A Beaux-Arts front is stone throughout; a palazzo's upper floors are the architect's stone or buff brick over a stone base."
+set = { role = "= floor", level = "= index", wall_material = "= 'stone' if (mode == 'giant' or floor in ('base', 'frieze')) else stone" }
+
+[[rule]]
+id = "beaux_arts.base.wall"
+label = "Cell"
+when = "not is_bay() or floor == 'frieze'"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "beaux_arts.base.arched_base"
+label = "Cell"
+doc = "The base is opened in round arches, each with its keystone, cut in the rustication."
+when = "is_bay() and floor == 'base'"
+set = { opening_type = "window", head = "round", light_width = "= min(1.7, w * 0.42)", sill = 1.1, light_height = "= h - 1.1 - 0.9", surround_kind = "none", keystone_present = true }
+
+[[rule]]
+id = "beaux_arts.base.the_portal"
+label = "Cell"
+doc = "The middle arch of the middle section is the portal, at the head of the podium steps."
+when = "is_bay() and floor == 'base' and entry and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= min(3.0, w - 1.0)", sill = "= flight_h", light_height = "= h - flight_h - 0.6", surround_kind = "moulded_architrave", keystone_present = true }
+
+[[rule]]
+id = "beaux_arts.base.behind_the_colonnade"
+label = "Cell"
+doc = "Behind a giant order the windows stack between the columns: pedimented on the first giant storey (the Custom House), plainer above."
+when = "is_bay() and floor == 'giant'"
+let = { first = "level == 1" }
+set = { opening_type = "window", head = "flat", light_width = "= min(1.5, w * 0.36)", sill = 0.9, light_height = "= h - 0.9 - (1.0 if first else 0.8)", surround_kind = "= 'pedimented' if first else 'moulded_architrave'", keystone_present = false }
+
+[[rule]]
+id = "beaux_arts.base.attic"
+label = "Cell"
+doc = "The attic is lit by low square windows standing on the main cornice."
+when = "is_bay() and floor == 'attic'"
+set = { opening_type = "window", head = "flat", light_width = "= min(1.2, w * 0.3)", sill = "= main_cornice_h + 0.35", light_height = "= h - main_cornice_h - 0.35 - 0.8", surround_kind = "moulded_architrave", keystone_present = false }
+
+[[rule]]
+id = "beaux_arts.base.piano_nobile"
+label = "Cell"
+doc = "The piano nobile's windows are the tallest above the base, under pediments."
+when = "is_bay() and floor == 'nobile'"
+set = { opening_type = "window", head = "flat", light_width = "= min(1.5, w * 0.38)", sill = 0.4, light_height = "= h - 0.4 - 1.1", surround_kind = "pedimented", keystone_present = false }
+
+[[rule]]
+id = "beaux_arts.base.upper_palazzo_floors"
+label = "Cell"
+doc = "Each floor over the nobile has shorter windows in plain architraves; the mezzanine under the cornice is a frieze of near-square lights."
+when = "is_bay() and floor in ('second', 'third', 'mezzanine')"
+let = { mezz = "floor == 'mezzanine'" }
+set = { opening_type = "window", head = "flat", light_width = "= min(1.4, w * 0.36) * (0.8 if mezz else 1.0)", sill = "= 0.5 if mezz else 0.8", light_height = "= h - (0.5 if mezz else 0.8) - (0.7 if mezz else 0.9)", surround_kind = "moulded_architrave", keystone_present = "= floor == 'second'" }

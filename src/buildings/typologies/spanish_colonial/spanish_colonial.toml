@@ -1,0 +1,209 @@
+# The Spanish Colonial Revival public building, as rules.
+#
+# A courthouse, post office or border station of 1915-1940 in California and
+# the Southwest: white stucco walls, red tile roofs at a low pitch with little
+# eave, few windows and those small and deep-set, wrought-iron grilles on the
+# ground floor and iron balconies above, a round-arched arcade (a loggia) at
+# the ground, an ornamented entrance surround (churrigueresque before the
+# Depression, plainer after), and on a bigger building a bell tower. The
+# massing is deliberately unequal: tower, main block and a low loggia wing,
+# their order the architect's.
+#
+# Numbers are INFERRED round figures from photographs: the Santa Barbara
+# County Courthouse (William Mooser III, 1929: a white block under a 22-degree
+# tile roof, the clock tower rising two storeys clear of it at one end, a
+# low arcaded wing, small windows in thick walls, the carved portals); the
+# U.S. Court House, Pasadena (1914, an arcaded loggia); the U.S. Inspection
+# Station, Tecate (1933, one storey, plainer).
+
+[style]
+name = "spanish_colonial"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 50 }
+describe = { rule = "spanish_colonial.masses", phase = "structure", detail = "f'Spanish Colonial Revival, {width:.1f} m, masses {kinds}, entry {entry_pos}, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+TileRoof = "spanish_colonial.tile_roof"
+Portal = "spanish_colonial.portal"
+Grille = "spanish_colonial.grille"
+Medallion = "kit.dormer"
+
+[params]
+ground_h = 4.4
+upper_h = 4.0
+belfry_h = 4.6
+main_floors = { modest = 1, ordinary = 2, comfortable = 2, grand = 3 }
+tower_w = 6.0                   # Santa Barbara's tower is about 6 m square
+tower_min_front = 20.0          # a smaller building has no tower
+wing_min_front = 27.0           # nor room for a low loggia wing beside the block
+wing_share = 0.3
+roof_pitch = 22.0               # degrees: a tile roof sheds water at a low pitch
+tower_pitch = 30.0
+roof_depth = 12.0               # the block's depth, which sets its hip in elevation
+wing_depth = 7.0
+rank = { wing = 0, main = 1, tower = 2 }
+bay = [3.2, 4.2, 5.4]           # few windows in a thick wall
+end = [1.2, 1.8, 3.0]
+tower_bay = [2.4, 3.0, 3.6]
+tower_end = [1.2, 1.5, 2.4]
+arcade_bay = [2.6, 3.0, 3.6]    # Santa Barbara's arcade arches are about 2.4 m clear
+arcade_end = [0.5, 0.8, 1.2]
+window_w = 0.95
+portal_w = 4.0
+portal_rise = 1.8               # how far the carved crest climbs over the door's storey
+carved_until = 1930             # after the crash the portals are plain
+entry_positions = ["first", "last", "middle"]
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "spanish_colonial.lot"
+label = "Lot"
+doc = "The masses: a tower on a comfortable or grand front wide enough for one, a low loggia wing beside a long block, on the sides the architect (the seed) chose; each fitted once; the storeys of each; one front as tall as the tallest."
+do = [
+  { let = { tower = "klass in ('comfortable', 'grand') and w >= tower_min_front", wing = "w >= wing_min_front", left = "seed % 2 == 0" } },
+  { set = { kinds = "= (['tower', 'main', 'wing'] if left else ['wing', 'main', 'tower']) if (tower and wing) else ((['tower', 'main'] if left else ['main', 'tower']) if tower else ((['main', 'wing'] if left else ['wing', 'main']) if wing else ['main']))" } },
+  { let = { wing_w = "min(12.0, max(7.0, w * wing_share))" } },
+  { let = { main_w = "w - (tower_w if tower else 0.0) - (wing_w if wing else 0.0)" } },
+  { set = { sizes = "= ([tower_w, main_w, wing_w] if left else [wing_w, main_w, tower_w]) if (tower and wing) else (([tower_w, main_w] if left else [main_w, tower_w]) if tower else (([main_w, wing_w] if left else [wing_w, main_w]) if wing else [w]))" } },
+  { set = { arcaded = "= (not wing) and klass != 'modest'", entry_pos = "= entry_positions[(seed // 2) % 3]", carved = "= year < carved_until" } },
+  { fit = "x", budget = "main_w", end = "end", bay = "bay", as = "main_rhythm" },
+  { fit = "x", budget = "main_w", end = "arcade_end", bay = "arcade_bay", as = "main_arcade" },
+  { fit = "x", budget = "wing_w", end = "arcade_end", bay = "arcade_bay", as = "wing_rhythm" },
+  { fit = "x", budget = "tower_w", end = "tower_end", bay = "tower_bay", as = "tower_rhythm", max_bays = 1 },
+  { set = { main_stack = "= [['ground', ground_h]] + [['upper', upper_h]] * (main_floors[klass] - 1)" } },
+  { set = { tower_stack = "= main_stack + [['tower', upper_h], ['belfry', belfry_h]]", wing_stack = "= [['loggia', ground_h]]" } },
+  # A low hipped roof rises half the block's depth (or half its front, if
+  # that is less) at the roof's pitch.
+  { let = { t = "sin(roof_pitch * pi() / 180.0) / cos(roof_pitch * pi() / 180.0)", tt = "sin(tower_pitch * pi() / 180.0) / cos(tower_pitch * pi() / 180.0)" } },
+  { set = { main_rise = "= min(main_w, roof_depth) / 2.0 * t", wing_rise = "= min(wing_w, wing_depth) / 2.0 * t", tower_rise = "= tower_w / 2.0 * tt" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "(fsum(column(tower_stack, 1)) + tower_rise if tower else fsum(column(main_stack, 1)) + main_rise) + 0.1"], name = "facade" },
+]
+
+[[production]]
+id = "spanish_colonial.facade"
+label = "Facade"
+doc = "The masses side by side; a lower one's roof dies against the wall of a taller neighbour."
+do = [ { split = "x", parts = [ { repeat = "range(len(kinds))", label = "Section", size = "sizes[item]", name = "sec{n}", attrs = { kind = "= kinds[item]", abut_left = "= item > 0 and rank[kinds[item - 1]] > rank[kinds[item]]", abut_right = "= item < len(kinds) - 1 and rank[kinds[item + 1]] > rank[kinds[item]]" } } ] } ]
+
+[[production]]
+id = "spanish_colonial.section"
+label = "Section"
+doc = "A mass is its storeys and its tile roof. The main block's door is where the architect put it, and before the Depression a carved portal frames it."
+let = { stack = "tower_stack if kind == 'tower' else (wing_stack if kind == 'wing' else main_stack)", rise = "tower_rise if kind == 'tower' else (wing_rise if kind == 'wing' else main_rise)" }
+do = [
+  { split = "y", parts = [
+      { repeat = "stack", label = "Storey", size = "item[1]", name = "s{i}", attrs = { floor = "= item[0]" } },
+      { label = "TileRoof", size = "rise", name = "roof", attrs = { pitch = "= tower_pitch if kind == 'tower' else roof_pitch" } },
+      { label = "Sky", size = "h - fsum(column(stack, 1)) - rise", name = "sky" },
+  ] },
+  { let = { axes = "bay_centres(main_arcade if arcaded else main_rhythm, x)" } },
+  { let = { door_x = "axes[0] if entry_pos == 'first' else (axes[len(axes) - 1] if entry_pos == 'last' else axes[len(axes) // 2])" } },
+  { let = { pw = "min(portal_w, 2.0 * (door_x - x), 2.0 * (x + w - door_x))" } },
+  { insert = "Portal", at = ["door_x - pw / 2.0", "y", "pw", "ground_h + portal_rise"], name = "portal", when = "kind == 'main' and carved" },
+]
+
+[[production]]
+id = "spanish_colonial.portal"
+label = "Portal"
+doc = "The carved frame: an estipite pilaster either side of the door, a medallion over it, and a crest of scrolls climbing above the storey."
+do = [
+  { insert = "Column", at = ["x + 0.1", "y", "0.42", "ground_h - 0.5"], name = "estipite_left", attrs = { order = "corinthian" } },
+  { insert = "Column", at = ["x + w - 0.52", "y", "0.42", "ground_h - 0.5"], name = "estipite_right", attrs = { order = "corinthian" } },
+  { insert = "Medallion", at = ["x + w / 2.0 - 0.45", "y + ground_h - 0.25", "0.9", "1.0"], name = "medallion", attrs = { dormer_form = "oeil_de_boeuf" } },
+]
+
+[[production]]
+id = "spanish_colonial.storey"
+label = "Storey"
+doc = "A storey is cut by its mass's rhythm: the arcade's on a loggia (and on the block's ground floor where no wing holds the loggia), the wall's few windows otherwise."
+let = { rh = "tower_rhythm if kind == 'tower' else (wing_rhythm if kind == 'wing' else (main_arcade if (floor == 'ground' and arcaded) else main_rhythm))" }
+do = [ { split = "x", by = "rh", label = "Cell" } ]
+
+[[production]]
+id = "spanish_colonial.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "spanish_colonial.light_bay"
+label = "LightBay"
+doc = "A belfry opening is a pair of arches on a colonnette; an upper window may open onto an iron balcony."
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+  { insert = "Balconette", at = ["x", "y + sill", "w", "0.95"], name = "balcony", when = "has('balcony') and balcony" },
+]
+
+[[production]]
+id = "spanish_colonial.light"
+label = "Light"
+doc = "The light, and over a ground-floor window its wrought-iron grille."
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Grille", at = ["x", "y", "w", "h"], name = "grille", when = "has('grille') and grille" },
+]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "spanish_colonial.roles.white_stucco"
+label = "Storey"
+layer = "roles"
+doc = "Its floor names its role; every wall is white stucco."
+set = { role = "= floor", wall_material = "render_white" }
+
+[[rule]]
+id = "spanish_colonial.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "spanish_colonial.base.the_arcade"
+label = "Cell"
+doc = "A loggia is a run of round arches on square piers, open to the ground."
+when = "is_bay() and (floor == 'loggia' or (floor == 'ground' and kind == 'main' and arcaded))"
+set = { opening_type = "window", head = "round", light_width = "= w - 0.7", sill = 0.0, light_height = "= h - 0.9", surround_kind = "none", keystone_present = false, grille = false }
+
+[[rule]]
+id = "spanish_colonial.base.grilled_window"
+label = "Cell"
+doc = "A ground-floor window is small, set high in the thick wall, behind a wrought-iron grille; arched or square-headed by the architect's hand."
+when = "is_bay() and floor == 'ground' and not (kind == 'main' and arcaded)"
+set = { opening_type = "window", head = "= 'round' if seed % 3 == 1 else 'flat'", light_width = "= window_w", sill = 1.3, light_height = 1.7, surround_kind = "none", keystone_present = false, grille = true }
+
+[[rule]]
+id = "spanish_colonial.base.upper_window"
+label = "Cell"
+doc = "Upper windows are few and small; some open to the floor onto an iron balcony -- the middle one in some architects' buildings, the outer ones in others'."
+when = "is_bay() and floor in ('upper', 'tower')"
+let = { balcony_here = "kind == 'main' and (is_middle_bay() if seed % 2 == 0 else not is_middle_bay())" }
+set = { opening_type = "window", head = "= 'round' if (seed % 3 == 1 and balcony_here) else 'flat'", light_width = "= window_w * (0.85 if kind == 'tower' else 1.0)", sill = "= 0.2 if balcony_here else 1.0", light_height = "= 2.4 if balcony_here else 1.6", surround_kind = "none", keystone_present = false, balcony = "= balcony_here" }
+
+[[rule]]
+id = "spanish_colonial.base.belfry"
+label = "Cell"
+doc = "The belfry opens on each face in a pair of round arches on a colonnette."
+when = "is_bay() and floor == 'belfry'"
+set = { opening_type = "window", head = "round", light_width = "= w - 0.3", sill = 1.0, light_height = "= h - 1.0 - 0.7", lights = "= (1.0, 1.0)", divider = "Column", divider_width = 0.28, order = "doric", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "spanish_colonial.base.the_door"
+label = "Cell"
+doc = "The door, under a round arch, in the bay the architect chose; a plain moulded frame once the carving stops."
+when = "is_bay() and kind == 'main' and floor == 'ground' and (is_first_bay() if entry_pos == 'first' else (is_last_bay() if entry_pos == 'last' else is_middle_bay()))"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= min(1.9, w - 0.8)", sill = 0.0, light_height = 3.1, surround_kind = "= 'none' if carved else 'moulded_architrave'", keystone_present = false, grille = false }

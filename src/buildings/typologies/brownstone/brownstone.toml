@@ -1,0 +1,201 @@
+# The Brooklyn and Manhattan brownstone row house, as rules.
+#
+# A speculative row house of 1850-1890 on a lot of 16 to 25 feet: an English
+# basement half a storey above the sidewalk, a high stoop over it to the
+# parlour floor's door, three bays (the door's and two windows), and two or
+# three bedroom floors under a cornice. The date chooses the dress:
+#
+# * Italianate (to c. 1870): round-headed parlour windows, segmental heads
+#   above, every opening under a heavy hood on scrolled consoles, a deep
+#   bracketed cornice;
+# * Neo-Grec (c. 1870-1885): square heads under flat projecting lintels with
+#   incised lines, an angular bracketed cornice; on a wider lot a two-storey
+#   bay front;
+# * Romanesque Revival (from c. 1885): rock-faced stone at the base, round
+#   arches with keystones on the parlour and top floors, a modillioned
+#   cornice; on a wider lot a bay front rising through the house.
+#
+# Numbers are INFERRED round figures from photographs: 147-159 Prospect
+# Place, Prospect Heights (Italianate, round-arched parlour windows under
+# console hoods, a high stoop); Park Slope's Union Street and Carroll Street
+# rows; the Neo-Grec and Romanesque rows of Harlem's Mount Morris Park and
+# Brooklyn Heights' Hicks and Henry Streets.
+
+[style]
+name = "brownstone"
+site = ["year", "klass", "seed", "width"]
+axiom = { w = "width", h = 30 }
+overhangs = ["Cornice", "Hood"]
+describe = { rule = "brownstone.row_house", phase = "period", detail = "f'{kind} brownstone, {width:.1f} m, {len(storey_heights)} storeys, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Stoop = "brownstone.stoop"
+Hood = "brownstone.hood"
+Grille = "brownstone.grille"
+Cell = "brownstone.cell"
+Socle = "brownstone.socle"
+Storey = "brownstone.storey"
+
+[params]
+basement_h = 2.5                # the parlour floor stands about eight feet up
+parlour_h = 4.1                 # the tallest room in the house
+upper_h = [3.5, 3.2, 3.0]       # bedroom floors, each a little lower
+uppers = { modest = 1, ordinary = 2, comfortable = 2, grand = 3 }
+entry_share = 0.36              # the door's bay of the three
+bay_front_min = 6.5             # a lot narrower than about 21 ft has a flat front
+side_share = 0.18               # an angled face of a bay front, seen from the street
+window_w = 1.05                 # a sash about 3 ft 6 in
+door_w = 1.35                   # a pair of doors
+cornice_h = { italianate = 0.8, neo_grec = 0.9, romanesque = 0.6 }
+stoop_w = 1.9
+walls_romanesque = ["brownstone", "brick"]
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "brownstone.lot"
+label = "Lot"
+doc = "The date chooses the dress; the class, the floors; the builder (the seed), which side the door is on. A late front wide enough swells into a bay. The stoop climbs over the basement to the door."
+do = [
+  { set = { kind = "= 'italianate' if year < 1870 else ('neo_grec' if year < 1885 else 'romanesque')", entry_left = "= seed % 2 == 1" } },
+  { set = { storey_heights = "= [basement_h, parlour_h] + [upper_h[0]] + ([upper_h[1]] if uppers[klass] >= 2 else []) + ([upper_h[2]] if uppers[klass] >= 3 else [])", bay_front = "= year >= 1870 and w >= bay_front_min" } },
+  # The bay rises two storeys on a Neo-Grec front, through the house on a
+  # Romanesque one.
+  { set = { bay_top = "= 2 if kind == 'neo_grec' else len(storey_heights) - 1" } },
+  { let = { front = "fsum(storey_heights)", ew = "w * entry_share" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Stoop", at = ["(ew / 2.0 if entry_left else w - ew / 2.0) - stoop_w / 2.0", "0.0", "stoop_w", "basement_h"], name = "stoop" },
+]
+
+[[production]]
+id = "brownstone.facade"
+label = "Facade"
+doc = "Basement, parlour, the bedroom floors."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] } ]
+
+[[production]]
+id = "brownstone.storey"
+label = "Storey"
+doc = "Every floor is cut into the door's bay and the windows' zone. A water table caps the basement; a Romanesque base is rock-faced; the cornice crowns the top floor."
+let = { ew = "w * entry_share" }
+do = [
+  { split = "x", when = "entry_left", parts = [ { label = "EntryZone", size = "ew", name = "entry" }, { label = "WindowZone", size = "w - ew", name = "windows" } ] },
+  { split = "x", when = "not entry_left", parts = [ { label = "WindowZone", size = "w - ew", name = "windows" }, { label = "EntryZone", size = "ew", name = "entry" } ] },
+  { insert = "Socle", at = ["x", "y", "w", "h"], name = "rockface", when = "kind == 'romanesque' and role in ('basement', 'parlour')" },
+  { insert = "Entablature", at = ["x", "y + h - 0.25", "w", "0.25"], name = "water_table", attrs = { course_kind = "bandeau" }, when = "role == 'basement'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "cornice_h[kind]"], name = "cornice", attrs = { cornice_ornament = "= 'modillioned' if kind == 'romanesque' else 'bracketed'" }, when = "index == count - 1" },
+]
+
+[[production]]
+id = "brownstone.window_zone"
+label = "WindowZone"
+doc = "Two windows between piers; or, on a late wide front, a bay of three faces, an angled one either side of the front, a pilaster at every arris."
+let = { bayed = "bay_front and level < bay_top", side = "w * side_share" }
+do = [
+  { split = "x", when = "not bayed", parts = [
+      { label = "Cell", size = "0.3", name = "x0", slot = "end" },
+      { label = "Cell", size = "(w - 0.6 - w * 0.14) / 2.0", name = "x1", slot = "bay" },
+      { label = "Cell", size = "w * 0.14", name = "x2", slot = "end" },
+      { label = "Cell", size = "(w - 0.6 - w * 0.14) / 2.0", name = "x3", slot = "bay" },
+      { label = "Cell", size = "0.3", name = "x4", slot = "end" },
+  ] },
+  { split = "x", when = "bayed", parts = [
+      { label = "Cell", size = "side", name = "x0", slot = "bay", attrs = { face = "side" } },
+      { label = "Cell", size = "w - 2 * side", name = "x1", slot = "bay", attrs = { face = "front" } },
+      { label = "Cell", size = "side", name = "x2", slot = "bay", attrs = { face = "side" } },
+  ] },
+  { each = "[x, x + side, x + w - side, x + w]", when = "bayed", do = [
+      { insert = "Column", at = ["min(max(item - 0.11, x), x + w - 0.22)", "y", "0.22", "h"], name = "arris{i}", attrs = { order = "pilaster" } },
+  ] },
+]
+
+[[production]]
+id = "brownstone.entry_zone"
+label = "EntryZone"
+doc = "The door's bay: the door on the parlour floor at the head of the stoop, a window over it on every floor above."
+do = [ { split = "x", parts = [
+    { label = "Cell", size = "0.3", name = "x0", slot = "end" },
+    { label = "Cell", size = "w - 0.6", name = "x1", slot = "bay" },
+    { label = "Cell", size = "0.3", name = "x2", slot = "end" },
+] } ]
+
+[[production]]
+id = "brownstone.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "brownstone.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "brownstone.light"
+label = "Light"
+doc = "The light, its keystone and frame; an iron grille over a basement window; over an Italianate opening a hood on consoles, over a Neo-Grec one an incised lintel."
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Grille", at = ["x", "y", "w", "h"], name = "grille", when = "has('grille') and grille" },
+  { insert = "Hood", at = ["x - 0.18", "y + h", "w + 0.36", "0.32 if hood == 'bracketed' else 0.26"], name = "hood", attrs = { hood_kind = "= hood" }, when = "hood != 'none'" },
+]
+
+# --- rules ---------------------------------------------------------------------
+# (A top-floor window stops 0.45 m shorter: the main cornice's frieze and
+# brackets hang into the storey over it.)
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "brownstone.roles.floor_and_stone"
+label = "Storey"
+layer = "roles"
+doc = "Basement, parlour, bedroom floors. Brownstone throughout, except that a Romanesque builder may raise brick bedroom floors on a brownstone base."
+let = { up = "index >= 2" }
+set = { role = "= ['basement', 'parlour'][index] if index < 2 else 'chamber'", level = "= index", wall_material = "= walls_romanesque[seed % 2] if (kind == 'romanesque' and up) else 'brownstone'" }
+
+[[rule]]
+id = "brownstone.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "brownstone.base.basement_window"
+label = "Cell"
+doc = "The basement's windows sit low behind iron grilles."
+when = "is_bay() and role == 'basement'"
+set = { opening_type = "window", head = "flat", light_width = "= min(window_w, w - 0.3)", sill = 0.45, light_height = 1.25, surround_kind = "none", keystone_present = false, grille = true, hood = "none" }
+
+[[rule]]
+id = "brownstone.base.under_the_stoop"
+label = "Cell"
+doc = "Under the stoop the basement door is hidden; the bay shows no opening."
+when = "is_bay() and role == 'basement' and in_parent('EntryZone')"
+specificity = 10
+set = { opening_type = "none" }
+
+[[rule]]
+id = "brownstone.base.a_window"
+label = "Cell"
+doc = "Parlour windows reach nearly to the floor, round-headed on an Italianate or Romanesque front; bedroom windows are shorter, segmental in the Italianate, square in the Neo-Grec, square in the Romanesque but arched on its top floor. The Italianate hoods every opening on consoles, the Neo-Grec gives it an incised lintel, the Romanesque a keystone."
+when = "is_bay() and role != 'basement'"
+let = { parlour = "role == 'parlour'", top = "level == len(storey_heights) - 1", front = "has('face') and face == 'front'", side = "has('face') and face == 'side'" }
+set = { opening_type = "window", head = "= ('round' if parlour else 'segmental') if kind == 'italianate' else (('round' if (parlour or top) else 'flat') if kind == 'romanesque' else 'flat')", light_width = "= min(1.9, w - 0.5) if front else ((w - 0.22) if side else min(window_w, w - 0.3))", sill = "= 0.35 if parlour else 0.8", light_height = "= h - (0.35 if parlour else 0.8) - (0.75 if kind == 'italianate' else 0.6) - (0.45 if top else 0.0)", surround_kind = "= 'none' if kind == 'neo_grec' else 'moulded_architrave'", keystone_present = "= kind == 'romanesque' and (parlour or top)", grille = false, hood = "= 'bracketed' if kind == 'italianate' else ('lintel' if kind == 'neo_grec' else 'none')" }
+
+[[rule]]
+id = "brownstone.base.the_door"
+label = "Cell"
+doc = "At the head of the stoop the parlour floor's entry bay is the front door, under an arch or a square transom by the dress."
+when = "is_bay() and role == 'parlour' and in_parent('EntryZone')"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "= 'flat' if kind == 'neo_grec' else 'round'", light_width = "= min(door_w, w - 0.3)", sill = 0.0, light_height = "= h - 0.65", surround_kind = "moulded_architrave", keystone_present = "= kind == 'romanesque'", grille = false }

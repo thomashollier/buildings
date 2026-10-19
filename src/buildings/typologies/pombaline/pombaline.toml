@@ -1,0 +1,190 @@
+# The Lisbon Pombaline building, as rules.
+#
+# After the 1755 earthquake the Baixa was rebuilt to standard elevations drawn
+# by Eugenio dos Santos and Carlos Mardel for the Marquis of Pombal. The
+# regulation is the grammar: the street's rank (rua nobre, secondary street,
+# alley) sets the floors and how rich they are; a stone ground floor of shop
+# doors, arched on the noble streets; balcony doors on the first floor, each
+# with its own iron balcony on a noble street; above them windows of one width
+# on one axis rhythm, every floor; corner pilasters of lioz stone (cunhais),
+# a cornice, and a tiled mansard with a trapeira dormer over the axes.
+# Later in the 19th century many fronts were clad in azulejo tiles and many
+# were raised by a floor (an acrescento); the date and the seed (the owner)
+# choose which.
+#
+# Numbers are INFERRED round figures from photographs: Rua da Prata 143-147
+# and 242-254, Rua Augusta, Rua Aurea (Rua do Ouro), Rua dos Fanqueiros and the
+# travessas between them (Wikimedia Commons: "Rua Prata, Lisboa, 2012-05-12",
+# "BAIXA POMBALINA.jpg", "Fachada1 Lisboa.JPG"), checked against the
+# regulation's habit of one window width for the whole street.
+
+[style]
+name = "pombaline"
+site = ["width", "year", "klass", "street", "seed"]
+axiom = { w = "width", h = 40 }
+overhangs = ["Cornice"]
+describe = { rule = "pombaline.standard_elevation", phase = "regulation", detail = "f'Pombaline building on a {street} street, {width:.1f} m, {year}, {len(storey_heights)} floors'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Roof = "pombaline.roof"
+Rail = "pombaline.rail"
+Cunhal = "kit.column"
+
+[params]
+# The street's rank, as the plans had it: storey heights bottom-up (ground,
+# first, second, third), whether the first floor has balconies, the mansard.
+# A rua nobre (Augusta, Aurea, Prata) has four floors and balconies; a
+# secondary street (Fanqueiros, Correeiros) four lower ones and no balconies
+# unless the owner paid; an alley (travessa) three.
+streets = { nobre = { heights = [4.6, 3.8, 3.5, 3.2], balconies = true, roof_h = 2.9 }, secondary = { heights = [4.1, 3.4, 3.2, 3.0], balconies = false, roof_h = 2.6 }, alley = { heights = [3.7, 3.1, 2.9], balconies = false, roof_h = 2.3 } }
+raised_floor = 3.0      # the 19th-century acrescento, a lower floor over the old cornice
+raised_from = 1870
+roles = ["ground", "first", "second", "third", "fourth"]
+rank = { modest = 0, ordinary = 1, comfortable = 2, grand = 3 }
+# ABSOLUTE: the regulation's one window width, the same on every floor.
+window_w = 1.1
+door_w = 1.45           # a shop door, a little wider than the windows over it
+bay = [2.3, 2.6, 3.0]
+end = [0.6, 1.0, 1.4]
+cunhal = 0.45           # the stone corner pilaster at each party wall
+sill_peito = 0.85       # a janela de peito: a window with a breast wall
+head_room = 0.7         # from the head of a window to the floor above
+balcony_w = 1.75        # an individual iron balcony, a hand wider than its door each side
+rail_h = 0.95
+fold_share = 0.6        # the mansard's lower, steeper slope as a share of its height
+dormer_w = 1.15
+dormer_h = 1.55
+# Paint: the first fronts were lime-washed in ochre, rose or white; from the
+# 1840s the azulejo factories clad them in patterned tile (blue on white).
+paints = ["plaster_ochre", "stucco_rose", "stucco", "plaster_ochre"]
+azulejo = "azulejo"            # a front clad in blue-and-white tiles
+azulejo_from = 1840
+dormer_forms = ["segmental", "pedimented", "segmental"]
+roof_tile = "tile_red"          # Portuguese red tile (telha)
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "pombaline.lot"
+label = "Lot"
+doc = "The front is the street's elevation: its floors, one fitted rhythm of axes for all of them, a tiled mansard over the cornice and a chimney at the party wall."
+do = [
+  # The owner (the seed) decides whether a later century raised the house and tiled it.
+  { set = { raised = "= year >= raised_from and seed % 2 == 1", tiled = "= year >= azulejo_from and seed % 3 != 0", paint = "= paints[seed % len(paints)]", arched = "= street == 'nobre' or (street == 'secondary' and seed % 2 == 0)", dormer_form = "= dormer_forms[seed % len(dormer_forms)]" } },
+  { set = { storey_heights = "= streets[street].heights + ([raised_floor] if raised else [])" } },
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", max_bays = 7 },
+  { let = { front = "fsum(storey_heights)", roof_h = "streets[street].roof_h" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Roof", at = ["0.0", "front", "w", "roof_h"], name = "roof", attrs = { fold = "= roof_h * fold_share", roof_paint = "= roof_tile" } },
+  { insert = "Chimney", at = ["w - 1.5", "front + roof_h - 0.2", "0.75", "1.3"], name = "chimney" },
+]
+
+[[production]]
+id = "pombaline.facade"
+label = "Facade"
+doc = "The floors, bottom-up, and a stone pilaster up each party wall from the pavement to the cornice."
+do = [
+  { split = "y", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}" } ] },
+  { insert = "Cunhal", at = ["x", "y", "cunhal", "h"], name = "cunhal_left", attrs = { order = "pilaster" } },
+  { insert = "Cunhal", at = ["x + w - cunhal", "y", "cunhal", "h"], name = "cunhal_right", attrs = { order = "pilaster" } },
+]
+
+[[production]]
+id = "pombaline.storey"
+label = "Storey"
+doc = "Every floor is cut by the one rhythm; a stone band closes the ground floor, the cornice the top one, and a noble first floor has an iron balcony at every door."
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Entablature", at = ["x", "y + h - 0.22", "w", "0.22"], name = "band", attrs = { course_kind = "bandeau" }, when = "role == 'ground'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.45"], name = "cornice", attrs = { cornice_ornament = "= 'modillioned' if rank[klass] >= 2 else 'plain'" }, when = "is_last('Storey')" },
+  { each = "bay_spans(rhythm, x)", when = "balcony_here", do = [
+      { insert = "Balconette", at = ["item.x + (item.w - balcony_w) / 2.0", "y", "balcony_w", "rail_h"], name = "balcony{i}" },
+  ] },
+]
+
+[[production]]
+id = "pombaline.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "pombaline.light_bay"
+label = "LightBay"
+doc = "The light; a balcony door with no balcony has an iron guard across its foot."
+do = [
+  { call = "kit.split_light_bay" },
+  { insert = "Rail", at = ["x", "y + sill", "w", "rail_h"], name = "rail", when = "rail" },
+]
+
+[[production]]
+id = "pombaline.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+[[production]]
+id = "pombaline.roof"
+label = "Roof"
+doc = "A trapeira over every axis of a noble street's mansard, over every other one elsewhere."
+do = [
+  { each = "bay_centres(rhythm, 0.0) if street == 'nobre' else every_other(bay_centres(rhythm, 0.0))", do = [
+      { insert = "Dormer", at = ["item - dormer_w / 2.0", "y + 0.3", "dormer_w", "dormer_h"], name = "trapeira{i}" },
+  ] },
+]
+
+# --- rules ---------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "pombaline.roles.floor_and_finish"
+label = "Storey"
+layer = "roles"
+doc = "Its place names the floor. The ground floor is stone; the floors over it are lime-washed, or tiled where the owner later clad them."
+set = { role = "= roles[index]", wall_material = "= 'stone' if index == 0 else (azulejo if tiled else paint)", balcony_here = "= index == 1 and (streets[street].balconies or rank[klass] >= 3)" }
+
+[[rule]]
+id = "pombaline.base.wall"
+label = "Cell"
+doc = "The ends, between the axes and the party walls, are wall."
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "pombaline.base.the_window_of_the_regulation"
+label = "Cell"
+doc = "Above the shops every axis holds a window of the one width; its breast and its head room are the same on every floor, so only the storey's height changes the light."
+when = "is_bay() and role != 'ground'"
+set = { opening_type = "window", head = "flat", light_width = "= window_w", sill = "= sill_peito", light_height = "= h - sill_peito - head_room", surround_kind = "= 'moulded_architrave' if rank[klass] >= 2 else 'bare_band'", keystone_present = false, rail = false }
+
+[[rule]]
+id = "pombaline.base.the_balcony_door"
+label = "Cell"
+doc = "The first floor's axes are janelas de sacada, doors to the floor; a grand house on a noble street has them on the second floor too. Without a balcony the door has a guard in its reveal."
+when = "is_bay() and (role == 'first' or (role == 'second' and street == 'nobre' and rank[klass] >= 3))"
+specificity = 10
+set = { opening_type = "window", head = "flat", light_width = "= window_w", sill = 0.0, light_height = "= h - head_room", surround_kind = "= 'moulded_architrave' if rank[klass] >= 2 else 'bare_band'", keystone_present = "= rank[klass] >= 3", rail = "= not balcony_here" }
+
+[[rule]]
+id = "pombaline.base.the_shop_door"
+label = "Cell"
+doc = "Every ground-floor axis is a shop's door in the stone, round-arched on a noble street, square elsewhere; from the 1850s the shops glazed theirs."
+when = "is_bay() and role == 'ground'"
+set = { opening_type = "= 'shop_bay' if year >= 1850 else 'pedestrian_entrance'", head = "= 'round' if arched else 'flat'", light_width = "= door_w", sill = 0.0, light_height = "= h - 0.9", surround_kind = "none", keystone_present = "= arched", rail = false }
+
+[[rule]]
+id = "pombaline.base.the_stair_door"
+label = "Cell"
+doc = "The middle axis of the ground floor is the door to the common stair."
+when = "is_bay() and role == 'ground' and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", light_width = "= door_w - 0.2" }

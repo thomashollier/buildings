@@ -1,0 +1,102 @@
+# The Art Deco movie palace front, as rules on the deco vocabulary.
+#
+# From photographs: the Paramount (Oakland, Timothy Pflueger, 1931), Radio
+# City Music Hall (New York, 1932), the Wiltern (Los Angeles, 1931), the
+# Pantages (Hollywood, 1930).
+# * the auditorium's front: a bank of doors under a projecting marquee (a
+#   deep box about 1.5 m high, a lettered readerboard, rows of bulbs), and
+#   over it a tall central panel three or four storeys high -- a mosaic
+#   (Paramount: two figures 34 m of tile), close-set fluted piers (the
+#   Pantages), or tall bands of glass (Radio City);
+# * a vertical blade sign far taller than the front -- one at the centre, a
+#   pair either side of the panel (Paramount), or one at the corner (the
+#   Wiltern) -- its letters stacked one over another;
+# * on a bigger lot the palace is let into a commercial block: shop bays
+#   either side, offices over them (the Wiltern's Pellissier building).
+# The seed (the architect) chooses the panel and the sign. Numbers are
+# INFERRED round figures from those photographs.
+
+[style]
+name = "movie_palace"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 80 }
+overhangs = []
+describe = { rule = "movie_palace.front", phase = "structure", detail = "f'Art Deco movie palace, {width:.1f} m, {year}, {klass}: {massing}'" }
+
+[lot_props]
+year = "= year"
+
+[params]
+front_w = { modest = 12.0, ordinary = 14.0, comfortable = 16.0, grand = 20.0 }   # the auditorium front's width
+panel_floors = { modest = 2, ordinary = 3, comfortable = 3, grand = 4 }
+shop_floors = { modest = 1, ordinary = 1, comfortable = 2, grand = 3 }
+panels = ["mosaic", "fluted", "glass"]
+signs = ["centre", "twin", "corner"]
+palace_walls = ["stucco", "plaster_ochre", "stone", "terracotta"]
+mosaic_paints = ["clapboard_blue", "stucco_rose", "plaster_ochre", "clapboard_sage"]
+marquee_h = 1.6
+marquee_at = 3.6               # the marquee's soffit, over the doors
+sign_w = { modest = 1.4, ordinary = 1.7, comfortable = 2.0, grand = 2.4 }
+sign_rise = 7.0                # how far the blade stands above the parapet
+letter_pitch = 1.5             # one letter of the blade's name, and the gap to the next
+
+[[rule]]
+id = "movie_palace.the_front_and_its_shops"
+label = "Lot"
+layer = "programme"
+doc = "The auditorium's front alone on a narrow lot; on a wider one, let into a block of shops either side."
+let = { f = "min(1.0, front_w[klass] / width)" }
+set = { composition = "= [['front', 1.0]] if f > 0.8 else [['shops', (1.0 - f) / 2.0], ['front', f], ['shops', (1.0 - f) / 2.0]]", massing = "= f'{panels[seed % 3]} panel, {signs[(seed // 3) % 3]} sign' + (', shops either side' if f <= 0.8 else '')", panel = "= panels[seed % 3]", sign = "= signs[(seed // 3) % 3]" }
+
+[[rule]]
+id = "movie_palace.shops"
+label = "Block"
+layer = "programme"
+doc = "Shop bays either side, offices over them: show windows, paired windows, piers in the zigzag years."
+let = { zig = "year <= zigzag_until" }
+set = { floors = "= shop_floors[klass]", ground_h = 5.2, floor_h = 3.7, parapet_h = 1.4, block_bay = [2.8, 3.4, 4.2], block_end = [0.5, 0.8, 1.4], glazing_upper = "= 'paired' if zig else 'ribbon'", piers = "= zig", spandrel = "= 'dark' if zig else 'none'", eyebrows = false, door = "none", base_wall = "shadow" }
+
+[[rule]]
+id = "movie_palace.the_front"
+label = "Block"
+layer = "programme"
+specificity = 10
+when = "part == 'front'"
+doc = "The front: a bank of doors, the panel's storeys over them, a stepped top in the zigzag years."
+set = { floors = "= panel_floors[klass]", ground_h = 5.6, floor_h = 4.6, parapet_h = 2.2, block_bay = [1.4, 1.9, 2.6], block_end = [1.2, 1.8, 2.6], glazing_ground = "blind", glazing_upper = "= 'band' if panel == 'glass' else 'blind'", spandrel = "= 'metal' if panel == 'glass' else 'none'", piers = false, door = "all", stripes = 0, eyebrows = false, crest = "= 'stepped' if year <= zigzag_until else 'flat'", crest_h = 2.4, crest_steps = 3, crest_reach = 0.4, base_wall = "stone" }
+
+[[rule]]
+id = "movie_palace.the_hand"
+label = "Block"
+layer = "hand"
+set = { wall = "= palace_walls[seed % 4]", accent = "= mosaic_paints[(seed + 1) % 4]" }
+
+[[production]]
+id = "movie_palace.the_panel_marquee_and_sign"
+label = "Dress"
+when = "part == 'front'"
+doc = "Over the doors the marquee; above it the panel (a mosaic of coloured bands, or flutes); the blade sign standing in front of it all."
+let = { top = "y + ground_h + floors * floor_h + parapet_h", px = "x + w * 0.16", pw = "w * 0.68", sw = "sign_w[klass]" }
+do = [
+  # The panel: a recessed field across the upper floors, inset from the front's edges.
+  { insert = "Panel", at = ["px", "y + ground_h + 0.4", "pw", "floors * floor_h - 0.2"], name = "panel", attrs = { paint = "= accent" }, when = "panel == 'mosaic'" },
+  { each = "range(5)", when = "panel == 'mosaic'", do = [
+      { insert = "Panel", at = ["px + pw * (0.1 + 0.18 * i)", "y + ground_h + 0.9", "pw * 0.08", "floors * floor_h - 1.2"], name = "tessera{i}", attrs = { paint = "= 'plaster_ochre' if i % 2 == 0 else 'render_white'" } },
+  ] },
+  { each = "range(int(pw / 0.9))", when = "panel == 'fluted'", do = [
+      { insert = "Panel", at = ["px + i * (pw / int(pw / 0.9)) + 0.15", "y + ground_h + 0.4", "pw / int(pw / 0.9) - 0.3", "floors * floor_h + parapet_h * 0.6"], name = "flute{i}", attrs = { paint = "render_white" } },
+  ] },
+  # The marquee: a box over the doors, its readerboard, its bulbs.
+  { insert = "Panel", at = ["x + 0.3", "y + marquee_at", "w - 0.6", "marquee_h"], name = "marquee", attrs = { paint = "shadow" } },
+  { insert = "Panel", at = ["x + 0.8", "y + marquee_at + 0.3", "w - 1.6", "marquee_h - 0.6"], name = "readerboard", attrs = { paint = "render_white" } },
+  { insert = "Panel", at = ["x + 0.3", "y + marquee_at + marquee_h - 0.1", "w - 0.6", "0.1"], name = "bulbs", attrs = { paint = "plaster_ochre" } },
+  # The blade sign(s), from the marquee to well above the parapet.
+  { let = { sy = "y + marquee_at + marquee_h", sh = "top - (y + marquee_at + marquee_h) + sign_rise" } },
+  { each = "[x + w / 2.0 - sw / 2.0] if sign == 'centre' else ([px - sw / 2.0, px + pw - sw / 2.0] if sign == 'twin' else [x + 0.2])", do = [
+      { let = { bx = "item", b = "i" } },
+      { insert = "Panel", at = ["bx", "sy", "sw", "sh"], name = "blade{b}", attrs = { paint = "brick" } },
+      { each = "range(int((sh - 1.0) / letter_pitch))", do = [
+          { insert = "Panel", at = ["bx + sw * 0.22", "sy + sh - 0.8 - (i + 1) * letter_pitch + 0.3", "sw * 0.56", "letter_pitch - 0.45"], name = "blade{b}_letter{i}", attrs = { paint = "render_white" } },
+      ] },
+  ] },
+]

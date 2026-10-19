@@ -1,0 +1,249 @@
+# The Second Empire civic block, as rules.
+#
+# A free-standing public building of 1860-1890 -- a custom house, a city hall,
+# a department's offices -- dressed after the Louvre's new pavilions. The
+# front is cut into ranges and pavilions: a centre pavilion and two end ones
+# on a long front, end pavilions or a centre one on a shorter front. Every
+# section stands on a rusticated basement, its storeys framed by columns
+# (paired on the pavilions of a rich building) under an entablature, and the
+# whole is crowned by a mansard: dormers over every window axis, and over each
+# pavilion a taller roof of its own, its curve the architect's (straight,
+# bowed out like the Louvre's, or flared at the foot), with iron cresting.
+#
+# It is a cousin of the Paris immeuble (paris/haussmann.toml), but a building
+# that stands alone on its square, so its roof returns at both ends and the
+# pavilions rise above the ranges.
+#
+# Numbers are INFERRED round figures from photographs: the U.S. Custom House,
+# Portland ME (Alfred Mullett, 1867-72: rusticated basement, two tall storeys
+# of round-arched windows between coupled columns, a pedimented centre);
+# the Eisenhower (Old) Executive Office Building, Washington (Mullett,
+# 1871-88: HABS DC-290, end and centre pavilions under taller convex
+# mansards, four storeys of paired columns, dormers on every axis);
+# Philadelphia City Hall and the Louvre's Pavillon Richelieu for the pavilion
+# roof.
+
+[style]
+name = "second_empire"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 60 }
+overhangs = ["Cornice", "Chimney"]
+describe = { rule = "second_empire.civic_block", phase = "structure", detail = "f'Second Empire civic block, {width:.1f} m, {layout} layout, {roof_profile} pavilion roofs, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Roofline = "second_empire.roofline"
+Flight = "second_empire.flight"
+Socle = "second_empire.socle"
+Storey = "second_empire.storey"
+Pediment = "second_empire.pediment"
+
+[params]
+# Storeys. Portland's basement is about a man and a half high, its two
+# principal storeys some 6 m each; the Executive Office Building's four are
+# nearer 5 m. A richer building has more storeys over the basement.
+basement_h = 2.8
+principal_h = { modest = 4.6, ordinary = 5.0, comfortable = 5.4, grand = 5.8 }
+upper_ratio = 0.9               # each storey over the principal one, this share of it
+upper_floors = { modest = 1, ordinary = 1, comfortable = 2, grand = 3 }
+# The bay: a window between two column pairs, 3 to 4 m on centres
+# (Portland's front is seven bays in about 26 m).
+bay = [3.0, 3.5, 4.2]
+end = [0.8, 1.2, 1.8]
+pav_end = [1.3, 1.6, 2.2]       # a pavilion's corners carry a column pair
+# Sections. An end pavilion is two or three bays, a centre pavilion three;
+# a range under 7 m between two pavilions would not read as one.
+end_pav_w = 9.0
+centre_pav_w = 11.5
+min_range = 7.0
+# The order: a column about half a metre across, paired 0.18 m apart.
+col_w = 0.5
+pair_gap = 0.18
+ent_h = 0.55                    # the entablature over each storey
+cornice_h = 0.8
+# The mansard: a storey high over the ranges, half as tall again over a
+# pavilion; the steep lower slope (brisis) is most of it.
+mansard_h = 4.0
+pavilion_rise = 1.6
+brisis_share = 0.78
+brisis_pitch = 76.0             # degrees, on the hipped return
+terrasson_pitch = 30.0
+dormer_w = 1.3
+dormer_max_h = 2.4
+pediment_slope = 0.17           # rise over span, a low classical pediment
+pavilion_dormer_lift = 1.7      # a pavilion's dormers stand higher in its taller roof, clear of a pediment
+flight_w = 4.2                  # the stair up to the principal floor
+# What the seed chooses: the architect's pavilion roof, his dormer, his stone.
+profiles = ["convex", "straight", "concave"]
+dormer_forms = ["pedimented", "round_arched", "segmental"]
+walls = ["stone", "stone", "brick"]
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "second_empire.lot"
+label = "Lot"
+doc = "The front is cut into pavilions and ranges by its length; each kind of section is fitted with bays once; the storeys are the basement, the principal floor and as many over it as the purse allows; a mansard crowns it and a flight of steps climbs to the door."
+do = [
+  { set = { roof_profile = "= profiles[seed % 3]", dormer_form = "= dormer_forms[(seed // 3) % 3]", stone = "= walls[(seed // 2) % 3]", column_style = "= 'paired' if klass in ('comfortable', 'grand') else 'single'" } },
+  { let = { centre_w = "min(centre_pav_w, w * 0.42)" } },
+  { set = { layout = "= 'five' if w >= 2 * end_pav_w + centre_pav_w + 2 * min_range else ('ends' if (w >= 2 * end_pav_w + min_range and seed % 2 == 0) else 'centre')" } },
+  { set = { kinds = "= ['end', 'range', 'centre', 'range', 'end'] if layout == 'five' else (['end', 'range', 'end'] if layout == 'ends' else ['range', 'centre', 'range'])" } },
+  { let = { range_w = "(w - 2 * end_pav_w - centre_w) / 2.0 if layout == 'five' else (w - 2 * end_pav_w if layout == 'ends' else (w - centre_w) / 2.0)" } },
+  { set = { sizes = "= [end_pav_w, range_w, centre_w, range_w, end_pav_w] if layout == 'five' else ([end_pav_w, range_w, end_pav_w] if layout == 'ends' else [range_w, centre_w, range_w])" } },
+  { fit = "x", budget = "end_pav_w", end = "pav_end", bay = "bay", as = "end_rhythm", max_bays = 3 },
+  { fit = "x", budget = "centre_w", end = "pav_end", bay = "bay", as = "centre_rhythm", max_bays = 3 },
+  { fit = "x", budget = "range_w", end = "end", bay = "bay", as = "range_rhythm" },
+  { set = { floors = "= [['basement', basement_h], ['principal', principal_h[klass]]] + [['upper', principal_h[klass] * upper_ratio]] * upper_floors[klass]" } },
+  { let = { front = "fsum(column(floors, 1))" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Roofline", at = ["0.0", "front", "w", "mansard_h * pavilion_rise"], name = "roof", attrs = { range_h = "= mansard_h", pavilion_h = "= mansard_h * pavilion_rise", brisis = "= brisis_share", pitch_low = "= brisis_pitch", pitch_high = "= terrasson_pitch" } },
+  # The door is on the middle axis of the middle section, up a flight of
+  # steps as high as the basement.
+  { let = { mid = "len(kinds) // 2" } },
+  { let = { erh = "end_rhythm if kinds[mid] == 'end' else (centre_rhythm if kinds[mid] == 'centre' else range_rhythm)" } },
+  { let = { cs = "bay_centres(erh, starts(sizes, 0.0)[mid])" } },
+  { insert = "Flight", at = ["cs[len(cs) // 2] - flight_w / 2.0", "0.0", "flight_w", "basement_h"], name = "flight" },
+  # Portland and the Executive Office Building mark the entrance pavilion
+  # with a pediment standing up into its roof.
+  { insert = "Pediment", at = ["starts(sizes, 0.0)[mid]", "front", "sizes[mid]", "sizes[mid] * pediment_slope"], name = "pediment", when = "kinds[mid] != 'range' and klass != 'modest'" },
+]
+
+[[production]]
+id = "second_empire.facade"
+label = "Facade"
+doc = "The front, section by section."
+do = [ { split = "x", parts = [ { repeat = "range(len(kinds))", label = "Section", size = "sizes[item]", name = "sec{n}", attrs = { kind = "= kinds[item]", entry = "= item == len(kinds) // 2" } } ] } ]
+
+[[production]]
+id = "second_empire.section"
+label = "Section"
+doc = "A section is the same stack of storeys as every other: pavilions project in plan and rise in their roofs, not in their floors."
+do = [ { split = "y", parts = [ { repeat = "floors", label = "Storey", size = "item[1]", name = "s{i}", attrs = { floor = "= item[0]" } } ] } ]
+
+[[production]]
+id = "second_empire.storey"
+label = "Storey"
+doc = "A storey is cut by its section's rhythm. The basement is rusticated under a plinth band; every storey above carries an entablature on its columns -- a pair on each pier of a rich pavilion, one otherwise, and on a grand building pilasters along the ranges too -- and the top one the cornice."
+let = { rh = "end_rhythm if kind == 'end' else (centre_rhythm if kind == 'centre' else range_rhythm)", top = "index == count - 1", pav = "kind != 'range'" }
+do = [
+  { split = "x", by = "rh", label = "Cell" },
+  { insert = "Socle", at = ["x", "y", "w", "h - 0.3"], name = "socle", attrs = { rustication = "raised_bossage" }, when = "floor == 'basement'" },
+  { insert = "Entablature", at = ["x", "y + h - 0.3", "w", "0.3"], name = "plinth", attrs = { course_kind = "bandeau" }, when = "floor == 'basement'" },
+  { insert = "Entablature", at = ["x", "y + h - ent_h", "w", "ent_h"], name = "entablature", attrs = { course_kind = "entablature" }, when = "floor != 'basement' and not top" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "cornice_h"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "top" },
+  { let = { pair = "column_style == 'paired' and pav", shaft = "h - (0.0 if top else ent_h)" } },
+  { each = "frame_lines(rh, x, 2 * col_w + pair_gap if pair else col_w, True)", when = "floor != 'basement' and (pav or klass == 'grand')", do = [
+      { insert = "Column", at = ["item.x", "y", "min(col_w, item.w)", "shaft"], name = "col{i}a", attrs = { order = "= column_order" } },
+      { insert = "Column", at = ["item.x + item.w - col_w", "y", "col_w", "shaft"], name = "col{i}b", attrs = { order = "= column_order" }, when = "pair and item.w >= 2 * col_w" },
+  ] },
+  # Over the door, a balcony across the centre pavilion's first upper floor.
+  { insert = "Balconette", at = ["x + 0.4", "y", "w - 0.8", "1.0"], name = "balcony", when = "entry and pav and floor == 'upper' and index == 2 and klass in ('comfortable', 'grand')" },
+]
+
+[[production]]
+id = "second_empire.roofline"
+label = "Roofline"
+doc = "The mansard over every section: a dormer on each window axis below, a taller one on a pavilion, and a stack at each end of a range."
+do = [
+  { each = "range(len(kinds))", do = [
+      { let = { si = "i", sx = "starts(sizes, 0.0)[item]", sw = "sizes[item]", k = "kinds[item]" } },
+      { let = { srh = "end_rhythm if k == 'end' else (centre_rhythm if k == 'centre' else range_rhythm)", rh_h = "mansard_h if k == 'range' else mansard_h * pavilion_rise", dw = "dormer_w if k == 'range' else dormer_w * 1.15" } },
+      { each = "bay_centres(srh, sx)", do = [
+          { insert = "Dormer", at = ["item - dw / 2.0", "y + (0.45 if k == 'range' else pavilion_dormer_lift)", "dw", "min(dormer_max_h, rh_h * brisis_share - (0.9 if k == 'range' else pavilion_dormer_lift + 0.5))"], name = "dormer{si}_{i}" },
+      ] },
+      { insert = "Chimney", at = ["sx + 0.6", "y + rh_h", "0.9", "1.4"], name = "chimney{si}a", when = "k == 'range'" },
+      { insert = "Chimney", at = ["sx + sw - 1.5", "y + rh_h", "0.9", "1.4"], name = "chimney{si}b", when = "k == 'range'" },
+  ] },
+]
+
+[[production]]
+id = "second_empire.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "second_empire.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "second_empire.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[layer]]
+name = "class"
+order = 20
+
+[[rule]]
+id = "second_empire.roles.the_floor_and_its_order"
+label = "Storey"
+layer = "roles"
+doc = "Its floor names its role. The orders climb as in the books: Doric on the principal floor, Corinthian above; pilasters along a range."
+set = { role = "= floor", wall_material = "= stone", column_order = "= 'pilaster' if kind == 'range' else ('doric' if floor == 'principal' else 'corinthian')" }
+
+[[rule]]
+id = "second_empire.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "second_empire.base.basement_light"
+label = "Cell"
+doc = "The basement is lit by squat segmental windows cut in the rustication."
+when = "is_bay() and floor == 'basement'"
+set = { opening_type = "window", head = "segmental", light_width = "= min(1.1, w * 0.34)", sill = 0.7, light_height = "= h - 0.7 - 0.75", surround_kind = "none", keystone_present = true }
+
+[[rule]]
+id = "second_empire.base.principal_window"
+label = "Cell"
+doc = "The principal floor's windows are tall and arched, round-headed in the 1860s (Portland), segmental later; a keystone in the arch."
+when = "is_bay() and floor == 'principal'"
+set = { opening_type = "window", head = "= 'round' if year < 1872 else 'segmental'", light_width = "= min(1.6, w * 0.42)", sill = 0.55, light_height = "= h - 0.55 - ent_h - 0.6", surround_kind = "moulded_architrave", keystone_present = true }
+
+[[rule]]
+id = "second_empire.base.upper_window"
+label = "Cell"
+doc = "Upper windows are a little shorter: segmental heads to the mid-1870s, square heads under hoods after (the Executive Office Building's later wings)."
+when = "is_bay() and floor == 'upper'"
+let = { arched = "year < 1876" }
+set = { opening_type = "window", head = "= 'segmental' if arched else 'flat'", light_width = "= min(1.5, w * 0.4)", sill = 0.75, light_height = "= h - 0.75 - ent_h - 0.6", surround_kind = "moulded_architrave", keystone_present = "= arched" }
+
+[[rule]]
+id = "second_empire.class.hooded_pavilions"
+label = "Cell"
+layer = "class"
+doc = "On a comfortable or grand building the pavilions' upper windows carry pediments."
+when = "is_bay() and floor == 'upper' and kind != 'range' and klass in ('comfortable', 'grand')"
+set = { surround_kind = "pedimented" }
+
+[[rule]]
+id = "second_empire.base.the_door"
+label = "Cell"
+doc = "The door is the middle bay of the middle section, on the principal floor at the head of the steps, under an arch."
+when = "is_bay() and entry and floor == 'principal' and is_middle_bay()"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= min(2.2, w - 1.2)", sill = 0.0, light_height = "= h - ent_h - 0.5", surround_kind = "moulded_architrave", keystone_present = true }
+
+[[rule]]
+id = "second_empire.base.under_the_steps"
+label = "Cell"
+doc = "The basement bay under the flight is blind."
+when = "is_bay() and entry and floor == 'basement' and is_middle_bay()"
+specificity = 10
+set = { opening_type = "none" }

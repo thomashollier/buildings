@@ -5,12 +5,33 @@
 # sloping sky-exposure plane, stepping back as it climbed, until its floor
 # plate was a quarter of the lot, and then it could rise without limit.
 # The district multiplier and the plane are simplified to one district.
+#
+# This is the family's skyscraper programme. The file is composed with
+# vocabulary.toml (the window kinds, piers, crests every deco building
+# shares) and the other programmes (commercial, office, institutional, civic,
+# religious, works) by family.py; it holds the [style] of the whole family.
+#
+# Crowns (by seed, the architect): a spire, a ziggurat, a lantern; and from
+# photographs of the three most copied ones --
+#   chrysler  the Chrysler Building (1930): stepped arches of a sunburst in
+#             stainless steel, each pierced by triangular windows, under a
+#             needle as tall again (INFERRED: arches about one tower width
+#             high, the needle about as tall again);
+#   mast      the Empire State Building (1931): two more setbacks, then a
+#             mooring mast -- a fluted drum a third of the tower wide, a
+#             lantern and an antenna;
+#   clock     the Eastern Columbia (Los Angeles, 1930) and Carbide & Carbon
+#             (Chicago, 1929): a clock tower a little under half the tower
+#             wide, a clock face on each side, under a stepped gilt cap.
+#             It comes with its skin: continuous piers and dark spandrel
+#             plates, the piers in coloured terracotta (Eastern Columbia) or
+#             dark granite (Carbide & Carbon) by the architect's hand.
 
 [style]
 name = "deco"
-site = ["width", "street_width", "year", "klass", "seed"]
+site = ["programme", "width", "street_width", "year", "klass", "seed"]
 axiom = { w = "width", h = 260 }
-describe = { rule = "deco.tiers_for", phase = "regulation", detail = "f'setback tower on a {street_width:.0f} m street: street wall {district * street_width:.1f} m ({district_why}), {len(setbacks)} setback tier(s) on a 1:{plane:g} plane, tower {tower_w:.1f} m wide x {tower_by_class[klass]} floors'" }
+describe = { rule = "deco.tiers_for", phase = "regulation", detail = "f'Art Deco {programme}, {width:.1f} m, {year}, {klass}: {massing}' if programme != 'skyscraper' else f'setback tower on a {street_width:.0f} m street: street wall {district * street_width:.1f} m ({district_why}), {len(setbacks)} setback tier(s) on a 1:{plane:g} plane, tower {tower_w:.1f} m wide x {tower_by_class[klass]} floors'" }
 
 [lot_props]
 year = "= year"
@@ -37,33 +58,43 @@ rank = { modest = 0, ordinary = 1, comfortable = 2, grand = 3 }
 # The envelope is the law's; how a tower dresses it is the architect's. The
 # seed stands for the architect, so a street of towers built under the same
 # law does not look cloned.
-crowns = ["spire", "ziggurat", "lantern"]
+# The first three crowns are the original seed % 3 choice; the three after
+# them were appended and the modulus widened to 6, so seeds 0-2 keep their
+# crowns and 3, 4, 5 take the new ones.
+crowns = ["spire", "ziggurat", "lantern", "chrysler", "mast", "clock"]
 # Crown tiers per crown: [floors, width as a share of the tower].
-crown_tiers = { spire = [[2, 0.72], [2, 0.48]], ziggurat = [[2, 0.84], [2, 0.66], [2, 0.48], [1, 0.32]], lantern = [[4, 0.46]] }
-spire_h = { spire = 9.0, ziggurat = 0.0, lantern = 5.5 }
+crown_tiers = { spire = [[2, 0.72], [2, 0.48]], ziggurat = [[2, 0.84], [2, 0.66], [2, 0.48], [1, 0.32]], lantern = [[4, 0.46]], chrysler = [], mast = [[2, 0.76], [2, 0.56]], clock = [[3, 0.44]] }
+spire_h = { spire = 9.0, ziggurat = 0.0, lantern = 5.5, chrysler = 0.0, mast = 0.0, clock = 4.0 }
+# A crown's own height as a share of the tower's width (INFERRED, above).
+crown_share = { spire = 0.0, ziggurat = 0.0, lantern = 0.0, chrysler = 1.9, mast = 1.35, clock = 0.0 }
 skins = ["brick_buff", "stone", "brick_dark", "terracotta"]
-fenestrations = ["paired", "strip", "single"]
+# The clock tower's skin: Eastern Columbia's terracotta or Carbide's granite.
+clock_skins = ["terracotta", "shadow"]
+fenestrations = ["paired", "strip", "single", "spandrel"]
+pier_orders = { brick_buff = "pilaster", stone = "pilaster", brick_dark = "pilaster", terracotta = "pilaster", shadow = "timber" }
 
 [[production]]
 id = "deco.lot"
 label = "Lot"
+when = "programme == 'skyscraper'"
 doc = "The lot is cut into the tiers the zoning envelope leaves, a crown, and a spire."
 do = [
   # The seed stands for the architect: same law, same envelope, a different hand.
-  { set = { crown = "= crowns[seed % 3]", skin = "= skins[(seed * 3 + 1) % 4]", fenestration = "= fenestrations[(seed * 2 + seed // 3) % 3]" } },
+  { set = { crown = "= crowns[seed % 6]" } },
+  { set = { skin = "= clock_skins[(seed // 6) % 2] if crown == 'clock' else skins[(seed * 3 + 1) % 4]", fenestration = "= 'spandrel' if crown == 'clock' else fenestrations[(seed * 2 + seed // 3) % 3]" } },
   # The street wall: as many floors as the multiple of the street allows.
   { let = { base_floors = "max(2, 1 + int((district * street_width - ground) // storey))" } },
   # Each setback steps in by rise / plane on each side, until the next step
   # would take the mass under the quarter-lot.
   { set = { setbacks = "= stepping(width, 2.0 * (tier_floors * storey) / plane, tower_share * width)" } },
   { set = { tower_w = "= min(([width] + setbacks)[-1], tower_share * width)" } },
-  { let = { used = "base_floors * storey + (ground - storey) + tier_floors * storey * len(setbacks) + tower_by_class[klass] * storey + fsum(column(crown_tiers[crown], 0)) * storey + spire_h[crown]" } },
+  { let = { used = "base_floors * storey + (ground - storey) + tier_floors * storey * len(setbacks) + tower_by_class[klass] * storey + fsum(column(crown_tiers[crown], 0)) * storey + spire_h[crown] + crown_share[crown] * tower_w" } },
   { split = "y", parts = [
       { label = "Tier", size = "base_floors * storey + (ground - storey)", name = "tier{n}", attrs = { tier_role = "street_wall", floors = "= base_floors", mass_w = "= width" } },
       { repeat = "setbacks", label = "Tier", size = "tier_floors * storey", name = "tier{n}", attrs = { tier_role = "setback", floors = "= tier_floors", mass_w = "= item" } },
       { label = "Tier", size = "tower_by_class[klass] * storey", name = "tier{n}", attrs = { tier_role = "tower", floors = "= tower_by_class[klass]", mass_w = "= tower_w" } },
       { repeat = "crown_tiers[crown]", label = "Tier", size = "item[0] * storey", name = "tier{n}", attrs = { tier_role = "crown", floors = "= item[0]", mass_w = "= tower_w * item[1]" } },
-      { repeat = "[spire_h[crown]] if spire_h[crown] > 0 else []", label = "Crown", size = "item", name = "spire" },
+      { repeat = "[spire_h[crown] + crown_share[crown] * tower_w] if spire_h[crown] + crown_share[crown] * tower_w > 0 else []", label = "Crown", size = "item", name = "spire" },
       { label = "Sky", size = "h - used", name = "sky" },
   ] },
 ]
@@ -87,7 +118,7 @@ do = [
   ] },
   { let = { y0 = "y + (ground if first else 0.0)" } },
   { each = "frame_lines(rhythm, x, pier, False)", do = [
-      { insert = "Pier", at = ["item.x", "y0", "item.w", "y + h - y0"], name = "pier{i}", attrs = { order = "pilaster" } },
+      { insert = "Pier", at = ["item.x", "y0", "item.w", "y + h - y0"], name = "pier{i}", attrs = { order = "= pier_orders[skin]" } },
   ] },
 ]
 
@@ -97,27 +128,12 @@ label = "Storey"
 doc = "A floor is cut by its mass's rhythm; the top floor of each tier is capped with a coping where the next tier steps back."
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
+  # Under a clock crown each window stands on a dark spandrel plate.
+  { each = "bay_spans(rhythm, x)", when = "fenestration == 'spandrel' and role != 'base' and not (crown == 'clock' and tier_role == 'crown' and index >= floors - 2)", do = [
+      { insert = "Spandrel", at = ["item.x + pier / 2.0 + 0.12", "y + 0.06", "item.w - pier - 0.24", "1.0"], name = "spandrel{i}", attrs = { order = "timber" } },
+  ] },
   { insert = "Entablature", at = ["x", "y + h - 0.45", "w", "0.45"], name = "coping", attrs = { course_kind = "entablature" }, when = "index == count - 1" },
 ]
-
-[[production]]
-id = "deco.cell"
-label = "Cell"
-when = "opening_type != 'none'"
-do = [ { call = "kit.split_cell_around_its_light" } ]
-
-[[production]]
-id = "deco.light_bay"
-label = "LightBay"
-do = [
-  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
-  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
-]
-
-[[production]]
-id = "deco.light"
-label = "Light"
-do = [ { call = "kit.dress_the_light" } ]
 
 [[rule]]
 id = "deco.roles.the_tier_says_what_you_are"
@@ -130,40 +146,55 @@ set = { role = "= 'base' if street else tier_role", wall_material = "= 'stone' i
 [[rule]]
 id = "deco.base.end_piers_are_wall"
 label = "Cell"
-when = "not is_bay()"
+when = "in_parent('Storey') and not is_bay()"
 set = { opening_type = "none" }
 
 [[rule]]
 id = "deco.base.paired_windows_over_a_spandrel"
 label = "Cell"
 doc = "A bay holds a pair of windows over a dark spandrel, so the piers read as the only continuous lines."
-when = "is_bay() and fenestration == 'paired'"
+when = "in_parent('Storey') and is_bay() and fenestration == 'paired'"
 set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.2", sill = 0.95, light_height = "= h - 0.95 - 0.45", lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.18, surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "deco.base.vertical_strips"
 label = "Cell"
 doc = "A bay is one tall strip of three lights, sill to head with barely a spandrel, so the whole tower reads as vertical bands."
-when = "is_bay() and fenestration == 'strip'"
+when = "in_parent('Storey') and is_bay() and fenestration == 'strip'"
 set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.1", sill = 0.55, light_height = "= h - 0.55 - 0.25", lights = "= (1.0, 1.0, 1.0)", divider = "Mullion", divider_width = 0.08, surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "deco.base.punched_windows"
 label = "Cell"
 doc = "A bay holds one punched window in a wall of masonry: the massive, sculptural tower."
-when = "is_bay() and fenestration == 'single'"
+when = "in_parent('Storey') and is_bay() and fenestration == 'single'"
 set = { opening_type = "window", head = "flat", light_width = "= (w - pier) * 0.45", sill = 1.0, light_height = "= h - 1.0 - 0.6", lights = "= None", surround_kind = "moulded_architrave", keystone_present = false }
 
 [[rule]]
 id = "deco.base.the_lobby_door"
 label = "Cell"
-when = "is_bay() and role == 'base' and is_middle_bay()"
+when = "in_parent('Storey') and is_bay() and role == 'base' and is_middle_bay()"
 specificity = 20
 set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 2.2, sill = 0.0, light_height = "= h - 1.0", lights = "= None", surround_kind = "moulded_architrave" }
 
 [[rule]]
 id = "deco.base.shops_on_the_street"
 label = "Cell"
-when = "is_bay() and role == 'base' and not is_middle_bay()"
+when = "in_parent('Storey') and is_bay() and role == 'base' and not is_middle_bay()"
 specificity = 10
 set = { opening_type = "shop_bay", head = "flat", light_width = "= w - 0.5", sill = 0.45, light_height = "= h - 0.45 - 1.0", lights = "= None" }
+
+[[rule]]
+id = "deco.base.piers_and_dark_spandrels"
+label = "Cell"
+doc = "Eastern Columbia, Carbide & Carbon: a bay is a pair of windows between continuous piers, a dark spandrel plate under them on every floor."
+when = "in_parent('Storey') and is_bay() and fenestration == 'spandrel'"
+set = { opening_type = "window", head = "flat", light_width = "= w - pier - 0.24", sill = 1.1, light_height = "= h - 1.1 - 0.3", lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.1, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "deco.base.the_clock_stands_in_wall"
+label = "Cell"
+doc = "The clock tower's top two floors are wall: the faces are set in it."
+when = "in_parent('Storey') and is_bay() and crown == 'clock' and tier_role == 'crown' and index_of('Storey') >= floors - 2"
+specificity = 30
+set = { opening_type = "none" }

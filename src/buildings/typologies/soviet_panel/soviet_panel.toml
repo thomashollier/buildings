@@ -1,0 +1,206 @@
+# Soviet prefabricated panel housing, as rules.
+#
+# The building is assembled, not composed: a run of identical sections (a
+# staircase, a podyezd, with flats either side), each section a fixed row of
+# bays, and every bay of every floor one factory panel holding one room's
+# window. So the facade is a grid of panels with their joints showing; the
+# windows are of one size per series; balconies or loggias stack straight up
+# the bays the series puts them on; the staircase bay's windows sit half a
+# floor off the rooms', lighting the landings; each entrance has a concrete
+# canopy; the roof is flat, with a lift's machine room over each stair on the
+# taller series.
+#
+# The date picks the series (the type the house-building combine was casting
+# that year), the class the height a series came in, the number of sections
+# the length of the block, the seed the colour of the balcony fronts.
+#   K-7    (Moscow, 1958-63)  five storeys, no lift, no balconies, ribbed tiled panels
+#   1-464  (1958-70)          five storeys, no lift, balconies on two bays a section
+#   II-49  (1965-80s)         nine to twelve storeys, a lift, balconies in stacks
+#   P-44   (1979 on)          ten to seventeen storeys, a lift, recessed loggias
+# Numbers are INFERRED round figures: the 3.2 m room panel and 2.7 m floor of
+# the 1-464, the 2.8 m floor of the later series, from the series drawings
+# (Wikimedia Commons "Хрущёвка II-35.png", "Фасад серии 1-467.png") and
+# photographs ("Moscow Khersonskaya Street 38", "Varketili district Tbilisi -
+# Brezhnevka", "Soviet blocks, Liepaja").
+
+[style]
+name = "soviet_panel"
+site = ["sections", "year", "klass", "seed"]
+axiom = { w = "sections * fsum(column(series_specs[step(series_by_year, year)].bays, 'w'))", h = 60 }
+overhangs = ["Cornice"]
+describe = { rule = "soviet_panel.series_for", phase = "period", detail = "f'Soviet panel block, series {series}, {sections} section(s), {floors_n} storeys, {year}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "soviet_panel.panel"
+Parapet = "soviet_panel.parapet"
+
+[params]
+# The series a year's combine cast, read like a step table: to 1963 the K-7,
+# to 1970 the 1-464, to 1978 the II-49, then the P-44.
+series_by_year = [[1963, "K-7"], [1970, "1-464"], [1978, "II-49"], [3000, "P-44"]]
+first_year = 1957        # the 1957 housing decree; no panel series before it
+# Each series: storey height, storeys by class, whether it has a lift, the
+# panel's finish, the plinth, the window widths (one per room type), the
+# section's bays left to right along the entrance front and which is the stair.
+series_specs = { "K-7" = { floor_h = 2.64, floors = { modest = 5, ordinary = 5, comfortable = 5, grand = 5 }, lift = false, wall = "clapboard_cream", plinth = 0.9, room_win = 1.3, kitchen_win = 1.1, stair = 3, bays = [ { kind = "room", w = 3.0 }, { kind = "room", w = 3.0 }, { kind = "kitchen", w = 2.4 }, { kind = "stair", w = 2.4 }, { kind = "kitchen", w = 2.4 }, { kind = "room", w = 3.0 }, { kind = "room", w = 3.0 } ] }, "1-464" = { floor_h = 2.7, floors = { modest = 5, ordinary = 5, comfortable = 5, grand = 5 }, lift = false, wall = "stucco", plinth = 1.0, room_win = 1.5, kitchen_win = 1.2, stair = 3, bays = [ { kind = "room", w = 3.2 }, { kind = "balcony", w = 3.2 }, { kind = "kitchen", w = 2.6 }, { kind = "stair", w = 2.6 }, { kind = "kitchen", w = 2.6 }, { kind = "balcony", w = 3.2 }, { kind = "room", w = 3.2 } ] }, "II-49" = { floor_h = 2.8, floors = { modest = 9, ordinary = 9, comfortable = 12, grand = 12 }, lift = true, wall = "concrete_panel", plinth = 1.1, room_win = 1.5, kitchen_win = 1.2, stair = 3, bays = [ { kind = "balcony", w = 3.2 }, { kind = "room", w = 3.2 }, { kind = "kitchen", w = 3.2 }, { kind = "stair", w = 2.8 }, { kind = "kitchen", w = 3.2 }, { kind = "room", w = 3.2 }, { kind = "balcony", w = 3.2 } ] }, "P-44" = { floor_h = 2.8, floors = { modest = 10, ordinary = 14, comfortable = 17, grand = 17 }, lift = true, wall = "concrete_panel", plinth = 1.2, room_win = 1.5, kitchen_win = 1.2, stair = 3, bays = [ { kind = "room", w = 3.0 }, { kind = "loggia", w = 3.0 }, { kind = "kitchen", w = 2.7 }, { kind = "stair", w = 2.7 }, { kind = "kitchen", w = 2.7 }, { kind = "loggia", w = 3.0 }, { kind = "room", w = 3.0 } ] } }
+# ABSOLUTE: the factory's fixed parts.
+window_sill = 0.85
+window_h = 1.45
+door_w = 1.3              # a pair of entrance doors
+door_h = 2.2
+canopy_w = 2.1            # the concrete slab over the entrance
+stair_win_w = 1.0         # the staircase's narrow landing windows
+stair_win_h = 1.1
+balcony_light = 1.9       # a balcony door and the window beside it
+front_h = 1.0             # a balcony or loggia front, to the handrail
+roof_parapet = 0.5
+lift_room_h = 2.5
+plinth_paint = "shadow"   # the technical underfloor, rendered dark
+recess_paint = "shadow"   # the back of a loggia, in shade
+# The fronts of balconies and loggias: the one colour a series panel took, by seed.
+fronts = ["stucco", "clapboard_blue", "terracotta", "render_white"]
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "soviet_panel.lot"
+label = "Lot"
+doc = "The block: a dark plinth, the panelled front, a parapet round the flat roof and, on the series with a lift, a machine room over each stair."
+do = [
+  { refuse = "no panel series before the 1957 housing decree", when = "year < first_year" },
+  { set = { series = "= step(series_by_year, year)" } },
+  { set = { spec = "= series_specs[series]" } },
+  { set = { floors_n = "= spec.floors[klass]", plan = "= spec.bays * sections", front_paint = "= fronts[seed % len(fronts)]" } },
+  { let = { sec_w = "fsum(column(spec.bays, 'w'))", stair_x = "starts(column(spec.bays, 'w'), 0.0)[spec.stair]", stair_w = "spec.bays[spec.stair].w", top = "spec.plinth + floors_n * spec.floor_h" } },
+  { insert = "Storey", at = ["0.0", "0.0", "w", "spec.plinth"], name = "plinth", attrs = { role = "plinth" } },
+  { insert = "Facade", at = ["0.0", "spec.plinth", "w", "floors_n * spec.floor_h"], name = "facade" },
+  { insert = "Storey", at = ["0.0", "top", "w", "roof_parapet"], name = "parapet", attrs = { role = "parapet" } },
+  { each = "range(sections)", when = "spec.lift", do = [
+      { insert = "Storey", at = ["i * sec_w + stair_x - 0.6", "top + roof_parapet", "stair_w + 1.2", "lift_room_h"], name = "lift_room{i}", attrs = { role = "machine_room" } },
+  ] },
+]
+
+[[production]]
+id = "soviet_panel.facade"
+label = "Facade"
+doc = "The front is its sections' bays side by side, each a stack of panels."
+do = [ { split = "x", parts = [ { repeat = "plan", label = "Stack", size = "item.w", name = "bay{i}", attrs = { bay_kind = "= item.kind" } } ] } ]
+
+[[production]]
+id = "soviet_panel.stack"
+label = "Stack"
+when = "bay_kind != 'stair'"
+doc = "A bay is the same panel cast once per floor."
+do = [ { split = "y", parts = [ { repeat = "range(floors_n)", label = "Storey", size = "spec.floor_h", name = "f{i}", attrs = { floor = "= i" } } ] } ]
+
+[[production]]
+id = "soviet_panel.stair_stack"
+label = "Stack"
+when = "bay_kind == 'stair'"
+doc = "The staircase's panels are cast to its landings, half a floor out of step with the rooms': a floor and a half over the entrance, a whole floor per landing, a half panel under the roof."
+do = [ { split = "y", parts = [
+    { label = "Storey", size = "spec.floor_h * 1.5", name = "f0", attrs = { floor = 0 } },
+    { repeat = "range(floors_n - 2)", label = "Storey", size = "spec.floor_h", name = "f{n}", attrs = { floor = "= i + 1" } },
+    { label = "Storey", size = "spec.floor_h * 0.5", name = "cap", attrs = { floor = -1 } },
+] } ]
+
+[[production]]
+id = "soviet_panel.panel"
+label = "Storey"
+when = "has('bay_kind')"
+doc = "A panel holds one opening; a balcony or loggia bay has its front over the lower part of it above the ground floor, and the staircase's ground panel has the entrance under a canopy."
+do = [
+  { split = "x", parts = [ { label = "Cell", size = "w", name = "panel", slot = "bay" } ], when = "not (bay_kind == 'stair' and floor == 0)" },
+  # The entrance panel: the door, and over its canopy the first landing's window.
+  { split = "y", parts = [
+      { label = "Cell", size = "spec.floor_h", name = "door", slot = "bay", attrs = { part = "door" } },
+      { label = "Cell", size = "h - spec.floor_h", name = "landing", slot = "bay", attrs = { part = "landing" } },
+  ], when = "bay_kind == 'stair' and floor == 0" },
+  { insert = "Parapet", at = ["x + 0.12", "y", "w - 0.24", "front_h"], name = "front", attrs = { projects = "= bay_kind == 'balcony'", front_paint = "= front_paint" }, when = "bay_kind in ('balcony', 'loggia') and floor > 0" },
+  { insert = "Cornice", at = ["x + (w - canopy_w) / 2.0", "y + door_h + 0.15", "canopy_w", "0.25"], name = "canopy", attrs = { cornice_ornament = "plain" }, when = "bay_kind == 'stair' and floor == 0" },
+]
+
+[[production]]
+id = "soviet_panel.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "soviet_panel.light_bay"
+label = "LightBay"
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+]
+
+[[production]]
+id = "soviet_panel.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules ---------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "soviet_panel.roles.panel_and_finish"
+label = "Storey"
+layer = "roles"
+doc = "A panel is ground or upper by its floor; the plinth is rendered dark, the back of a loggia is in shade, every other panel shows the series' finish."
+let = { recess = "has('bay_kind') and bay_kind == 'loggia' and floor > 0" }
+set = { role = "= role if has('role') else ('ground' if floor == 0 else 'upper')", wall_material = "= plinth_paint if (has('role') and role == 'plinth') else (recess_paint if recess else spec.wall)" }
+
+[[rule]]
+id = "soviet_panel.base.the_room_window"
+label = "Cell"
+doc = "A room's panel has the series' room window, a pair of casements, at one sill and one height on every floor."
+when = "bay_kind in ('room', 'balcony', 'loggia')"
+set = { opening_type = "window", head = "flat", light_width = "= spec.room_win", sill = "= window_sill", light_height = "= window_h", lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.08, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "soviet_panel.base.the_kitchen_window"
+label = "Cell"
+doc = "A kitchen's panel has the narrower kitchen window, at the same sill and head."
+when = "bay_kind == 'kitchen'"
+set = { opening_type = "window", head = "flat", light_width = "= spec.kitchen_win", sill = "= window_sill", light_height = "= window_h", lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.08, surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "soviet_panel.base.the_balcony_door"
+label = "Cell"
+doc = "Above the ground floor a balcony or loggia panel has a door and a window side by side behind its front."
+when = "bay_kind in ('balcony', 'loggia') and floor > 0"
+specificity = 10
+set = { light_width = "= balcony_light", sill = 0.0, light_height = "= window_sill + window_h", lights = "= (0.75, 1.15)" }
+
+[[rule]]
+id = "soviet_panel.base.the_landing_window"
+label = "Cell"
+doc = "A staircase panel lights its landing: a narrow window in the middle of the panel, so half a floor out of step with the rooms'."
+when = "bay_kind == 'stair'"
+set = { opening_type = "window", head = "flat", light_width = "= stair_win_w", sill = "= (h - stair_win_h) / 2.0", light_height = "= stair_win_h", lights = "= None", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "soviet_panel.base.the_entrance"
+label = "Cell"
+doc = "At the foot of every staircase, the entrance."
+when = "bay_kind == 'stair' and has('part') and part == 'door'"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", light_width = "= door_w", sill = 0.0, light_height = "= door_h" }
+
+[[rule]]
+id = "soviet_panel.base.the_half_panel_under_the_roof"
+label = "Cell"
+doc = "The half panel that closes the staircase under the roof is blank."
+when = "bay_kind == 'stair' and floor < 0"
+specificity = 10
+set = { opening_type = "none" }

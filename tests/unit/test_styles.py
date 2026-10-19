@@ -111,4 +111,6 @@ def test_the_seed_dresses_the_same_frame_differently():
     }
     assert len(chicago) == 6 and len(deco) == 6
     assert {c[2] for c in chicago} == {"arcade", "attic_band", "oculi"}
-    assert {d[0] for d in deco} == {"spire", "ziggurat", "lantern"}
+    # The first three crowns keep their seeds; the three appended (Chrysler,
+    # Empire State mast, Eastern Columbia clock) take seeds 3, 4 and 5.
+    assert {d[0] for d in deco} == {"spire", "ziggurat", "lantern", "chrysler", "mast", "clock"}

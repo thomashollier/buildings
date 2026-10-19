@@ -1,0 +1,224 @@
+# The Baroque church front, as rules.
+#
+# Two orders. The lower spans nave and chapels; the upper, narrower, spans
+# the nave alone, and great volutes join it to the lower order's cornice,
+# hiding the chapel roofs; a pediment crowns it. Each order is cut into
+# planes, outer to centre, and the planes step forward toward the centre:
+# here a plane's depth is drawn as a lighter face, a deeper cornice, and a
+# column where the plane behind it has a pilaster.
+# The date makes the type:
+#   gesu     Vignola and della Porta's Il Gesu (1568-84): flat, one step at
+#            the centre, paired pilasters throughout, the portal under a
+#            segmental pediment nested in a triangular one;
+#   susanna  Maderno's Santa Susanna (1603): three steps forward to the
+#            centre, engaged columns on the front planes;
+#   late     after 1640 (Sant'Agnese in Agone, Santi Luca e Martina): the
+#            stepping carried further, columns on every plane that projects,
+#            pediments broken round a cartouche or segmental.
+# A late front may, by the architect's choice (the seed), trade its volutes
+# for twin bell towers over the outer bays (Sant'Agnese); a grand one shows
+# its dome over the front.
+# Numbers are INFERRED from photographs of Il Gesu (about 35 m across the
+# lower order and as tall to the apex), Santa Susanna and Sant'Agnese: the
+# lower order about half the width tall, the upper a third, a pediment
+# rising about 23 degrees; the upper order two thirds of the lower's width.
+
+[style]
+name = "baroque"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = "width * 3" }
+overhangs = ["Cornice"]
+describe = { rule = "baroque.church_front", phase = "structure", detail = "f'Baroque {kind} front, {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "baroque.storey"
+Cell = "baroque.cell"
+Crown = "baroque.crown"
+Dressing = "baroque.dressing"
+Volute = "baroque.volute"
+Dome = "baroque.dome"
+Cap = "baroque.cap"
+
+[params]
+types = [[1600, "gesu"], [1640, "susanna"], [99999, "late"]]
+# The planes of an order, outer to centre to outer, as shares of the width.
+plane_names = ["outer", "side", "inner", "centre", "inner", "side", "outer"]
+plane_shares = [0.17, 0.13, 0.08, 0.24, 0.08, 0.13, 0.17]
+# How far each plane stands forward, in steps.
+depths = { gesu = [0, 0, 1, 1, 1, 0, 0], susanna = [0, 1, 2, 3, 2, 1, 0], late = [0, 1, 2, 3, 2, 1, 0] }
+# From how many steps forward a support is a column rather than a pilaster.
+column_from = { gesu = 9, susanna = 2, late = 1 }
+# A face's paint by its depth: the nearer, the lighter it reads.
+faces = ["stone", "stucco", "plaster_white", "render_white"]
+lower_k = 0.52                # the lower order's height, of the width
+upper_k = 0.36
+pediment_slope = 0.42         # rise over half-width: about 23 degrees
+entablature_k = 0.1           # of an order's height
+cornice_k = 0.022             # a cornice's depth, of the width, per step it stands forward
+pilaster_k = 0.028
+column_k = 0.04
+crowns = { gesu = ["triangular", "triangular"], susanna = ["triangular", "triangular"], late = ["broken", "segmental"] }
+portal_dressing = { gesu = "nested", susanna = "triangular", late = "broken" }
+dome_k = 0.62                 # the dome's width, of the upper order's
+tower_k = 1.25                # a bell tower's belfry, of the upper order's height
+cap_k = 1.5                   # its cap, of the tower's width
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "baroque.lot"
+label = "Lot"
+doc = "The date makes the type; the two orders stand on the lot, the volutes or the bell towers beside the upper, the pediment over it and, on a grand late front, the dome behind."
+let = { lower = "w * lower_k", upper = "w * upper_k", ow = "w * plane_shares[0]" }
+do = [
+  { set = { kind = "= step(types, year)" } },
+  { set = { towers = "= kind == 'late' and seed % 2 == 0", has_dome = "= klass == 'grand' and kind != 'gesu'" } },
+  { let = { uw = "w - 2 * ow" } },
+  { let = { ped = "uw / 2.0 * pediment_slope", dw = "uw * dome_k" } },
+  { let = { foot = "ped * max(0.0, 1.0 - dw / uw)" } },
+  { insert = "Dome", at = ["(w - dw) / 2.0", "lower + upper", "dw", "foot + dw * 0.32 + dw * 0.5 + dw * 0.4"], name = "dome", attrs = { foot = "= foot", drum = "= foot + dw * 0.32", cupola = "= dw * 0.5" }, when = "has_dome" },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "lower + upper"], name = "facade", attrs = { lower_h = "= lower", upper_h = "= upper" } },
+  { insert = "Volute", at = ["ow * 0.06", "lower", "ow * 0.94", "upper * 0.62"], name = "volute_l", attrs = { side = "left" }, when = "not towers" },
+  { insert = "Volute", at = ["w - ow", "lower", "ow * 0.94", "upper * 0.62"], name = "volute_r", attrs = { side = "right" }, when = "not towers" },
+  { insert = "Crown", at = ["ow", "lower + upper", "uw", "ped"], name = "pediment", attrs = { form = "= crowns[kind][seed // 2 % 2]" } },
+  { insert = "Tower", at = ["0.0", "lower", "ow", "upper * tower_k + ow * cap_k"], name = "tower_l", when = "towers" },
+  { insert = "Tower", at = ["w - ow", "lower", "ow", "upper * tower_k + ow * cap_k"], name = "tower_r", when = "towers" },
+]
+
+[[production]]
+id = "baroque.facade"
+label = "Facade"
+doc = "The lower order and the upper."
+do = [ { split = "y", id_base = "parent", parts = [
+    { label = "Order", size = "lower_h", name = "lower", attrs = { level = "lower" } },
+    { label = "Order", size = "upper_h", name = "upper", attrs = { level = "upper" } },
+] } ]
+
+[[production]]
+id = "baroque.order"
+label = "Order"
+doc = "An order is cut into its planes, outer to centre to outer; the upper order leaves the outer bays to the volutes."
+do = [
+  { split = "x", when = "level == 'lower'", parts = [
+      { repeat = "range(7)", label = "Storey", size = "width * plane_shares[i]", name = "{n}", attrs = { plane = "= plane_names[i]", depth = "= depths[kind][i]" } },
+  ] },
+  { split = "x", when = "level == 'upper'", parts = [
+      { label = "Void", size = "width * plane_shares[0]", name = "0" },
+      { repeat = "range(1, 6)", label = "Storey", size = "width * plane_shares[item]", name = "{n}", attrs = { plane = "= plane_names[item]", depth = "= depths[kind][item]" } },
+      { label = "Void", size = "width * plane_shares[6]", name = "6" },
+  ] },
+]
+
+[[production]]
+id = "baroque.tower"
+label = "Tower"
+doc = "A bell tower over an outer bay: its belfry and its cap."
+do = [ { split = "y", parts = [
+    { label = "Storey", size = "h - w * cap_k", name = "belfry", attrs = { plane = "belfry", depth = 0, level = "belfry" } },
+    { label = "Cap", size = "w * cap_k", name = "cap" },
+] } ]
+
+[[production]]
+id = "baroque.plane"
+label = "Storey"
+doc = "A plane stands a support at either edge -- a column if it stands far enough forward, else a pilaster -- carries its entablature and its cornice, deeper the further forward it stands, and holds the opening between."
+let = { sup = "width * (column_k if depth >= column_from[kind] else pilaster_k)", ent = "h * entablature_k" }
+do = [
+  { split = "x", when = "plane == 'inner'", parts = [ { label = "Cell", size = "w", name = "x0", slot = "end" } ] },
+  { split = "x", when = "plane != 'inner'", parts = [
+      { label = "Cell", size = "sup", name = "x0", slot = "end" },
+      { label = "Cell", size = "w - 2 * sup", name = "x1", slot = "bay" },
+      { label = "Cell", size = "sup", name = "x2", slot = "end" },
+  ] },
+  { insert = "Column", at = ["x", "y + h * 0.05", "sup", "h * 0.95 - ent"], name = "support_l", attrs = { order = "corinthian" } },
+  { insert = "Column", at = ["x + w - sup", "y + h * 0.05", "sup", "h * 0.95 - ent"], name = "support_r", attrs = { order = "corinthian" } },
+  { insert = "Entablature", at = ["x", "y + h - ent", "w", "ent"], name = "entablature", attrs = { course_kind = "entablature" } },
+  { insert = "Cornice", at = ["x", "y + h", "w", "width * cornice_k * (1 + depth)"], name = "cornice", attrs = { cornice_ornament = "modillioned" } },
+]
+
+[[production]]
+id = "baroque.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+doc = "A bay is cut around its opening, and the opening dressed: a niche's round head, or a pediment over a door or window."
+do = [
+  { call = "kit.split_cell_around_its_light" },
+  { let = { lb = "child('LightBay')" } },
+  { insert = "Dressing", at = ["lb.x", "y + sill + light_height", "lb.w", "lb.w / 2.0"], name = "niche_head", attrs = { form = "niche" }, when = "dressing == 'niche'" },
+  { insert = "Dressing", at = ["lb.x - 0.25", "y + sill + light_height + 0.15", "lb.w + 0.5", "min(lb.w * 0.32 + 0.3, h * (1 - entablature_k) - sill - light_height - 0.3)"], name = "pediment", attrs = { form = "= dressing" }, when = "dressing not in ('none', 'niche')" },
+]
+
+[[production]]
+id = "baroque.light_bay"
+label = "LightBay"
+do = [ { call = "kit.split_light_bay" } ]
+
+[[production]]
+id = "baroque.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "baroque.roles.plane"
+label = "Storey"
+layer = "roles"
+doc = "A plane's face is painted by how far forward it stands."
+set = { role = "= plane", wall_material = "= faces[min(depth, 3)]" }
+
+[[rule]]
+id = "baroque.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "baroque.base.a_niche"
+label = "Cell"
+doc = "The outer and side bays hold niches for statues, round-headed."
+when = "is_bay()"
+set = { opening_type = "blind_panel", head = "flat", light_width = "= min(w - 0.6, width * 0.05)", sill = "= h * 0.3", light_height = "= h * 0.32", surround_kind = "none", keystone_present = false, dressing = "niche" }
+
+[[rule]]
+id = "baroque.base.a_side_door"
+label = "Cell"
+doc = "A richer church opens side doors into its aisles, under segmental pediments."
+when = "is_bay() and level == 'lower' and plane == 'side' and klass in ('comfortable', 'grand')"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= min(w - 0.6, width * 0.06)", sill = 0.0, light_height = "= h * 0.36", surround_kind = "moulded_architrave", keystone_present = false, dressing = "segmental" }
+
+[[rule]]
+id = "baroque.base.the_portal"
+label = "Cell"
+doc = "The great portal in the centre, its pediment the type's: nested at the Gesu, triangular at Santa Susanna, broken later."
+when = "is_bay() and level == 'lower' and plane == 'centre'"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= min(w - 0.6, width * 0.1)", sill = 0.0, light_height = "= h * 0.5", surround_kind = "moulded_architrave", keystone_present = false, dressing = "= portal_dressing[kind]" }
+
+[[rule]]
+id = "baroque.base.the_great_window"
+label = "Cell"
+doc = "Over the portal the nave's great window, under a pediment."
+when = "is_bay() and level == 'upper' and plane == 'centre'"
+specificity = 10
+set = { opening_type = "window", head = "= 'round' if kind == 'late' else 'flat'", light_width = "= min(w - 0.6, width * 0.085)", sill = "= h * 0.18", light_height = "= h * 0.44", surround_kind = "moulded_architrave", keystone_present = "= kind == 'late'", dressing = "= 'segmental' if kind == 'gesu' else 'triangular'" }
+
+[[rule]]
+id = "baroque.base.the_belfry"
+label = "Cell"
+doc = "A bell tower's belfry: one tall round-arched opening."
+when = "is_bay() and level == 'belfry'"
+specificity = 10
+set = { opening_type = "window", head = "round", light_width = "= w * 0.7", sill = "= h * 0.2", light_height = "= h * 0.55", surround_kind = "moulded_architrave", keystone_present = true, dressing = "none" }

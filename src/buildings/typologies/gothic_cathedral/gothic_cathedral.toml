@@ -1,0 +1,264 @@
+# The Gothic cathedral west front, as rules.
+#
+# A screen in three registers over three portals, divided into three by four
+# buttresses that run up into the towers: the portals, the central one the
+# widest, each a pointed doorway inside rings of archivolts stepping in to a
+# carved tympanum; the gallery of kings in their niches; the rose over the
+# central portal between pairs of lancets under the towers; an open gallery
+# across the whole front; then the two towers, and between them the gable of
+# the nave roof.
+# Numbers are INFERRED from photographs of Notre-Dame de Paris (front 41 m
+# wide: portals to 17 m, kings 3.5 m, rose stage 14 m with a rose 9.6 m
+# across, gallery 8 m, towers 69 m), Amiens and Reims (taller portals,
+# deeper, under gablets; pinnacled towers), Chartres and Cologne (spires about
+# three times as tall as their tower is wide) and Strasbourg (one spire).
+# The date chooses how deep the portals are and whether gablets crown them;
+# the chapter's means (class) how many rings and how tall the towers; the
+# master mason (seed) how the towers end.
+
+[style]
+name = "gothic_cathedral"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = "width * 4.5" }
+overhangs = ["Cornice"]
+describe = { rule = "gothic_cathedral.west_front", phase = "structure", detail = "f'Gothic west front, {width:.1f} m, begun {year}, towers {tops[0]}/{tops[1]}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "gothic.storey"
+Wall = "gothic.storey"
+Cell = "gothic.cell"
+Portal = "gothic.portal"
+Rose = "gothic.rose"
+Arch = "gothic.arch"
+Top = "gothic.tower_top"
+NaveGable = "gothic.nave_gable"
+Buttress = "kit.column"
+
+[params]
+tower_share = 0.32            # each tower's part of the front (Notre-Dame 13 of 41 m)
+# Registers as shares of the front's width, bottom-up (Notre-Dame).
+portal_k = 0.42               # to 1220; after it the portals rise under gablets
+portal_k_late = 0.5           # Amiens, Reims
+gablets_from = 1220
+kings_k = 0.085
+rose_k = 0.34
+gallery_k = 0.2
+tower_k = { modest = 0.42, ordinary = 0.52, comfortable = 0.58, grand = 0.63 }
+buttress_k = 0.035
+# The portals: how wide in their part of the front, how many rings.
+central_portal = 0.8          # of the centre
+side_portal = 0.66            # of a tower's part
+rings_by_class = { modest = 2, ordinary = 3, comfortable = 4, grand = 5 }
+late_rings = 2                # a High Gothic portal is two orders deeper
+door_share = 0.42             # of the portal's span, the door left inside the rings
+arch_rise = 0.78              # rise over span: a little under the equilateral arch
+# The rose: as wide as three quarters of the centre; its spokes by date.
+rose_share = 0.74
+spokes_by_date = [[1200, 12], [1240, 16], [9999, 24]]
+kings_bay = [1.2, 1.45, 1.8]
+kings_end = [0.3, 0.6, 1.2]
+lancet_share = 0.46           # a lancet pair's width, of a tower's part
+gallery_light = 1.4
+nave_pitch = 1.1              # the nave gable's rise over its half-width (about 48 degrees)
+parapet = 2.2
+# How a tower ends, left and right: the master mason's choice, by the seed.
+# Before the gablets a tower was flat-topped (Notre-Dame) or spired (Chartres).
+tops_early = [["flat", "flat"], ["flat", "flat"], ["spire", "spire"], ["flat", "flat"]]
+tops_late = [["pinnacles", "pinnacles"], ["spire", "spire"], ["spire", "flat"], ["flat", "flat"]]
+spire_k = 2.8                 # spire height over tower width (Chartres, Cologne)
+pinnacle_k = 0.9
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "gothic_cathedral.lot"
+label = "Lot"
+doc = "The front is cut into three by its towers' parts; the registers rise over the whole; the towers and the nave gable stand on them, and four buttresses run up the front into the towers."
+let = { tw = "w * tower_share", late = "year >= gablets_from" }
+do = [
+  { set = { tops = "= (tops_late if late else tops_early)[seed % 4]", tower_w = "= tw", centre_w = "= w - 2 * tw", registers = "= [w * (portal_k_late if late else portal_k), w * kings_k, w * rose_k, w * gallery_k]" } },
+  { let = { front = "fsum(registers)", th = "w * tower_k[klass]", bw = "w * buttress_k" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Tower", at = ["0.0", "front", "tw", "th + parapet + tw * spire_k"], name = "tower_l", attrs = { top = "= tops[0]", belfry_h = "= th" } },
+  { insert = "Tower", at = ["w - tw", "front", "tw", "th + parapet + tw * spire_k"], name = "tower_r", attrs = { top = "= tops[1]", belfry_h = "= th" } },
+  { insert = "NaveGable", at = ["tw", "front", "w - 2 * tw", "(w - 2 * tw) / 2.0 * nave_pitch"], name = "nave_gable" },
+  { each = "[0.0, tw - bw / 2.0, w - tw - bw / 2.0, w - bw]", do = [
+      { insert = "Buttress", at = ["item", "0.0", "bw", "front + th * 0.92"], name = "buttress{i}", attrs = { order = "pilaster" } },
+  ] },
+]
+
+[[production]]
+id = "gothic_cathedral.facade"
+label = "Facade"
+doc = "Portals, kings, rose, gallery."
+do = [ { split = "y", id_base = "parent", parts = [
+    { label = "Register", size = "registers[0]", name = "portals" },
+    { label = "Storey", size = "registers[1]", name = "kings", attrs = { register = "kings" } },
+    { label = "Storey", size = "registers[2]", name = "rose", attrs = { register = "rose" } },
+    { label = "Storey", size = "registers[3]", name = "gallery", attrs = { register = "gallery" } },
+] } ]
+
+[[production]]
+id = "gothic_cathedral.portals"
+label = "Register"
+doc = "The portal register is wall and three portals, each centred in its part of the front, the central one widest."
+let = { ps = "tower_w * side_portal", pc = "centre_w * central_portal" }
+do = [ { split = "x", parts = [
+    { label = "Wall", size = "(tower_w - ps) / 2.0", name = "wall0" },
+    { label = "Portal", size = "ps", name = "portal_l", attrs = { central = false } },
+    { label = "Wall", size = "(tower_w - ps) / 2.0 + (centre_w - pc) / 2.0", name = "wall1" },
+    { label = "Portal", size = "pc", name = "portal_c", attrs = { central = true } },
+    { label = "Wall", size = "(tower_w - ps) / 2.0 + (centre_w - pc) / 2.0", name = "wall2" },
+    { label = "Portal", size = "ps", name = "portal_r", attrs = { central = false } },
+    { label = "Wall", size = "(tower_w - ps) / 2.0", name = "wall3" },
+] } ]
+
+[[production]]
+id = "gothic_cathedral.portal"
+label = "Portal"
+doc = "Inside its rings a portal is a door up to the springing, divided by a trumeau, under the tympanum."
+let = { inner = "w - 2 * margin - 2 * rings * ring_w" }
+do = [ { insert = "Storey", at = ["x + margin + rings * ring_w", "y", "inner", "spring"], name = "door", attrs = { register = "door" } } ]
+
+[[production]]
+id = "gothic_cathedral.storey"
+label = "Storey"
+doc = "The kings stand in a row of niches fitted to the front; the rose stage is a tower part, the centre and a tower part; the gallery the same three, open; a door is one opening split by its trumeau; a belfry one pair of tall lancets."
+do = [
+  { fit = "x", end = "kings_end", bay = "kings_bay", as = "niches", max_bays = 80, when = "register == 'kings'" },
+  { split = "x", by = "niches", when = "register == 'kings'" },
+  { each = "column_lines(niches, x, 0.2)", when = "register == 'kings'", do = [
+      { insert = "Column", at = ["item.x", "y + 0.35", "item.w", "h - 0.9"], name = "colonnette{i}", attrs = { order = "corinthian" } },
+  ] },
+  { insert = "Entablature", at = ["x", "y + h - 0.55", "w", "0.55"], name = "string", attrs = { course_kind = "entablature" }, when = "register in ('kings', 'gallery', 'belfry')" },
+  { split = "x", when = "register in ('rose', 'gallery')", parts = [
+      { label = "Cell", size = "tower_w", name = "x0", slot = "bay", attrs = { part = "tower" } },
+      { label = "Cell", size = "centre_w", name = "x1", slot = "bay", attrs = { part = "centre" } },
+      { label = "Cell", size = "tower_w", name = "x2", slot = "bay", attrs = { part = "tower" } },
+  ] },
+  { split = "x", when = "register == 'door'", parts = [ { label = "Cell", size = "w", name = "x0", slot = "bay" } ] },
+  { split = "x", when = "register == 'belfry'", parts = [
+      { label = "Cell", size = "w * 0.2", name = "x0", slot = "end" },
+      { label = "Cell", size = "w * 0.6", name = "x1", slot = "bay" },
+      { label = "Cell", size = "w * 0.2", name = "x2", slot = "end" },
+  ] },
+]
+
+[[production]]
+id = "gothic_cathedral.tower"
+label = "Tower"
+doc = "A tower is its belfry stage and what crowns it, and the sky over a top that is not a spire."
+let = { top_h = "parapet + (w * spire_k if top == 'spire' else w * pinnacle_k if top == 'pinnacles' else 0.0)" }
+do = [ { split = "y", parts = [
+    { label = "Storey", size = "belfry_h", name = "belfry", attrs = { register = "belfry" } },
+    { label = "Top", size = "top_h", name = "top", attrs = { parapet_h = "= parapet", pinnacle_h = "= w * pinnacle_k" } },
+    { label = "Sky", size = "h - belfry_h - top_h", name = "sky" },
+] } ]
+
+[[production]]
+id = "gothic_cathedral.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+doc = "A bay is cut around its light; a rose carries its tracery, a pair of lancets its relieving arch."
+do = [
+  { call = "kit.split_cell_around_its_light" },
+  { let = { lb = "child('LightBay')" } },
+  { insert = "Rose", at = ["lb.x", "y + sill", "lb.w", "light_height"], name = "tracery", attrs = { spokes = "= step(spokes_by_date, year)" }, when = "opening_type == 'oeil_de_boeuf'" },
+]
+
+[[production]]
+id = "gothic_cathedral.light_bay"
+label = "LightBay"
+doc = "Lancets side by side on colonnettes, under one pointed arch."
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+  { insert = "Arch", at = ["x", "y + sill + light_height - w * 0.3", "w", "min(w * 0.75, h - sill - light_height + w * 0.3)"], name = "arch", when = "has('relieving') and relieving" },
+]
+
+[[production]]
+id = "gothic_cathedral.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "gothic_cathedral.roles.register"
+label = "Storey"
+layer = "roles"
+doc = "A storey is its register, in the cathedral's stone; a door stands in the shadow of its portal."
+set = { role = "= register", wall_material = "= 'shadow' if register == 'door' else 'stone'" }
+
+[[rule]]
+id = "gothic_cathedral.roles.wall"
+label = "Wall"
+layer = "roles"
+set = { role = "portal_wall", wall_material = "stone" }
+
+[[rule]]
+id = "gothic_cathedral.base.the_portal"
+label = "Portal"
+doc = "A portal's rings: more for a richer chapter and two more after 1220, when it also rises taller under a gablet. Its arch is about equilateral; the door is what the rings leave."
+let = { span = "w * 0.92", n = "rings_by_class[klass] + (late_rings if year >= gablets_from else 0)" }
+set = { margin = "= w * 0.04", rings = "= n", ring_w = "= span * (1.0 - door_share) / 2.0 / n", rise = "= span * arch_rise * (1.0 if central else 0.95)", spring = "= min(h * 0.5, h - span * arch_rise - (0.06 * h if year < gablets_from else 0.0)) * (1.0 if central else 0.92)", gablet = "= year >= gablets_from" }
+
+[[rule]]
+id = "gothic_cathedral.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "gothic_cathedral.base.a_king_in_his_niche"
+label = "Cell"
+doc = "Each niche of the gallery of kings holds a statue, drawn as the panel it stands on."
+when = "is_bay() and register == 'kings'"
+set = { opening_type = "blind_panel", head = "flat", light_width = "= w - 0.35", sill = 0.35, light_height = "= h - 0.95", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "gothic_cathedral.base.the_door"
+label = "Cell"
+doc = "The door: two leaves either side of the trumeau, which carries a statue."
+when = "is_bay() and register == 'door'"
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = "= w", sill = 0.0, light_height = "= h - 0.3", lights = "= (1.0, 1.0)", divider = "Column", divider_width = "= min(0.9, w * 0.12)", order = "doric", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "gothic_cathedral.base.the_rose"
+label = "Cell"
+doc = "Over the central portal, the rose: three quarters of the centre across, its spokes more numerous as the date advances."
+when = "is_bay() and register == 'rose' and part == 'centre'"
+let = { dia = "min(w * rose_share, h * 0.9)" }
+set = { opening_type = "oeil_de_boeuf", head = "flat", light_width = "= dia", sill = "= (h - dia) / 2.0", light_height = "= dia", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "gothic_cathedral.base.lancets_under_a_tower"
+label = "Cell"
+doc = "Under each tower, at the rose's level, a pair of lancets beneath a relieving arch."
+when = "is_bay() and register == 'rose' and part == 'tower'"
+set = { opening_type = "window", head = "ogee", light_width = "= w * lancet_share", sill = "= h * 0.2", light_height = "= h * 0.5", lights = "= (1.0, 1.0)", divider = "Column", divider_width = 0.35, order = "corinthian", surround_kind = "none", keystone_present = false, relieving = true }
+
+[[rule]]
+id = "gothic_cathedral.base.the_open_gallery"
+label = "Cell"
+doc = "The gallery runs open across the front: tall lancets on slender colonnettes, as many as fit."
+when = "is_bay() and register == 'gallery'"
+set = { opening_type = "window", head = "ogee", light_width = "= w - 1.2", sill = 0.9, light_height = "= h - 2.2", lights = "= (1.0,) * max(2, round((w - 1.2) / gallery_light))", divider = "Column", divider_width = 0.25, order = "corinthian", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "gothic_cathedral.base.the_belfry"
+label = "Cell"
+doc = "Each face of a belfry: two very tall louvred lancets."
+when = "is_bay() and register == 'belfry'"
+set = { opening_type = "window", head = "ogee", light_width = "= w * 0.8", sill = "= h * 0.12", light_height = "= h * 0.72", lights = "= (1.0, 1.0)", divider = "Column", divider_width = "= w * 0.12", order = "corinthian", surround_kind = "none", keystone_present = false }

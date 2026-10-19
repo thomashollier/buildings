@@ -1,0 +1,107 @@
+# The Miami Beach Art Deco hotel, as rules on the deco vocabulary.
+#
+# Ocean Drive and Collins Avenue, 1930-1942: Henry Hohauser's Colony (1935)
+# and Cardozo (1939), L. Murray Dixon's Tides (1936) and Victor (1937),
+# Kiehnel & Elliott's Carlyle (1941). From photographs of those:
+# * three or four storeys: a lobby and porch floor, two or three floors of
+#   rooms (about 3 m each), a low parapet;
+# * a symmetrical front in three parts, side | centre | side, the centre
+#   raised above the parapet in a fin (the Colony, the Victor) carrying the
+#   hotel's name, or (before about 1936) a stepped parapet with vertical fins;
+# * thin concrete "eyebrows" over every window, a hand deep, a little wider
+#   than the window, the sun's shade;
+# * racing stripes: three thin bands across the head zone of each floor
+#   (streamline), portholes in the centre, glass-block panels flanking the
+#   lobby door, a keystone (coral rock) base on the earlier ones and a
+#   terrazzo porch;
+# * on a corner lot the corner is rounded: the parapet turns down in a
+#   quarter circle and the windows run to the edge (the Carlyle, the Tides);
+# * white or a pale stucco, the stripes and fin in an accent: the pastel
+#   palette is the seed's (the 1980s repainting by Leonard Horowitz made it
+#   famous; the 1930s were mostly white with coloured trim).
+# Numbers are INFERRED round figures from those photographs.
+
+[style]
+name = "miami_deco"
+site = ["width", "year", "klass", "seed", "corner"]
+axiom = { w = "width", h = 60 }
+overhangs = []
+describe = { rule = "miami_deco.hotel", phase = "structure", detail = "f'Miami Beach hotel, {width:.1f} m on Ocean Drive, {year}, {klass}: {massing}'" }
+
+[lot_props]
+year = "= year"
+
+[params]
+miami_zigzag_until = 1935       # Tropical Deco's vertical fins and stepped parapets give way to the streamline
+miami_floors = { modest = 2, ordinary = 2, comfortable = 3, grand = 3 }
+miami_walls = ["render_white", "stucco", "render_white", "stucco_rose", "render_white", "plaster_ochre"]
+miami_accents = ["clapboard_blue", "clapboard_sage", "stucco_rose", "plaster_ochre", "clapboard_rose"]
+corner_w = 3.4                  # the rounded corner, about one bay of the curve seen flat
+fin_h = 5.0                     # the Colony's fin above the parapet, about a storey and a half
+porthole_d = 0.9
+
+[[rule]]
+id = "miami_deco.three_parts"
+label = "Lot"
+layer = "programme"
+doc = "Side | centre | side, the centre about a third; a corner lot adds its rounded corner at the end."
+let = { c = "corner_w / width if corner else 0.0" }
+set = { composition = "= [['side', (1.0 - 0.3 - c) / 2.0], ['centre', 0.3], ['side', (1.0 - 0.3 - c) / 2.0]] + ([['corner', c]] if corner else [])", massing = "= ('streamline' if year > miami_zigzag_until else 'tropical deco') + (', rounded corner' if corner else '')" }
+
+[[rule]]
+id = "miami_deco.a_hotel_block"
+label = "Block"
+layer = "programme"
+doc = "Rooms over a lobby floor: pairs of casements under eyebrows, the porch on a terrazzo step; stripes after the zigzag years."
+let = { zig = "year <= miami_zigzag_until" }
+set = { floors = "= miami_floors[klass]", ground_h = 3.9, floor_h = 3.0, parapet_h = 1.1, block_bay = [2.2, 2.7, 3.3], block_end = [0.4, 0.6, 1.2], glazing_ground = "paired", glazing_upper = "paired", door = "none", eyebrows = true, stripes = "= 0 if zig else 3", crest = "flat", plinth = 0.45, portholes = "= not zig" }
+
+[[rule]]
+id = "miami_deco.the_centre"
+label = "Block"
+layer = "programme"
+specificity = 10
+when = "part == 'centre'"
+doc = "The centre: three bays, the lobby door between glass-block panels, the fin with the hotel's name (streamline) or a stepped parapet behind vertical fins (Tropical Deco)."
+let = { zig = "year <= miami_zigzag_until" }
+set = { block_end = [0.3, 0.4, 0.6], block_bay = "= [(w - 0.8) / 3.0 - 0.05, (w - 0.8) / 3.0, (w - 0.8) / 3.0 + 0.05]", glazing_ground = "glass_block", door = "centre", crest = "= 'stepped' if zig else 'fin'", crest_h = "= fin_h * 0.6 if zig else fin_h", crest_steps = 3, crest_reach = "= 0.45 if zig else 0.22", piers = "= zig", pier_w = 0.28, pier_rise = 1.4, stoop = 0.45 }
+
+[[rule]]
+id = "miami_deco.the_rounded_corner"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "The corner: one bay of ribbon windows running to the edge, the parapet turning down round it."
+when = "part == 'corner'"
+set = { block_end = [0.1, 0.15, 0.3], block_bay = "= [w - 0.6, w - 0.3, w - 0.2]", glazing_ground = "ribbon", glazing_upper = "ribbon", parapet_h = 0.3, crest = "rounded", crest_h = 0.8 }
+
+[[rule]]
+id = "miami_deco.the_palette"
+label = "Block"
+layer = "hand"
+doc = "The wall, the accent and the porch by the seed; a keystone base in the zigzag years."
+let = { wall_paint = "miami_walls[seed % 6]" }
+set = { wall = "= wall_paint", base_wall = "= 'brick_buff' if year <= miami_zigzag_until else wall_paint", accent = "= miami_accents[(seed + seed // 6) % 5] if miami_accents[(seed + seed // 6) % 5] != wall_paint else 'clapboard_blue'", plinth_paint = "= 'stucco_rose' if wall_paint != 'stucco_rose' else 'cast_iron'" }
+
+[[rule]]
+id = "miami_deco.porthole_bays_are_wall"
+label = "Cell"
+layer = "programme"
+doc = "Where the centre takes portholes, its middle bay is wall on the room floors."
+when = "in_parent('Floor') and is_bay() and part == 'centre' and portholes and role == 'upper' and is_middle_bay()"
+specificity = 5
+set = { opening_type = "none" }
+
+[[production]]
+id = "miami_deco.dress_the_centre"
+label = "Dress"
+doc = "The centre's name: a vertical panel up the fin and a band across the parapet; a porthole on each floor of its middle bay."
+when = "part == 'centre'"
+let = { top = "y + ground_h + floors * floor_h + parapet_h" }
+do = [
+  { insert = "Panel", at = ["x + w / 2.0 - w * 0.06", "top - parapet_h + 0.15", "w * 0.12", "parapet_h + crest_h * 0.72 - 0.15"], name = "name_fin", attrs = { paint = "= accent" }, when = "crest == 'fin'" },
+  { insert = "Panel", at = ["x + w * 0.2", "top - parapet_h + 0.25", "w * 0.6", "parapet_h - 0.45"], name = "name_band", attrs = { paint = "= accent" }, when = "crest != 'fin'" },
+  { each = "range(floors)", when = "portholes", do = [
+      { insert = "Porthole", at = ["x + w / 2.0 - porthole_d / 2.0", "y + ground_h + i * floor_h + (floor_h - porthole_d) / 2.0", "porthole_d", "porthole_d"], name = "porthole{i}", attrs = { dormer_form = "oeil_de_boeuf" } },
+  ] },
+]

@@ -1,0 +1,294 @@
+# The English Tudor and Elizabethan house, as rules.
+#
+# A box frame of oak whose members show on the face of the wall, its panels
+# limewashed white: the "black and white" of Cheshire, Shropshire and the
+# Welsh Marches. The frame is laid over the window grammar as in Normandy
+# (normandy.toml), but English in every part:
+#  * close studding (studs a stud's width or two apart, Chester and
+#    Shrewsbury town fronts) or square panels with a lozenge or a pair of
+#    braces in them (Little Moreton Hall, the Cotswold and Warwickshire
+#    cottages);
+#  * every opening a wide mullioned window, transomed when tall, glazed in
+#    diamond leaded panes; an oriel on a town house's first floor;
+#  * steep gables (about 58 degrees) with dark bargeboards, a king post and
+#    chevrons in the gable; a town house turns one or two gables to the
+#    street, a manor stands cross-gabled wings in front of its hall roof;
+#  * tall clustered brick chimney stacks; thatch on a cottage, stone slate on
+#    a town house or a manor.
+#  cottage (Anne Hathaway's Cottage, Shottery): one long storey under thatch,
+#          its chamber windows in dormers;
+#  town    (Bridge Street, Chester; Wyle Cop and High Street, Shrewsbury):
+#          narrow, three storeys each jettied past the one below, gabled;
+#  manor   (Little Moreton Hall, Cheshire; Speke Hall): long, two jettied
+#          storeys, wings gabled by the money behind it.
+# From the 1840s the Tudor Revival: the same frame over a brick ground floor,
+# and slate where there had been thatch. The seed stands for the carpenter:
+# which side the door is on, the gable's infill, the oriel.
+# Numbers are INFERRED round figures from photographs (Wikimedia Commons:
+# "Little Moreton Hall 01.jpg", "30 Bridge Street, Chester.jpg", "Old Tudor
+# Steak House, Shrewsbury.jpg", "Anne Hathaway's Cottage Stratford.jpg").
+
+[style]
+name = "tudor"
+site = ["kind", "year", "klass", "seed", "width"]
+axiom = { w = "width if width is not None else kinds[kind].frontage", h = 30 }
+overhangs = ["Chimney"]
+describe = { rule = "tudor.timber_frame", phase = "structure", detail = "f'{\"Tudor Revival\" if revival else \"Tudor\"} {kind}, {w:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Roof = "tudor.roof"
+Storey = "tudor.storey"
+Cell = "tudor.cell"
+Post = "kit.column"
+Mullion = "kit.column"
+Brace = "tudor.brace"
+Gable = "tudor.gable"
+Leading = "tudor.leading"
+Oriel = "tudor.oriel"
+
+[params]
+# By kind: storey heights bottom-up, the default frontage, how far each
+# storey is jettied past the one below, the frame (close studs or square
+# panels, and their spacing), the fitted bays, the roof behind the front.
+kinds = { cottage = { heights = [2.7], frontage = 10.0, jetty = 0.0, frame = "square", stud = 1.05, end = [0.6, 1.0, 2.0], bay = [2.0, 2.6, 3.2], roof_h = 5.2 }, town = { heights = [3.0, 2.7, 2.5], frontage = 6.0, jetty = 0.38, frame = "close", stud = 0.42, end = [0.3, 0.5, 1.0], bay = [1.6, 2.1, 2.7], roof_h = 0.0 }, manor = { heights = [3.1, 2.9], frontage = 20.0, jetty = 0.32, frame = "square", stud = 0.95, end = [0.4, 0.8, 1.6], bay = [2.2, 2.8, 3.4], roof_h = 4.6 } }
+revival_from = 1840
+post = 0.16               # an oak stud's face
+plate = 0.2               # the wall plate and bressumer
+rail = 0.11               # the sill and head rails between the studs
+gable_pitch = 0.8         # gable height over its width: about 58 degrees
+verge = 0.3               # the bargeboard's reach past the wall
+double_gable_from = 8.5   # a town front this wide carries two gables
+wing_w = 6.0              # a manor's cross wing, the width of its gable
+pane = 0.42               # a light between two mullions
+diamond = [0.2, 0.3]    # a leaded diamond pane, width and height
+transom_from = 1.25       # a light this tall has a transom
+infill = "plaster_white"  # limewashed wattle and daub
+hip_share = 0.55         # how far a hipped end runs in, as a share of the roof's height
+stack = 0.42              # one shaft of a clustered chimney
+gable_infills = ["chevron", "lozenge", "chevron"]
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "tudor.lot"
+label = "Lot"
+doc = "The frame's storeys; over them a town house's street gables, or a roof behind a manor's cross-gabled wings, or a cottage's thatch; and a cluster of brick chimney shafts."
+do = [
+  { refuse = "a manor's front is wider than its cross wing and a hall beside it", when = "kind == 'manor' and w < wing_w + 4.0" },
+  { set = { revival = "= year >= revival_from", spec = "= kinds[kind]", gable_infill = "= gable_infills[seed % len(gable_infills)]" } },
+  { let = { front = "fsum(spec.heights)", gables = "(2 if w >= double_gable_from else 1) if kind == 'town' else 0" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  # A town house: one or two gables to the street, side by side.
+  { each = "range(gables)", do = [
+      { insert = "Gable", at = ["i * w / gables", "front", "w / gables", "gable_pitch * w / gables"], name = "gable{i}" },
+  ] },
+  # A cottage or a manor: the roof; thatch on a cottage until the Revival.
+  { insert = "Roof", at = ["0.0", "front", "w", "spec.roof_h"], name = "roof", attrs = { pitch = 55.0, roof_material = "= 'thatch' if (kind == 'cottage' and not revival) else 'slate'", dormer_form = "segmental", hip_run = "= spec.roof_h * hip_share" }, when = "kind != 'town'" },
+  # A manor's cross wings: both ends and the porch on a grand one, both ends
+  # on a comfortable one, one end (an L) otherwise -- which end, the seed.
+  # A front too narrow for the wings it was paid for gets the fewer that fit.
+  { let = { wings = "[0.0, 0.5, 1.0] if (klass == 'grand' and w >= 3 * wing_w + 2.0) else ([0.0, 1.0] if (klass in ('grand', 'comfortable') and w >= 2 * wing_w + 2.0) else [float(seed % 2)])" } },
+  { each = "wings", when = "kind == 'manor'", do = [
+      { insert = "Gable", at = ["item * (w - wing_w)", "front", "wing_w", "min(gable_pitch * wing_w, spec.roof_h + 0.4)"], name = "wing{i}" },
+  ] },
+  # The chimney: a cluster of shafts, three on a manor, two elsewhere.
+  { let = { shafts = "3 if kind == 'manor' else 2", cx = "w * 0.62 if kind == 'manor' else (w * 0.68 if kind == 'cottage' else (w - 1.4 if seed % 2 == 0 else 0.5))", base = "front + (spec.roof_h * 0.55 if kind != 'town' else 1.0)" } },
+  { each = "range(shafts)", do = [
+      { insert = "Chimney", at = ["cx + i * (stack + 0.06)", "base", "stack", "spec.roof_h * 0.45 + 1.0 if kind != 'town' else gable_pitch * w / max(gables, 1) * 0.85 - 1.0"], name = "shaft{i}" },
+  ] },
+]
+
+[[production]]
+id = "tudor.facade"
+label = "Facade"
+doc = "The storeys, bottom-up."
+do = [ { split = "y", parts = [ { repeat = "spec.heights", label = "Floor", size = "item", name = "floor{i}" } ] } ]
+
+[[production]]
+id = "tudor.floor"
+label = "Floor"
+doc = "Each storey is jettied out past the one under it, so the lowest is the narrowest; the top one is the whole front."
+let = { inset = "spec.jetty * (count - 1 - index)" }
+do = [ { insert = "Storey", at = ["x + inset", "y", "w - 2 * inset", "h"], name = "storey", attrs = { floor_index = "= index" } } ]
+
+[[production]]
+id = "tudor.storey"
+label = "Storey"
+when = "role != 'loft'"
+doc = "A storey is fitted with its bays and carries the wall plate; a jettied storey stands on a bressumer showing its joist ends."
+do = [
+  { fit = "x", end = "spec.end", bay = "spec.bay", as = "rhythm" },
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Entablature", at = ["x", "y + h - plate", "w", "plate"], name = "plate", attrs = { course_kind = "timber_beam" } },
+]
+
+[[production]]
+id = "tudor.loft"
+label = "Storey"
+when = "role == 'loft'"
+doc = "The chamber in a gable: one wide window between two studs."
+do = [ { split = "x", parts = [
+    { label = "Cell", size = "0.25", name = "x0", slot = "end" },
+    { label = "Cell", size = "w - 0.5", name = "x1", slot = "bay" },
+    { label = "Cell", size = "0.25", name = "x2", slot = "end" },
+] } ]
+
+[[production]]
+id = "tudor.framed_cell"
+label = "Cell"
+when = "opening_type != 'none'"
+doc = "An opening's anatomy, then the frame round it: studs at the frame's spacing, none across the light, one either side; a sill rail and a head rail between them."
+do = [
+  { call = "kit.split_cell_around_its_light" },
+  { let = { lb = "child('LightBay')" } },
+  { each = "frame_posts(x, w, spec.stud, post, lb, is_last('Cell'))", when = "framed", do = [
+      { insert = "Post", at = ["item", "y", "post", "h - (plate if role != 'loft' else 0.0)"], name = "stud{i}", attrs = { order = "timber" } },
+  ] },
+  { let = { lh = "min(light_height, h - sill)" } },
+  { insert = "Post", at = ["x", "y + sill - rail", "w", "rail"], name = "sill_rail", attrs = { order = "timber" }, when = "framed and sill > rail" },
+  { insert = "Post", at = ["x", "y + sill + lh", "w", "rail"], name = "head_rail", attrs = { order = "timber" }, when = "framed and h - sill - lh > rail + (plate if role != 'loft' else 0.0)" },
+  # An oriel stands out on a bracketed sill, under a hood of its own.
+  { insert = "Oriel", at = ["x", "y + sill - 0.12", "w", "0.12"], name = "oriel", when = "oriel" },
+  { insert = "Post", at = ["lb.x - 0.12", "y + sill + lh", "lb.w + 0.24", "0.16"], name = "oriel_hood", attrs = { order = "timber" }, when = "oriel" },
+]
+
+[[production]]
+id = "tudor.frame_wall"
+label = "Cell"
+when = "opening_type == 'none' and framed"
+doc = "A wall panel is all frame: studs, and in square framing a brace up from the corner post into the panel."
+do = [
+  { each = "frame_posts(x, w, spec.stud, post, None, is_last('Cell'))", do = [
+      { insert = "Post", at = ["item", "y", "post", "h - (plate if role != 'loft' else 0.0)"], name = "stud{i}", attrs = { order = "timber" } },
+  ] },
+  { let = { bw = "min(w, 1.1)" } },
+  { insert = "Brace", at = ["x if index == 0 else x + w - bw", "y + 0.2", "bw", "h - plate - 0.4"], name = "brace", attrs = { direction = "= 'falling' if index == 0 else 'rising'" }, when = "spec.frame == 'square' and role != 'loft' and (index == 0 or is_last('Cell'))" },
+]
+
+[[production]]
+id = "tudor.light_bay"
+label = "LightBay"
+doc = "The window is a row of lights between timber mullions; a tall one has a transom; under it, in square framing, a lozenge of braces fills the breast, in close studding short studs."
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
+  { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
+  { let = { lh = "min(light_height, h - sill)", b = "child('Breast')" } },
+  { insert = "Post", at = ["x", "y + sill + lh * 0.62", "w", "0.08"], name = "transom", attrs = { order = "timber" }, when = "opening_type == 'window' and lh >= transom_from" },
+  { each = "frame_posts(b.x, b.w, spec.stud, post, None, True)", when = "framed and spec.frame == 'close' and b.h > 0.3", do = [
+      { insert = "Post", at = ["item", "b.y", "post", "b.h - rail"], name = "breast_stud{i}", attrs = { order = "timber" } },
+  ] },
+  { let = { cx = "b.x + b.w / 2.0", cy = "b.y + (b.h - rail) / 2.0", hw = "min(b.w, b.h * 1.6) / 2.0", hh = "(b.h - rail) / 2.0 - 0.06" } },
+  { each = "[['rising', cx, b.y + 0.06], ['falling', cx, cy], ['rising', cx - hw, cy], ['falling', cx - hw, b.y + 0.06]]", when = "framed and spec.frame == 'square' and role != 'ground' and b.h > 0.5", do = [
+      { insert = "Brace", at = ["item[1]", "item[2]", "hw", "hh"], name = "lozenge{i}", attrs = { direction = "= item[0]" } },
+  ] },
+]
+
+[[production]]
+id = "tudor.light"
+label = "Light"
+doc = "A window's light is glazed in diamond panes between lead cames."
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Leading", at = ["x", "y", "w", "h"], name = "leading", attrs = { pane_w = "= diamond[0]", pane_h = "= diamond[1]" }, when = "opening_type == 'window'" },
+]
+
+[[production]]
+id = "tudor.gable"
+label = "Gable"
+doc = "A gable holds a chamber window; a king post rises from it to the apex, dark bargeboards run up the verges, and chevrons (or a lozenge) fill the triangle over the window."
+let = { lw = "min(w * 0.55, 3.0)", lh = "1.9", cx = "x + w / 2.0" }
+do = [
+  { set = { infill_paint = "= infill", verge_reach = "= verge" } },
+  { insert = "Storey", at = ["cx - lw / 2.0", "y + 0.3", "lw", "lh"], name = "loft", attrs = { role = "loft", floor_index = 9 } },
+  { insert = "Brace", at = ["x", "y", "w / 2.0", "h"], name = "barge_left", attrs = { direction = "rising" } },
+  { insert = "Brace", at = ["cx", "y", "w / 2.0", "h"], name = "barge_right", attrs = { direction = "falling" } },
+  { let = { top = "y + 0.3 + lh", tall = "h - 0.3 - lh" } },
+  { insert = "Post", at = ["cx - post / 2.0", "top", "post", "tall * 0.8"], name = "king_post", attrs = { order = "timber" } },
+  # Chevrons: inverted Vs stacked up the king post, each as wide as the
+  # triangle lets it be at its height.
+  { each = "[0, 1, 2]", when = "gable_infill == 'chevron'", do = [
+      { let = { y0 = "top + 0.1 + item * tall * 0.24", d = "tall * 0.2" } },
+      { let = { s = "(w / 2.0) * (1.0 - (y0 + d - y) / h) - 0.12" } },
+      { insert = "Brace", at = ["cx - s", "y0", "s", "d"], name = "chevron_l{i}", attrs = { direction = "rising" }, when = "s > 0.2" },
+      { insert = "Brace", at = ["cx", "y0", "s", "d"], name = "chevron_r{i}", attrs = { direction = "falling" }, when = "s > 0.2" },
+  ] },
+  # A lozenge either side of the king post instead.
+  { let = { ly = "top + 0.1", lhh = "tall * 0.2" } },
+  { let = { la = "((w / 2.0) * (1.0 - (ly + 2.0 * lhh - y) / h) - 0.25) / 2.0" } },
+  { each = "[-1.0, 1.0]", when = "gable_infill == 'lozenge' and la > 0.15", do = [
+      { let = { lx = "cx + item * (la + 0.15)" } },
+      { insert = "Brace", at = ["lx", "ly", "la", "lhh"], name = "lz_a{i}", attrs = { direction = "rising" } },
+      { insert = "Brace", at = ["lx", "ly + lhh", "la", "lhh"], name = "lz_b{i}", attrs = { direction = "falling" } },
+      { insert = "Brace", at = ["lx - la", "ly + lhh", "la", "lhh"], name = "lz_c{i}", attrs = { direction = "rising" } },
+      { insert = "Brace", at = ["lx - la", "ly", "la", "lhh"], name = "lz_d{i}", attrs = { direction = "falling" } },
+  ] },
+]
+
+[[production]]
+id = "tudor.roof"
+label = "Roof"
+doc = "A cottage's chambers are lit by dormers through the thatch, over every other window axis below."
+do = [
+  { each = "every_other(bay_axes('b/facade/floor0/storey'))", when = "kind == 'cottage'", do = [
+      { insert = "Dormer", at = ["item - 0.65", "y + 0.3", "1.3", "1.5"], name = "dormer{i}" },
+  ] },
+]
+
+# --- rules ---------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "tudor.roles.storey"
+label = "Storey"
+layer = "roles"
+doc = "Ground, upper, or the chamber in a gable; limewashed panels between the timbers -- except a Revival house's ground floor, which is brick."
+let = { r = "role if has('role') else ('ground' if floor_index == 0 else 'upper')" }
+set = { role = "= r", wall_material = "= 'brick' if (revival and r == 'ground') else infill", framed = "= not (revival and r == 'ground')" }
+
+[[rule]]
+id = "tudor.base.end_panels_are_frame"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none", oriel = false }
+
+[[rule]]
+id = "tudor.base.the_mullioned_window"
+label = "Cell"
+doc = "A bay holds a wide window of lights a pane wide each between mullions: on a town front nearly the bay's width, smaller in a cottage."
+when = "is_bay()"
+let = { lw = "min(w - 0.45, 1.5) if kind == 'cottage' else w - 0.45", sill_h = "0.95 if role == 'ground' and kind == 'cottage' else (0.4 if role == 'loft' else 0.85)" }
+set = { opening_type = "window", head = "flat", light_width = "= lw", sill = "= sill_h", light_height = "= min(1.15 if kind == 'cottage' else 2.0, h - sill_h - 0.5)", lights = "= [1.0] * max(2, int(lw / pane))", divider = "Mullion", divider_width = 0.07, order = "timber", surround_kind = "none", keystone_present = false, oriel = false }
+
+[[rule]]
+id = "tudor.base.the_shop"
+label = "Cell"
+doc = "A town house's ground floor is a shop: its windows low and wide."
+when = "is_bay() and role == 'ground' and kind == 'town'"
+specificity = 5
+set = { sill = 0.6, light_height = "= h - 0.6 - 0.6" }
+
+[[rule]]
+id = "tudor.base.the_door"
+label = "Cell"
+doc = "On the ground floor one bay is the door under a four-centred head: at the side in town (which side, the carpenter's), in the middle of a cottage or a manor."
+when = "is_bay() and role == 'ground' and ((is_first_bay() if seed % 2 == 0 else is_last_bay()) if kind == 'town' else is_middle_bay())"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "segmental", light_width = 1.0, sill = 0.0, light_height = "= min(2.2, h - 0.45)", lights = "= None", oriel = false }
+
+[[rule]]
+id = "tudor.base.the_oriel"
+label = "Cell"
+doc = "A town house's first floor, where it was paid for, has an oriel in its middle bay."
+when = "is_bay() and kind == 'town' and role == 'upper' and floor_index == 1 and is_middle_bay() and (seed % 2 == 1 or klass in ('comfortable', 'grand'))"
+specificity = 5
+set = { oriel = true }

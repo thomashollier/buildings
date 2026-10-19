@@ -1,0 +1,76 @@
+# The works programme: the deco of public works -- power houses, pumping
+# stations, intake towers.
+#
+# From photographs: the Hoover Dam intake towers (1935: concrete, fins,
+# a clock face reading Nevada time), 1930s municipal power and pumping
+# stations (brick halls of tall windows between buttress piers, stacks
+# behind). Numbers are INFERRED round figures from those photographs.
+# * under 16 m: an intake tower -- tall floors, slot windows between fins, a
+#   stepped top, a clock;
+# * wider: a turbine hall -- one or two very tall floors of glass bands
+#   between buttress piers, a raised centre bay, stacks behind on a grand one.
+
+[params]
+works_walls = ["brick", "render_white", "brick_buff", "stone"]
+intake_until = 16.0
+stack_w = 3.2
+stack_h = 26.0
+
+[[rule]]
+id = "deco.works.tower_or_hall"
+label = "Lot"
+layer = "programme"
+doc = "A narrow work is a tower; a wide one a hall, its centre raised."
+when = "programme == 'works'"
+let = { tower = "width < intake_until" }
+set = { composition = "= [['intake', 1.0]] if tower else [['hall', 0.36], ['centre', 0.28], ['hall', 0.36]]", massing = "= 'intake tower' if tower else ('turbine hall with stacks' if klass == 'grand' else 'turbine hall')" }
+
+[[rule]]
+id = "deco.works.a_hall"
+label = "Block"
+layer = "programme"
+doc = "A turbine hall: tall floors of glass bands between buttress piers, a plain parapet."
+when = "programme == 'works'"
+set = { floors = "= 1 if rank[klass] <= 1 else 2", ground_h = 5.0, floor_h = 7.5, parapet_h = 1.8, block_bay = [2.6, 3.2, 4.0], block_end = [0.8, 1.2, 2.0], glazing_ground = "punched", glazing_upper = "band", spandrel = "metal", piers = true, pier_w = 0.9, pier_rise = 0.6, door = "none", eyebrows = false, stripes = 0, crest = "flat" }
+
+[[rule]]
+id = "deco.works.raised_centre"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "The centre of a hall: a storey higher, its door, a stepped top."
+when = "programme == 'works' and part == 'centre'"
+set = { parapet_h = 3.0, door = "centre", crest = "stepped", crest_h = 2.4, crest_steps = 3, crest_reach = 0.4 }
+
+[[rule]]
+id = "deco.works.the_intake_tower"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "Hoover Dam's intake tower: four tall floors of slot windows between fins, a blank top floor for the clock, a stepped crown."
+when = "programme == 'works' and part == 'intake'"
+set = { floors = "= 3 + rank[klass] // 2", ground_h = 6.0, floor_h = 5.5, parapet_h = 5.0, glazing_ground = "slot", glazing_upper = "slot", spandrel = "none", piers = true, pier_w = 0.7, block_bay = [1.6, 2.0, 2.6], block_end = [0.6, 1.0, 1.6], door = "centre", crest = "stepped", crest_h = 2.6, crest_steps = 2, crest_reach = 0.5 }
+
+[[rule]]
+id = "deco.works.concrete_or_brick"
+label = "Block"
+layer = "hand"
+when = "programme == 'works'"
+set = { wall = "= 'render_white' if part == 'intake' else works_walls[seed % 4]", base_wall = "= 'render_white' if part == 'intake' else works_walls[seed % 4]" }
+
+[[production]]
+id = "deco.works.the_clock"
+label = "Dress"
+doc = "The intake tower's clock, in the blank wall at its top."
+when = "programme == 'works' and part == 'intake'"
+do = [ { insert = "Porthole", at = ["x + w / 2.0 - min(3.2, w * 0.4) / 2.0", "y + ground_h + floors * floor_h + 0.4", "min(3.2, w * 0.4)", "min(3.2, w * 0.4)"], name = "clock", attrs = { dormer_form = "oeil_de_boeuf" } } ]
+
+[[production]]
+id = "deco.works.the_stacks"
+label = "Dress"
+doc = "A grand hall's stacks stand behind its raised centre, either side."
+when = "programme == 'works' and part == 'centre' and klass == 'grand'"
+do = [
+  { insert = "Chimney", at = ["x + w * 0.12", "y + ground_h + floors * floor_h + parapet_h", "stack_w", "stack_h"], name = "stack0" },
+  { insert = "Chimney", at = ["x + w * 0.88 - stack_w", "y + ground_h + floors * floor_h + parapet_h", "stack_w", "stack_h"], name = "stack1" },
+]

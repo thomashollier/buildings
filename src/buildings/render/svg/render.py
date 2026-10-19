@@ -486,6 +486,22 @@ _WALL_PAINT = {
     "clapboard_cream": _C["wall_clapboard_cream"],
     "clapboard_rose": _C["wall_clapboard_rose"],
     "plaster_ochre": _C["wall_plaster_ochre"],
+    "brownstone": _C["wall_brownstone"],
+    "slate": _C["wall_slate"],
+    "tile_red": _C["wall_tile_red"],
+    "azulejo": _C["wall_azulejo"],
+    "concrete_panel": _C["wall_concrete_panel"],
+    "marble_white": _C["wall_marble_white"],
+    "granite_grey": _C["wall_granite_grey"],
+    "sandstone_red": _C["wall_sandstone_red"],
+    "travertine": _C["wall_travertine"],
+    "brick_roman": _C["wall_brick_roman"],
+    "lead_roof": _C["wall_lead_roof"],
+    "mud_brick": _C["wall_mud_brick"],
+    "basalt": _C["wall_basalt"],
+    "vermilion": _C["wall_vermilion"],
+    "alabaster": _C["wall_alabaster"],
+    "chimney_brick": _C["wall_chimney_brick"],
 }
 
 #: Materials laid in horizontal boards, drawn as a line every board.

@@ -8,16 +8,29 @@
 # under a pointed arch whatever the palazzo's width; a palazzo built for two
 # brothers (Bernardo) has two gates, one in each wing; a richer house puts a
 # mezzanine over the water storey and a full third floor under the cornice.
+#
+# Before 1300 the palazzo is the older Veneto-Byzantine "casa-fondaco"
+# (12th-13th c.; from photographs of the Fondaco dei Turchi, Ca' Farsetti,
+# Ca' Loredan, Ca' da Mosto): no wing | centre | wing, but a long portico of
+# round arches on columns across the whole water storey, a continuous arcade
+# of stilted round arches -- about twice as many, half as wide -- across the
+# floor above behind a balustrade, and on a large one two low corner towers
+# (torreselle) that stand a little forward and rise a storey above the
+# cornice; the Fondaco's top is crenellated. White Istrian stone.
 
 [style]
 name = "venice"
 site = ["width", "year", "klass", "seed"]
 axiom = { w = "width", h = 40 }
 overhangs = ["Cornice"]
-describe = { rule = "venice.palazzo", phase = "structure", detail = "f'Gothic palazzo, {width:.1f} m on the canal, {year}, {klass}'" }
+# (the Byzantine type's crenellation and tower edges stand inside their parts)
+describe = { rule = "venice.palazzo", phase = "structure", detail = "f'Veneto-Byzantine palazzo, {width:.1f} m on the canal, {year}, {klass}' if year < byzantine_until else f'Gothic palazzo, {width:.1f} m on the canal, {year}, {klass}'" }
 
 [lot_props]
 year = "= year"
+
+[emit]
+Merlons = "venice.crenellation"
 
 [params]
 # Storey heights by class: the richer the owner, the taller the floors.
@@ -33,9 +46,21 @@ wing_bay = [1.8, 2.2, 2.8]
 wing_end = [0.5, 0.9, 1.4]
 polifora_min_light = 0.95     # INFERRED -- the narrowest arch of a polifora, about a wing window
 
+# --- the Veneto-Byzantine type (before 1300) ------------------------------------
+byzantine_until = 1300          # the Gothic type replaces it in the 14th century
+portico_h = { modest = 4.6, ordinary = 5.0, comfortable = 5.6, grand = 6.2 }
+loggia_h = { modest = 4.4, ordinary = 4.6, comfortable = 5.0, grand = 5.4 }
+tower_top_h = 3.8               # the torresella's storey above the cornice
+torresella_share = 0.17         # each corner tower, of the front (Fondaco: a sixth)
+torreselle_from = 18.0          # narrower fronts (Ca' da Mosto, Ca' Farsetti) have none
+portico_arch = 2.6              # a portico arch with its column, INFERRED (Fondaco, Loredan)
+arcade_end = 0.55               # the pier closing an arcade at each end
+merlon_h = 1.3                  # the Fondaco's crenellation
+
 [[production]]
 id = "venice.lot"
 label = "Lot"
+when = "year >= byzantine_until"
 doc = "The palazzo stands its whole front on the canal. Money adds a mezzanine and a third floor; the seed stands for the family, one of two brothers sharing a front with two gates."
 do = [
   { let = { rich = "klass in ('comfortable', 'grand')" } },
@@ -54,6 +79,7 @@ do = [ { split = "y", id_base = "parent", parts = [ { repeat = "floors", label =
 [[production]]
 id = "venice.storey"
 label = "Storey"
+when = "in_parent('Facade')"
 doc = "Every storey is cut the same way: wing, centre, wing. A string course crowns each one; the top carries a dentilled cornice."
 let = { centre = "w * centre_share" }
 do = [
@@ -189,3 +215,95 @@ doc = "A front shared by two brothers has a gate in each wing, in the bay neares
 when = "is_bay() and in_parent('Wing') and role == 'water' and two_gates and (is_last_bay() if side == 'left' else is_first_bay())"
 specificity = 20
 set = { opening_type = "pedestrian_entrance", head = "ogee", light_width = "= min(w - 0.4, gate_w[1])", sill = 0.0, light_height = "= min(h - 0.5, 2.0 * min(w - 0.4, gate_w[1]) + 0.2)", surround_kind = "moulded_architrave" }
+
+# === The Veneto-Byzantine casa-fondaco (before 1300) =============================
+
+[[production]]
+id = "venice.byzantine_lot"
+label = "Lot"
+when = "year < byzantine_until"
+doc = "The casa-fondaco: a body of two arcaded storeys, between two corner towers on a large front; the grandest crenellated."
+let = { towers = "width >= torreselle_from", tw = "max(2.8, width * torresella_share)" }
+do = [
+  { set = { crenellated = "= klass == 'grand'" } },
+  { split = "x", when = "towers", parts = [
+      { label = "Torresella", size = "tw", name = "tower_left", attrs = { side = "left" } },
+      { label = "Body", size = "w - 2 * tw", name = "body" },
+      { label = "Torresella", size = "tw", name = "tower_right", attrs = { side = "right" } },
+  ] },
+  { split = "x", when = "not towers", parts = [ { label = "Body", size = "w", name = "body" } ] },
+]
+
+[[production]]
+id = "venice.byzantine_body"
+label = "Body"
+doc = "The body: the portico over the water, the arcade above it, a cornice, and the crenellation on the grandest."
+do = [
+  { split = "y", parts = [
+      { label = "Storey", size = "portico_h[klass]", name = "s0", attrs = { floor = "portico" } },
+      { label = "Storey", size = "loggia_h[klass]", name = "s1", attrs = { floor = "loggia" } },
+      { repeat = "[merlon_h] if crenellated else []", label = "Merlons", size = "item", name = "merlons" },
+      { label = "Sky", size = "h - portico_h[klass] - loggia_h[klass] - (merlon_h if crenellated else 0.0)", name = "sky" },
+  ] },
+]
+
+[[production]]
+id = "venice.torresella"
+label = "Torresella"
+doc = "A corner tower: the water storey, the arcade storey, and one more over the cornice; its inner edge marked where it stands forward."
+do = [
+  { split = "y", parts = [
+      { label = "Storey", size = "portico_h[klass]", name = "s0", attrs = { floor = "tower_water" } },
+      { label = "Storey", size = "loggia_h[klass]", name = "s1", attrs = { floor = "tower_loggia" } },
+      { label = "Storey", size = "tower_top_h", name = "s2", attrs = { floor = "tower_top" } },
+      { repeat = "[merlon_h] if crenellated else []", label = "Merlons", size = "item", name = "merlons" },
+      { label = "Sky", size = "h - portico_h[klass] - loggia_h[klass] - tower_top_h - (merlon_h if crenellated else 0.0)", name = "sky" },
+  ] },
+  { insert = "Column", at = ["x + w - 0.3 if side == 'left' else x", "y", "0.3", "portico_h[klass] + loggia_h[klass] + tower_top_h"], name = "edge", attrs = { order = "pilaster" } },
+]
+
+[[production]]
+id = "venice.arcade_storey"
+label = "Storey"
+when = "not in_parent('Facade')"
+doc = "A Byzantine storey is one arcade between two short piers (a tower's, one opening between wider piers); a string course over it, a dentilled cornice on the body's top storey and the tower's."
+let = { pier = "arcade_end if role in ('portico', 'loggia') else w * 0.22" }
+do = [
+  { split = "x", parts = [
+      { label = "Cell", size = "pier", name = "x0", slot = "end" },
+      { label = "Cell", size = "w - 2 * pier", name = "x1", slot = "bay" },
+      { label = "Cell", size = "pier", name = "x2", slot = "end" },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.4"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "role in ('loggia', 'tower_top')" },
+  { insert = "Entablature", at = ["x", "y + h - 0.16", "w", "0.16"], name = "string_course", attrs = { course_kind = "bandeau" }, when = "role in ('portico', 'tower_water', 'tower_loggia')" },
+]
+
+[[rule]]
+id = "venice.roles.istrian_stone"
+label = "Storey"
+layer = "roles"
+specificity = 10
+doc = "The Byzantine fronts are faced in white Istrian stone."
+when = "floor in ('portico', 'loggia', 'tower_water', 'tower_loggia', 'tower_top')"
+set = { wall_material = "stone" }
+
+[[rule]]
+id = "venice.byzantine.the_portico"
+label = "Cell"
+doc = "The water storey is one portico of round arches on columns, an arch for every portico_arch of front."
+when = "is_bay() and role == 'portico'"
+set = { opening_type = "window", head = "round", light_width = "= w", sill = 0.0, light_height = "= h - 0.9", lights = "= (1.0,) * max(3, round(w / portico_arch))", divider = "Column", divider_width = 0.42, order = "corinthian", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "venice.byzantine.the_arcade"
+label = "Cell"
+doc = "The floor above is a continuous arcade of stilted round arches, about twice as many as the portico's, on slender columns behind a balustrade."
+when = "is_bay() and role == 'loggia'"
+set = { opening_type = "window", head = "round", light_width = "= w", sill = 0.95, light_height = "= h - 0.95 - 0.45", lights = "= (1.0,) * (2 * max(3, round(w / portico_arch)) - 1)", divider = "Column", divider_width = 0.22, order = "corinthian", surround_kind = "none", keystone_present = false, balcony = true }
+
+[[rule]]
+id = "venice.byzantine.tower_openings"
+label = "Cell"
+doc = "A tower opens less: one round arch to the water, a bifora above, a trifora of small arches in its top storey."
+when = "is_bay() and role in ('tower_water', 'tower_loggia', 'tower_top')"
+set = { opening_type = "window", head = "round", light_width = "= w", sill = "= 1.4 if role == 'tower_water' else 0.9", light_height = "= h - (1.4 if role == 'tower_water' else 0.9) - 0.8", lights = "= None if role == 'tower_water' else ((1.0, 1.0) if role == 'tower_loggia' else (1.0, 1.0, 1.0))", divider = "Column", divider_width = 0.2, order = "corinthian", surround_kind = "moulded_architrave", keystone_present = false }

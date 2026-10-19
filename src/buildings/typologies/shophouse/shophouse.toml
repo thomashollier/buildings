@@ -1,0 +1,262 @@
+# The Straits Chinese shophouse, as rules.
+#
+# A narrow terrace unit (4.5 to 6 m) of the Straits Settlements, 1840-1960:
+# the shop on the ground floor behind the 'five-foot way', a covered arcade
+# the upper floor stands over on two piers; the house above, lit by tall
+# windows closed by timber jalousies; a tiled roof running back from the
+# street, over open eaves on the early fronts and behind a parapet on the
+# later ones. The date picks the style -- the six of the Penang and Singapore
+# conservation guidelines -- and with it how many windows, what stands between
+# them, what goes over them and what crowns the front:
+#   Early (to c. 1850): low, one window, eaves on the street;
+#   Southern Chinese (to c. 1890): two windows, still eaves;
+#   Early Straits Eclectic (to c. 1910): two tall windows with transom lights
+#     between pilasters, a parapet over a cornice;
+#   Late Straits Eclectic (to c. 1930): three windows under arched fanlights
+#     between Corinthian pilasters, a pediment on the parapet;
+#   Art Deco (to c. 1950): three windows in a plain frame, a stepped parapet
+#     with the date panel in it;
+#   Early Modern (after): one wide window, a flat rendered parapet.
+# A third storey where money and the date allow it. Units of one row share
+# their date but each owner paints his own.
+# Numbers are INFERRED from photographs of Armenian Street and Lebuh Chulia
+# in George Town (Commons "Penang.Shophouse (VI)", "Georgetown Penang
+# December 2007"), Emerald Hill and Telok Ayer in Singapore: the five-foot
+# way about 4 m high, an upper floor 3.3 to 3.9 m, piers about a third of a
+# metre, windows about 1 m wide.
+
+[style]
+name = "shophouse"
+site = ["width", "year", "klass", "seed", "units"]
+axiom = { w = "width * units", h = 30 }
+overhangs = ["Cornice", "Roof", "Crown"]
+describe = { rule = "shophouse.shophouse", phase = "period", detail = "f'{kind} shophouse, {units} x {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Pier = "kit.storey"
+Recess = "kit.storey"
+Jalousie = "shophouse.jalousie"
+Roof = "shophouse.roof"
+Crown = "shophouse.crown"
+
+[params]
+# The date picks the style: the first row whose year the date does not pass.
+kinds = [[1849, "early"], [1889, "southern_chinese"], [1909, "early_straits"], [1929, "late_straits"], [1949, "art_deco"], [9999, "early_modern"]]
+ground_h = { early = 3.4, southern_chinese = 3.8, early_straits = 4.2, late_straits = 4.5, art_deco = 4.3, early_modern = 4.0 }
+upper_h = { early = 3.0, southern_chinese = 3.3, early_straits = 3.6, late_straits = 3.9, art_deco = 3.6, early_modern = 3.3 }
+parapet_h = { early = 0.0, southern_chinese = 0.0, early_straits = 0.9, late_straits = 1.1, art_deco = 1.3, early_modern = 0.8 }
+windows = { early = 1, southern_chinese = 2, early_straits = 2, late_straits = 3, art_deco = 3, early_modern = 1 }
+narrow_late = 5.4               # a late Straits front narrower than this has two windows, not three
+# What goes over a window: nothing, a transom light, or an arched fanlight.
+fans = { early = "none", southern_chinese = "none", early_straits = "transom", late_straits = "arch", art_deco = "transom", early_modern = "none" }
+sills = { early = 0.9, southern_chinese = 0.6, early_straits = 0.25, late_straits = 0.25, art_deco = 0.5, early_modern = 0.9 }
+# What stands between the windows and on the piers.
+pilasters = { early = "none", southern_chinese = "none", early_straits = "pilaster", late_straits = "corinthian", art_deco = "pilaster", early_modern = "none" }
+pier_orders = { early = "none", southern_chinese = "none", early_straits = "doric", late_straits = "corinthian", art_deco = "pilaster", early_modern = "none" }
+crowns = { early = "none", southern_chinese = "none", early_straits = "none", late_straits = "pediment", art_deco = "stepped", early_modern = "none" }
+crown_h = 1.2
+crown_share = 0.5               # the crown's width as a share of the unit's
+third_from = 1900               # a third storey is a twentieth-century thing...
+third_for = ["comfortable", "grand"]   # ...and a rich owner's
+paints = { early = ["plaster_white", "plaster_ochre", "stucco"], southern_chinese = ["plaster_ochre", "stucco_rose", "plaster_white", "stucco"], early_straits = ["stucco_rose", "plaster_ochre", "stucco", "brick_buff"], late_straits = ["plaster_ochre", "stucco_rose", "stucco", "brick_buff"], art_deco = ["render_white", "stucco", "plaster_ochre"], early_modern = ["render_white", "stucco"] }
+pier = 0.34
+beam = 0.6                      # the fascia over the five-foot way
+pilaster = 0.24
+jamb = 0.32                     # wall either side of a window, inside its share
+roof_rise = 1.1                 # the near slope, foreshortened
+jalousie_gap = 0.07             # the slats of a jalousie, a hand apart
+grille_gap = 0.12               # the bars of a shop window's grille
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "shophouse.lot"
+label = "Lot"
+doc = "The date picks the style; money and the date a third storey. The row stands on the lot."
+do = [
+  { set = { kind = "= step(kinds, year)" } },
+  { set = { n_upper = "= 2 if (year >= third_from and klass in third_for and kind != 'early_modern') else 1" } },
+  { let = { front = "ground_h[kind] + upper_h[kind] * n_upper + parapet_h[kind]" } },
+  { insert = "Terrace", at = ["0.0", "0.0", "w", "front"], name = "terrace" },
+]
+
+[[production]]
+id = "shophouse.terrace"
+label = "Terrace"
+doc = "The row is cut into its units, all of one width."
+do = [ { split = "x", id_base = "parent", parts = [ { repeat = "range(units)", label = "Unit", size = "width", name = "u{n}", attrs = { unit = "= i" } } ] } ]
+
+[[production]]
+id = "shophouse.unit"
+label = "Unit"
+doc = "A unit is the five-foot way, its upper floors and the parapet, painted by its owner; the roof behind, and the crown on the parapet's middle."
+do = [
+  { set = { paint = "= paints[kind][(seed + unit) % len(paints[kind])]" } },
+  { split = "y", parts = [
+      { label = "Ground", size = "ground_h[kind]", name = "ground" },
+      { repeat = "range(n_upper)", label = "Storey", size = "upper_h[kind]", name = "s{n}", attrs = { floor = "upper" } },
+      { repeat = "[parapet_h[kind]] if parapet_h[kind] > 0 else []", label = "Storey", size = "item", name = "parapet", attrs = { floor = "parapet" } },
+  ] },
+  { insert = "Roof", at = ["x", "y + h", "w", "roof_rise"], name = "roof", when = "kind != 'early_modern'" },
+  { insert = "Crown", at = ["x + w * (1 - crown_share) / 2.0", "y + h", "w * crown_share", "crown_h"], name = "crown", attrs = { crown_form = "= crowns[kind]", wall_material = "= paint" }, when = "crowns[kind] != 'none'" },
+]
+
+[[production]]
+id = "shophouse.ground"
+label = "Ground"
+doc = "The ground storey is the five-foot way -- a pier either side and the shop recessed between them -- under the fascia the upper floor stands on."
+do = [
+  { split = "y", parts = [
+      { label = "Arcade", size = "h - beam", name = "arcade" },
+      { label = "Storey", size = "beam", name = "fascia", attrs = { floor = "fascia" } },
+  ] },
+]
+
+[[production]]
+id = "shophouse.arcade"
+label = "Arcade"
+do = [ { split = "x", parts = [
+    { label = "Pier", size = "pier", name = "pier_l" },
+    { label = "Recess", size = "w - 2 * pier", name = "recess" },
+    { label = "Pier", size = "pier", name = "pier_r" },
+] } ]
+
+[[production]]
+id = "shophouse.pier"
+label = "Pier"
+doc = "On a Straits Eclectic or Art Deco front a pier is dressed as a column of its order."
+do = [ { insert = "Column", at = ["x", "y", "w", "h"], name = "order", attrs = { order = "= pier_orders[kind]" }, when = "pier_orders[kind] != 'none'" } ]
+
+[[production]]
+id = "shophouse.recess"
+label = "Recess"
+doc = "The shop front in the shade of the five-foot way: a door between two grilled windows."
+do = [ { split = "x", parts = [
+    { label = "Cell", size = "0.25", name = "x0", slot = "end" },
+    { label = "Cell", size = "(w - 0.5 - 1.6) / 2.0", name = "x1", slot = "bay" },
+    { label = "Cell", size = "1.6", name = "x2", slot = "bay", attrs = { door = true } },
+    { label = "Cell", size = "(w - 0.5 - 1.6) / 2.0", name = "x3", slot = "bay" },
+    { label = "Cell", size = "0.25", name = "x4", slot = "end" },
+] } ]
+
+[[production]]
+id = "shophouse.storey"
+label = "Storey"
+doc = "An upper floor holds its windows in equal shares between end walls, pilasters on the shares' edges where the style has them; the fascia carries a band; a Deco parapet holds the date panel."
+let = { n = "2 if (kind == 'late_straits' and w < narrow_late) else windows[kind]", e = "0.2" }
+do = [
+  { split = "x", when = "floor == 'upper'", parts = [
+      { label = "Cell", size = "e", name = "x{n}", slot = "end" },
+      { repeat = "range(n)", label = "Cell", size = "(w - 2 * e) / n", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "e", name = "x{n}", slot = "end" },
+  ] },
+  { each = "range(n + 1)", when = "floor == 'upper' and pilasters[kind] != 'none'", do = [
+      { insert = "Column", at = ["min(max(x + e + i * (w - 2 * e) / n - pilaster / 2.0, x), x + w - pilaster)", "y", "pilaster", "h"], name = "pilaster{i}", attrs = { order = "= pilasters[kind]" } },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.8"], name = "eaves", attrs = { cornice_ornament = "tiled" }, when = "floor == 'upper' and parapet_h[kind] == 0 and nth == count - 1" },
+  { insert = "Entablature", at = ["x", "y + h - 0.2", "w", "0.2"], name = "band", attrs = { course_kind = "bandeau" }, when = "floor == 'fascia'" },
+  { insert = "Cornice", at = ["x", "y", "w", "0.35"], name = "cornice", attrs = { cornice_ornament = "= 'modillioned' if kind in ('early_straits', 'late_straits') else 'plain'" }, when = "floor == 'parapet'" },
+  { split = "x", when = "floor == 'parapet' and kind == 'art_deco'", parts = [
+      { label = "Cell", size = "w * 0.3", name = "x0", slot = "end" },
+      { label = "Cell", size = "w * 0.4", name = "x1", slot = "bay", attrs = { plaque = true } },
+      { label = "Cell", size = "w * 0.3", name = "x2", slot = "end" },
+  ] },
+]
+
+[[production]]
+id = "shophouse.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "shophouse.light_bay"
+label = "LightBay"
+do = [ { call = "sanaa.window_and_fanlight" } ]
+
+[[production]]
+id = "shophouse.light"
+label = "Light"
+doc = "A light is closed by its jalousies, or a shop window by its grille."
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Jalousie", at = ["x", "y", "w", "h"], name = "screen", when = "has('screen_gap') and screen_gap" },
+]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "shophouse.roles.painted"
+label = "Storey"
+layer = "roles"
+doc = "Every storey of a unit is in its owner's paint."
+set = { role = "= floor", wall_material = "= paint" }
+
+[[rule]]
+id = "shophouse.roles.pier"
+label = "Pier"
+layer = "roles"
+set = { role = "pier", wall_material = "= paint" }
+
+[[rule]]
+id = "shophouse.roles.the_five_foot_way"
+label = "Recess"
+layer = "roles"
+doc = "The shop stands back in the arcade's shade."
+set = { role = "recess", wall_material = "shadow" }
+
+[[rule]]
+id = "shophouse.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "shophouse.base.a_shop_window"
+label = "Cell"
+doc = "Either side of the shop door, a window behind an iron grille."
+when = "is_bay() and role == 'recess'"
+set = { opening_type = "window", head = "flat", light_width = "= w - 0.3", sill = 0.9, light_height = "= min(1.7, h - 1.4)", surround_kind = "none", keystone_present = false, screen_gap = "= grille_gap", lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "shophouse.base.the_shop_door"
+label = "Cell"
+doc = "The shop's door, in the middle of the recess, with a transom light over it."
+when = "is_bay() and role == 'recess' and has('door') and door"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.35, sill = 0.0, light_height = "= min(2.9, h - 0.3)", surround_kind = "none", keystone_present = false, screen_gap = "= None", lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "shophouse.base.an_upper_window"
+label = "Cell"
+doc = "An upper window fills its share but for the jambs: closed by jalousies, from the style's sill to the lintel, under a transom light or an arched fanlight where the style has one."
+when = "is_bay() and role == 'upper'"
+let = { lw = "w - 2 * jamb", fan_h = "0.0 if fans[kind] == 'none' else (w - 2 * jamb) / 2.0 if fans[kind] == 'arch' else 0.4" }
+set = { opening_type = "window", head = "flat", light_width = "= lw", sill = "= sills[kind]", light_height = "= h - sills[kind] - 0.45 - fan_h - (0.12 if fan_h > 0 else 0.0)", surround_kind = "= 'moulded_architrave' if kind in ('early_straits', 'late_straits') else 'none'", keystone_present = "= kind == 'late_straits'", screen_gap = "= jalousie_gap", lights = "= (1.0, 1.0) if lw > 1.3 else (1.0,)", divider_width = 0.08, fan_type = "= None if fans[kind] == 'none' else 'window'", fan_head = "= 'round' if fans[kind] == 'arch' else 'flat'", fan_height = "= fan_h", fan_gap = 0.12, fan_shared = true }
+
+[[rule]]
+id = "shophouse.base.the_modern_ribbon"
+label = "Cell"
+doc = "An Early Modern front has one wide glazed window of steel casements, unshuttered."
+when = "is_bay() and role == 'upper' and kind == 'early_modern'"
+specificity = 5
+set = { opening_type = "window", head = "flat", light_width = "= w - 0.5", sill = 0.9, light_height = 1.5, surround_kind = "bare_band", keystone_present = false, screen_gap = "= None", lights = "= (1.0, 1.0, 1.0, 1.0)", divider_width = 0.08, fan_type = "= None" }
+
+[[rule]]
+id = "shophouse.base.the_date_panel"
+label = "Cell"
+doc = "An Art Deco parapet carries a panel for the date."
+when = "is_bay() and has('plaque') and plaque"
+specificity = 10
+set = { opening_type = "blind_panel", head = "flat", light_width = "= w", sill = 0.15, light_height = "= h - 0.3", surround_kind = "none", keystone_present = false, screen_gap = "= None", lights = "= (1.0,)", fan_type = "= None" }

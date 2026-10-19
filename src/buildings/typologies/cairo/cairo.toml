@@ -1,0 +1,232 @@
+# The Islamic Cairo house front, as rules.
+#
+# A Mamluk or Ottoman town house turns its back on the street: the ground
+# floor is stone and nearly blind, a few grilled lights high in the wall and
+# a bent entrance in an outer bay, its door under a pointed hood -- a niche
+# of stalactite tiers (muqarnas) on the older houses, a plain pointed arch on
+# the later. The upper floors stand out over it on a timber beam, and the
+# rooms look down through wooden mashrabiya -- latticed oriels on stone
+# corbels, and flat lattices in the windows between them -- with small paired
+# lights under a round qamariyya on the floor above. A crenellated band of
+# stepped merlons tops the front.
+# The seed stands for the family: Cairo stone (ashlar ground, plastered
+# upper floors) or the brick of Rashid, red with black and white courses;
+# striped (ablaq) courses on the ground floor or plain; and where the oriels
+# hang -- one in the middle, every other bay, or every bay.
+# Numbers are INFERRED from photographs of Bayt al-Suhaymi (1648, Darb
+# al-Asfar), Bayt al-Kritliyya (1632) and the Ottoman houses of Rashid
+# (Bayt Arab Kli, Bayt al-Amasyali): a ground floor 4.5 m high, a qa'a floor
+# over it of about 4.2 m, oriels about 2.5 m wide standing on 0.7 m corbels,
+# merlons about 0.9 m apart.
+
+[style]
+name = "cairo"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 30 }
+overhangs = ["Cornice"]
+describe = { rule = "cairo.house_front", phase = "structure", detail = "f'{manner} house front, {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "cairo.storey"
+Cell = "cairo.cell"
+Box = "kit.storey"
+Lattice = "cairo.lattice"
+Corbel = "cairo.corbel"
+Hood = "cairo.hood"
+Cresting = "cairo.cresting"
+Qamariya = "sanaa.qamariya"
+Ablaq = "kit.column"
+
+[params]
+ground_h = { cairo = 4.6, rashid = 4.4 }
+upper_h = [4.2, 3.6, 3.3]          # the qa'a floor, the floor over it, a third on the grandest
+upper_floors = { modest = 1, ordinary = 2, comfortable = 2, grand = 3 }
+bay = [2.6, 3.1, 3.7]
+end = [0.6, 1.0, 1.6]
+beam = 0.32                        # the timber beam the upper floors stand out on
+cresting_h = 1.0
+cresting_wall = 0.25
+merlon = 0.9
+# Ablaq: dark courses across the blind lower wall, under the high lights; in
+# Rashid black and white brick courses over the arches of the shop bays.
+ablaq_courses = { cairo = [0.4, 1.1, 1.8, 2.5], rashid = [0.08, 3.3, 3.62] }
+ablaq_course = 0.18
+# The mashrabiya oriel.
+oriel_inset = 0.25                 # from each side of its bay
+corbel = 0.7                       # the corbel's height
+corbel_courses = 4
+corbel_toe = 0.35                  # the corbel's foot as a share of the oriel's width
+oriel_pane = 0.75                  # one latticed panel of an oriel
+oriel_patterns = ["centre", "alternate", "all"]
+lattice_gap = 0.06                 # the mesh of a mashrabiya, INFERRED from close views
+hood_rise = 1.25
+muqarnas_tiers = 4
+muqarnas_before = 1700             # stalactite hoods are Mamluk and early Ottoman
+heads = ["ogee", "round"]          # pointed, or horseshoe-like round, upper windows
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "cairo.lot"
+label = "Lot"
+doc = "The family's choices; one rhythm of bays fitted to the front; the stone ground floor and the upper floors money pays for; the crenellated band on top."
+do = [
+  { set = { manner = "= 'rashid' if seed % 3 == 2 else 'cairo'", ablaq = "= seed % 2 == 1 or seed % 3 == 2", portal_first = "= seed % 4 < 2", head_form = "= heads[(seed // 3) % 2]", hood_form = "= 'muqarnas' if year < muqarnas_before else 'pointed'" } },
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 5 },
+  { let = { nb = "len(bay_spans(rhythm, 0.0))", pattern = "'centre' if klass == 'modest' else oriel_patterns[(seed // 2) % 3] if klass != 'grand' else 'all'" } },
+  { set = { oriel_bays = "= [nb // 2] if pattern == 'centre' else every_other(range(nb)) if pattern == 'alternate' else range(nb)" } },
+  { let = { n_up = "upper_floors[klass]" } },
+  { set = { floors = "= [['ground', ground_h[manner], False]] + [['qaa', upper_h[0], True]] + ([['upper', upper_h[1], klass == 'grand' or manner == 'rashid']] if n_up > 1 else []) + ([['upper', upper_h[2], False]] if n_up > 2 else [])" } },
+  { let = { front = "fsum(column(floors, 1))" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Cresting", at = ["0.0", "front", "w", "cresting_h"], name = "cresting", attrs = { wall_h = "= cresting_wall", merlon_w = "= merlon", wall_material = "= 'brick' if manner == 'rashid' else 'stucco'" } },
+]
+
+[[production]]
+id = "cairo.facade"
+label = "Facade"
+doc = "The ground floor, then the upper floors."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "floors", label = "Storey", size = "item[1]", name = "s{i}", attrs = { floor = "= item[0]", has_oriels = "= item[2]" } } ] } ]
+
+[[production]]
+id = "cairo.storey"
+label = "Storey"
+doc = "Every floor is cut by the one rhythm. The ground floor carries the beam the upper floors stand out on, and its ablaq courses where the family striped its wall; an upper floor hangs its oriels."
+do = [
+  { split = "x", by = "rhythm" },
+  { insert = "Entablature", at = ["x", "y + h - beam", "w", "beam"], name = "beam", attrs = { course_kind = "timber_beam" }, when = "floor == 'ground'" },
+  { let = { door = "bay_spans(rhythm, x)[0 if portal_first else -1]" } },
+  { each = "ablaq_courses[manner]", when = "floor == 'ground' and ablaq", do = [
+      { insert = "Ablaq", at = ["x", "y + item", "door.x - x", "ablaq_course"], name = "ablaq_l{i}", attrs = { order = "= 'corner_board' if manner == 'rashid' and i % 2 == 1 else 'timber'" }, when = "door.x - x > 0.05" },
+      { insert = "Ablaq", at = ["door.x + door.w", "y + item", "x + w - door.x - door.w", "ablaq_course"], name = "ablaq_r{i}", attrs = { order = "= 'corner_board' if manner == 'rashid' and i % 2 == 1 else 'timber'" }, when = "x + w - door.x - door.w > 0.05" },
+  ] },
+  { each = "oriel_bays", when = "has_oriels", do = [
+      { let = { b = "bay_spans(rhythm, x)[item]" } },
+      { insert = "Oriel", at = ["b.x + oriel_inset", "y", "b.w - 2 * oriel_inset", "h - 0.35"], name = "oriel{i}" },
+  ] },
+]
+
+[[production]]
+id = "cairo.oriel"
+label = "Oriel"
+doc = "An oriel is a timber box on a stone corbel."
+do = [ { split = "y", parts = [
+    { label = "Corbel", size = "corbel", name = "corbel", attrs = { corbel_steps = "= corbel_courses", corbel_foot = "= corbel_toe" } },
+    { label = "Box", size = "h - corbel", name = "box" },
+] } ]
+
+[[production]]
+id = "cairo.box"
+label = "Box"
+doc = "The box is a row of latticed panels between thin posts, under a small moulded cap."
+let = { n = "max(2, round((w - 0.2) / oriel_pane))" }
+do = [
+  { split = "x", parts = [
+      { label = "Cell", size = "0.1", name = "x{n}", slot = "end" },
+      { repeat = "range(n)", label = "Cell", size = "(w - 0.2) / n", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "0.1", name = "x{n}", slot = "end" },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.25"], name = "cap", attrs = { cornice_ornament = "modillioned" } },
+]
+
+[[production]]
+id = "cairo.cell"
+label = "Cell"
+doc = "A bay with an opening is cut around its light; the portal's bay also carries the hood over its door."
+when = "opening_type != 'none'"
+do = [
+  { call = "kit.split_cell_around_its_light" },
+  { insert = "Hood", at = ["x + (w - light_width - 0.6) / 2.0", "y + light_height + 0.1", "light_width + 0.6", "hood_rise"], name = "hood", attrs = { hood_spring = 0.35, hood_tiers = "= muqarnas_tiers" }, when = "opening_type == 'pedestrian_entrance'" },
+]
+
+[[production]]
+id = "cairo.light_bay"
+label = "LightBay"
+do = [ { call = "sanaa.window_and_fanlight" } ]
+
+[[production]]
+id = "cairo.light"
+label = "Light"
+doc = "A light is screened by its mashrabiya, under its head."
+do = [
+  { call = "kit.dress_the_light" },
+  { insert = "Lattice", at = ["x", "y", "w", "h - (w / 2.0 if head == 'round' else w * 0.75 if head == 'ogee' else 0.0)"], name = "lattice", when = "has('screen_gap') and screen_gap" },
+]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "cairo.roles.floor_and_material"
+label = "Storey"
+layer = "roles"
+doc = "Cairo: a yellow ashlar ground floor under plastered upper floors. Rashid: brick all the way up."
+set = { role = "= floor", wall_material = "= 'brick' if manner == 'rashid' else ('brick_buff' if floor == 'ground' else 'stucco')" }
+
+[[rule]]
+id = "cairo.roles.the_oriel_box"
+label = "Box"
+layer = "roles"
+doc = "An oriel is timber."
+set = { role = "oriel", wall_material = "timber_dark" }
+
+[[rule]]
+id = "cairo.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "cairo.base.high_grilled_lights"
+label = "Cell"
+doc = "The ground floor is all but blind: a small grilled light high in each bay, out of reach and out of sight. In Rashid the ground floor opens in round-arched shop bays."
+when = "is_bay() and floor == 'ground'"
+set = { opening_type = "window", head = "= 'round' if manner == 'rashid' else 'flat'", light_width = "= 1.5 if manner == 'rashid' else 0.6", sill = "= 0.45 if manner == 'rashid' else 3.0", light_height = "= 2.7 if manner == 'rashid' else 0.8", surround_kind = "= 'none' if manner == 'rashid' else 'moulded_architrave'", keystone_present = false, screen_gap = 0.11, lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "cairo.base.the_bent_entrance"
+label = "Cell"
+doc = "The portal is in an outer bay: a door under a pointed head, in a stone frame, with the hood over it."
+when = "is_bay() and floor == 'ground' and (is_first_bay() if portal_first else is_last_bay())"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "ogee", light_width = 1.5, sill = 0.0, light_height = "= min(2.9, h - hood_rise - 0.3)", surround_kind = "moulded_architrave", keystone_present = false, screen_gap = "= None", lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "cairo.base.a_latticed_window"
+label = "Cell"
+doc = "On the qa'a floor, between the oriels, a tall window behind a flat mashrabiya, its head pointed or round as the family built."
+when = "is_bay() and floor == 'qaa'"
+set = { opening_type = "window", head = "= head_form", light_width = 1.2, sill = 0.9, light_height = 2.3, surround_kind = "bare_band", keystone_present = false, screen_gap = "= lattice_gap", lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "cairo.base.paired_lights_under_a_qamariyya"
+label = "Cell"
+doc = "Higher up, a pair of small latticed lights under one round qamariyya of coloured glass in plaster."
+when = "is_bay() and floor == 'upper'"
+set = { opening_type = "window", head = "flat", light_width = 1.4, sill = 0.8, light_height = 1.3, surround_kind = "bare_band", keystone_present = false, screen_gap = "= lattice_gap", lights = "= (1.0, 1.0)", divider_width = 0.2, fan_type = "qamariya", fan_head = "circle", fan_spokes = 6, fan_height = 0.75, fan_gap = 0.15, fan_shared = true }
+
+[[rule]]
+id = "cairo.base.behind_an_oriel"
+label = "Cell"
+doc = "Where an oriel hangs, the wall behind it is the oriel's."
+when = "is_bay() and floor != 'ground' and has_oriels and (nth - 1) in oriel_bays"
+specificity = 5
+set = { opening_type = "none" }
+
+[[rule]]
+id = "cairo.base.an_oriel_panel"
+label = "Cell"
+doc = "Each panel of an oriel: a solid apron, then the lattice to the cap."
+when = "is_bay() and role == 'oriel'"
+specificity = 20
+set = { opening_type = "window", head = "flat", light_width = "= w - 0.08", sill = "= h * 0.3", light_height = "= h * 0.62", surround_kind = "none", keystone_present = false, screen_gap = "= lattice_gap", lights = "= (1.0,)", fan_type = "= None" }

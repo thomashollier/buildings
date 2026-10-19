@@ -1,0 +1,211 @@
+# The Renaissance palazzo, as rules.
+#
+# Three storeys under a crowning cornice, every one cut by the one rhythm of
+# bays fitted to the frontage. What changes from family to family is the dress
+# laid on that frame, and the seed stands for the family and its architect:
+#   rucellai  Alberti's Palazzo Rucellai (1446-51): superimposed pilasters,
+#             one order a floor, an entablature over every storey, smooth
+#             drafted ashlar throughout;
+#   medici    Michelozzo's Palazzo Medici (1444-60): rustication graded from
+#             rough bosses on the ground floor to drafted ashlar on the piano
+#             nobile to smooth stone under the cornice;
+#   strozzi   Benedetto da Maiano and Cronaca's Palazzo Strozzi (1489-1538):
+#             bossed through two floors, drafted on the third;
+#   farnese   the Roman palazzo after 1510 (Sangallo and Michelangelo's
+#             Palazzo Farnese): a plain wall between rusticated quoins,
+#             aedicule windows with pediments alternately triangular and
+#             segmental, no bifore.
+# The Florentine piani nobili open in bifore: two round-arched lights on a
+# colonnette under one arch, an oculus in the tympanum.
+# Numbers are INFERRED round figures from photographs of Palazzo Rucellai,
+# Medici-Riccardi, Strozzi, Pitti (the rusticated ground floor) and Farnese:
+# a bay of 3.4 m between Rucellai's pilasters and of about 4 m at Medici and
+# Strozzi; a crowning cornice about a tenth of the height it crowns
+# (Michelozzo's at Medici, Cronaca's at Strozzi), much less over Rucellai's
+# orders; a bifora about a third as wide as its storey is tall, its arch's
+# crown two thirds of the way up the storey.
+
+[style]
+name = "renaissance"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 60 }
+overhangs = ["Cornice"]
+describe = { rule = "renaissance.palazzo", phase = "structure", detail = "f'{kind} palazzo, {width:.1f} m, {year}, {klass}'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Storey = "renaissance.storey"
+Cell = "renaissance.cell"
+Rustication = "renaissance.rustication"
+Quoin = "renaissance.rustication"
+Archivolt = "renaissance.archivolt"
+Pediment = "renaissance.pediment"
+
+[params]
+# Storey heights by class -- ground, piano nobile, secondo piano. Strozzi's
+# floors are near 10 m; a modest palazzo's half that.
+heights = { modest = [5.2, 4.8, 4.4], ordinary = [6.2, 5.8, 5.2], comfortable = [7.4, 6.8, 6.0], grand = [9.2, 8.4, 7.4] }
+floor_names = ["ground", "nobile", "secondo"]
+# The family's architect, by the seed (from 1510 the Roman palazzo).
+florentine = ["rucellai", "medici", "rucellai", "strozzi"]
+roman_from = 1510
+# The bay rhythm: [narrowest, preferred, widest] bay and end pier.
+bay_of = { rucellai = [2.9, 3.4, 4.0], medici = [3.4, 4.0, 4.8], strozzi = [3.4, 4.0, 4.8], farnese = [3.6, 4.3, 5.0] }
+# Rucellai's corner pilaster is its end pier; the others leave a wide
+# blank pier at each end, Farnese the widest, for its quoins.
+end_of = { rucellai = [0.5, 0.6, 0.8], medici = [1.2, 1.8, 2.6], strozzi = [1.2, 1.8, 2.6], farnese = [2.0, 2.8, 3.6] }
+# Rustication by floor, bottom-up: rough bosses, drafted courses, or smooth.
+grading = { rucellai = ["flat_incised_refends", "flat_incised_refends", "flat_incised_refends"], medici = ["raised_bossage", "flat_incised_refends", "none"], strozzi = ["raised_bossage", "raised_bossage", "flat_incised_refends"], farnese = ["none", "none", "none"] }
+course_h = { raised_bossage = 0.75, flat_incised_refends = 0.55, none = 1.0 }
+block_l = { raised_bossage = 1.5, flat_incised_refends = 1.0, none = 1.0 }
+walls = { rucellai = "stone", medici = "stone", strozzi = "stone", farnese = "brick_roman" }
+# Rucellai's orders, one a floor: Tuscan, Ionic, Corinthian. The renderer has
+# no Ionic capital; the nearest it draws is the fluted shaft with a plain cap.
+pilaster_orders = ["pilaster", "doric", "corinthian"]
+pilaster_w = 0.55
+frieze_h = 0.8                # Rucellai's entablature over every storey
+course = 0.35                 # the sill course between floors elsewhere
+# The crowning cornice as a share of the height it crowns.
+cornice_share = { rucellai = 0.05, medici = 0.095, strozzi = 0.09, farnese = 0.075 }
+cornice_kind = { rucellai = "modillioned", medici = "bracketed", strozzi = "bracketed", farnese = "bracketed" }
+quoin = [1.5, 0.95]           # long and short stones, alternately
+quoin_course = 0.62
+portal_w = { modest = 1.8, ordinary = 2.2, comfortable = 2.6, grand = 3.0 }
+colonnette = 0.22             # the column between a bifora's two lights
+bifora_rise = 0.68            # the arch's crown, as a share of the storey
+aedicule_col = 0.3
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "renaissance.lot"
+label = "Lot"
+doc = "The family's architect and the date choose the dress; the class the storey heights; one rhythm of bays is fitted to the frontage."
+do = [
+  { set = { kind = "= 'farnese' if year >= roman_from else florentine[seed % 4]", storey_heights = "= heights[klass]" } },
+  { fit = "x", end = "end_of[kind]", bay = "bay_of[kind]", as = "rhythm", min_bays = 3, max_bays = 15 },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(storey_heights)"], name = "facade" },
+]
+
+[[production]]
+id = "renaissance.facade"
+label = "Facade"
+doc = "Ground floor, piano nobile, secondo piano."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "storey_heights", label = "Storey", size = "item", name = "s{i}", attrs = { floor = "= floor_names[i]", level = "= i" } } ] } ]
+
+[[production]]
+id = "renaissance.storey"
+label = "Storey"
+doc = "A floor is cut by the rhythm and dressed: its rustication, its order of pilasters and entablature or the sill course over it, quoins at its ends, and over the last floor the crowning cornice."
+let = { top = "level == len(storey_heights) - 1" }
+do = [
+  { split = "x", by = "rhythm", label = "Cell" },
+  { insert = "Rustication", at = ["x", "y", "w", "h"], name = "rustication", when = "dress != 'none'", attrs = { treatment = "= dress", course_columns = "= max(1, round(w / block_l[dress]))", course_rows = "= max(1, round(h / course_h[dress]))" } },
+  # Rucellai: an order of pilasters on every frame line, under its entablature.
+  { each = "column_lines(rhythm, x, pilaster_w)", when = "kind == 'rucellai'", do = [
+      { insert = "Column", at = ["item.x", "y", "item.w", "h - frieze_h"], name = "pilaster{i}", attrs = { order = "= pilaster_orders[level]" } },
+  ] },
+  { insert = "Entablature", at = ["x", "y + h - frieze_h", "w", "frieze_h"], name = "entablature", attrs = { course_kind = "entablature" }, when = "kind == 'rucellai'" },
+  { insert = "Entablature", at = ["x", "y + h - course", "w", "course"], name = "sill_course", attrs = { course_kind = "entablature" }, when = "kind != 'rucellai' and not top" },
+  # Farnese: rusticated quoins, long and short stones by turns.
+  { let = { n = "max(1, round(h / quoin_course))" } },
+  { each = "range(n)", when = "kind == 'farnese'", do = [
+      { insert = "Quoin", at = ["x", "y + i * h / n", "quoin[i % 2]", "h / n"], name = "quoin_l{i}", attrs = { treatment = "raised_bossage", course_columns = 1, course_rows = 1 } },
+      { insert = "Quoin", at = ["x + w - quoin[i % 2]", "y + i * h / n", "quoin[i % 2]", "h / n"], name = "quoin_r{i}", attrs = { treatment = "raised_bossage", course_columns = 1, course_rows = 1 } },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "fsum(storey_heights) * cornice_share[kind]"], name = "cornice", attrs = { cornice_ornament = "= cornice_kind[kind]" }, when = "top" },
+]
+
+[[production]]
+id = "renaissance.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+doc = "A bay is cut around its light; a Roman aedicule stands a column either side of it and a pediment over it."
+do = [
+  { call = "kit.split_cell_around_its_light" },
+  { let = { lb = "child('LightBay')" } },
+  { insert = "Column", at = ["lb.x - aedicule_col", "y + sill", "aedicule_col", "light_height"], name = "aedicule_l", attrs = { order = "corinthian" }, when = "aedicule" },
+  { insert = "Column", at = ["lb.x + lb.w", "y + sill", "aedicule_col", "light_height"], name = "aedicule_r", attrs = { order = "corinthian" }, when = "aedicule" },
+  { insert = "Pediment", at = ["lb.x - aedicule_col - 0.12", "y + sill + light_height", "lb.w + 2 * aedicule_col + 0.24", "pediment_h"], name = "pediment", when = "pediment != 'none'" },
+]
+
+[[production]]
+id = "renaissance.light_bay"
+label = "LightBay"
+doc = "A bifora's two lights on their colonnette, and the arch over both, sprung from where theirs spring."
+let = { lw = "(w - colonnette) / 2.0" }
+do = [
+  { call = "kit.split_light_bay_into_lights", when = "bifora" },
+  { call = "kit.split_light_bay", when = "not bifora" },
+  { insert = "Archivolt", at = ["x", "y + sill + light_height - lw / 2.0", "w", "w / 2.0 + 0.2"], name = "arch", attrs = { band = 0.2, oculus = "= lw * 0.28" }, when = "bifora" },
+]
+
+[[production]]
+id = "renaissance.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "renaissance.roles.floor_and_dress"
+label = "Storey"
+layer = "roles"
+doc = "A storey is its floor; its wall the family's stone, rusticated as its floor in the grading."
+set = { role = "= floor", wall_material = "= walls[kind]", dress = "= grading[kind][level]" }
+
+[[rule]]
+id = "renaissance.base.wall"
+label = "Cell"
+doc = "The end piers are wall."
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "renaissance.base.the_small_high_window"
+label = "Cell"
+doc = "A Florentine ground floor is a fortress: small square windows set high in the rustication."
+when = "is_bay() and floor == 'ground' and kind != 'farnese'"
+set = { opening_type = "window", head = "flat", light_width = "= min(1.2, w * 0.3)", sill = "= h * 0.5", light_height = "= min(1.3, h * 0.25)", surround_kind = "moulded_architrave", keystone_present = false, bifora = false, aedicule = false, pediment = "none" }
+
+[[rule]]
+id = "renaissance.base.the_kneeling_window"
+label = "Cell"
+doc = "A Roman ground floor has tall windows on consoles, framed and capped."
+when = "is_bay() and floor == 'ground' and kind == 'farnese'"
+set = { opening_type = "window", head = "flat", light_width = "= min(1.5, w * 0.36)", sill = "= h * 0.3", light_height = "= h * 0.4", surround_kind = "moulded_architrave", keystone_present = false, bifora = false, aedicule = false, pediment = "none" }
+
+[[rule]]
+id = "renaissance.base.the_portal"
+label = "Cell"
+doc = "The portal is in the middle bay: round-arched in a rusticated front, square-headed between Rucellai's pilasters."
+when = "is_bay() and floor == 'ground' and is_middle_bay()"
+specificity = 10
+let = { pw = "min(portal_w[klass], w - 0.6)" }
+set = { opening_type = "pedestrian_entrance", head = "= 'flat' if kind == 'rucellai' else 'round'", light_width = "= pw", sill = 0.0, light_height = "= min(h - 1.0, 2.0 * pw + 0.6)", surround_kind = "moulded_architrave", keystone_present = "= kind != 'rucellai'", bifora = false, aedicule = false, pediment = "none" }
+
+[[rule]]
+id = "renaissance.base.the_bifora"
+label = "Cell"
+doc = "On the piani nobili of a Florentine palazzo every bay is a bifora: two round-arched lights on a colonnette under one arch, its crown two thirds of the way up the storey."
+when = "is_bay() and floor != 'ground' and kind != 'farnese'"
+let = { bw = "min(w - 1.2, max(1.5, h * 0.3))", sill_h = "0.45 if kind == 'rucellai' else course + 0.1" }
+set = { opening_type = "window", head = "round", light_width = "= bw", sill = "= sill_h", light_height = "= h * bifora_rise - sill_h - (bw - (bw - colonnette) / 2.0) / 2.0", lights = "= (1.0, 1.0)", divider = "Column", divider_width = "= colonnette", order = "corinthian", surround_kind = "none", keystone_present = false, bifora = true, aedicule = false, pediment = "none" }
+
+[[rule]]
+id = "renaissance.base.the_aedicule"
+label = "Cell"
+doc = "A Roman piano nobile frames every window in an aedicule, its pediments triangular and segmental by turns; the floor over it caps every one with a triangle."
+when = "is_bay() and floor != 'ground' and kind == 'farnese'"
+let = { lh = "min(h * 0.5, 2.0 * min(1.5, w * 0.36))" }
+set = { opening_type = "window", head = "flat", light_width = "= min(1.5, w * 0.36)", sill = "= h * 0.16", light_height = "= lh", surround_kind = "moulded_architrave", keystone_present = false, bifora = false, aedicule = true, pediment = "= ('triangular' if nth % 2 == 1 else 'segmental') if floor == 'nobile' else 'triangular'", pediment_h = "= min(1.0, h * 0.84 - h * 0.16 - lh)" }

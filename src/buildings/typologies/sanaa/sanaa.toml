@@ -1,0 +1,194 @@
+# The Sana'a tower house, as rules.
+#
+# A tower on a narrow footprint, five to eight storeys: one or two storeys of
+# rough dark stone at the foot (stables and stores, lit by slits and a door),
+# then storeys of brick, each standing on a white gypsum frieze, and on top
+# the mafraj, the reception room with the largest windows, under a parapet of
+# white pointed merlons. Every window is a rectangular light with a fanlight
+# over it -- the qamariya, alabaster or coloured glass in a gypsum frame --
+# arched or round, over each light or over a pair.
+# The seed stands for the family: how the windows are grouped, the
+# qamariya's shape, a mafraj set back as a little tower on its roof terrace,
+# or a plain mud-brick tower in the manner of Shibam (no friezes, small
+# shuttered windows, the top whitewashed).
+# Numbers are INFERRED from photographs of the Old City of Sana'a (the tower
+# houses by Bab al-Yemen and Talha, Commons "Tower House in the Old City of
+# Sana'a") and of Shibam: storeys about 3 m, a frieze about half a metre, a
+# window about 0.8 m by 1.2 m under a qamariya half its width high.
+
+[style]
+name = "sanaa"
+site = ["width", "year", "klass", "seed"]
+axiom = { w = "width", h = 60 }
+overhangs = ["Cornice"]
+describe = { rule = "sanaa.tower_house", phase = "structure", detail = "f'{manner} tower house, {width:.1f} m, {year}, {klass}, {len(floors)} bands'" }
+
+[lot_props]
+year = "= year"
+
+[emit]
+Zigzag = "sanaa.zigzag"
+Parapet = "sanaa.parapet"
+Qamariya = "sanaa.qamariya"
+Cell = "sanaa.cell"
+Storey = "sanaa.storey"
+
+[params]
+# The stone storeys at the foot and the brick storeys over them, by money:
+# a richer family builds higher. The mafraj always crowns the tower.
+stone_floors = { modest = 1, ordinary = 2, comfortable = 2, grand = 2 }
+brick_floors = { modest = 3, ordinary = 3, comfortable = 4, grand = 5 }
+max_brick = 5                 # eight storeys is the tallest seen
+ground_h = 3.2                # the stable storey
+store_h = 2.8                 # the grain store over it
+floor_h = 3.0
+mafraj_h = 3.5
+frieze_h = 0.5
+parapet_h = 1.3
+parapet_wall = 0.45           # the solid part of the parapet, under the merlons
+merlon = 0.55                 # one white merlon, point to point
+lozenge = 0.42                # one lozenge of the carved frieze
+setback_min_width = 8.0       # a front narrower than this has no room for a terrace
+setback_share = 0.62          # a set-back mafraj covers this share of the roof
+# Window groupings, and the bay each needs. The seed stands for the family.
+groupings = ["single", "paired", "shared"]
+bays = { single = [1.5, 1.9, 2.4], paired = [2.3, 2.7, 3.2], shared = [2.3, 2.7, 3.2], shibam = [1.1, 1.4, 1.8] }
+spokes = 6                    # the ribs of a qamariya's tracery
+end = [0.6, 0.9, 1.5]
+fan_forms = ["arched", "round"]
+window_w = 0.8                # one light
+window_h = 1.2
+mafraj_window_w = 0.95
+mafraj_window_h = 1.5
+mullion = 0.2                 # the plaster pier between a pair
+transom = 0.14                # the gypsum transom between a light and its qamariya
+round_fan_max = 0.7           # a round qamariya, at most this across
+shibam_window = [0.6, 0.85]   # Shibam: small shuttered windows, no fanlight
+
+# --- productions -------------------------------------------------------------
+
+[[production]]
+id = "sanaa.lot"
+label = "Lot"
+doc = "The family's choices, the storeys money pays for, one rhythm of windows for the whole front, the mafraj on top (set back on its roof terrace where the family built it so), and the parapets."
+do = [
+  { set = { manner = "= 'shibam' if seed % 5 == 4 else 'sanaa'", grouping = "= 'shibam' if seed % 5 == 4 else groupings[seed % 3]", fan = "= fan_forms[(seed // 3) % 2]", setback = "= seed % 4 == 3 and width >= setback_min_width" } },
+  { let = { n_stone = "stone_floors[klass]", n_brick = "min(brick_floors[klass] + (1 if seed % 3 == 1 else 0), max_brick)", band = "[['frieze', frieze_h]] if manner == 'sanaa' else []" } },
+  { set = { floors = "= [['ground', ground_h]] + ([['store', store_h]] if n_stone > 1 else []) + (band + [['brick', floor_h]]) * n_brick + ([] if setback else band + [['mafraj', mafraj_h]])" } },
+  { fit = "x", end = "end", bay = "bays[grouping]", as = "rhythm", max_bays = 4 },
+  { let = { front = "fsum(column(floors, 1))", mw = "w * setback_share" } },
+  { let = { mx = "0.0 if seed % 2 == 0 else w - mw" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  { insert = "Parapet", at = ["0.0", "front", "w", "parapet_h"], name = "parapet", attrs = { wall_h = "= parapet_wall", merlon_w = "= merlon", wall_material = "plaster_white" } },
+  { fit = "x", budget = "mw", end = "end", bay = "bays[grouping]", as = "mafraj_rhythm", max_bays = 3, when = "setback" },
+  { insert = "Storey", at = ["mx", "front", "mw", "mafraj_h"], name = "mafraj", attrs = { floor = "mafraj", rhythm = "= mafraj_rhythm" }, when = "setback" },
+  { insert = "Parapet", at = ["mx", "front + mafraj_h", "mw", "parapet_h"], name = "mafraj_parapet", attrs = { wall_h = "= parapet_wall", merlon_w = "= merlon", wall_material = "plaster_white" }, when = "setback" },
+]
+
+[[production]]
+id = "sanaa.facade"
+label = "Facade"
+doc = "The storeys bottom-up, each brick storey on its frieze."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "floors", label = "Storey", size = "item[1]", name = "s{i}", attrs = { floor = "= item[0]" } } ] } ]
+
+[[production]]
+id = "sanaa.storey"
+label = "Storey"
+doc = "A frieze carries its carved band; any other storey is cut by the front's one rhythm."
+do = [
+  { insert = "Zigzag", at = ["x", "y + h * 0.22", "w", "h * 0.56"], name = "zigzag", attrs = { lozenge_w = "= lozenge" }, when = "floor == 'frieze'" },
+  { split = "x", by = "rhythm", when = "floor != 'frieze'" },
+]
+
+[[production]]
+id = "sanaa.cell"
+label = "Cell"
+when = "opening_type != 'none'"
+do = [ { call = "kit.split_cell_around_its_light" } ]
+
+[[production]]
+id = "sanaa.light_bay"
+label = "LightBay"
+do = [ { call = "sanaa.window_and_fanlight" } ]
+
+[[production]]
+id = "sanaa.light"
+label = "Light"
+do = [ { call = "kit.dress_the_light" } ]
+
+# --- rules -------------------------------------------------------------------
+
+[[layer]]
+name = "roles"
+order = 0
+
+[[layer]]
+name = "base"
+order = 0
+
+[[rule]]
+id = "sanaa.roles.floor_and_material"
+label = "Storey"
+layer = "roles"
+doc = "Dark stone at the foot, brick above, white gypsum friezes; in Shibam mud plaster all the way up and the mafraj whitewashed."
+set = { role = "= floor", wall_material = "= ('plaster_white' if floor in ('frieze', 'mafraj') else 'plaster_ochre') if manner == 'shibam' else ('plaster_white' if floor == 'frieze' else 'shadow' if floor in ('ground', 'store') else 'brick')" }
+
+[[rule]]
+id = "sanaa.base.wall"
+label = "Cell"
+when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "sanaa.base.a_window_under_its_qamariya"
+label = "Cell"
+doc = "A brick storey's window: one light or a pair, white-framed, and over it the qamariya -- a half-round arch as high as half its width, or a round light -- over each light, or one over the pair."
+when = "is_bay() and floor == 'brick'"
+let = { n = "1 if grouping == 'single' else 2", lw = "window_w * n + mullion * (n - 1)", fw = "window_w * n + mullion * (n - 1) if (n == 1 or grouping == 'shared') else window_w" }
+set = { opening_type = "window", head = "flat", light_width = "= lw", sill = 0.8, light_height = "= window_h", surround_kind = "bare_band", keystone_present = false, lights = "= (1.0,) * n", divider_width = "= mullion", fan_type = "qamariya", fan_head = "= 'round' if fan == 'arched' else 'circle'", fan_spokes = "= spokes", fan_height = "= fw / 2.0 if fan == 'arched' else min(fw * 0.85, round_fan_max)", fan_gap = "= transom", fan_shared = "= grouping == 'shared'", fan_surround = "bare_band" }
+
+[[rule]]
+id = "sanaa.base.the_mafraj_windows"
+label = "Cell"
+doc = "The mafraj, the room for guests at the top, has the largest windows: always a pair, set low, under the qamariyas."
+when = "is_bay() and floor == 'mafraj'"
+let = { lw = "mafraj_window_w * 2 + mullion", fw = "mafraj_window_w * 2 + mullion if grouping == 'shared' else mafraj_window_w" }
+set = { opening_type = "window", head = "flat", light_width = "= lw", sill = 0.45, light_height = "= mafraj_window_h", surround_kind = "bare_band", keystone_present = false, lights = "= (1.0, 1.0)", divider_width = "= mullion", fan_type = "qamariya", fan_head = "= 'round' if fan == 'arched' else 'circle'", fan_spokes = "= spokes", fan_height = "= fw / 2.0 if fan == 'arched' else min(fw * 0.85, round_fan_max)", fan_gap = "= transom", fan_shared = "= grouping == 'shared'", fan_surround = "bare_band" }
+
+[[rule]]
+id = "sanaa.base.store_lights"
+label = "Cell"
+doc = "The store over the stables is lit by small square windows."
+when = "is_bay() and floor == 'store'"
+set = { opening_type = "window", head = "flat", light_width = 0.55, sill = 1.1, light_height = 0.7, surround_kind = "bare_band", keystone_present = false, lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "sanaa.base.stable_slits"
+label = "Cell"
+doc = "The stable storey is all but blind: a slit high in the wall."
+when = "is_bay() and floor == 'ground'"
+set = { opening_type = "window", head = "flat", light_width = 0.32, sill = 2.0, light_height = 0.6, surround_kind = "none", keystone_present = false, lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "sanaa.base.every_other_slit_is_wall"
+label = "Cell"
+doc = "Only every other bay of the stable storey has a slit at all."
+when = "is_bay() and floor == 'ground' and nth % 2 == 0"
+specificity = 1
+set = { opening_type = "none" }
+
+[[rule]]
+id = "sanaa.base.shibam_windows"
+label = "Cell"
+doc = "In Shibam the windows are small shuttered openings with no fanlight."
+when = "is_bay() and manner == 'shibam' and floor in ('store', 'brick', 'mafraj')"
+specificity = 5
+set = { opening_type = "window", head = "flat", light_width = "= shibam_window[0]", sill = 1.0, light_height = "= shibam_window[1]", surround_kind = "none", keystone_present = false, lights = "= (1.0,)", fan_type = "= None" }
+
+[[rule]]
+id = "sanaa.base.the_door"
+label = "Cell"
+doc = "The door is in an outer bay, which one the family's; a small arched fanlight over it."
+when = "is_bay() and floor == 'ground' and (is_first_bay() if seed % 2 == 0 else is_last_bay())"
+specificity = 10
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.15, sill = 0.0, light_height = 2.3, surround_kind = "bare_band", keystone_present = false, lights = "= (1.0,)", fan_type = "= 'qamariya' if manner == 'sanaa' else None", fan_head = "round", fan_spokes = 4, fan_height = 0.5, fan_gap = 0.1, fan_shared = true, fan_surround = "none" }

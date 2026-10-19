@@ -1,0 +1,62 @@
+# The commercial programme: the shops of a deco main street.
+#
+# Three sizes, by class and frontage, from photographs:
+# * the "taxpayer" (modest and ordinary, under 24 m): a one- or two-storey
+#   row of shops built to pay the taxes on a lot held for something taller --
+#   show windows on bulkheads, black structural glass (Vitrolite) between
+#   them, a tall sign parapet raised in the middle in a stepped (zigzag) or
+#   banded (streamline) panel;
+# * the variety store (Kress, Sacramento 1931; Kress stores generally): three
+#   or four floors of offices or stock over show windows, piers running up
+#   through the parapet between dark spandrels;
+# * the department store (Bullocks Wilshire, Los Angeles 1929; I. Magnin):
+#   a long low block with a tower of setbacks, at its centre or at its
+#   corner (the architect's hand), the tower's windows in vertical strips.
+# Numbers are INFERRED round figures from those photographs.
+
+[params]
+shop_walls = ["stucco", "brick_buff", "terracotta", "plaster_ochre"]
+store_walls = ["brick_buff", "terracotta", "stone", "stucco"]
+taxpayer_until = 24.0     # a frontage this wide or wider is built up as a store
+
+[[rule]]
+id = "deco.commercial.the_kind_of_shop"
+label = "Lot"
+layer = "programme"
+doc = "A modest frontage is a taxpayer, a larger one a store; a grand one a department store with a tower, at its centre or its corner by the architect's hand."
+when = "programme == 'commercial'"
+let = { kind = "'department store' if klass == 'grand' else ('taxpayer' if rank[klass] <= 1 and width < taxpayer_until else 'store')" }
+set = { composition = "= ([['store', 0.39], ['tower', 0.22], ['store', 0.39]] if seed % 2 == 0 else [['tower', 0.24], ['store', 0.76]]) if kind == 'department store' else [['shops', 1.0] if kind == 'taxpayer' else ['store', 1.0]]", massing = "= kind" }
+
+[[rule]]
+id = "deco.commercial.shops"
+label = "Block"
+layer = "programme"
+doc = "A taxpayer: shop fronts, a door to each pair, one floor of offices on an ordinary one, a tall sign parapet stepped up in the middle."
+when = "programme == 'commercial' and part == 'shops'"
+set = { floors = "= 0 if klass == 'modest' else 1", ground_h = 4.4, parapet_h = 1.9, block_bay = [3.0, 3.7, 4.6], block_end = [0.4, 0.6, 1.0], glazing_upper = "paired", door = "centre", base_wall = "shadow", crest = "= 'stepped' if year <= zigzag_until else 'flat'", crest_h = 1.5, crest_steps = 2, crest_reach = 0.36, eyebrows = false }
+
+[[rule]]
+id = "deco.commercial.store"
+label = "Block"
+layer = "programme"
+doc = "A store: three or four floors over show windows, piers through the parapet, dark spandrels (zigzag) or ribbon windows under racing stripes (streamline)."
+when = "programme == 'commercial' and part in ('store', 'tower')"
+let = { zig = "year <= zigzag_until" }
+set = { floors = "= 4 if klass in ('comfortable', 'grand') else 3", ground_h = 5.0, floor_h = 3.8, parapet_h = 1.6, block_bay = [2.8, 3.4, 4.2], block_end = [0.6, 1.0, 1.8], glazing_upper = "= 'paired' if zig else 'ribbon'", piers = "= zig", pier_rise = 1.0, spandrel = "= 'dark' if zig else 'none'", base_wall = "stone", crest = "= 'stepped' if zig else 'flat'", crest_h = 1.4, crest_steps = 3, crest_reach = 0.3, eyebrows = false }
+
+[[rule]]
+id = "deco.commercial.the_tower"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "The department store's tower (Bullocks Wilshire): one floor above the store, then setbacks, its windows vertical strips, a stepped top."
+when = "programme == 'commercial' and part == 'tower'"
+set = { floors = 5, setbacks = "= [[2, 0.78], [2, 0.58], [2, 0.4]]", glazing_upper = "strip", piers = true, spandrel = "dark", pier_rise = 0.0, crest = "stepped", crest_h = 4.0, crest_steps = 3, crest_reach = 0.3, block_bay = [1.8, 2.4, 3.0], door = "centre" }
+
+[[rule]]
+id = "deco.commercial.the_merchants_paint"
+label = "Block"
+layer = "hand"
+when = "programme == 'commercial'"
+set = { wall = "= shop_walls[seed % 4] if part == 'shops' else store_walls[seed % 4]", accent = "= 'clapboard_blue' if seed % 2 else 'stucco_rose'" }

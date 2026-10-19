@@ -1,0 +1,55 @@
+# The religious programme: the deco church.
+#
+# From photographs: Boston Avenue Methodist (Tulsa, 1929, Adah Robinson and
+# Bruce Goff): a tower of continuous limestone fins rising in setbacks to a
+# glazed lantern and a finial, between two low wings of tall windows; and the
+# smaller deco churches of the 1930s: a nave front raised in a stepped
+# gable, tall windows, aisles either side.
+# * comfortable and grand: wing | tower | wing (Boston Avenue);
+# * modest and ordinary: aisle | nave | aisle.
+# Numbers are INFERRED round figures from those photographs.
+
+[params]
+church_walls = ["stone", "brick_buff", "stucco", "brick"]
+
+[[rule]]
+id = "deco.religious.tower_or_nave"
+label = "Lot"
+layer = "programme"
+doc = "A rich congregation builds a tower between wings; a poorer one a nave front between aisles."
+when = "programme == 'religious'"
+let = { tower = "rank[klass] >= 2" }
+set = { composition = "= [['wing', 0.37], ['tower', 0.26], ['wing', 0.37]] if tower else [['aisle', 0.27], ['nave', 0.46], ['aisle', 0.27]]", massing = "= 'tower between wings' if tower else 'nave between aisles'" }
+
+[[rule]]
+id = "deco.religious.low_wings"
+label = "Block"
+layer = "programme"
+doc = "Wings and aisles: one tall floor of tall round-headed windows, no shops, no door."
+when = "programme == 'religious'"
+set = { floors = "= 1 if part == 'wing' else 0", ground_h = 6.0, floor_h = 4.4, parapet_h = 1.2, block_bay = [1.8, 2.3, 2.9], block_end = [0.6, 1.0, 1.6], glazing_ground = "tall", glazing_upper = "slot", door = "none", piers = "= part == 'wing'", pier_w = 0.45, pier_rise = 0.8, eyebrows = false, stripes = 0, crest = "= 'chevron' if part == 'wing' and year <= zigzag_until else 'flat'", crest_h = 0.8, crest_steps = 6 }
+
+[[rule]]
+id = "deco.religious.the_tower"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "Boston Avenue's tower: close-set fins the whole height, narrow glass between them, setbacks, and a finial."
+when = "programme == 'religious' and part == 'tower'"
+set = { floors = "= 6 if klass == 'comfortable' else 8", ground_h = 7.0, floor_h = 4.2, glazing_ground = "tall", glazing_upper = "strip", door = "centre", piers = true, pier_w = 0.42, pier_rise = 0.0, block_bay = [1.0, 1.3, 1.7], block_end = [0.4, 0.6, 1.0], setbacks = "= [[2, 0.82], [2, 0.62]]", crest = "spire", crest_h = 14.0, crest_steps = 3, crest_reach = 0.45, stoop = 0.8 }
+
+[[rule]]
+id = "deco.religious.the_nave"
+label = "Block"
+layer = "programme"
+specificity = 10
+doc = "A nave front: higher than its aisles, a tall window band over the door, raised in a stepped gable."
+when = "programme == 'religious' and part == 'nave'"
+set = { floors = 1, ground_h = 5.0, floor_h = 6.0, glazing_ground = "tall", glazing_upper = "band", spandrel = "light", door = "centre", piers = true, pier_w = 0.5, block_bay = [1.6, 2.0, 2.6], crest = "stepped", crest_h = "= 4.0 if klass == 'ordinary' else 3.0", crest_steps = 4, crest_reach = 0.3, stoop = 0.6 }
+
+[[rule]]
+id = "deco.religious.the_stone"
+label = "Block"
+layer = "hand"
+when = "programme == 'religious'"
+set = { wall = "= church_walls[seed % 4]", base_wall = "= church_walls[seed % 4]" }
