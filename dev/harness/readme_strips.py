@@ -124,12 +124,12 @@ def strips():
             ("brick store-and-loft, 1890, 2 lots", generate_soho(SohoSite(2, 1890, P.LOFT, K.MODEST, seed=2))[0]),
         ]),
         "venice": ("Venetian Gothic palazzo (venice.toml)", [
-            ("11 m, ordinary", generate_venice(PalazzoSite(11.0, 1380, K.ORDINARY))[0]),
-            ("14 m, ordinary", generate_venice(PalazzoSite(14.0, 1400, K.ORDINARY))[0]),
-            ("16 m, comfortable", generate_venice(PalazzoSite(16.0, 1410, K.COMFORTABLE))[0]),
-            ("19 m, grand", generate_venice(PalazzoSite(19.0, 1430, K.GRAND))[0]),
-            ("22 m, grand", generate_venice(PalazzoSite(22.0, 1440, K.GRAND))[0]),
-            ("25 m, grand", generate_venice(PalazzoSite(25.0, 1450, K.GRAND))[0]),
+            ("11 m, ordinary", generate_venice(PalazzoSite(11.0, 1380, K.ORDINARY, seed=0))[0]),
+            ("14 m, ordinary", generate_venice(PalazzoSite(14.0, 1400, K.ORDINARY, seed=2))[0]),
+            ("16 m, comfortable", generate_venice(PalazzoSite(16.0, 1410, K.COMFORTABLE, seed=1))[0]),
+            ("19 m, grand", generate_venice(PalazzoSite(19.0, 1430, K.GRAND, seed=0))[0]),
+            ("22 m, grand, two gates", generate_venice(PalazzoSite(22.0, 1440, K.GRAND, seed=1))[0]),
+            ("25 m, grand", generate_venice(PalazzoSite(25.0, 1450, K.GRAND, seed=2))[0]),
         ]),
         "victorian": ("San Francisco Victorian (victorian.toml)", [
             ("Italianate, 1872, 25 ft", generate_victorian(VictorianSite(1872, K.ORDINARY, 0))[0]),

@@ -3,7 +3,11 @@
 # Tripartite: every storey is cut wing | centre | wing. The centre is the end
 # of the portego, opening on the nobile floors through a polifora of ogee
 # lights on colonnettes, and on the water storey through the gate.
-# Numbers are INFERRED round figures (Ca' Foscari, Ca' d'Oro, Pisani-Moretta).
+# Numbers are INFERRED round figures from photographs (Ca' Foscari, Palazzo
+# Bernardo, Contarini Fasan, Pisani-Moretta): a water gate is 2 to 3 m wide
+# under a pointed arch whatever the palazzo's width; a palazzo built for two
+# brothers (Bernardo) has two gates, one in each wing; a richer house puts a
+# mezzanine over the water storey and a full third floor under the cornice.
 
 [style]
 name = "venice"
@@ -16,8 +20,14 @@ describe = { rule = "venice.palazzo", phase = "structure", detail = "f'Gothic pa
 year = "= year"
 
 [params]
-# Water storey, piano nobile, second nobile, mezzanine under the roof.
-heights = [4.6, 5.8, 5.0, 2.9]
+# Storey heights by class: the richer the owner, the taller the floors.
+water_h = { modest = 4.0, ordinary = 4.2, comfortable = 4.6, grand = 5.0 }
+nobile1_h = { modest = 4.6, ordinary = 4.8, comfortable = 5.4, grand = 6.0 }
+nobile2_h = { modest = 4.2, ordinary = 4.4, comfortable = 5.0, grand = 5.6 }
+mezzanine_h = 2.3               # an ammezzato over the water storey
+third_h = 4.4                   # a full floor under the cornice
+attic_h = 2.9                   # or a low mezzanine under the roof
+gate_w = [2.0, 3.0]             # a water gate, narrowest and widest
 centre_share = 0.40
 wing_bay = [1.8, 2.2, 2.8]
 wing_end = [0.5, 0.9, 1.4]
@@ -26,14 +36,20 @@ polifora_min_light = 0.95     # INFERRED -- the narrowest arch of a polifora, ab
 [[production]]
 id = "venice.lot"
 label = "Lot"
-doc = "The palazzo stands its whole front on the canal."
-do = [ { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(heights)"], name = "facade" } ]
+doc = "The palazzo stands its whole front on the canal. Money adds a mezzanine and a third floor; the seed stands for the family, one of two brothers sharing a front with two gates."
+do = [
+  { let = { rich = "klass in ('comfortable', 'grand')" } },
+  { set = { two_gates = "= width >= 20 and seed % 2 == 1", wing_balconies = "= seed % 3 != 2" } },
+  { let = { mezz = "rich and width >= 16", third = "width >= 21 or (rich and seed % 2 == 1)" } },
+  { set = { floors = "= [['water', water_h[klass]]] + ([['mezzanine', mezzanine_h]] if mezz else []) + [['nobile1', nobile1_h[klass]], ['nobile2', nobile2_h[klass]]] + ([['third', third_h]] if third else [['attic', attic_h]])" } },
+  { insert = "Facade", at = ["0.0", "0.0", "w", "fsum(column(floors, 1))"], name = "facade" },
+]
 
 [[production]]
 id = "venice.facade"
 label = "Facade"
-doc = "Four storeys, the piano nobile the tallest."
-do = [ { split = "y", id_base = "parent", parts = [ { repeat = "heights", label = "Storey", size = "item", name = "s{i}" } ] } ]
+doc = "The water storey, perhaps a mezzanine, two nobile floors (the first the tallest), and a third floor or a low attic."
+do = [ { split = "y", id_base = "parent", parts = [ { repeat = "floors", label = "Storey", size = "item[1]", name = "s{i}", attrs = { floor = "= item[0]" } } ] } ]
 
 [[production]]
 id = "venice.storey"
@@ -42,12 +58,12 @@ doc = "Every storey is cut the same way: wing, centre, wing. A string course cro
 let = { centre = "w * centre_share" }
 do = [
   { split = "x", parts = [
-      { label = "Wing", size = "(w - centre) / 2.0", name = "wing_left" },
+      { label = "Wing", size = "(w - centre) / 2.0", name = "wing_left", attrs = { side = "left" } },
       { label = "Centre", size = "centre", name = "centre" },
-      { label = "Wing", size = "(w - centre) / 2.0", name = "wing_right" },
+      { label = "Wing", size = "(w - centre) / 2.0", name = "wing_right", attrs = { side = "right" } },
   ] },
-  { insert = "Cornice", at = ["x", "y + h", "w", "0.45"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "role == 'attic'" },
-  { insert = "Entablature", at = ["x", "y + h - 0.16", "w", "0.16"], name = "string_course", attrs = { course_kind = "bandeau" }, when = "role != 'attic'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "0.45"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "index == count - 1" },
+  { insert = "Entablature", at = ["x", "y + h - 0.16", "w", "0.16"], name = "string_course", attrs = { course_kind = "bandeau" }, when = "index != count - 1" },
 ]
 
 [[production]]
@@ -62,24 +78,31 @@ do = [
 [[production]]
 id = "venice.centre"
 label = "Centre"
-doc = "The centre is the portego's end: on the nobile floors one wide cell for the polifora, on the water storey the gate between two lights, under the roof a row of small windows."
+doc = "The centre is the portego's end: on the nobile and third floors one wide cell for the polifora, on the water storey the gate (between two lights where there is room for them), in a mezzanine a row of small windows."
 do = [
-  { split = "x", when = "role == 'nobile'", parts = [
+  { split = "x", when = "role in ('nobile', 'third')", parts = [
       { label = "Cell", size = "0.45", name = "x0", slot = "end" },
       { label = "Cell", size = "w - 2 * 0.45", name = "x1", slot = "bay" },
       { label = "Cell", size = "0.45", name = "x2", slot = "end" },
   ] },
-  # The water gate takes its width from the polifora over it -- half its span,
-  # and never less than a boat needs -- and the two lights share the rest.
-  { let = { gate = "max(1.8, (w - 0.9) * 0.5)" } },
-  { split = "x", when = "role == 'water'", parts = [
+  # A water gate is as wide as a boat and its mooring need, 2 to 3 m, not a
+  # share of the front. Lights flank it where the centre has room for them;
+  # on a narrow palazzo the gate stands alone in the centre's wall.
+  { let = { gate = "min(gate_w[1], max(gate_w[0], w * 0.42))" } },
+  { let = { flanked = "w - 1.2 - gate >= 2 * 1.4" } },
+  { split = "x", when = "role == 'water' and not two_gates and flanked", parts = [
       { label = "Cell", size = "0.4", name = "x0", slot = "end" },
-      { label = "Cell", size = "(w - 0.8 - gate) / 2.0", name = "x1", slot = "bay" },
-      { label = "Cell", size = "gate", name = "x2", slot = "bay" },
-      { label = "Cell", size = "(w - 0.8 - gate) / 2.0", name = "x3", slot = "bay" },
+      { label = "Cell", size = "(w - 1.2 - gate) / 2.0", name = "x1", slot = "bay" },
+      { label = "Cell", size = "gate + 0.4", name = "x2", slot = "bay" },
+      { label = "Cell", size = "(w - 1.2 - gate) / 2.0", name = "x3", slot = "bay" },
       { label = "Cell", size = "0.4", name = "x4", slot = "end" },
   ] },
-  { split = "x", when = "role == 'attic'", parts = [
+  { split = "x", when = "role == 'water' and not two_gates and not flanked", parts = [
+      { label = "Cell", size = "(w - gate - 0.4) / 2.0", name = "x0", slot = "end" },
+      { label = "Cell", size = "gate + 0.4", name = "x1", slot = "bay" },
+      { label = "Cell", size = "(w - gate - 0.4) / 2.0", name = "x2", slot = "end" },
+  ] },
+  { split = "x", when = "role in ('attic', 'mezzanine') or (role == 'water' and two_gates)", parts = [
       { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
       { repeat = "range(3)", label = "Cell", size = "(w - 2 * 0.4) / 3", name = "x{n}", slot = "bay" },
       { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
@@ -111,8 +134,8 @@ do = [ { call = "kit.dress_the_light" } ]
 id = "venice.roles.the_storey_knows_its_floor"
 label = "Storey"
 layer = "roles"
-doc = "Water storey at the bottom, mezzanine at the top, nobile between."
-set = { role = "= 'water' if index == 0 else 'attic' if index == count - 1 else 'nobile'", wall_material = "stucco_rose" }
+doc = "Each storey is the floor the facade gave it; both nobile floors are nobile."
+set = { role = "= 'nobile' if floor in ('nobile1', 'nobile2') else floor", wall_material = "stucco_rose" }
 
 [[rule]]
 id = "venice.base.end_piers_are_wall"
@@ -123,8 +146,8 @@ set = { opening_type = "none" }
 [[rule]]
 id = "venice.base.mezzanine_lights"
 label = "Cell"
-when = "is_bay() and role == 'attic'"
-set = { opening_type = "window", head = "flat", light_width = 0.75, sill = 0.9, light_height = 0.95, surround_kind = "moulded_architrave", keystone_present = false }
+when = "is_bay() and role in ('attic', 'mezzanine')"
+set = { opening_type = "window", head = "flat", light_width = 0.75, sill = "= 0.9 if role == 'attic' else 0.6", light_height = 0.95, surround_kind = "moulded_architrave", keystone_present = false }
 
 [[rule]]
 id = "venice.base.water_storey_lights"
@@ -135,26 +158,34 @@ set = { opening_type = "window", head = "round", light_width = 0.9, sill = 1.6, 
 [[rule]]
 id = "venice.base.an_ogee_window"
 label = "Cell"
-doc = "A wing bay holds one tall ogee-headed light in a stone frame, with a balconette on the nobile floors."
-when = "is_bay() and role == 'nobile'"
-set = { opening_type = "window", head = "ogee", light_width = 1.1, sill = 0.15, light_height = "= h - 0.15 - 1.2", surround_kind = "moulded_architrave", keystone_present = false, balcony = true }
+doc = "A wing bay holds one tall ogee-headed light in a stone frame. A balconette fronts it on the first nobile floor, and on the second too in some families' houses; never on the third."
+when = "is_bay() and role in ('nobile', 'third')"
+set = { opening_type = "window", head = "ogee", light_width = 1.1, sill = "= 0.15 if role == 'nobile' else 0.4", light_height = "= h - (0.15 if role == 'nobile' else 0.4) - 1.2", surround_kind = "moulded_architrave", keystone_present = false, balcony = "= floor == 'nobile1' or (floor == 'nobile2' and wing_balconies)" }
 
 [[rule]]
 id = "venice.base.the_polifora"
 label = "Cell"
 doc = "On a nobile floor the centre is one opening of many ogee lights on colonnettes."
-when = "is_bay() and in_parent('Centre') and role == 'nobile'"
+when = "is_bay() and in_parent('Centre') and role in ('nobile', 'third')"
 specificity = 10
 # As many lights as the house can afford, but never so many that a light
 # comes out narrower than polifora_min_light: a narrow palazzo opens in
 # fewer, wider arches rather than in slits.
-let = { want = "(5 if klass == 'grand' else 4) - (0 if index_of('Storey') == 1 else 1)", fits = "int((w + 0.24) // (polifora_min_light + 0.24))" }
-set = { opening_type = "window", head = "ogee", light_width = "= w", sill = 0.15, light_height = "= h - 0.15 - 1.2", lights = "= (1.0,) * max(2, min(want, fits))", divider = "Column", divider_width = 0.24, order = "corinthian", surround_kind = "none", balcony = true }
+let = { want = "(5 if klass == 'grand' else 4) - (0 if floor == 'nobile1' else 1) ", fits = "int((w + 0.24) // (polifora_min_light + 0.24))" }
+set = { opening_type = "window", head = "ogee", light_width = "= w", sill = "= 0.15 if role == 'nobile' else 0.4", light_height = "= h - (0.15 if role == 'nobile' else 0.4) - 1.2", lights = "= (1.0,) * max(2, min(want, fits))", divider = "Column", divider_width = 0.24, order = "corinthian", surround_kind = "none", balcony = "= role == 'nobile'" }
 
 [[rule]]
 id = "venice.base.the_water_gate"
 label = "Cell"
-doc = "The middle of the water storey is the gate the boats come in by."
-when = "is_bay() and in_parent('Centre') and role == 'water' and is_middle_bay()"
+doc = "The middle of the water storey is the gate the boats come in by: 2 to 3 m wide, under a pointed arch, about twice as tall as it is wide."
+when = "is_bay() and in_parent('Centre') and role == 'water' and is_middle_bay() and not two_gates"
 specificity = 20
-set = { opening_type = "pedestrian_entrance", head = "round", light_width = "= w - 0.3", sill = 0.0, light_height = "= h - 0.7", surround_kind = "moulded_architrave" }
+set = { opening_type = "pedestrian_entrance", head = "ogee", light_width = "= min(w - 0.4, gate_w[1])", sill = 0.0, light_height = "= min(h - 0.5, 2.0 * min(w - 0.4, gate_w[1]) + 0.2)", surround_kind = "moulded_architrave" }
+
+[[rule]]
+id = "venice.base.two_gates"
+label = "Cell"
+doc = "A front shared by two brothers has a gate in each wing, in the bay nearest the centre, and the centre between them is lit by small windows."
+when = "is_bay() and in_parent('Wing') and role == 'water' and two_gates and (is_last_bay() if side == 'left' else is_first_bay())"
+specificity = 20
+set = { opening_type = "pedestrian_entrance", head = "ogee", light_width = "= min(w - 0.4, gate_w[1])", sill = 0.0, light_height = "= min(h - 0.5, 2.0 * min(w - 0.4, gate_w[1]) + 0.2)", surround_kind = "moulded_architrave" }

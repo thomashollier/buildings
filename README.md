@@ -92,7 +92,7 @@ Six buildings from each ruleset, one scale per strip
 
 ![amsterdam](docs/strips/amsterdam.png)
 
-**Venetian Gothic palazzo** — every storey cut wing | centre | wing; the noble floor opens in a polifora of ogee lights on colonnettes -- never so many that an arch comes out under 0.95 m -- and the water gate below takes its width from the polifora.
+**Venetian Gothic palazzo** — every storey cut wing | centre | wing; the noble floors open in a polifora of ogee lights on colonnettes, never so many that an arch comes out under 0.95 m. The water gate is 2 to 3 m wide under a pointed arch, and a front shared by two brothers has one in each wing. Money sets the floor heights and adds a mezzanine over the water storey and a full third floor under the cornice; the family decides whether the second noble floor's windows get balconies.
 
 ![venice](docs/strips/venice.png)
 

@@ -313,7 +313,7 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         # hand-built node could still state one) puts the glass IN the arch
         # instead, the way a real arched doorway with a fan light over it
         # does.
-        arched = head_form in ("round", "segmental", "irregular")
+        arched = head_form in ("round", "segmental", "irregular", "ogee")
         fan_h = head_h if arched else min(head_h, max(0.22, body_w * 0.4), h)
         body_bot = y
         body_top = y + h - fan_h

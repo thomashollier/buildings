@@ -54,13 +54,35 @@ def test_every_venetian_storey_is_wing_centre_wing_and_the_nobile_opens_in_a_pol
     for st in storeys:
         assert [c.label for c in st.children if c.label in ("Wing", "Centre")] == ["Wing", "Centre", "Wing"]
     building, _ = generate_venice(PalazzoSite(19.0, 1430, BuildingClass.GRAND))
-    centre_lights = [
-        sum(1 for n in walk(s) if n.kind == "opening" and "/centre/" in n.id)
-        for s in building.children
-        if s.kind == "storey"
-    ]
-    assert centre_lights[1] == 5 and centre_lights[2] == 4  # first nobile richer than the second
+    floors = [st.attrs["floor"] for st in storeys]
+    centre_lights = {
+        floor: sum(1 for n in walk(s) if n.kind == "opening" and "/centre/" in n.id)
+        for floor, s in zip(floors, (s for s in building.children if s.kind == "storey"))
+    }
+    assert centre_lights["nobile1"] == 5 and centre_lights["nobile2"] == 4  # first nobile richer than the second
     assert any(n.props.get("head") == "ogee" for n in walk(building))
+
+
+def test_a_water_gate_is_as_wide_as_a_boat_needs_and_a_shared_front_has_two():
+    def gates(site):
+        building, _ = generate_venice(site)
+        return [n.props["w"] for n in walk(building) if n.props.get("opening_type") == "pedestrian_entrance"]
+
+    for width in (11.0, 14.0, 19.0, 25.0):
+        (w,) = gates(PalazzoSite(width, 1420, BuildingClass.ORDINARY))
+        assert 1.9 <= w <= 3.0, (width, w)
+    assert len(gates(PalazzoSite(22.0, 1440, BuildingClass.GRAND, seed=1))) == 2
+
+
+def test_a_richer_palazzo_is_taller_and_has_more_floors():
+    def floors(site):
+        lot, _ = derive_venice(site)
+        return [st.attrs["floor"] for st in lot.children[0].children], lot.children[0].scope.h
+
+    small, small_h = floors(PalazzoSite(11.0, 1380, BuildingClass.ORDINARY))
+    big, big_h = floors(PalazzoSite(25.0, 1450, BuildingClass.GRAND))
+    assert small == ["water", "nobile1", "nobile2", "attic"]
+    assert big == ["water", "mezzanine", "nobile1", "nobile2", "third"] and big_h > small_h + 5
 
 
 def test_the_chicago_shaft_is_uniform_its_piers_run_through_and_its_windows_are_1_2_1():
