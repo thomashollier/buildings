@@ -1,0 +1,16 @@
+img00.png	amsterdam	1700, wide, neck gable
+img01.png	venice_byzantine	1230, 22 m, comfortable
+img02.png	venice	14 m, ordinary
+img03.png	venice	19 m, grand
+img04.png	venice_byzantine	1250, 16 m, comfortable
+img05.png	venice	25 m, grand
+img06.png	amsterdam	1750, bell gable
+img07.png	amsterdam	1800, straight cornice
+img08.png	venice_byzantine	1200, 12 m (Ca' da Mosto)
+img09.png	venice	16 m, comfortable
+img10.png	amsterdam	1635, narrow, step gable
+img11.png	amsterdam	1620, step gable
+img12.png	venice_byzantine	1225, 30 m, grand (Fondaco)
+img13.png	venice	11 m, ordinary
+img14.png	amsterdam	1670, neck gable
+img15.png	venice	22 m, grand, two gates
