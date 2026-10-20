@@ -246,6 +246,11 @@ def draw_building(canvas: Canvas, building: Node, labels: bool = False) -> None:
             base_y = _num(special.props, "y")
             head_y = base_y + _num(special.props, "h")
             el.draw_chimney(canvas, sx, base_y, sw, max(0.0, head_y - base_y))
+        elif element_kind == "fumaiolo":
+            el.draw_fumaiolo(
+                canvas, _num(special.props, "x"), _num(special.props, "y"), _num(special.props, "w"),
+                _num(special.props, "h"), _num(special.props, "head_w"), _num(special.props, "head_h"),
+            )
 
     # A stoop stands in front of the wall it climbs; every other outline is
     # the wall itself, behind its storeys.

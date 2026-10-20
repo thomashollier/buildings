@@ -39,50 +39,60 @@ def test_each_style_derives_traces_renders_and_repeats(name, generate, derive, s
 
 
 def test_the_gable_follows_the_date_and_narrows_as_it_climbs():
+    # The builder (seed 0) draws the modal form of each date.
     assert [gable_form(y) for y in (1620, 1680, 1750, 1800)] == ["step", "neck", "bell", "straight"]
     lot, _ = derive_amsterdam(CanalSite(6.6, 1625, BuildingClass.COMFORTABLE))
     gable = next(s for s in lot.children if s.label == "Gable")
     widths = [t.children[0].scope.w for t in gable.children if t.label == "GableTier"]
-    assert len(widths) == 3 and widths == sorted(widths, reverse=True)
+    assert len(widths) == 2 and widths == sorted(widths, reverse=True)
+    # A cornice house carries no shaped gable: only the dormer over its cornice.
     building, _ = generate_amsterdam(CanalSite(6.6, 1800, BuildingClass.ORDINARY))
-    assert not any(n.kind == "gable" and n.props["form"] != "stoop" for n in walk(building))
+    tops = [n for n in walk(building) if n.kind == "gable" and n.props["form"] != "stoop"]
+    assert tops and all(n.props["form"] == "straight" for n in tops)
+    assert max(n.props["points"][-1][0] for n in tops) - min(p[0] for n in tops for p in n.props["points"]) < 3.0
+
+
+def _venice_storeys(lot):
+    return [c for c in lot.children[0].children if c.label == "Storey"]
 
 
 def test_every_venetian_storey_is_wing_centre_wing_and_the_nobile_opens_in_a_polifora():
     lot, _ = derive_venice(PalazzoSite(19.0, 1430, BuildingClass.GRAND))
-    storeys = lot.children[0].children
+    storeys = _venice_storeys(lot)
     for st in storeys:
         assert [c.label for c in st.children if c.label in ("Wing", "Centre")] == ["Wing", "Centre", "Wing"]
     building, _ = generate_venice(PalazzoSite(19.0, 1430, BuildingClass.GRAND))
     floors = [st.attrs["floor"] for st in storeys]
     centre_lights = {
-        floor: sum(1 for n in walk(s) if n.kind == "opening" and "/centre/" in n.id)
+        floor: sum(1 for n in walk(s) if n.kind == "opening" and n.props["opening_type"] == "window" and "/centre/" in n.id)
         for floor, s in zip(floors, (s for s in building.children if s.kind == "storey"))
     }
-    assert centre_lights["nobile1"] == 5 and centre_lights["nobile2"] == 4  # first nobile richer than the second
+    assert centre_lights["nobile1"] == centre_lights["nobile2"] == 4  # the same polifora on both nobile floors
     assert any(n.props.get("head") == "ogee" for n in walk(building))
 
 
 def test_a_water_gate_is_as_wide_as_a_boat_needs_and_a_shared_front_has_two():
     def gates(site):
         building, _ = generate_venice(site)
-        return [n.props["w"] for n in walk(building) if n.props.get("opening_type") == "pedestrian_entrance"]
+        return [n.props["w"] for n in walk(building) if n.props.get("opening_type") == "water_gate"]
 
     for width in (11.0, 14.0, 19.0, 25.0):
-        (w,) = gates(PalazzoSite(width, 1420, BuildingClass.ORDINARY))
+        (w,) = gates(PalazzoSite(width, 1420, BuildingClass.ORDINARY, seed=1))
         assert 1.9 <= w <= 3.0, (width, w)
-    assert len(gates(PalazzoSite(22.0, 1440, BuildingClass.GRAND, seed=1))) == 2
+    assert len(gates(PalazzoSite(22.0, 1440, BuildingClass.GRAND, seed=0))) == 2
 
 
-def test_a_richer_palazzo_is_taller_and_has_more_floors():
+def test_a_richer_palazzo_is_taller_and_what_stands_over_the_second_nobile_floor_is_the_familys():
     def floors(site):
         lot, _ = derive_venice(site)
-        return [st.attrs["floor"] for st in lot.children[0].children], lot.children[0].scope.h
+        return [st.attrs["floor"] for st in _venice_storeys(lot)], lot.children[0].scope.h
 
-    small, small_h = floors(PalazzoSite(11.0, 1380, BuildingClass.ORDINARY))
-    big, big_h = floors(PalazzoSite(25.0, 1450, BuildingClass.GRAND))
-    assert small == ["water", "nobile1", "nobile2", "attic"]
-    assert big == ["water", "mezzanine", "nobile1", "nobile2", "third"] and big_h > small_h + 5
+    small, small_h = floors(PalazzoSite(11.0, 1380, BuildingClass.ORDINARY, seed=3))
+    big, big_h = floors(PalazzoSite(25.0, 1450, BuildingClass.GRAND, seed=3))
+    assert small == big == ["water", "nobile1", "nobile2"] and big_h > small_h + 3
+    assert floors(PalazzoSite(14.0, 1400, BuildingClass.ORDINARY, seed=2))[0][-1] == "attic"
+    assert floors(PalazzoSite(25.0, 1450, BuildingClass.GRAND, seed=5))[0][-1] == "third"
+    assert floors(PalazzoSite(25.0, 1450, BuildingClass.ORDINARY, seed=5))[0][-1] == "attic"  # a third floor costs
 
 
 def test_the_chicago_shaft_is_uniform_its_piers_run_through_and_its_windows_are_1_2_1():

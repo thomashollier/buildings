@@ -77,11 +77,11 @@ def strips():
         "haussmann": ("Paris as a rule file (haussmann.toml)", _paris(generate_haussmann)),
         "amsterdam": ("Amsterdam canal house (amsterdam.toml)", [
             ("1620, step gable", a(CanalSite(6.6, 1620, K.COMFORTABLE))[0]),
-            ("1635, narrow, step gable", a(CanalSite(5.2, 1635, K.ORDINARY))[0]),
-            ("1670, neck gable", a(CanalSite(7.2, 1670, K.COMFORTABLE))[0]),
-            ("1700, wide, neck gable", a(CanalSite(8.0, 1700, K.GRAND))[0]),
-            ("1750, bell gable", a(CanalSite(5.8, 1750, K.ORDINARY))[0]),
-            ("1800, straight cornice", a(CanalSite(7.0, 1800, K.ORDINARY))[0]),
+            ("1650, raised neck gable", a(CanalSite(7.0, 1650, K.ORDINARY, seed=1))[0]),
+            ("1690, neck gable, tarred", a(CanalSite(7.2, 1690, K.COMFORTABLE, seed=1))[0]),
+            ("1740, bell gable", a(CanalSite(5.8, 1740, K.ORDINARY, seed=4))[0]),
+            ("1760, 5 bays, grand, crest", a(CanalSite(11.0, 1760, K.GRAND, seed=3))[0]),
+            ("1800, cornice and dormer", a(CanalSite(7.0, 1800, K.ORDINARY, seed=0))[0]),
         ]),
         "chicago": ("Chicago School office block (chicago.toml)", [
             ("1890, modest, 3 bays", c(OfficeSite(20.5, 1890, K.MODEST, seed=0))[0]),
@@ -140,12 +140,12 @@ def strips():
             ("brick store-and-loft, 1890, 2 lots", generate_soho(SohoSite(2, 1890, P.LOFT, K.MODEST, seed=2))[0]),
         ]),
         "venice": ("Venetian Gothic palazzo (venice.toml)", [
-            ("11 m, ordinary", generate_venice(PalazzoSite(11.0, 1380, K.ORDINARY, seed=0))[0]),
-            ("14 m, ordinary", generate_venice(PalazzoSite(14.0, 1400, K.ORDINARY, seed=2))[0]),
-            ("16 m, comfortable", generate_venice(PalazzoSite(16.0, 1410, K.COMFORTABLE, seed=1))[0]),
-            ("19 m, grand", generate_venice(PalazzoSite(19.0, 1430, K.GRAND, seed=0))[0]),
-            ("22 m, grand, two gates", generate_venice(PalazzoSite(22.0, 1440, K.GRAND, seed=1))[0]),
-            ("25 m, grand", generate_venice(PalazzoSite(25.0, 1450, K.GRAND, seed=2))[0]),
+            ("1380, 11 m, ordinary", generate_venice(PalazzoSite(11.0, 1380, K.ORDINARY, seed=3))[0]),
+            ("1400, 14 m, ordinary, attic", generate_venice(PalazzoSite(14.0, 1400, K.ORDINARY, seed=2))[0]),
+            ("1410, 16 m, comfortable", generate_venice(PalazzoSite(16.0, 1410, K.COMFORTABLE, seed=0))[0]),
+            ("1430, 19 m, grand, tracery", generate_venice(PalazzoSite(19.0, 1430, K.GRAND, seed=4))[0]),
+            ("1440, 22 m, grand, two gates", generate_venice(PalazzoSite(22.0, 1440, K.GRAND, seed=0))[0]),
+            ("1450, 25 m, grand, third floor", generate_venice(PalazzoSite(25.0, 1450, K.GRAND, seed=5))[0]),
         ]),
         "victorian": ("San Francisco Victorian (victorian.toml)", [
             ("Italianate, 1872, 25 ft", generate_victorian(VictorianSite(1872, K.ORDINARY, 0))[0]),
@@ -359,10 +359,10 @@ def _deco_family():
         "venice_byzantine": ("Venetian palazzo: Veneto-Byzantine before 1300, Gothic after (venice.toml)", [
             ("1200, 12 m (Ca' da Mosto)", v(PalazzoSite(12.0, 1200, K.ORDINARY, seed=0))),
             ("1250, 16 m, comfortable", v(PalazzoSite(16.0, 1250, K.COMFORTABLE, seed=1))),
-            ("1230, 22 m, comfortable", v(PalazzoSite(22.0, 1230, K.COMFORTABLE, seed=2))),
+            ("1230, 22 m, comfortable (Loredan type)", v(PalazzoSite(22.0, 1230, K.COMFORTABLE, seed=2))),
             ("1225, 30 m, grand (Fondaco)", v(PalazzoSite(30.0, 1225, K.GRAND, seed=0))),
-            ("1380, 11 m, Gothic", v(PalazzoSite(11.0, 1380, K.ORDINARY, seed=0))),
-            ("1430, 19 m, Gothic", v(PalazzoSite(19.0, 1430, K.GRAND, seed=0))),
+            ("1380, 11 m, Gothic", v(PalazzoSite(11.0, 1380, K.ORDINARY, seed=3))),
+            ("1430, 19 m, Gothic", v(PalazzoSite(19.0, 1430, K.GRAND, seed=4))),
         ]),
     }
 

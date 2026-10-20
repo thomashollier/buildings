@@ -107,4 +107,12 @@ COLORS: dict[str, str] = {
     "hoist_beam": "#3B2E26",
     "column": "#CFC8B6",
     "column_stroke": "#7A7262",
+    # Istrian stone, the white trim of a Venetian front, and the dark of an
+    # open arch (a portico, a water gate) with nothing glazed in it.
+    "istrian": "#EEEAE0",
+    "istrian_line": "#9C9384",
+    "socle_istrian_course": "#E6E1D5",
+    "void": "#2B3138",
+    "roof_coppi": "#A9644A",
+    "roof_coppi_line": "#7E4634",
 }

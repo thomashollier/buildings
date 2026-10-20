@@ -1,11 +1,16 @@
 # The Amsterdam canal house, as rules.
 #
-# Narrow, deep, tall brick, taxed by its frontage. The street front rises into
-# a gable that is a grammar of its own: tiers that narrow as they climb, each
-# holding fewer windows, and an outline whose shape tells its date -- step to
-# 1640, neck to 1720, bell to 1790, a straight cornice after. The outline is
-# drawn by a named writer around the tiers the rules place.
-# Numbers are INFERRED round figures (Herengracht, Keizersgracht).
+# Narrow, deep, tall brick, taxed by its frontage. The street front stands on
+# a light stone plinth over the half-sunk souterrain, is reached up a stoop
+# to a tall bel-etage, and rises into a gable that is a grammar of its own:
+# tiers that narrow as they climb, and an outline whose shape follows fashion.
+# Fashion overlapped: the step gable to the 1660s, the neck from 1638 to the
+# 1770s, the bell from the 1660s, the straight cornice (lijst) from the 1660s
+# on wide or rich fronts and nearly everywhere after 1790. The date gives the
+# odds; the builder (the seed) draws from them.
+#
+# Numbers are from the fidelity review (dev/fidelity/amsterdam/grading.md):
+# Grachtenboek plates and 3DBAG for heights, photographs for ratios.
 
 [style]
 name = "amsterdam"
@@ -19,41 +24,93 @@ year = "= year"
 
 [emit]
 Gable = "amsterdam.gable"
-Stoop = "kit.stoop"
+Stoop = "amsterdam.stoop"
+Anchor = "amsterdam.anchor"
 
 [params]
 bay = [1.8, 2.2, 2.6]             # a tall cross-window and its pier
 end = [0.3, 0.5, 0.9]
 gable_bay = [1.2, 1.75, 2.15]     # a gable tier squeezes harder: it is a loft
 gable_end = [0.2, 0.45, 0.9]
-window_share = 0.62               # a deep house is lit from its two ends
-basement = 1.5                    # the half-sunk souterrain, lit just over the street
-ground = 3.6                      # the raised ground floor, up the stoop
-first = 3.4
-taper = 0.93
-uppers = 3
+# Window share of the bay, by date: small early lights, sashes widening later.
+glass_by_date = [[1639, 0.52], [1749, 0.60], [9999, 0.65]]
+# The souterrain shows less above the street before about 1640.
+souterrain_by_date = [[1639, 1.0], [1664, 1.25], [9999, 1.5]]
+bel_etage = 4.2                   # the tall main floor up the stoop, 1.3x the next
+first = 3.3
+taper = 0.88                      # 3.3 -> 2.9 -> 2.56
+# Upper storeys over the bel-etage: two on the early, gabled fronts; three on
+# the classic house; a lijst house has one more, its attic under the roof.
+uppers_early = 2
+uppers_classic = 3
+uppers_lijst = 4
+early_until = 1665                # the step-gable, red-brick, banded front ends
+head_band = 0.45                  # lintel or flat arch between a window and the floor above
+# The odds of each gable form, by date: [year limit, [[cumulative share, form], ...]].
+# The modal form of each band is listed first, so seed 0 draws it.
+form_by_date = [
+  [1637, [[1.0, "step"]]],
+  [1664, [[0.45, "step"], [0.70, "raised_neck"], [1.0, "neck"]]],
+  [1699, [[0.60, "neck"], [0.85, "bell"], [1.0, "straight"]]],
+  [1749, [[0.50, "neck"], [0.80, "bell"], [1.0, "straight"]]],
+  [1789, [[0.45, "bell"], [0.70, "neck"], [1.0, "straight"]]],
+  [9999, [[0.90, "straight"], [1.0, "bell"]]],
+]
+lijst_forced_from = 1660          # a wide or grand front takes a cornice from here
+wide_from = 9.0                   # metres of frontage that buy 4-5 bays
 # Per gable form: [height, width as a share of the frontage] for each tier,
 # and the crown over the last one.
-# Seen in photographs: a step gable climbs in small steps through two tiers
-# of windows to a narrow top; a neck gable is one window wide, a tall neck on
-# low claw-piece shoulders under a pediment; a bell gable is a wide bell.
-tiers = { step = [[2.6, 0.78], [2.4, 0.52], [1.9, 0.32]], neck = [[2.6, 0.4], [2.3, 0.4]], bell = [[3.0, 0.62]], straight = [] }
-crowns = { step = 0.0, neck = 1.1, bell = 1.4, straight = 0.0 }
+# Step: two tiers in few, large steps and a top block (Herengracht 203).
+# Neck: one storey, one window wide, under a pediment (Grachtenboek).
+# Raised neck: a wide shoulder storey under the neck (Keizersgracht 133).
+# Bell: one attic storey, one opening, inside a bell 0.68 of the front wide.
+# Straight: a dormer (or a raised crest) over the cornice, holding the hatch;
+# its width is given in metres below, not as a share.
+tiers = { step = [[2.4, 0.74], [2.0, 0.46]], raised_neck = [[2.6, 0.65], [2.4, 0.40]], neck = [[2.8, 0.40]], bell = [[2.1, 0.30]], straight = [] }
+crowns = { step = 0.9, raised_neck = 0.9, neck = 0.9, bell = 1.2, straight = 0.5 }
+step_top = 0.22                   # the top block of a step gable, share of the frontage
+bell_foot = 0.68                  # the bell's foot, share of the frontage
+bell_cap = 0.25                   # its segmental cap
+lijst_dormer = [1.9, 1.6]         # [height, width] of the dormer over a cornice
+lijst_crest = [1.3, 3.0]          # [height, width] of a raised crest (verhoogde lijst)
+crest_from = 1700
+crest_until = 1780
+cornice_depth = 0.9               # a console cornice, stopping at the party walls
+# The stoop: treads of a ship's stair, climbing parallel to the front.
+tread_rise = 0.19
+tread_run = 0.27
 
 [[production]]
 id = "amsterdam.lot"
 label = "Lot"
-doc = "Two or three bays fitted to the frontage, a facade on the lot, a stoop up to its door and, unless the date has put a cornice there, a gable on the facade."
+doc = "Bays fitted to the frontage (up to seven on a wide or grand front); the builder draws the gable form from the odds of the date; a facade on the lot, a stoop up to its door and a gable, a dormer or a crest over it."
 do = [
-  # The gable's outline follows fashion, and fashion follows the date.
-  { set = { form = "= 'step' if year < 1640 else 'neck' if year < 1720 else 'bell' if year < 1790 else 'straight'", storey_heights = "= [basement, ground] + geometric(first, taper, uppers)" } },
-  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 3 },
-  { let = { front = "fsum(storey_heights)" } },
+  # The builder (the seed) stands behind each draw: the gable, the door side,
+  # the brick, the trim. Each is mixed differently so they do not move together.
+  { let = { u_form = "((seed * 37 + 11) % 100 + 0.5) / 100.0", u_wall = "((seed * 53 + (seed // 2) * 31 + 29) % 100 + 0.5) / 100.0", jit = "1.0 + ((seed * 23 + 7) % 11 - 5) / 100.0" } },
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 7, when = "width >= wide_from or klass == 'grand'" },
+  { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 3, when = "not (width >= wide_from or klass == 'grand')" },
+  { let = { nb = "len(bay_spans(rhythm, 0.0))" } },
+  { set = { form = "= 'straight' if (year >= lijst_forced_from and (nb >= 4 or klass == 'grand')) else step(step(form_by_date, year), u_form)" } },
+  { set = { glass = "= step(glass_by_date, year)", souterrain = "= step(souterrain_by_date, year)", early = "= year < early_until" } },
+  { set = { storey_heights = "= [souterrain, bel_etage * jit] + geometric(first * jit, taper, uppers_early if early else (uppers_lijst if form == 'straight' else uppers_classic))" } },
+  # Brick: bright red before 1665; then mostly dark, a fifth tarred black,
+  # a late lijst front sometimes plastered white, a grand one in sandstone.
+  { set = { wall = "= 'brick' if early else ('travertine' if (klass == 'grand' and form == 'straight' and seed % 3 == 0) else ('plaster_white' if (form == 'straight' and year >= 1790 and u_wall > 0.80) else ('basalt' if u_wall > 0.78 else 'brick_dark')))" } },
+  # Stone trim: sandstone left buff, or painted white in the 18th century.
+  { set = { trim = "= 'travertine' if (year < 1700 or (seed // 2) % 2 == 0) else 'plaster_white'" } },
+  # The door: in the middle of five bays, otherwise in an outer bay, left or
+  # right as the builder (or the neighbour's mirror) has it.
+  { set = { door_at = "= 'middle' if (nb >= 5 and nb % 2 == 1) else ['first', 'last'][seed % 2]" } },
+  { let = { front = "fsum(storey_heights)", door_i = "nb // 2 if door_at == 'middle' else (0 if door_at == 'first' else nb - 1)" } },
+  { let = { door = "bay_spans(rhythm, 0.0)[door_i]", run = "(round(souterrain / tread_rise) - 1) * tread_run" } },
+  { let = { st_l = "max(0.0, door.x - (run if door_at != 'first' else 0.6))", st_r = "min(w, door.x + door.w + (run if door_at != 'last' else 0.6))" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
-  # The stoop climbs from the street to the door, over the souterrain.
-  { let = { door = "bay_spans(rhythm, 0.0)[0]" } },
-  { insert = "Stoop", at = ["door.x", "0.0", "door.w", "basement"], name = "stoop" },
-  { insert = "Gable", at = ["0.0", "front", "w", "fsum(column(tiers[form], 0)) + crowns[form]"], name = "gable", attrs = { form = "= form" }, when = "len(tiers[form]) > 0" },
+  # The stoop climbs from the street to the door, parallel to the front.
+  { insert = "Stoop", at = ["st_l", "0.0", "st_r - st_l", "souterrain"], name = "stoop", attrs = { side = "= door_at", door_x = "= door.x", door_w = "= door.w", treads = "= round(souterrain / tread_rise) - 1" } },
+  { let = { lijst_crested = "form == 'straight' and year >= crest_from and year < crest_until and (seed // 2) % 2 == 1" } },
+  { let = { gtiers = "([[lijst_crest[0], lijst_crest[1] / w]] if lijst_crested else [[lijst_dormer[0], lijst_dormer[1] / w]]) if form == 'straight' else tiers[form]" } },
+  { insert = "Gable", at = ["0.0", "front", "w", "fsum(column(gtiers, 0)) + crowns[form]"], name = "gable", attrs = { form = "= form", top = "= 'crest' if lijst_crested else ('dormer' if form == 'straight' else form)", gtiers = "= gtiers", wall = "= wall", trim = "= trim", foot = "= bell_foot", cap = "= bell_cap if form == 'bell' else step_top" } },
 ]
 
 [[production]]
@@ -67,10 +124,15 @@ do = [
 [[production]]
 id = "amsterdam.storey"
 label = "Storey"
-doc = "A storey is cut by its rhythm; the top storey of a house with no gable carries the cornice."
+doc = "A storey is cut by its rhythm; an early front is banded in sandstone at its sills and over its window heads; the top storey of a house with no gable carries a console cornice that stops at the party walls."
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
-  { insert = "Cornice", at = ["x", "y + h", "w", "0.6"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "role == 'top' and form == 'straight'" },
+  { insert = "Entablature", at = ["x", "y + h - head_band + 0.12", "w", "0.12"], name = "head_band", attrs = { course_kind = "bandeau" }, when = "early and role in ('base', 'upper', 'top')" },
+  { insert = "Entablature", at = ["x", "y + (0.35 if role == 'base' else 0.75) - 0.24", "w", "0.12"], name = "sill_band", attrs = { course_kind = "bandeau" }, when = "early and role in ('base', 'upper', 'top')" },
+  # Iron wall anchors tie the front to the floor beams, one in each end pier at every floor.
+  { insert = "Anchor", at = ["x + size_of(rhythm[0]) / 2.0 - 0.03", "y + h - 0.5", "0.06", "0.45"], name = "anchor_l", when = "role in ('basement', 'base', 'upper')" },
+  { insert = "Anchor", at = ["x + w - size_of(rhythm[-1]) / 2.0 - 0.03", "y + h - 0.5", "0.06", "0.45"], name = "anchor_r", when = "role in ('basement', 'base', 'upper')" },
+  { insert = "Cornice", at = ["x + 0.32", "y + h", "w - 0.64", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "bracketed" }, when = "role == 'top' and form == 'straight'" },
 ]
 
 [[production]]
@@ -78,17 +140,18 @@ id = "amsterdam.gable"
 label = "Gable"
 doc = "The gable is cut into its tiers, bottom-up, and the crown over them."
 do = [ { split = "y", parts = [
-    { repeat = "tiers[form]", label = "GableTier", size = "item[0]", name = "tier{i}", attrs = { share = "= item[1]" } },
+    { repeat = "gtiers", label = "GableTier", size = "item[0]", name = "tier{i}", attrs = { share = "= item[1]" } },
     { repeat = "[crowns[form]] if crowns[form] else []", label = "Crown", size = "item", name = "crown" },
 ] } ]
 
 [[production]]
 id = "amsterdam.gable_tier"
 label = "GableTier"
-doc = "Each tier holds a storey narrower than the one below, centred, with as many windows as its own width fits."
-let = { tw = "w * share" }
+doc = "Each tier holds a storey narrower than the one below, centred, never narrower than one opening and its piers (1.8 m). A step gable's tiers, and a raised neck's shoulder, hold as many windows as they fit; a neck, a bell, a dormer or a crest holds one opening, on the axis."
+let = { multi = "form == 'step' or (form == 'raised_neck' and not is_last('GableTier'))", tw = "max(w * share, 1.8) if multi else min(max(w * share, 1.8), 3.9)" }
 do = [
-  { fit = "x", budget = "tw", end = "gable_end", bay = "gable_bay", as = "tier_rhythm", max_bays = 3 },
+  { fit = "x", budget = "tw", end = "gable_end", bay = "gable_bay", as = "tier_rhythm", max_bays = 5, when = "multi" },
+  { fit = "x", budget = "tw", end = "gable_end", bay = "gable_bay", as = "tier_rhythm", max_bays = 1, when = "not multi" },
   { insert = "Storey", at = ["x + (w - tw) / 2.0", "y", "tw", "h"], name = "storey", attrs = { role = "gable", rhythm = "= tier_rhythm" } },
 ]
 
@@ -120,8 +183,8 @@ set = { role = "= 'basement' if index == 0 else 'base' if index == 1 else 'top' 
 id = "amsterdam.base.brick"
 label = "Storey"
 layer = "roles"
-doc = "The whole front is the same dark brick, gable and all."
-set = { wall_material = "brick_dark" }
+doc = "The front is one brick, gable and all: red early, dark or tarred black later. The souterrain is faced in stone or plastered light, a pale plinth under the dark body up to the bel-etage floor; the dormer or crest over a cornice is timber, painted like the cornice."
+set = { wall_material = "= trim if ((in_parent('Facade') and index == 0) or (in_parent('GableTier') and form == 'straight')) else wall" }
 
 [[rule]]
 id = "amsterdam.base.end_piers_are_wall"
@@ -132,10 +195,10 @@ set = { opening_type = "none" }
 [[rule]]
 id = "amsterdam.base.a_bay_holds_a_tall_window"
 label = "Cell"
-doc = "Every bay holds a tall window under a stone lintel: the front is as much glass as brick can carry."
+doc = "Every bay holds a window, tallest on the bel-etage (sill 0.35 m) and shrinking up the front (sills 0.75 m); before 1665 under a relieving arch with a keystone, after it in a flush white frame."
 when = "is_bay()"
-let = { sill_h = "0.55 if role != 'gable' else 0.45", clear = "0.5 if role == 'top' and form == 'straight' else 0.3 if role == 'gable' else 0.0" }
-set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = "= sill_h", light_height = "= h - sill_h - 0.45 - clear", surround_kind = "moulded_architrave", keystone_present = false }
+let = { sill_h = "0.35 if role == 'base' else 0.45 if role == 'gable' else (0.5 if role == 'top' and form == 'straight' else 0.75)", clear = "0.2 if role == 'top' and form == 'straight' else 0.3 if role == 'gable' else 0.0" }
+set = { opening_type = "window", head = "flat", light_width = "= glass * w", sill = "= sill_h", light_height = "= h - sill_h - head_band - clear", surround_kind = "= 'none' if early else 'bare_band'", keystone_present = "= early" }
 
 [[rule]]
 id = "amsterdam.base.the_souterrain_lights"
@@ -143,20 +206,28 @@ label = "Cell"
 doc = "The half-basement is lit by low windows just over the street."
 when = "is_bay() and role == 'basement'"
 specificity = 10
-set = { opening_type = "window", head = "flat", light_width = "= window_share * w", sill = 0.3, light_height = "= h - 0.3 - 0.25", surround_kind = "none", keystone_present = false }
+set = { opening_type = "window", head = "flat", light_width = "= glass * w", sill = 0.2, light_height = "= h - 0.2 - 0.2", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "amsterdam.base.the_souterrain_door"
+label = "Cell"
+doc = "Under the stoop's landing, in the door's bay, is the souterrain door."
+when = "is_bay() and role == 'basement' and ((door_at == 'first' and is_first_bay()) or (door_at == 'last' and is_last_bay()) or (door_at == 'middle' and is_middle_bay()))"
+specificity = 20
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 0.9, sill = 0.0, light_height = "= h - 0.3", surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "amsterdam.base.the_door_up_the_stoop"
 label = "Cell"
-doc = "The door is in the bay beside the stair down to the street, up a stoop over the half-basement, under a transom light."
-when = "is_bay() and role == 'base' and is_first_bay()"
+doc = "The door is up the stoop, in an outer bay (the middle one of five), its fanlight's head level with the windows'."
+when = "is_bay() and role == 'base' and ((door_at == 'first' and is_first_bay()) or (door_at == 'last' and is_last_bay()) or (door_at == 'middle' and is_middle_bay()))"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.1, sill = 0.0, light_height = "= h - 0.9" }
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.2, sill = 0.0, light_height = "= h - head_band" }
 
 [[rule]]
 id = "amsterdam.base.the_attic_hatch"
 label = "Cell"
-doc = "The top tier of a gable is the loft, and its middle opening is the hatch goods are hoisted through."
-when = "is_bay() and role == 'gable' and is_last('GableTier') and is_middle_bay()"
+doc = "The top tier of a gable is the loft, and its opening on the axis is the hatch goods are hoisted through, under the beam. A tier with an even count has no opening on the axis, so no hatch."
+when = "is_bay() and role == 'gable' and is_last('GableTier') and is_middle_bay() and len(bay_spans(rhythm, 0.0)) % 2 == 1"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", light_height = "= h - 0.45 - 0.55", head = "flat" }
+set = { opening_type = "pedestrian_entrance", light_height = "= h - 0.45 - 0.45", head = "flat", surround_kind = "none", keystone_present = false }
