@@ -36,9 +36,13 @@ gable_end = [0.2, 0.45, 0.9]
 glass_by_date = [[1639, 0.52], [1749, 0.60], [9999, 0.65]]
 # The souterrain shows less above the street before about 1640.
 souterrain_by_date = [[1639, 1.0], [1664, 1.25], [9999, 1.5]]
-bel_etage = 4.2                   # the tall main floor up the stoop, 1.3x the next
-first = 3.3
-taper = 0.88                      # 3.3 -> 2.9 -> 2.56
+bel_etage = 4.4                   # the tall main floor up the stoop, 1.3x the next
+first = 3.4
+taper = 0.92                      # 3.4 -> 3.13 -> 2.88 -> 2.65
+upper_min = 2.7                   # no habitable storey of the front lower than this (3DBAG, Grachtenboek)
+upper_sill = 0.6                  # an upper window's sill over its floor
+light_max = 1.4                   # a sash window is 1.1-1.4 m wide; a wide bay has more pier
+light_min_ratio = 1.5             # ...and never squarer than this: a low top storey has a narrower sash
 # Upper storeys over the bel-etage: two on the early, gabled fronts; three on
 # the classic house; a lijst house has one more, its attic under the roof.
 uppers_early = 2
@@ -93,7 +97,9 @@ do = [
   { let = { nb = "len(bay_spans(rhythm, 0.0))" } },
   { set = { form = "= 'straight' if (year >= lijst_forced_from and (nb >= 4 or klass == 'grand')) else step(step(form_by_date, year), u_form)" } },
   { set = { glass = "= step(glass_by_date, year)", souterrain = "= step(souterrain_by_date, year)", early = "= year < early_until" } },
-  { set = { storey_heights = "= [souterrain, bel_etage * jit] + geometric(first * jit, taper, uppers_early if early else (uppers_lijst if form == 'straight' else uppers_classic))" } },
+  # The storeys taper up the front, but never so far that the top one drops under upper_min.
+  { let = { nu = "uppers_early if early else (uppers_lijst if form == 'straight' else uppers_classic)" } },
+  { set = { storey_heights = "= [souterrain, bel_etage * jit] + geometric(first * jit, max(taper, (upper_min / (first * jit)) ** (1.0 / max(1, nu - 1))), nu)" } },
   # Brick: bright red before 1665; then mostly dark, a fifth tarred black,
   # a late lijst front sometimes plastered white, a grand one in sandstone.
   { set = { wall = "= 'brick' if early else ('travertine' if (klass == 'grand' and form == 'straight' and seed % 3 == 0) else ('plaster_white' if (form == 'straight' and year >= 1790 and u_wall > 0.80) else ('basalt' if u_wall > 0.78 else 'brick_dark')))" } },
@@ -105,6 +111,9 @@ do = [
   { let = { front = "fsum(storey_heights)", door_i = "nb // 2 if door_at == 'middle' else (0 if door_at == 'first' else nb - 1)" } },
   { let = { door = "bay_spans(rhythm, 0.0)[door_i]", run = "(round(souterrain / tread_rise) - 1) * tread_run" } },
   { let = { st_l = "max(0.0, door.x - (run if door_at != 'first' else 0.6))", st_r = "min(w, door.x + door.w + (run if door_at != 'last' else 0.6))" } },
+  # Where the flight comes down, the souterrain shows blank plinth: a stair
+  # never runs across a window.
+  { set = { flight_l = "= st_l if door_at != 'first' else door.x + door.w", flight_r = "= st_r if door_at != 'last' else door.x" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
   # The stoop climbs from the street to the door, parallel to the front.
   { insert = "Stoop", at = ["st_l", "0.0", "st_r - st_l", "souterrain"], name = "stoop", attrs = { side = "= door_at", door_x = "= door.x", door_w = "= door.w", treads = "= round(souterrain / tread_rise) - 1" } },
@@ -195,10 +204,10 @@ set = { opening_type = "none" }
 [[rule]]
 id = "amsterdam.base.a_bay_holds_a_tall_window"
 label = "Cell"
-doc = "Every bay holds a window, tallest on the bel-etage (sill 0.35 m) and shrinking up the front (sills 0.75 m); before 1665 under a relieving arch with a keystone, after it in a flush white frame."
+doc = "Every bay holds a window, tallest on the bel-etage (sill 0.35 m) and shrinking up the front (sills 0.6 m) but never square: about 2.5, 1.9, 1.7, 1.5 times as tall as wide going up, a low top storey's sash narrower rather than squatter; a sash no wider than 1.4 m. Before 1665 under a relieving arch with a keystone, after it in a flush white frame."
 when = "is_bay()"
-let = { sill_h = "0.35 if role == 'base' else 0.45 if role == 'gable' else (0.5 if role == 'top' and form == 'straight' else 0.75)", clear = "0.2 if role == 'top' and form == 'straight' else 0.3 if role == 'gable' else 0.0" }
-set = { opening_type = "window", head = "flat", light_width = "= glass * w", sill = "= sill_h", light_height = "= h - sill_h - head_band - clear", surround_kind = "= 'none' if early else 'bare_band'", keystone_present = "= early" }
+let = { sill_h = "0.35 if role == 'base' else 0.45 if role == 'gable' else (0.5 if role == 'top' and form == 'straight' else upper_sill)", clear = "0.2 if role == 'top' and form == 'straight' else 0.3 if role == 'gable' else 0.0", lh = "h - sill_h - head_band - clear" }
+set = { opening_type = "window", head = "flat", light_width = "= min(light_max, glass * w) if role == 'gable' else min(light_max, glass * w, lh / light_min_ratio)", sill = "= sill_h", light_height = "= lh", surround_kind = "= 'none' if early else 'bare_band'", keystone_present = "= early" }
 
 [[rule]]
 id = "amsterdam.base.the_souterrain_lights"
@@ -207,6 +216,14 @@ doc = "The half-basement is lit by low windows just over the street."
 when = "is_bay() and role == 'basement'"
 specificity = 10
 set = { opening_type = "window", head = "flat", light_width = "= glass * w", sill = 0.2, light_height = "= h - 0.2 - 0.2", surround_kind = "none", keystone_present = false }
+
+[[rule]]
+id = "amsterdam.base.no_window_behind_the_flight"
+label = "Cell"
+doc = "Where the stoop's flight comes down in front of a souterrain bay, that bay is blank plinth: the stair runs in front of wall, never across a window."
+when = "is_bay() and role == 'basement' and x < flight_r - 0.05 and x + w > flight_l + 0.05"
+specificity = 15
+set = { opening_type = "none" }
 
 [[rule]]
 id = "amsterdam.base.the_souterrain_door"

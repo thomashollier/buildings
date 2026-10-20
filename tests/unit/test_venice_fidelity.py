@@ -86,7 +86,7 @@ def test_byzantine_supports_are_smooth_columns_the_portico_open_with_paterae():
 
 
 def test_both_nobile_polifore_have_the_same_lights_and_the_class_caps_them():
-    caps = {K.MODEST: 3, K.ORDINARY: 4, K.COMFORTABLE: 5, K.GRAND: 6}
+    caps = {K.MODEST: 4, K.ORDINARY: 5, K.COMFORTABLE: 6, K.GRAND: 6}
     for width in (11.0, 14.0, 16.0, 19.0, 22.0, 25.0, 30.0):
         for klass in K:
             for seed in range(6):
@@ -98,9 +98,25 @@ def test_both_nobile_polifore_have_the_same_lights_and_the_class_caps_them():
                 }
                 n1, n2 = len(cells["nobile1"].attrs["lights"]), len(cells["nobile2"].attrs["lights"])
                 assert n1 == n2
-                assert 2 <= n1 <= caps[klass] + (2 if klass == K.GRAND else 0)
+                assert 3 <= n1 <= caps[klass] + (2 if klass == K.GRAND else 0)
                 if "third" in cells:
                     assert len(cells["third"].attrs["lights"]) <= max(3, n1 - 2)
+
+
+def test_polifora_lights_are_slender_everywhere_never_broad_and_squat():
+    """Round 2: no three broad lights (about 1:1.2) on a third floor or a
+    modest front; a light at most 1.1 m wide and at least 2.5 times as tall."""
+    for width in (9.0, 11.0, 14.0, 17.0, 20.0, 26.0, 30.0):
+        for klass in K:
+            for seed in range(0, 100, 9):
+                building, _ = generate_venice(PalazzoSite(width, 1440, klass, seed=seed))
+                for storey in _storeys(building):
+                    if storey.props["role"] not in ("nobile", "third"):
+                        continue
+                    for o in walk(storey):
+                        if o.kind == "opening" and o.props["opening_type"] == "window":
+                            assert o.props["w"] <= 1.1 + 1e-9, o.id
+                            assert o.props["h"] >= 2.5 * o.props["w"] - 1e-9, o.id
 
 
 # 5. Stone balustrades -----------------------------------------------------------------------
@@ -148,11 +164,14 @@ def test_over_the_second_nobile_floor_nothing_an_attic_or_a_third_floor():
 # 7. Two gates ---------------------------------------------------------------------------------
 
 
-def test_one_wide_front_in_four_has_two_gates_mostly_side_by_side_under_the_polifora():
+def test_one_wide_front_in_four_has_two_gates_side_by_side_under_the_polifora():
     attrs = [_lot_attrs(PalazzoSite(22.0, 1440, K.GRAND, seed=s)) for s in SEEDS]
-    pair = sum(a["gate_pair"] for a in attrs)
-    wing = sum(a["wing_gates"] for a in attrs)
-    assert pair + wing == 25 and pair == 15
+    assert sum(a["gate_pair"] for a in attrs) == 25
+    # Round 2: never out in the wings, whatever the family.
+    for seed in SEEDS:
+        building, _ = generate_venice(PalazzoSite(20.0, 1376, K.COMFORTABLE, seed=seed))
+        gates = [n for n in walk(building) if n.kind == "opening" and n.props["opening_type"] == "water_gate"]
+        assert gates and all("/centre/" in g.id for g in gates)
     assert not any(_lot_attrs(PalazzoSite(18.0, 1440, K.GRAND, seed=s))["gate_pair"] for s in SEEDS)
     building, _ = generate_venice(PalazzoSite(22.0, 1440, K.GRAND, seed=0))
     gates = [n for n in walk(building) if n.kind == "opening" and n.props["opening_type"] == "water_gate"]
@@ -178,6 +197,22 @@ def test_a_quatrefoil_over_every_colonnette_on_the_traceried_floor_from_1420():
         cols = sum(1 for n in storey.children if n.kind == "column" and n.props.get("order") == "colonnette")
         traced = storey.id.endswith("s1")
         assert q == (cols if traced else 0), storey.id
+    # Round 2: the tracery is one web with the arcade. Each quatrefoil stands
+    # between the two arch tips beside it, its centre about level with them,
+    # and the stone web begins at the arches' springing, inside the frame.
+    storey = next(s for s in _storeys(building) if s.id.endswith("s1"))
+    lights = [n for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "window" and "/centre/" in n.id]
+    tips = max(o.props["y"] + o.props["h"] for o in lights)
+    spring = min(o.props["y"] + o.props["h"] - o.props["head_rise"] for o in lights)
+    (band,) = [n for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "tracery_band"]
+    assert band.props["y"] == pytest.approx(spring)
+    frame = next(n for n in walk(storey) if n.kind == "surround" and n.id.endswith("/frame"))
+    assert band.props["y"] + band.props["h"] == pytest.approx(frame.props["y"] + frame.props["h"])
+    for q in (n for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "quatrefoil"):
+        cy = q.props["y"] + q.props["h"] / 2.0
+        assert abs(cy - tips) < 0.35
+    bay = next(n for n in walk(storey) if n.kind == "bay" and any(c.props.get("opening_type") == "tracery_band" for c in n.children))
+    assert bay.children[0].props["opening_type"] == "tracery_band"  # drawn behind the arches
     early, _ = generate_venice(PalazzoSite(19.0, 1400, K.GRAND, seed=4))
     assert not any(n.props.get("opening_type") == "quatrefoil" for n in walk(early))
     plain, _ = generate_venice(PalazzoSite(19.0, 1450, K.ORDINARY, seed=4))
@@ -189,7 +224,11 @@ def test_a_quatrefoil_over_every_colonnette_on_the_traceried_floor_from_1420():
 
 def test_the_water_gate_is_an_open_arch_whose_head_is_the_familys():
     heads = Counter(_lot_attrs(PalazzoSite(16.0, 1440, K.ORDINARY, seed=s))["gate_head"] for s in SEEDS)
-    assert heads == {"pointed": 45, "ogee": 30, "round": 25}
+    assert heads == {"pointed": 45, "ogee": 55}  # no round-headed gate on a Gothic front
+    early = Counter(_lot_attrs(PalazzoSite(16.0, 1320, K.ORDINARY, seed=s))["gate_head"] for s in SEEDS)
+    assert early == {"pointed": 75, "round": 25}
+    middle = Counter(_lot_attrs(PalazzoSite(16.0, 1360, K.ORDINARY, seed=s))["gate_head"] for s in SEEDS)
+    assert middle == {"pointed": 100}
     building, _ = generate_venice(PalazzoSite(16.0, 1440, K.ORDINARY, seed=1))
     water = next(s for s in _storeys(building) if s.props["role"] == "water")
     (gate,) = [n for n in walk(water) if n.kind == "opening" and n.props["opening_type"] == "water_gate"]
@@ -204,6 +243,18 @@ def test_istrian_corners_a_base_course_and_the_wall_by_family():
     assert any(n.kind == "socle" and n.props["treatment"] == "istrian_course" for n in walk(building))
     walls = Counter(_lot_attrs(PalazzoSite(16.0, 1440, K.ORDINARY, seed=s))["palazzo_wall"] for s in SEEDS)
     assert walls == {"brick": 40, "stucco_rose": 30, "stucco": 20, "plaster_ochre": 10}
+
+
+def test_the_family_reaches_the_byzantine_front():
+    """Round 2: two modest fronts of different families were byte-identical."""
+    from buildings.render.svg.render import render
+
+    for width, klass in ((28.0, K.MODEST), (16.0, K.ORDINARY), (22.0, K.COMFORTABLE)):
+        drawings = {render(generate_venice(PalazzoSite(width, 1250, klass, seed=s))[0]) for s in range(20)}
+        assert len(drawings) >= 10
+    a = render(generate_venice(PalazzoSite(28.0, 1291, K.MODEST, seed=54))[0])
+    b = render(generate_venice(PalazzoSite(28.0, 1245, K.MODEST, seed=73))[0])
+    assert a != b
 
 
 def test_only_the_grand_fondaco_has_towers_and_merlons_and_they_are_large():

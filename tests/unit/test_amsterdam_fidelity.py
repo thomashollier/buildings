@@ -209,7 +209,7 @@ def test_the_bel_etage_is_tall_and_the_windows_shrink_going_up():
         w = _openings(st, "window")[0].props
         ratios.append(w["h"] / w["w"])
     assert ratios == sorted(ratios, reverse=True)
-    assert 2.2 <= ratios[0] <= 3.0 and 0.9 <= ratios[-1] <= 1.3
+    assert 2.2 <= ratios[0] <= 3.0 and 1.45 <= ratios[-1] <= 1.8
     # The door and its fanlight reach the bel-etage window heads.
     (door,) = _openings(storeys[1], "pedestrian_entrance")
     win = _openings(storeys[1], "window")[0]
@@ -258,3 +258,35 @@ def test_early_fronts_are_red_and_banded_later_ones_dark_or_tarred():
 def test_window_share_grows_with_the_date():
     shares = [derive_amsterdam(CanalSite(6.6, y, K.ORDINARY))[0].attrs["glass"] for y in (1620, 1700, 1780)]
     assert shares == sorted(shares) and shares[0] < shares[-1]
+
+
+# --- Round 2 -------------------------------------------------------------------
+
+def test_upper_windows_are_never_square_and_no_storey_drops_under_2_6_m():
+    """Window h:w about 2.5 / 1.9 / 1.7 / 1.5 going up; no habitable storey of
+    the front under 2.6 m."""
+    for width in (4.5, 6.6, 8.0, 11.0):
+        for year in (1620, 1690, 1760, 1810):
+            for klass in K:
+                for seed in range(0, 40, 7):
+                    building, _ = generate_amsterdam(CanalSite(width, year, klass, seed))
+                    front = [st for st in _storeys(building)[1:] if st.props["role"] != "gable"]
+                    for i, st in enumerate(front):
+                        assert st.props["h"] >= 2.6
+                        for win in _openings(st, "window"):
+                            assert win.props["h"] / win.props["w"] >= (2.2 if i == 0 else 1.45)
+
+
+def test_the_stoop_never_runs_across_a_souterrain_window():
+    for width in (4.5, 5.0, 6.6, 8.0, 11.0):
+        for year in (1620, 1700, 1780):
+            for klass in K:
+                for seed in range(12):
+                    building, _ = generate_amsterdam(CanalSite(width, year, klass, seed))
+                    souterrain = _storeys(building)[0]
+                    flights = [n for n in walk(building) if n.id.startswith("b/stoop/flight") and n.kind == "gable"]
+                    assert flights
+                    for win in _openings(souterrain, "window"):
+                        for f in flights:
+                            xs = [x for x, _ in f.props["points"]]
+                            assert max(xs) <= win.props["x"] + 1e-6 or min(xs) >= win.props["x"] + win.props["w"] - 1e-6

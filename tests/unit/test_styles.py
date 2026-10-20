@@ -67,7 +67,7 @@ def test_every_venetian_storey_is_wing_centre_wing_and_the_nobile_opens_in_a_pol
         floor: sum(1 for n in walk(s) if n.kind == "opening" and n.props["opening_type"] == "window" and "/centre/" in n.id)
         for floor, s in zip(floors, (s for s in building.children if s.kind == "storey"))
     }
-    assert centre_lights["nobile1"] == centre_lights["nobile2"] == 4  # the same polifora on both nobile floors
+    assert centre_lights["nobile1"] == centre_lights["nobile2"] == 5  # the same polifora on both nobile floors, slender lights filling the centre
     assert any(n.props.get("head") == "ogee" for n in walk(building))
 
 

@@ -193,24 +193,76 @@ def write_balconette(shape: Shape, below, d) -> list:
     ]
 
 
+def _ogee_half(x: float, y: float, w: float, rise: float, steps: int = 14) -> list[tuple[float, float]]:
+    """The left half of an ogee head, springing to tip: it leaves the springing
+    upright, curves in, turns about two thirds of the way up and runs concave
+    into the point (the cubic the head is drawn with)."""
+    pts = []
+    for i in range(steps + 1):
+        t = i / steps
+        pts.append((x + w / 2.0 * (3 * t * t - 2 * t ** 3), y + rise * (3 * t * (1 - t) ** 2 * 0.50 + 3 * t * t * (1 - t) * 0.12 + t ** 3)))
+    return pts
+
+
+def _head_extrados(light: Shape) -> list[tuple[float, float]]:
+    """The outer edge of a light's head, its stone band included, as points:
+    where tracery set over the arcade has to stop."""
+    x, w = _light_span(light)
+    rise = head_rise(light)
+    spring = light.scope.y + light.scope.h - rise
+    band = min(0.14, w * 0.09)
+    x, w, rise = x - band, w + 2.0 * band, rise + band
+    head = light.attr("head", "flat")
+    if head == "ogee":
+        left = _ogee_half(x, spring, w, rise)
+    else:
+        # A round or pointed head, near enough as an arc for clearance.
+        left = [(x + w / 2.0 * (1 - math.cos(a)), spring + rise * math.sin(a)) for a in (math.pi / 2 * k / 12 for k in range(13))]
+    pts = left + [(2 * x + w - px, py) for px, py in reversed(left[:-1])]
+    if head == "ogee" and light.attr("finial", False):
+        f = finial_height(w - 2.0 * band)
+        tip = (x + w / 2.0, spring + rise - band)
+        pts += [(tip[0] - f * 0.32, tip[1] + f * 0.45), (tip[0], tip[1] + f), (tip[0] + f * 0.32, tip[1] + f * 0.45)]
+    return pts
+
+
 def write_tracery(shape: Shape, below, d) -> list:
-    """The band of tracery over a polifora: Istrian stone pierced by a
-    quatrefoil over every colonnette (Ca' Foscari, Bernardo, Pisani-Moretta)."""
+    """The tracery of a polifora (Ca' d'Oro, Ca' Foscari, Pisani-Moretta): one
+    web of Istrian stone with the arcade, from the arches' springing to the
+    frame's head, in the same frame. A quatrefoil stands over every colonnette
+    between the two arch tips beside it, as large as clears both arches and the
+    frame's head, so it rises straight off the extrados of the arches rather
+    than sitting in a strip of its own. The web goes first in the bay: the
+    arches are cut out of it when they are drawn over it."""
     s = shape.scope
     arcade = next(c for c in shape.siblings if c.label == "Arcade")
     lights = [c for c in arcade.children if c.label == "Light"]
     cols = [c for c in arcade.children if c.label not in ("Light",)]
     pitch = lights[0].scope.w + (cols[0].scope.w if cols else 0.0)
+    spring = min(lt.scope.y + lt.scope.h - head_rise(lt) for lt in lights)
+    top = s.y + s.h
     trace = tuple(shape.trace)
-    nodes: list = [OpeningNode(id=f"{shape.id}/band", kind="opening", trace=trace, props={**kit.xywh(s), "opening_type": "tracery_band"})]
+    nodes: list = [OpeningNode(id=f"{shape.id}/band", kind="opening", trace=trace,
+                               props={"x": s.x, "y": spring, "w": s.w, "h": top - spring, "opening_type": "tracery_band"})]
     for k, c in enumerate(cols):
+        i = arcade.children.index(c)
+        arches = _head_extrados(arcade.children[i - 1]) + _head_extrados(arcade.children[i + 1])
         cx = c.scope.x + c.scope.w / 2.0
+        # The largest ring that sits between the two arches under the frame's
+        # head: shrink it till it clears them both.
+        r = min(0.5 * pitch - 0.1, 0.42 * pitch)
+        while r > 0.12:
+            cy = top - 0.08 - r
+            if min(math.hypot(px - cx, py - cy) for px, py in arches) >= r + 0.03:
+                break
+            r -= 0.01
+        cy = top - 0.08 - r
         nodes.append(
             OpeningNode(
                 id=f"{shape.id}/quatrefoil{k}",
                 kind="opening",
                 trace=trace,
-                props={"x": cx - pitch / 2.0, "y": s.y, "w": pitch, "h": s.h, "opening_type": "quatrefoil"},
+                props={"x": cx - r / 0.92, "y": cy - r / 0.92, "w": 2.0 * r / 0.92, "h": 2.0 * r / 0.92, "opening_type": "quatrefoil"},
             )
         )
     return nodes
@@ -274,6 +326,10 @@ def write_cell(cell: Shape, below, d) -> list:
     out = tuple(n for n in bay.children if n.kind in ("ironwork", "balcony"))
     if out:
         bay = replace(bay, children=tuple(n for n in bay.children if n.kind not in ("ironwork", "balcony")))
+    # A polifora's tracery web lies behind its arches: it goes first.
+    web = tuple(n for n in bay.children if n.props.get("opening_type") == "tracery_band")
+    if web:
+        bay = replace(bay, children=web + tuple(n for n in bay.children if n not in web))
     return [bay, *rest, *out]
 
 

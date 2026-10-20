@@ -1,0 +1,16 @@
+img00.png	amsterdam	4.8 m 1744 modest seed 55
+img01.png	venice	13.0 m 1366 ordinary seed 462
+img02.png	venice	22.0 m 1457 ordinary seed 657
+img03.png	venice	22.0 m 1408 comfortable seed 928
+img04.png	amsterdam	10.0 m 1790 grand seed 877
+img05.png	amsterdam	10.0 m 1709 ordinary seed 821
+img06.png	venice	22.0 m 1486 grand seed 50
+img07.png	amsterdam	7.2 m 1778 grand seed 177
+img08.png	venice	10.0 m 1363 ordinary seed 729
+img09.png	venice_byzantine	16.0 m 1271 modest seed 55
+img10.png	amsterdam	7.2 m 1726 comfortable seed 233
+img11.png	venice_byzantine	12.0 m 1234 modest seed 462
+img12.png	venice_byzantine	26.0 m 1272 ordinary seed 447
+img13.png	amsterdam	7.2 m 1667 modest seed 276
+img14.png	venice_byzantine	16.0 m 1269 grand seed 989
+img15.png	venice	13.0 m 1410 comfortable seed 708
