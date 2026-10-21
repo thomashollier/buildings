@@ -30,7 +30,7 @@ def write_balconette(shape: Shape, below, d) -> list:
     """A balcony slab under a filant, none under a garde-corps; the grown iron
     (rails, bars, rosettes, diagonals) stands on it."""
     nodes = list(below)
-    if shape.id.rsplit("/", 1)[-1].startswith("balcon_filant"):
+    if shape.id.rsplit("/", 1)[-1].startswith("balcon"):
         s = shape.scope
         nodes.insert(0, BalconyNode(id=f"{shape.id}/platform", kind="balcony", trace=tuple(shape.trace),
                                     props={**kit.xywh(s), "continuous": True, "projection": 0.9,

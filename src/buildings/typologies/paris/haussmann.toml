@@ -56,6 +56,9 @@ noble_light_h = { grand = 2.9, comfortable = 2.25, ordinary = 2.15, modest = 2.1
 light_aspect = 1.9
 balcony_deck_min = 6.0          # 1823: no projecting balcony with its deck under 6 m
 # Balconies (R6): a filant on the noble floor and on the top floor, by class.
+noble_filant_extent = { full = 0.8, central = 0.2 }   # photo check B2
+letting_balconies = [[1859, [1.0, 0.0, 0.0]], [9999, [0.4, 0.35, 0.25]]]   # [rails, grouped, per window], photo check R2
+pediment_floor = { noble = 0.3, above = 0.25, none = 0.45 }   # photo check R11
 p_noble_filant = { grand = 0.85, comfortable = 0.85, ordinary = 0.5, modest = 0.1 }
 p_top_filant = { grand = 0.85, comfortable = 0.8, ordinary = 0.6, modest = 0.4 }
 # The comble (R8): one level or two, by date and envelope.
@@ -102,11 +105,11 @@ do = [
   { set = { base_h = "= base", mid = "= mid", noble_h = "= noble", lettings = "= lettings", shop = "= shop", up_h = "= up" } },
   { let = { front = "base + noble + fsum(geometric(up, taper, lettings))" } },
   { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2 },
-  { set = { motif = "= draw('railing_motif', [0, 1, 2], step(railing_motifs, year))", light_width = "= between('light_w', light_w[0], light_w[1])", noble_filant = "= chance('noble_filant', p_noble_filant[klass])", top_filant = "= chance('top_filant', p_top_filant[klass])", door = "= 'cochere' if chance('cochere', (cochere_wide if w >= 16 else cochere)[klass]) else 'pietonne'", refends = "= year >= 1853 and chance('refends', rusticated)" } },
+  { set = { motif = "= draw('railing_motif', [0, 1, 2], step(railing_motifs, year))", light_width = "= between('light_w', light_w[0], light_w[1])", noble_filant = "= chance('noble_filant', p_noble_filant[klass])", top_filant = "= chance('top_filant', p_top_filant[klass])", door = "= 'cochere' if chance('cochere', (cochere_wide if w >= 16 else cochere)[klass]) else 'pietonne'", refends = "= year >= 1853 and chance('refends', rusticated)", filant_extent = "= draw('filant_extent', noble_filant_extent)", pediments = "= draw('pediments', pediment_floor) if klass in ('grand', 'comfortable') else 'none'" } },
   # The entrance by parity (R13): the middle of an odd run, or one of the outer
   # bays of an even one.
   { let = { nb = "len(bay_spans(rhythm, 0.0))" } },
-  { set = { door_bay = "= (nb // 2 if chance('door_middle', 0.55) else draw('door_end', [0, nb - 1])) if nb % 2 == 1 else draw('door_even', [0, nb - 1, 1, nb - 2], [0.2, 0.2, 0.3, 0.3])" } },
+  { set = { door_bay = "= draw('door_odd', [nb // 2, 0, nb - 1, 1, nb - 2], [0.4, 0.175, 0.175, 0.125, 0.125]) if nb % 2 == 1 else draw('door_even', [0, nb - 1, 1, nb - 2], [0.2, 0.2, 0.3, 0.3])" } },
   # The comble (R8): before 1884 a brisis and a low terrasson inside the 45
   # degree line; after, the taller arc and a steeper break. Two levels when the
   # envelope allows.
@@ -136,12 +139,22 @@ doc = "A storey is cut by the one rhythm. The base block is crowned by an entabl
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
   { insert = "Entablature", at = ["x", "y + h - 0.45", "w", "0.45"], name = "base_entablature", attrs = { course_kind = "entablature" }, when = "role == 'base' and index == base_top" },
-  { let = { filant = "(role == 'principal' and noble_filant and y >= balcony_deck_min) or (role == 'upper' and index == count - 1 and top_filant)" } },
-  { insert = "Balconette", at = ["x", "y", "w", "1.0"], name = "balcon_filant", when = "filant" },
+  { let = { spans = "bay_spans(rhythm, x)", filant = "(role == 'principal' and noble_filant and y >= balcony_deck_min) or (role == 'upper' and index == count - 1 and top_filant)" } },
+  # The noble filant runs the full front, or only across the middle bays.
+  { let = { central = "role == 'principal' and filant_extent == 'central' and len(spans) >= 4" } },
+  { insert = "Balconette", at = ["x", "y", "w", "1.0"], name = "balcon_filant", when = "filant and not central" },
+  { insert = "Balconette", at = ["spans[1].x", "y", "spans[-2].x + spans[-2].w - spans[1].x", "1.0"], name = "balcon_filant", when = "filant and central" },
+  # A letting floor between: rails only, a grouped balcony over the middle
+  # bays, or a balcony at each window (by date, drawn per floor).
+  { let = { lb = "draw('letting_balcony', ['rails', 'grouped', 'each'], step(letting_balconies, year), per='Storey') if role == 'upper' and not filant else 'rails'" } },
+  { insert = "Balconette", at = ["spans[1].x", "y", "spans[-2].x + spans[-2].w - spans[1].x", "1.0"], name = "balcon_group", when = "lb == 'grouped' and len(spans) >= 4" },
   # Without a balcony before it, every porte-fenetre has its garde-corps
-  # across the light, from the storey so its iron stands in front of the wall.
-  { each = "bay_centres(rhythm, x)", when = "role in ('principal', 'upper') and not filant", do = [
-      { insert = "Balconette", at = ["item - light_width / 2.0", "y + 0.1", "light_width", "0.9"], name = "garde_corps{i}" },
+  # across the light (or a small balcony of its own), from the storey so its
+  # iron stands in front of the wall.
+  { each = "range(len(spans))", when = "role in ('principal', 'upper') and not (filant and not central)", do = [
+      { let = { sp = "spans[item]", covered = "(central or (lb == 'grouped' and len(spans) >= 4)) and 0 < item < len(spans) - 1" } },
+      { insert = "Balconette", at = ["sp.x + sp.w / 2.0 - light_width / 2.0 - 0.15", "y", "light_width + 0.3", "1.0"], name = "balcony_win{i}", when = "lb == 'each' and not covered" },
+      { insert = "Balconette", at = ["sp.x + sp.w / 2.0 - light_width / 2.0", "y + 0.1", "light_width", "0.9"], name = "garde_corps{i}", when = "lb != 'each' and not covered" },
   ] },
   { insert = "Cornice", at = ["x", "y + h", "w", "cornice_h"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "index == count - 1" },
   # The base in channelled stone, laid on the wall before its openings.
@@ -304,6 +317,6 @@ set = { opening_type = "pedestrian_entrance", head = "= 'round' if cochere else 
 id = "haussmann.class.the_noble_floor_is_pedimented"
 label = "Cell"
 layer = "class"
-doc = "A comfortable or grand owner crowns the noble floor's windows with pediments."
-when = "is_bay() and role == 'principal' and klass in ('grand', 'comfortable')"
+doc = "A comfortable or grand owner crowns one floor's windows with pediments: the noble floor, the one above it, or none (photo check R11)."
+when = "is_bay() and ((role == 'principal' and pediments == 'noble') or (role == 'upper' and pediments == 'above' and index == count - lettings))"
 set = { surround_kind = "pedimented" }

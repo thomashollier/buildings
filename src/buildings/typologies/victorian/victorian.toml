@@ -36,8 +36,8 @@ Rail = "kit.column"
 [params]
 # Storey heights as ranges (fidelity review R-8: observer 1.8-2.7 / 3.8-4.6 /
 # 3.4-4.0 m from riser counts and a 12 ft parlour ceiling).
-basement_h = [2.25, 2.7]      # photo check: sidewalk to cornice 11.1-12.0 m on 21 Italianates
-parlour_h = [4.0, 4.2]
+basement_h = [2.3, 2.5]      # photo check: sidewalk to cornice 11.1-12.0 m on 21 Italianates
+parlour_h = [4.0, 4.2]   # photo check: 2.4 / 4.1 / 3.6, about 11.5 m to the cornice top
 chamber_h = [3.5, 3.7]
 third_h = 3.3
 # The type by date as an overlapping ramp, not hard cuts (R-6, Bulletin 18):
@@ -60,6 +60,7 @@ hoods = { italianate = [["pedimented", 0.55, 0.35], ["moulded_architrave", 0.4, 
 belts = { italianate = { entablature = 2, dentil = 1 }, stick = { entablature = 1, plat_bande = 1 }, queen_anne = { dentil = 1, entablature = 1 } }
 paints = ["clapboard_sage", "clapboard_blue", "clapboard_cream", "clapboard_rose"]
 corner_orders = { corner_board = 3, corinthian = 1 }
+quoin_odds = { modest = 0.1, ordinary = 0.25, comfortable = 0.5, grand = 0.7 }   # photo check O-10: quoin strips at the front's edges
 corner_board = 0.14
 extra_floor = 3.1               # a second chamber floor
 patio_w = 1.3                   # a side yard behind a fence, beside the entry
@@ -87,18 +88,18 @@ label = "Lot"
 doc = "The house front, its layout, what crowns it, the stoop up to the door, and a side yard where the builder left one."
 do = [
   { set = { kind = "= draw('kind', kinds, step(kind_ramp, year))" } },
-  { set = { door_pair = "= chance('door_pair', 0.7 if kind == 'italianate' else 0.3)", it_pair = "= kind == 'italianate' and chance('it_pair', 0.15)", base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)" } },
+  { set = { door_pair = "= chance('door_pair', 0.7 if kind == 'italianate' else 0.3)", it_pair = "= kind == 'italianate' and chance('it_pair', 0.4 if (klass == 'grand' or w >= 12.0) else 0.15)", base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)", quoins = "= chance('quoins', quoin_odds[klass])" } },
   { set = { storey_heights = "= [base_h, between('parlour_h', parlour_h[0], parlour_h[1]), between('chamber_h', chamber_h[0], chamber_h[1])] + ([third_h] if chance('third_storey', third_storey[klass]) else [])" } },
   { let = { patio = "patio_w if (layout != 'double' and w >= 6.8 and chance('patio', 0.5 if (w >= 10 or klass == 'grand') else 0.10)) else 0.0" } },
   # The facade stands beside the side yard, which is on the entry's side.
   { let = { fx = "patio if layout == 'single_right' else 0.0", fw = "w - patio", front = "fsum(storey_heights)" } },
   { set = { bay_x = "= fx + fw * (1 - bay_share) if layout == 'single_right' else fx", bay_w = "= fw * (0.36 if layout == 'double' else bay_share)", entry_x = "= fx if layout == 'single_right' else fx + fw * (0.36 if layout == 'double' else bay_share)", entry_w = "= fw * (0.28 if layout == 'double' else 1 - bay_share)" } },
   # With a turret over the bay, the gable crowns only the rest of the front.
-  { let = { turret = "kind == 'queen_anne' and chance('turret', 0.4 if klass == 'grand' else 0.25 if klass == 'comfortable' else 0.15)", bay_right = "layout == 'single_right'", gable_h = "0.62 * fw" } },
+  { let = { turret = "kind == 'queen_anne' and chance('turret', 0.4 if klass == 'grand' else 0.25 if klass == 'comfortable' else 0.15)", bay_right = "layout == 'single_right'", gable_h = "between('gable_rise', 0.62, 0.78) * fw" } },
   { insert = "Facade", at = ["fx", "0.0", "fw", "front"], name = "facade" },
   { insert = "Top", at = ["fx", "front", "fw", "between('false_front', 1.3, 1.8) if kind != 'queen_anne' else gable_h"], name = "top", attrs = { kind = "= kind" }, when = "not turret" },
-  { insert = "Top", at = ["fx if bay_right else bay_x + bay_w", "front", "(bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)", "max(3.0, 0.62 * ((bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)))"], name = "top", attrs = { kind = "= kind" }, when = "turret" },
-  { insert = "Turret", at = ["bay_x + 0.15", "front - storey_heights[-1]", "bay_w - 0.3", "storey_heights[-1] + 2.6 + 3.2"], name = "turret", when = "turret" },
+  { insert = "Top", at = ["fx if bay_right else bay_x + bay_w", "front", "(bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)", "max(3.0, between('gable_rise', 0.62, 0.78) * ((bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)))"], name = "top", attrs = { kind = "= kind" }, when = "turret" },
+  { insert = "Turret", at = ["bay_x + 0.15", "front - storey_heights[-1]", "bay_w - 0.3", "storey_heights[-1] + 2.6 + (bay_w - 0.3)"], name = "turret", when = "turret" },
   # A wooden stair seen front-on, centred under the door (R-1).
   { let = { sw = "min(entry_w - 0.3, between('stoop_w', stoop_w_pair[0], stoop_w_pair[1]) if door_pair else between('stoop_w', stoop_w[0], stoop_w[1]))" } },
   { insert = "Stoop", at = ["entry_x + entry_w / 2.0 - sw / 2.0", "0.0", "sw", "base_h"], name = "stoop", attrs = { risers = "= max(5, round(base_h / riser))" } },
@@ -129,6 +130,9 @@ do = [
       { label = "EntryZone", size = "w * 0.28", name = "entry" },
       { label = "BayZone", size = "w - w * 0.36 - w * 0.28", name = "bay_zone_2" },
   ] },
+  # Quoin strips at the front's two edges, on the floors over the basement.
+  { insert = "Column", at = ["x", "y", "0.22", "h"], name = "quoin_l", attrs = { order = "quoins" }, when = "quoins and role in ('parlour', 'chamber', 'third')" },
+  { insert = "Column", at = ["x + w - 0.22", "y", "0.22", "h"], name = "quoin_r", attrs = { order = "quoins" }, when = "quoins and role in ('parlour', 'chamber', 'third')" },
   # A rare third storey is cut like the others: the bay rises through it (the
   # blind judges failed a bay that stopped a floor short of the cornice).
   # The false front: boards over a frieze and a bracketed cornice.
@@ -314,7 +318,7 @@ set = { opening_type = "none" }
 id = "victorian.base.basement_light"
 label = "Cell"
 when = "is_bay() and role == 'basement'"
-set = { opening_type = "window", head = "flat", light_width = "= w * 0.8", sill = 0.8, light_height = 0.8, surround_kind = "none", keystone_present = false }
+set = { opening_type = "window", head = "= draw('basement_head', ['segmental', 'flat', 'round'], [0.5, 0.4, 0.1], per='Lot')", light_width = "= min(w * 0.8, 1.2)", sill = 0.8, light_height = 0.8, surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "victorian.base.a_tall_sash"
