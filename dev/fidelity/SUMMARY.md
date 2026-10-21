@@ -38,3 +38,27 @@ trend, not the decimals. Round 2 had one judge only.
 
 Reports: `judge_a.md`/`judge_b.md` (round 1), `round2/judge_a.md`,
 `round3/judge_fair.md`, `round3/judge_sceptical.md`; keys beside the images.
+
+# SF Victorian and Paris rule file (one round, after the graders' fixes)
+
+16 fresh drawings (8 each), judged blind in separate threads; key in
+`round_vp/blind_key.txt`.
+
+| | Fair judge | Sceptical judge |
+|---|---|---|
+| Identified city and family | 16 / 16 | 16 / 16 |
+| Passes at a glance | 3 | 0 |
+| With flaws | 11 | 13 |
+| Fails | 2 (img07, img10) | 3 (img00, img07, img09) |
+| Plausibility (of 5) | 3.4 SF, 3.4 Paris | — |
+
+What the key shows about the fails: img00 and img09 are 1896 Queen Annes the
+judges read as Stick or a mix (the Queen Anne still lacks its own vocabulary:
+shingles, porch, overhanging gable); img07 is an Italianate whose drawn third
+storey sits above a two-storey bay; img10 is an 1896 two-level comble too tall
+for its front.
+
+Remaining giveaways: SF doors without a portico or porch, bare gables,
+brackets floating above the frieze; Paris storeys too even on modest houses,
+no rusticated base, thin cornices, window-sized doors on wide fronts where a
+porte cochere belongs, no balcony consoles, two-level combles too tall.

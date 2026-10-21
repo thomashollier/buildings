@@ -1,0 +1,16 @@
+img00.png	victorian	8.4 m 1896 comfortable seed 162
+img01.png	victorian	7.62 m 1868 modest seed 377
+img02.png	victorian	6.1 m 1875 comfortable seed 250
+img03.png	victorian	8.4 m 1876 comfortable seed 826
+img04.png	paris	street 9.0 parcel 14.0 1869 comfortable carriage seed 795
+img05.png	paris	street 20.0 parcel 14.0 1859 ordinary carriage seed 556
+img06.png	paris	street 15.0 parcel 22.0 1882 ordinary residential seed 129
+img07.png	victorian	8.4 m 1872 comfortable seed 647
+img08.png	victorian	7.62 m 1890 grand seed 876
+img09.png	victorian	7.62 m 1896 modest seed 515
+img10.png	paris	street 20.0 parcel 18.0 1896 modest carriage seed 824
+img11.png	paris	street 24.0 parcel 14.0 1863 comfortable shop seed 746
+img12.png	paris	street 12.0 parcel 10.0 1874 ordinary cafe seed 168
+img13.png	victorian	6.1 m 1870 comfortable seed 615
+img14.png	paris	street 12.0 parcel 14.0 1899 comfortable residential seed 231
+img15.png	paris	street 15.0 parcel 18.0 1840 comfortable cafe seed 92
