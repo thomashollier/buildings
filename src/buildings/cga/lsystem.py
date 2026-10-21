@@ -781,6 +781,12 @@ def _round_pieces(solid: _Solid, roses: list[_Rose]) -> list[tuple[Point, ...]]:
         pts = rim(_UP, _DOWN) + (rose.arc(_DOWN, _UP) if rose else [])
     elif abs(ox - clip.x - clip.w) < _TOL:
         pts = rim(3 * _UP, _UP) + (rose.arc(_UP, 3 * _UP) if rose else [])
+    elif rose is None and abs(oy - clip.y) < _TOL:
+        # Centred on the floor: the half standing on it (a sunburst).
+        pts = rim(0.0, math.pi)
+    elif rose is None and abs(oy - clip.y - clip.h) < _TOL:
+        # Centred on the ceiling: the half hanging from it (a shingle's butt).
+        pts = rim(math.pi, 2 * math.pi)
     else:
         pts = rim(_UP, _UP - 2 * math.pi)
         if rose is not None:

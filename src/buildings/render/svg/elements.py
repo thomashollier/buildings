@@ -820,10 +820,11 @@ def _draw_corbelled_eave(canvas: Canvas, x: float, y: float, w: float, reach: fl
 def draw_brace(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
     """A diagonal timber across its own rectangle, rising left to right or
     falling, as the IR says."""
+    stroke = float(props.get("stroke_w", 2.2))
     if props.get("direction") == "rising":
-        canvas.line(x, y, x + w, y + h, _C["timber"], 2.2)
+        canvas.line(x, y, x + w, y + h, _C["timber"], stroke)
     else:
-        canvas.line(x, y + h, x + w, y, _C["timber"], 2.2)
+        canvas.line(x, y + h, x + w, y, _C["timber"], stroke)
 
 
 def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:

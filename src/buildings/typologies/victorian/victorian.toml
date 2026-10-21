@@ -26,6 +26,12 @@ Top = "victorian.top"
 Turret = "victorian.turret"
 Stoop = "victorian.stoop"
 Patio = "victorian.fence"
+Shingle = "grow.stone"
+SunDisc = "grow.stone"
+Slant = "grow.slant"
+Spindle = "kit.column"
+Bead = "kit.column"
+Rail = "kit.column"
 
 [params]
 # Storey heights as ranges (fidelity review R-8: observer 1.8-2.7 / 3.8-4.6 /
@@ -55,6 +61,11 @@ corner_orders = { corner_board = 3, corinthian = 1 }
 corner_board = 0.14
 extra_floor = 3.1               # a second chamber floor
 patio_w = 1.3                   # a side yard behind a fence, beside the entry
+# Grown ornament (victorian.shingles, victorian.sunburst, victorian.spindles).
+shingle_band = 0.7              # a band of fish-scale shingles across the gable's foot
+scale_w = 0.16                  # one shingle, butt to butt
+spindle_pitch = 0.11
+spindle_w = 0.035
 stoop_w = [1.1, 1.5]            # a wooden stair, front-on, under the door (R-1)
 riser = 0.18
 # The door hood by type (R-3): [option, weight].
@@ -100,28 +111,24 @@ id = "victorian.storey"
 label = "Storey"
 do = [
   # A facade floor is cut by the layout: the bay's zone and the entry's.
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret', 'third') and layout == 'single_left'", parts = [
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'single_left'", parts = [
       { label = "BayZone", size = "w * bay_share", name = "bay_zone" },
       { label = "EntryZone", size = "w - w * bay_share", name = "entry" },
   ] },
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret', 'third') and layout == 'single_right'", parts = [
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'single_right'", parts = [
       { label = "EntryZone", size = "w * (1 - bay_share)", name = "entry" },
       { label = "BayZone", size = "w - w * (1 - bay_share)", name = "bay_zone" },
   ] },
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret', 'third') and layout == 'double'", parts = [
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'double'", parts = [
       { label = "BayZone", size = "w * 0.36", name = "bay_zone" },
       { label = "EntryZone", size = "w * 0.28", name = "entry" },
       { label = "BayZone", size = "w - w * 0.36 - w * 0.28", name = "bay_zone_2" },
   ] },
-  # A rare third storey stands over the bay's cornice: three plain sashes.
-  { split = "x", when = "role == 'third'", parts = [
-      { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
-      { repeat = "range(3)", label = "Cell", size = "(w - 0.8) / 3", name = "x{n}", slot = "bay" },
-      { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
-  ] },
+  # A rare third storey is cut like the others: the bay rises through it (the
+  # blind judges failed a bay that stopped a floor short of the cornice).
   # The false front: boards over a frieze and a bracketed cornice.
   { split = "x", when = "role == 'parapet'", parts = [ { label = "Cell", size = "w", name = "x0", slot = "end" } ] },
-  { insert = "Entablature", at = ["x", "y", "w", "0.5"], name = "frieze", attrs = { course_kind = "entablature" }, when = "role == 'parapet'" },
+  { insert = "Entablature", at = ["x", "y + h - 0.5", "w", "0.5"], name = "frieze", attrs = { course_kind = "entablature" }, when = "role == 'parapet'" },
   { insert = "Cornice", at = ["x", "y + h", "w", "0.6"], name = "cornice", attrs = { cornice_ornament = "bracketed" }, when = "role == 'parapet'" },
   # The gable's attic and the turret's room: one window between two walls.
   { split = "x", when = "role in ('attic', 'turret')", parts = [
@@ -147,6 +154,8 @@ do = [
       { label = "Cell", size = "w - 2 * side", name = "x1", slot = "bay", attrs = { face = "front" } },
       { label = "Cell", size = "side", name = "x2", slot = "bay", attrs = { face = "side" } },
   ] },
+  # Stick and Queen Anne bays carry a frieze of turned spindles under the cornice.
+  { insert = "Spindles", at = ["x", "y + h - 0.32 - 0.2", "w", "0.2"], name = "spindles", when = "role != 'basement' and kind != 'italianate'" },
   { insert = "Entablature", at = ["x", "y + h - 0.32", "w", "0.32"], name = "bay_cornice", attrs = { course_kind = "= draw('belt', belts[kind], per='Storey')" }, when = "role != 'basement'" },
   { each = "[x, x + side, x + w - side, x + w]", when = "role != 'basement'", do = [
       { insert = "Column", at = ["min(max(item - corner_board / 2.0, x), x + w - corner_board)", "y", "corner_board", "h - 0.32"], name = "corner{i}", attrs = { order = "= corner_order" } },
@@ -168,9 +177,75 @@ id = "victorian.top"
 label = "Top"
 doc = "A Queen Anne front ends in a gable with a window in it; the others in a false front, a parapet of boards over a bracketed cornice."
 do = [
-  { let = { aw = "(min(w * 0.36, 1.8) if w > 5 else w * 0.5)" } },
-  { insert = "Storey", at = ["x + (w - aw) / 2.0", "y + 0.35", "aw", "min(1.9, h * 0.55)"], name = "attic", attrs = { role = "attic" }, when = "kind == 'queen_anne'" },
+  { let = { aw = "(min(w * 0.36, 1.8) if w > 5 else w * 0.5)", qa = "kind == 'queen_anne'" } },
+  # A Queen Anne gable: a band of fish-scale shingles across its foot, the
+  # attic window over it, and a sunburst in the apex -- each grown.
+  { let = { band = "min(shingle_band, h * 0.18)", ah = "min(1.6, h * 0.42)" } },
+  { insert = "Shingles", at = ["x + w * 0.1", "y + 0.05", "w * 0.8", "band"], name = "shingles", when = "qa" },
+  { insert = "Storey", at = ["x + (w - aw) / 2.0", "y + band + 0.15", "aw", "ah"], name = "attic", attrs = { role = "attic" }, when = "qa" },
+  { let = { t0 = "band + 0.15 + ah + 0.15" } },
+  { let = { half = "(w / 2.0) * (1 - (t0 + 0.05) / h) * 0.8" } },
+  { insert = "Sunburst", at = ["x + w / 2.0 - half", "y + t0", "2 * half", "half"], name = "sunburst", when = "qa and half > 0.35" },
   { insert = "Storey", at = ["x", "y", "w", "h"], name = "false_front", attrs = { role = "parapet" }, when = "kind != 'queen_anne'" },
+]
+
+[[production]]
+id = "victorian.shingles"
+label = "Shingles"
+doc = "A band of fish-scale shingles, grown: rows of half-round butts hanging across the gable's foot."
+do = [ { grow = "victorian.shingles", generations = 2, params = { n = "max(2, round(w / scale_w))", rows = "max(1, int(h / (w / max(2, round(w / scale_w)) * 0.5)))" } } ]
+
+[[production]]
+id = "victorian.sunburst"
+label = "Sunburst"
+doc = "A sunburst panel in the gable's apex, grown: a half-disc and its rays."
+do = [ { grow = "victorian.sunburst", generations = 1, params = { rays = "max(5, min(11, round(w / 0.18)))" } } ]
+
+[[production]]
+id = "victorian.spindles"
+label = "Spindles"
+doc = "A spindle frieze, grown: a rail, then turned spindles at a steady pitch, a bead on each."
+do = [ { grow = "victorian.spindles", generations = 2, params = { n = "max(3, round(w / spindle_pitch))" } } ]
+
+[[lsystem]]
+id = "victorian.shingles"
+doc = "Fish-scale shingles: rows of round butts."
+axiom = "Band"
+rules = [
+  { id = "victorian.shingles.rows", pred = "Band", to = "Ry(rows) [ Row ]" },
+  { id = "victorian.shingles.scales", pred = "Row", to = "Rx(n) [ Scale ]" },
+]
+interpret = [
+  { module = "Ry(k)", repeat = "y", n = "k" },
+  { module = "Rx(k)", repeat = "x", n = "k" },
+  { module = "Scale", do = [ { round = "min(cw * 0.5, ch) - 0.003", at = ["cw / 2", "ch"] }, { outline = "Shingle" } ] },
+]
+
+[[lsystem]]
+id = "victorian.sunburst"
+doc = "A sunburst: a half-disc on its base and rays fanning from the base's middle."
+axiom = "Sun"
+rules = [ { id = "victorian.sunburst.rays", pred = "Sun", to = "[ Disc ] Rays" } ]
+interpret = [
+  { module = "Disc", do = [ { round = "min(cw / 2, ch)", at = ["cw / 2", "0"] }, { outline = "SunDisc" } ] },
+  { module = "Rays", each = "range(1, rays)", line = ["cw / 2", "0.01", "cw / 2 + 0.92 * min(cw / 2, ch) * cos(pi() * item / rays)", "0.92 * min(cw / 2, ch) * sin(pi() * item / rays)"], width = "0.02", attrs = { stroke_w = 0.8 } },
+]
+
+[[lsystem]]
+id = "victorian.spindles"
+doc = "A spindle frieze: a rail along the top, then a row of turned spindles each with a bead."
+axiom = "Frieze"
+rules = [
+  { id = "victorian.spindles.railed", pred = "Frieze", to = "Rail Inset [ Rx(n) [ Spindle ] ]" },
+]
+interpret = [
+  { module = "Rail", place = "Rail", at = ["0", "ch - 0.04", "cw", "0.04"], attrs = { order = "timber" } },
+  { module = "Inset", inset = "[0, 0, 0, 0.04]" },
+  { module = "Rx(k)", repeat = "x", n = "k" },
+  { module = "Spindle", do = [
+      { place = "Spindle", at = ["cw / 2 - spindle_w / 2", "0", "spindle_w", "ch"], attrs = { order = "timber" } },
+      { place = "Bead", at = ["cw / 2 - spindle_w", "ch / 2 - spindle_w", "2 * spindle_w", "2 * spindle_w"], attrs = { order = "timber" } },
+  ] },
 ]
 
 [[production]]

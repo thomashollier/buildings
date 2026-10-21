@@ -17,6 +17,15 @@ describe = { rule = "haussmann.reglement", phase = "regulation", detail = "f'Par
 [lot_props]
 year = "= year"
 
+[emit]
+Balconette = "haussmann.balconette"
+Rail = "kit.column"
+Bar = "kit.column"
+Rosette = "kit.column"
+Slant = "grow.slant"
+Rustication = "haussmann.rustication"
+Storey = "haussmann.storey"
+
 [params]
 # The facade height a street allows, as each regulation's step table:
 # [street width up to, cornice height]. The same limits reglement.py states;
@@ -51,12 +60,24 @@ p_noble_filant = { grand = 0.85, comfortable = 0.85, ordinary = 0.5, modest = 0.
 p_top_filant = { grand = 0.85, comfortable = 0.8, ordinary = 0.6, modest = 0.4 }
 # The comble (R8): one level or two, by date and envelope.
 h_comble_one = { before_1884 = 3.2, after_1884 = 4.0 }
-h_comble_two = { before_1884 = 5.0, after_1884 = 6.5 }
+h_comble_two = { before_1884 = 4.6, after_1884 = 5.6 }   # blind judges: 6.5 m read 1.7-2.2 storeys too tall
 # Dormers (R9): every axis or every other, by class; the form by class and date.
 every_axis = { grand = 0.75, comfortable = 0.75, ordinary = 0.4, modest = 0.4 }
 dormer_forms = { rich = { pedimented = 0.35, segmental = 0.3, oeil_de_boeuf = 0.2, flat_lucarne = 0.15 }, plain = { flat_lucarne = 0.5, segmental = 0.3, round_arched = 0.2 } }
 # The entrance (R12, R13): cochere or pietonne by class; position by parity.
 cochere = { grand = 1.0, comfortable = 0.35, ordinary = 0.15, modest = 0.0 }
+cochere_wide = { grand = 1.0, comfortable = 0.7, ordinary = 0.4, modest = 0.1 }   # a front of 16 m or more (the judges: a window-sized door on a wide front)
+# The base's stone: refends (channelled joints) from 1853 on most fronts (R16).
+rusticated = 0.8
+course = 0.42                   # one course of the socle
+cornice_h = 0.85                # the crowning cornice, on modillions
+# Cast-iron railings, grown (paris.railing): the motif by date -- plain bars
+# under the Restauration, lozenge-and-rosette panels under the Second Empire,
+# bars with a crossed panel under the Third Republic. [bars, lozenge, cross].
+railing_motifs = [[1849, [1.0, 0.0, 0.0]], [1879, [0.3, 0.7, 0.0]], [9999, [0.2, 0.3, 0.5]]]
+rail_h = 0.05
+iron_bar = 0.025
+panel_w = 0.55
 
 # --- productions ---------------------------------------------------------------
 
@@ -81,7 +102,7 @@ do = [
   { set = { base_h = "= base", mid = "= mid", noble_h = "= noble", lettings = "= lettings", shop = "= shop", up_h = "= up" } },
   { let = { front = "base + noble + fsum(geometric(up, taper, lettings))" } },
   { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2 },
-  { set = { light_width = "= between('light_w', light_w[0], light_w[1])", noble_filant = "= chance('noble_filant', p_noble_filant[klass])", top_filant = "= chance('top_filant', p_top_filant[klass])", door = "= 'cochere' if chance('cochere', cochere[klass]) else 'pietonne'" } },
+  { set = { motif = "= draw('railing_motif', [0, 1, 2], step(railing_motifs, year))", light_width = "= between('light_w', light_w[0], light_w[1])", noble_filant = "= chance('noble_filant', p_noble_filant[klass])", top_filant = "= chance('top_filant', p_top_filant[klass])", door = "= 'cochere' if chance('cochere', (cochere_wide if w >= 16 else cochere)[klass]) else 'pietonne'", refends = "= year >= 1853 and chance('refends', rusticated)" } },
   # The entrance by parity (R13): the middle of an odd run, or one of the outer
   # bays of an even one.
   { let = { nb = "len(bay_spans(rhythm, 0.0))" } },
@@ -115,8 +136,16 @@ doc = "A storey is cut by the one rhythm. The base block is crowned by an entabl
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
   { insert = "Entablature", at = ["x", "y + h - 0.45", "w", "0.45"], name = "base_entablature", attrs = { course_kind = "entablature" }, when = "role == 'base' and index == base_top" },
-  { insert = "Balconette", at = ["x", "y", "w", "1.0"], name = "balcon_filant", when = "(role == 'principal' and noble_filant and y >= balcony_deck_min) or (role == 'upper' and index == count - 1 and top_filant)" },
-  { insert = "Cornice", at = ["x", "y + h", "w", "0.6"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "index == count - 1" },
+  { let = { filant = "(role == 'principal' and noble_filant and y >= balcony_deck_min) or (role == 'upper' and index == count - 1 and top_filant)" } },
+  { insert = "Balconette", at = ["x", "y", "w", "1.0"], name = "balcon_filant", when = "filant" },
+  # Without a balcony before it, every porte-fenetre has its garde-corps
+  # across the light, from the storey so its iron stands in front of the wall.
+  { each = "bay_centres(rhythm, x)", when = "role in ('principal', 'upper') and not filant", do = [
+      { insert = "Balconette", at = ["item - light_width / 2.0", "y + 0.1", "light_width", "0.9"], name = "garde_corps{i}" },
+  ] },
+  { insert = "Cornice", at = ["x", "y + h", "w", "cornice_h"], name = "cornice", attrs = { cornice_ornament = "modillioned" }, when = "index == count - 1" },
+  # The base in channelled stone, laid on the wall before its openings.
+  { insert = "Rustication", at = ["x", "y", "w", "h - (0.45 if index == base_top else 0.0)"], name = "refends", when = "role == 'base' and refends", attrs = { treatment = "flat_incised_refends", course_columns = 1, course_rows = "= max(1, round(h / course))" } },
 ]
 
 [[production]]
@@ -145,16 +174,57 @@ do = [ { call = "kit.split_cell_around_its_light" } ]
 [[production]]
 id = "haussmann.light_bay"
 label = "LightBay"
-doc = "The light, and a garde-corps across a porte-fenetre that has no balcony before it."
-do = [
-  { call = "kit.split_light_bay" },
-  { insert = "Balconette", at = ["x", "y + sill", "w", "0.9"], name = "garde_corps", when = "has('garde_corps') and garde_corps" },
-]
+doc = "The light (its garde-corps is put up by the storey)."
+do = [ { call = "kit.split_light_bay" } ]
 
 [[production]]
 id = "haussmann.light"
 label = "Light"
 do = [ { call = "kit.dress_the_light" } ]
+
+[[production]]
+id = "haussmann.railing"
+label = "Balconette"
+doc = "Cast-iron railing, grown: paris.railing frames it in a top and bottom rail and cuts it into near-square panels, then fills each with the motif of its date."
+do = [ { grow = "paris.railing", generations = 3, params = { n = "max(1, round(w / panel_w))", m = "motif", rail = "rail_h", bar = "iron_bar" } } ]
+
+# --- the railings, grown -----------------------------------------------------------
+#
+# Paris balcony and garde-corps iron (the photo corpus's se-ironwork family):
+# a top rail and a bottom rail, standards dividing panels about 0.55 m wide,
+# and in each panel the motif of the date.
+
+[[lsystem]]
+id = "paris.railing"
+doc = "A cast-iron railing: rails, panels, and each panel's motif."
+axiom = "Railing"
+rules = [
+  { id = "paris.railing.framed", pred = "Railing", to = "Frame Inset [ Rx(n) [ Panel ] ]" },
+  { id = "paris.railing.bars", pred = "Panel", when = "m == 0", to = "Post Bars(3)" },
+  { id = "paris.railing.lozenge", pred = "Panel", when = "m == 1", to = "Post Bars(1) Lozenge Rosette" },
+  { id = "paris.railing.crossed", pred = "Panel", when = "m == 2", to = "Post Cross Rosette" },
+]
+interpret = [
+  { module = "Frame", do = [
+      { place = "Rail", at = ["0", "ch - rail", "cw", "rail"], attrs = { order = "timber" } },
+      { place = "Rail", at = ["0", "0", "cw", "rail"], attrs = { order = "timber" } },
+  ] },
+  { module = "Inset", inset = "[0, rail, 0, rail]" },
+  { module = "Rx(k)", repeat = "x", n = "k" },
+  { module = "Post", place = "Bar", at = ["0", "0", "bar * 1.6", "ch"], attrs = { order = "timber" } },
+  { module = "Bars(k)", each = "range(k)", place = "Bar", at = ["(item + 1) * cw / (k + 1) - bar / 2", "0", "bar", "ch"], attrs = { order = "timber" } },
+  { module = "Lozenge", do = [
+      { line = ["cw / 2", "ch * 0.1", "cw * 0.9", "ch / 2"], width = "bar", attrs = { stroke_w = 0.9 } },
+      { line = ["cw * 0.9", "ch / 2", "cw / 2", "ch * 0.9"], width = "bar", attrs = { stroke_w = 0.9 } },
+      { line = ["cw / 2", "ch * 0.9", "cw * 0.1", "ch / 2"], width = "bar", attrs = { stroke_w = 0.9 } },
+      { line = ["cw * 0.1", "ch / 2", "cw / 2", "ch * 0.1"], width = "bar", attrs = { stroke_w = 0.9 } },
+  ] },
+  { module = "Cross", do = [
+      { line = ["bar * 2", "0", "cw", "ch"], width = "bar", attrs = { stroke_w = 0.9 } },
+      { line = ["bar * 2", "ch", "cw", "0"], width = "bar", attrs = { stroke_w = 0.9 } },
+  ] },
+  { module = "Rosette", place = "Rosette", at = ["cw / 2 - 0.05", "ch / 2 - 0.05", "0.1", "0.1"], attrs = { order = "timber" } },
+]
 
 # --- roles: identity from the stack ---------------------------------------------
 

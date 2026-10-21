@@ -17,9 +17,48 @@ from buildings.cga import Grammar
 from buildings.ir.nodes import BuildingNode
 from buildings.site import SiteContext
 from buildings.trace import TraceLog
-from buildings.typologies.common.rulefile import load_style
+from buildings.cga import Shape
+from dataclasses import replace
+
+from buildings.ir.nodes import BalconyNode, SocleNode
+from buildings.typologies.common import kit
+from buildings.typologies.common.rulefile import load_style, register_writer
 
 __all__ = ["STYLE", "derive_haussmann", "generate_haussmann"]
+
+def write_balconette(shape: Shape, below, d) -> list:
+    """A balcony slab under a filant, none under a garde-corps; the grown iron
+    (rails, bars, rosettes, diagonals) stands on it."""
+    nodes = list(below)
+    if shape.id.rsplit("/", 1)[-1].startswith("balcon_filant"):
+        s = shape.scope
+        nodes.insert(0, BalconyNode(id=f"{shape.id}/platform", kind="balcony", trace=tuple(shape.trace),
+                                    props={**kit.xywh(s), "continuous": True, "projection": 0.9,
+                                           "bracket_count": max(3, round(s.w / 1.4) + 1)}))
+    return nodes
+
+
+register_writer("haussmann.balconette", write_balconette)
+
+
+def write_rustication(shape: Shape, below, d) -> list:
+    """The base's channelled stone: courses the rules state."""
+    return [SocleNode(id=shape.id, kind="socle", trace=tuple(shape.trace),
+                      props={**kit.xywh(shape.scope), "treatment": shape.attrs["treatment"],
+                             "course_columns": shape.attrs["course_columns"], "course_rows": shape.attrs["course_rows"]})]
+
+
+def write_storey(storey: Shape, below, d) -> list:
+    """A storey, its socle laid on the wall before its openings cut it."""
+    out = kit.write_storey(storey, below, d)
+    node = out[0]
+    socles = tuple(c for c in node.children if c.kind == "socle")
+    rest = tuple(c for c in node.children if c.kind != "socle")
+    return [replace(node, children=socles + rest), *out[1:]]
+
+
+register_writer("haussmann.rustication", write_rustication)
+register_writer("haussmann.storey", write_storey)
 
 STYLE = load_style(Path(__file__).with_name("haussmann.toml"))
 

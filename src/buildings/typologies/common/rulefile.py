@@ -864,7 +864,8 @@ def write_slant(shape: Shape, below, d) -> list:
             id=shape.id,
             kind="brace",
             trace=tuple(shape.trace),
-            props={**kit.xywh(shape.scope), "direction": shape.attrs["direction"]},
+            props={**kit.xywh(shape.scope), "direction": shape.attrs["direction"],
+                   **({"stroke_w": float(shape.attrs["stroke_w"])} if "stroke_w" in shape.attrs else {})},
         )
     ]
 
