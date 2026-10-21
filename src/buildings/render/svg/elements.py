@@ -1087,6 +1087,11 @@ def draw_socle(canvas: Canvas, x: float, y: float, w: float, h: float, props: Ma
             canvas.rect(x - grow, top - h / rows, w + 2 * grow, h / rows, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
         canvas.rect(x - spread * rows, y, w + 2 * spread * rows, h - _num(props, "dry_h", 0.0), _C["water"], stroke_w=0.0, opacity=0.55)
         return
+    if treatment in ("zocalo", "porch"):
+        # A painted band at a wall's foot, or the shade inside a recessed
+        # porch: one flat field in the paint the IR states.
+        canvas.rect(x, y, w, h, _C.get(str(props.get("paint")), fill), stroke_w=0.0)
+        return
     if treatment == "istrian_course":
         # Courses of white stone, the joints of each course breaking those
         # of the one below.

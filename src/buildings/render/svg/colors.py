@@ -162,6 +162,8 @@ COLORS: dict[str, str] = {
     "coral_stone_joint": "#B3A688",
     "tile_red_dark": "#8C3D2B",
     "trim_white": "#F4F1EA",
+    # The shade inside a recessed entry porch.
+    "porch_shadow": "#6E6C72",
 }
 
 # The shade of each pastel: a back wall in shadow under a portal, a zocalo,

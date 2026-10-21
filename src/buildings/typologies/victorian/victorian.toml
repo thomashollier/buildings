@@ -22,6 +22,9 @@ describe = { rule = "victorian.victorian_type", phase = "period", detail = "f'Sa
 year = "= year"
 
 [emit]
+Storey = "victorian.storey"
+PorchShade = "victorian.porch_shade"
+PorchFace = "grow.stone"
 Top = "victorian.top"
 Turret = "victorian.turret"
 Stoop = "victorian.stoop"
@@ -75,6 +78,11 @@ riser = 0.18
 # The door hood by type (R-3): [option, weight].
 # Italianate entry (photo check): console hood 0.35, framed recess 0.35,
 # columned portico 0.30 (0.8 grand) -- drawn as hood, pediment, pediment.
+# A recessed entry porch at the top of the stoop (the Steiner Street row on
+# Alamo Square): the door set back in shade, an arch (Italianate) or a square
+# head with corner brackets (Stick, Queen Anne) cut in the front, columns at
+# its jambs.
+porch_odds = { italianate = 0.6, stick = 0.6, queen_anne = 0.8 }
 door_hoods = { italianate = { moulded_architrave = 0.35, pedimented = 0.65 }, stick = { pedimented = 0.8, moulded_architrave = 0.2 }, queen_anne = { moulded_architrave = 0.5, pedimented = 0.4, bare_band = 0.1 } }
 # The layouts a lot of its width allows. The seed stands for the builder.
 #   single_left / single_right: one bay window, the entry beside it
@@ -88,7 +96,7 @@ label = "Lot"
 doc = "The house front, its layout, what crowns it, the stoop up to the door, and a side yard where the builder left one."
 do = [
   { set = { kind = "= draw('kind', kinds, step(kind_ramp, year))" } },
-  { set = { door_pair = "= chance('door_pair', 0.7 if kind == 'italianate' else 0.3)", it_pair = "= kind == 'italianate' and chance('it_pair', 0.4 if (klass == 'grand' or w >= 12.0) else 0.15)", base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)", quoins = "= chance('quoins', quoin_odds[klass])" } },
+  { set = { door_pair = "= chance('door_pair', 0.7 if kind == 'italianate' else 0.3)", it_pair = "= kind == 'italianate' and chance('it_pair', 0.4 if (klass == 'grand' or w >= 12.0) else 0.15)", base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)", porch = "= chance('porch', porch_odds[kind])", quoins = "= chance('quoins', quoin_odds[klass])" } },
   { set = { storey_heights = "= [base_h, between('parlour_h', parlour_h[0], parlour_h[1]), between('chamber_h', chamber_h[0], chamber_h[1])] + ([third_h] if chance('third_storey', third_storey[klass]) else [])" } },
   { let = { patio = "patio_w if (layout != 'double' and w >= 6.8 and chance('patio', 0.5 if (w >= 10 or klass == 'grand') else 0.10)) else 0.0" } },
   # The facade stands beside the side yard, which is on the entry's side.
@@ -177,12 +185,28 @@ do = [
 [[production]]
 id = "victorian.entry_zone"
 label = "EntryZone"
-doc = "The entry column: the door on the parlour floor, a window over it, a small window into the basement under the stoop."
-do = [ { split = "x", parts = [
+doc = "The entry column: the door on the parlour floor -- on most houses set back in a recessed porch -- a window over it, a small window into the basement under the stoop."
+do = [
+  { split = "x", parts = [
     { label = "Cell", size = "0.3", name = "x0", slot = "end" },
     { label = "Cell", size = "w - 0.6", name = "x1", slot = "bay" },
     { label = "Cell", size = "0.3", name = "x2", slot = "end" },
-] } ]
+  ] },
+  # The recessed porch on the parlour floor: its shade, the face of the
+  # front over its opening, a column at each jamb.
+  { let = { pw = "min(w - 0.6, (1.3 if door_pair else 1.0) + 1.1)", ph = "h - 0.5" } },
+  { let = { px = "x + w / 2.0 - pw / 2.0", spring = "ph - (pw / 2.0 if kind == 'italianate' else 0.45)" } },
+  { insert = "PorchShade", at = ["px", "y", "pw", "ph"], name = "porch_shade", when = "porch and role == 'parlour'" },
+  { insert = "Porch", at = ["px", "y + spring", "pw", "ph - spring"], name = "porch_head", when = "porch and role == 'parlour'" },
+  { insert = "Column", at = ["px", "y", "0.2", "spring"], name = "porch_col_l", attrs = { order = "colonnette", shaft_width = 0.13 }, when = "porch and role == 'parlour'" },
+  { insert = "Column", at = ["px + pw - 0.2", "y", "0.2", "spring"], name = "porch_col_r", attrs = { order = "colonnette", shaft_width = 0.13 }, when = "porch and role == 'parlour'" },
+]
+
+[[production]]
+id = "victorian.porch"
+label = "Porch"
+doc = "The face of the front over a recessed porch, grown: a round arch cut from it, or a square head with a bracket in each corner."
+do = [ { grow = "victorian.porch", generations = 1, params = { arched = "kind == 'italianate'", face = "'wall_' + paint" } } ]
 
 [[production]]
 id = "victorian.top"
@@ -218,6 +242,23 @@ id = "victorian.spindles"
 label = "Spindles"
 doc = "A spindle frieze, grown: a rail, then turned spindles at a steady pitch, a bead on each."
 do = [ { grow = "victorian.spindles", generations = 2, params = { n = "max(3, round(w / spindle_pitch))" } } ]
+
+[[lsystem]]
+id = "victorian.porch"
+doc = "A porch head: the front's face with a round arch cut from it; or a square head with a bracket in each upper corner."
+axiom = "P"
+rules = [
+  { id = "victorian.porch.arch", pred = "P", when = "arched", to = "Arch" },
+  { id = "victorian.porch.square", pred = "P", when = "not arched", to = "Head Brackets" },
+]
+interpret = [
+  { module = "Arch", polygon = "PorchFace", points = "[[0.0, 0.0], [cw / 2 - (cw / 2) * cos(pi() * 0.0625), (cw / 2) * sin(pi() * 0.0625)], [cw / 2 - (cw / 2) * cos(pi() * 0.1250), (cw / 2) * sin(pi() * 0.1250)], [cw / 2 - (cw / 2) * cos(pi() * 0.1875), (cw / 2) * sin(pi() * 0.1875)], [cw / 2 - (cw / 2) * cos(pi() * 0.2500), (cw / 2) * sin(pi() * 0.2500)], [cw / 2 - (cw / 2) * cos(pi() * 0.3125), (cw / 2) * sin(pi() * 0.3125)], [cw / 2 - (cw / 2) * cos(pi() * 0.3750), (cw / 2) * sin(pi() * 0.3750)], [cw / 2 - (cw / 2) * cos(pi() * 0.4375), (cw / 2) * sin(pi() * 0.4375)], [cw / 2 - (cw / 2) * cos(pi() * 0.5000), (cw / 2) * sin(pi() * 0.5000)], [cw / 2 - (cw / 2) * cos(pi() * 0.5625), (cw / 2) * sin(pi() * 0.5625)], [cw / 2 - (cw / 2) * cos(pi() * 0.6250), (cw / 2) * sin(pi() * 0.6250)], [cw / 2 - (cw / 2) * cos(pi() * 0.6875), (cw / 2) * sin(pi() * 0.6875)], [cw / 2 - (cw / 2) * cos(pi() * 0.7500), (cw / 2) * sin(pi() * 0.7500)], [cw / 2 - (cw / 2) * cos(pi() * 0.8125), (cw / 2) * sin(pi() * 0.8125)], [cw / 2 - (cw / 2) * cos(pi() * 0.8750), (cw / 2) * sin(pi() * 0.8750)], [cw / 2 - (cw / 2) * cos(pi() * 0.9375), (cw / 2) * sin(pi() * 0.9375)], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "= face" } },
+  { module = "Head", polygon = "PorchFace", points = "[[0.0, ch * 0.55], [cw, ch * 0.55], [cw, ch], [0.0, ch]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  { module = "Brackets", do = [
+      { polygon = "PorchFace", points = "[[0.0, 0.0], [0.08, 0.0], [0.42, ch * 0.55], [0.0, ch * 0.55]]", attrs = { paint = "trim_white", edge = "cornice_stroke" } },
+      { polygon = "PorchFace", points = "[[cw - 0.08, 0.0], [cw, 0.0], [cw, ch * 0.55], [cw - 0.42, ch * 0.55]]", attrs = { paint = "trim_white", edge = "cornice_stroke" } },
+  ] },
+]
 
 [[lsystem]]
 id = "victorian.shingles"
@@ -343,4 +384,4 @@ label = "Cell"
 doc = "The parlour floor's entry bay is the front door, under a transom."
 when = "is_bay() and role == 'parlour' and in_parent('EntryZone')"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", head = "= 'segmental' if kind == 'italianate' else 'flat'", light_width = "= 1.3 if door_pair else 1.0", sill = 0.0, light_height = "= h - 0.7", lights = "= None", surround_kind = "= draw('door_hood', door_hoods[kind])", keystone_present = "= kind == 'italianate'" }
+set = { opening_type = "pedestrian_entrance", head = "= 'segmental' if kind == 'italianate' else 'flat'", light_width = "= 1.3 if door_pair else 1.0", sill = 0.0, light_height = "= (h - 0.5 - min(w - 0.6, (1.3 if door_pair else 1.0) + 1.1) / 2.0 - 0.15 if kind == 'italianate' else h - 0.5 - 0.45 - 0.1) if porch else h - 0.7", lights = "= None", surround_kind = "= 'none' if porch else draw('door_hood', door_hoods[kind])", keystone_present = "= kind == 'italianate' and not porch" }

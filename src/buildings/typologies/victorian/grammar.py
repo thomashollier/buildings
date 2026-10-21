@@ -11,12 +11,12 @@ the entry points.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Callable
 
 from buildings.cga import Grammar, Shape
-from buildings.ir.nodes import BuildingNode, GableNode
+from buildings.ir.nodes import BuildingNode, GableNode, SocleNode
 from buildings.site import BuildingClass
 from buildings.trace import TraceLog
 from buildings.typologies.common import kit
@@ -102,6 +102,24 @@ def write_fence(fence: Shape, below, d) -> list:
                              "hoist_beam": None, "wall_material": fence.attr("paint")})]
 
 
+def write_porch_shade(shade: Shape, below, d) -> list:
+    """The shade inside a recessed entry porch, laid on the wall before the
+    door in it is drawn."""
+    return [SocleNode(id=shade.id, kind="socle", trace=tuple(shade.trace),
+                      props={**kit.xywh(shade.scope), "treatment": "porch", "paint": "porch_shadow"})]
+
+
+def write_storey(storey: Shape, below, d) -> list:
+    """A storey, its porch shade laid on the wall before its openings."""
+    out = kit.write_storey(storey, below, d)
+    node = out[0]
+    socles = tuple(c for c in node.children if c.kind == "socle")
+    rest = tuple(c for c in node.children if c.kind != "socle")
+    return [replace(node, children=socles + rest), *out[1:]]
+
+
+register_writer("victorian.porch_shade", write_porch_shade)
+register_writer("victorian.storey", write_storey)
 register_writer("victorian.stoop", write_stoop)
 register_writer("victorian.fence", write_fence)
 

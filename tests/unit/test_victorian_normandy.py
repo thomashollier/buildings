@@ -89,3 +89,19 @@ def test_the_country_house_is_close_set_under_thatch():
         return len(posts) / ground.props["w"]
 
     assert posts_per_metre(b) > posts_per_metre(town)
+
+
+def test_most_doors_are_set_back_in_a_recessed_porch():
+    from buildings.site import BuildingClass
+    from buildings.typologies.victorian.grammar import VictorianSite, derive_victorian
+
+    porches = 0
+    for seed in range(30):
+        lot, _ = derive_victorian(VictorianSite(1880 + seed % 15, BuildingClass.ORDINARY, seed))
+        shade = [s for s in lot.walk() if s.label == "PorchShade"]
+        porches += bool(shade)
+        if shade:
+            door = next(c for c in lot.walk() if c.label == "Cell" and c.attrs.get("opening_type") == "pedestrian_entrance")
+            assert door.attrs["surround_kind"] == "none"
+            assert shade[0].scope.contains(door.children[0].scope) or shade[0].scope.w >= door.attrs["light_width"]
+    assert 12 <= porches <= 28
