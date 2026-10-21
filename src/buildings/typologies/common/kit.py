@@ -373,19 +373,29 @@ def write_roof(roof: Shape, below: Sequence[Node], d) -> list[Node]:
     s = roof.scope
     eaves, ridge = s.y, s.y + s.h
     pitch = float(roof.attr("pitch", 40.0))
-    run = s.h / math.tan(math.radians(pitch))
+    # A mansard states its two slopes and where the brisis breaks; a plain
+    # roof states one pitch and no break.
+    lower = float(roof.attr("lower_pitch", pitch))
+    upper = float(roof.attr("upper_pitch", pitch))
+    brk = float(roof.attr("break_pct", 1.0))
+    if brk < 0.995:
+        bh = s.h * brk
+        x1 = bh / math.tan(math.radians(lower))
+        points = ((0.0, eaves), (x1, eaves + bh), (x1 + (s.h - bh) / math.tan(math.radians(upper)), ridge))
+    else:
+        points = ((0.0, eaves), (s.h / math.tan(math.radians(pitch)), ridge))
     return [
         RoofNode(
             id=roof.id,
             kind="roof",
             trace=tuple(roof.trace),
-            props={**xywh(s), "material": roof.attr("roof_material", "slate"), "seam_count": 6, "lower_angle_deg": pitch, "upper_angle_deg": pitch, "break_pct": 1.0},
+            props={**xywh(s), "material": roof.attr("roof_material", "slate"), "seam_count": 6, "lower_angle_deg": lower, "upper_angle_deg": upper, "break_pct": brk},
         ),
         SilhouetteNode(
             id=f"{roof.id}/silhouette",
             kind="silhouette",
             trace=tuple(roof.trace),
-            props={"x": 0.0, "y": 0.0, "w": s.w, "h": ridge, "eaves_height": eaves, "ridge_height": ridge, "points": ((0.0, eaves), (run, ridge))},
+            props={"x": 0.0, "y": 0.0, "w": s.w, "h": ridge, "eaves_height": eaves, "ridge_height": ridge, "points": points},
         ),
         *below,
     ]

@@ -117,3 +117,16 @@ def test_a_new_draw_does_not_reshuffle_an_old_one(tmp_path):
 def test_pick_options_need_weights(tmp_path):
     with pytest.raises(RuleFileError):
         _style(tmp_path, _TOY + '\n[[rule]]\nid = "toy.bad"\nlabel = "Cell"\npick = { head = "round" }\n')
+
+
+@pytest.mark.parametrize("street,year,klass", [(20.0, 1865, "COMFORTABLE"), (12.0, 1890, "MODEST"), (30.0, 1868, "GRAND")])
+def test_a_hundred_seeds_give_a_hundred_paris_fronts_on_one_parcel(street, year, klass):
+    from buildings.site import GroundProgramme, SiteContext
+    from buildings.typologies.paris.rules import generate_haussmann
+
+    k = BuildingClass[klass]
+    designs = {
+        _coarse(generate_haussmann(SiteContext(street, 14.0, 14.0, year, k, GroundProgramme.SHOP, seed=s))[0])
+        for s in range(100)
+    }
+    assert len(designs) >= 80, len(designs)
