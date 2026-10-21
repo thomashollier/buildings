@@ -214,10 +214,31 @@ Per symbol, `interpret` gives one step or a `do` list of steps:
 | `{ inset = "d" }` or `"[l, b, r, t]"` | shrinks the cell (forgotten at the branch's `]`) |
 | `{ place = "Label", at = [x, y, w, h], attrs = {...} }` | a rectangle, in cell-local metres |
 | `{ line = [x0, y0, x1, y1], width = "t", straight = "Bar", slant = "Slant" }` | a bar square to the cell (`straight`), or a diagonal across its box (`slant`, with `direction` rising or falling) |
+| `{ over = "form", span = "s", rise = "r", pitch = "p", count = "k", start = "x", spring = "y", band = "b", finial = "f" }` | the cell stands over a row of `k` arches (`form` round, pointed or ogee, as the renderer turns them), `s` wide at pitch `p` from `x`, springing at `y` (default 0) and rising `r`, their stone band `b` and fleuron `f` included: its floor becomes their extrados |
+| `{ arch = "form", rise = "r" }` | the cell is an arch: its ceiling becomes the head over its full width, springing `r` below its top |
+| `{ round = "r", at = [cx, cy], fit = "c" }` | the cell becomes a disc of radius `r` about `(cx, cy)`; with `fit`, `r` shrinks by 1 cm until the disc clears the cell's floor and ceiling by `c` (`at` sees the trial `r`) |
+| `{ ring = "n", radius = "d", size = "s", start = "deg" }` | `n` round cells `s` across, set about the cell's centre at distance `d` from angle `deg` (default 90, the top); the following `[ ... ]` draws once in each, with `angle` bound |
+| `{ outline = "Label", attrs = {...} }` | the cell's own shape (with its profile, or round) as a polygon mark, cut by every `pierce` made after it in its branch |
+| `{ pierce = "r", at = [cx, cy] }` | cuts a disc (default: about the cell's centre) out of the nearest `outline` drawn before it in its branch or an enclosing one |
+| `{ polygon = "Label", points = "[[x, y], ...]", attrs = {...} }` | a polygon in cell-local metres |
 
 Any step may carry `when` and `each` (with `item` and `i` bound). Names in a
-step: `cw` and `ch` (the cell's size) and the module's formal parameters,
-then as above. A `[` with no pending part draws in a copy of the cell.
+step: `cw` and `ch` (the cell's size), `cr` in a round cell (its radius),
+names its cell binds (`angle`), the module's formal parameters, then as
+above. A `[` with no pending part draws in a copy of the cell. Parts cut from
+a profiled cell keep the profile over their own width.
+
+**Outlines and piercings.** An outline is drawn where it was made, once the
+string is interpreted, with every piercing of it cut out: piercings that
+overlap open as one (a quatrefoil: four foils round a heart), which must be
+star-shaped about the middle of their centres, and must stay inside the
+outline (`OutsideParent`) -- except that one centred on the outline's left
+or right edge is a bite out of that edge, and a round outline centred on the
+edge of the rectangle it was made in is halved by it (a half oculus against
+a jamb). Each outline is emitted as one simple polygon (an inner opening is
+reached by a slit from the top), its `points` in the mark's attributes;
+`[emit] Label = "grow.stone"` draws it as stone standing in front of the
+wall, and what it leaves open shows whatever is behind it.
 
 **What it guarantees.** Every mark becomes a child shape of the grown one,
 inserted by the engine, so the engine's `OutsideParent` check applies; a mark
@@ -226,15 +247,23 @@ engine's `insert` entry and one naming the L-system, the rule that wrote its
 module and the generation it was written in; the grown shape carries one
 entry for the whole growth (generations, the final string, every stochastic
 choice and what it beat). The children's labels are written by whatever
-`[emit]` names (`kit.column` for timber, `grow.slant` for a diagonal brace),
-so nothing new reaches the renderer.
+`[emit]` names (`kit.column` for timber, `grow.slant` for a diagonal brace,
+`grow.stone` for an outline), so nothing new reaches the renderer.
+
+The Venetian Gothic tracery (`venice.tracery` in `venice.toml`) is grown with
+these: the band over a polifora stands `over` its arches and is cut at their
+tips; over every colonnette an oculus (an `outline` pierced by a `round`
+eye, itself outlined and pierced by a `ring` of foils round a heart), and
+against each jamb half of one -- a context rule, `Jamb < Oculus` -- with a
+third generation drawing the foils out into a cusped quatrefoil on a grand
+house's broad lights.
 
 ## What stays in Python
 
 - **The engine and the shared kit:** window anatomy and IR writers.
 - **Drawings a file names by writer:** Amsterdam's gable outline (step, neck,
   bell), the Victorian false-front gable, turret cone and stoop, Normandy's
-  braces and gable, Kyoto's lattice (Cairo's mashrabiya is grown, above), the Corbusian pavilion screen, the Art
+  braces and gable, Kyoto's lattice (Cairo's mashrabiya and Venice's tracery are grown, above), the Corbusian pavilion screen, the Art
   Deco spire. These are outlines drawn around shapes the rules placed, not
   decisions.
 - **The measured Paris generator.** By design, it reads Daly through its own

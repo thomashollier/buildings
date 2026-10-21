@@ -43,6 +43,17 @@ interpretation may
 * ``place`` a rectangle, or draw a ``line`` of a given width, in cell-local
   metres (``cw`` and ``ch`` are the cell's size).
 
+A cell need not be a rectangle. It may stand ``over`` a row of arches (its
+floor their extrados), be an ``arch`` (its ceiling the head), or be
+``round`` (a disc, fitted if asked between its floor and ceiling), and a
+``ring`` sets round cells about a centre (the following ``[ ... ]`` drawn in
+each, ``angle`` bound). What it draws may be an ``outline`` -- the cell's
+own shape as a polygon -- which later modules ``pierce``: piercings that
+overlap open as one, so four foils round a heart cut a quatrefoil, and the
+outline is emitted as one simple polygon with its openings cut out (by a
+slit from its top, or as a bite out of the edge an opening is centred on).
+So tracery is grown as stone, and its openings are what the stone leaves.
+
 A ``[`` with no pending part draws in a copy of the current cell, and every
 change made inside a branch is forgotten at its ``]``. A mark must lie inside
 its cell (``OutsideParent`` again), so a module can draw only where its own
@@ -64,6 +75,7 @@ from buildings.cga.shape import Scope, Shape
 from buildings.trace import TraceEntry
 
 __all__ = [
+    "Cell",
     "Draw",
     "GrowConflict",
     "GrowError",
@@ -75,6 +87,7 @@ __all__ = [
     "Template",
     "derive_string",
     "grow",
+    "head_outline",
     "interpret_string",
     "parse_modules",
     "parse_pattern",
@@ -241,8 +254,10 @@ class LRule:
 @dataclass(frozen=True)
 class Draw:
     """One step of a module's interpretation. ``verb`` is one of ``split``,
-    ``repeat``, ``inset``, ``place``, ``line``; ``fields`` holds its compiled
-    expressions; ``each`` repeats it with ``item`` and ``i`` bound."""
+    ``repeat``, ``inset``, ``place``, ``line`` (rectangles), ``over``,
+    ``arch``, ``round``, ``ring`` (shaped cells), ``outline``, ``pierce``,
+    ``polygon`` (outlines); ``fields`` holds its compiled expressions;
+    ``each`` repeats it with ``item`` and ``i`` bound."""
 
     verb: str
     axis: str | None = None
@@ -446,12 +461,352 @@ def derive_string(
 @dataclass(frozen=True)
 class Mark:
     """One thing a grown string draws: a label, where (absolute metres), the
-    attributes it is given, and the module that drew it."""
+    attributes it is given, and the module that drew it. An outline's
+    attributes carry its ``points``."""
 
     label: str
     scope: Scope
     attrs: Mapping[str, Any]
     module: Module
+
+
+Point = tuple[float, float]
+
+
+@dataclass(frozen=True)
+class Cell(Scope):
+    """The region a module draws in: a rectangle (the ``Scope`` it is), which
+    may have a *profile* -- a ``floor`` or a ``ceil`` (polylines, left to
+    right, in absolute metres) that is not straight: the extrados of the
+    arches the cell stands over (``over``), or the head of the arch the cell
+    is (``arch``) -- or be *round*: a disc of ``radius`` about ``centre``
+    (``round``, ``ring``), its rectangle only the disc's box, and ``clip`` the
+    rectangle it was made in. ``names`` are bound for whatever draws in it (a
+    ring part's ``angle``)."""
+
+    floor: tuple[Point, ...] = ()
+    ceil: tuple[Point, ...] = ()
+    centre: Point | None = None
+    radius: float = 0.0
+    clip: Scope | None = None
+    names: tuple[tuple[str, Any], ...] = ()
+
+
+def _cell(s: Scope, like: Cell | None = None, axis: str | None = None) -> Cell:
+    """A rectangle as a cell. A part cut from a profiled cell keeps the
+    profile over its own width (cut across x) or the edge it shares (cut
+    across y); every part keeps the names bound in its parent."""
+    if like is None:
+        return Cell(s.x, s.y, s.w, s.h)
+    floor = ceil = ()
+    if axis == "x" or axis is None:
+        floor, ceil = _clip_profile(like.floor, s.x, s.x + s.w), _clip_profile(like.ceil, s.x, s.x + s.w)
+    else:
+        if abs(s.y - like.y) < _TOL and like.floor:
+            floor = tuple((x, min(y, s.y + s.h)) for x, y in like.floor)
+        if abs(s.y + s.h - like.y - like.h) < _TOL and like.ceil:
+            ceil = tuple((x, max(y, s.y)) for x, y in like.ceil)
+    return Cell(s.x, s.y, s.w, s.h, floor=floor, ceil=ceil, names=like.names)
+
+
+def _rect(cell: Scope) -> Scope:
+    return Scope(cell.x, cell.y, cell.w, cell.h)
+
+
+# --- profiles: arches, as the renderer turns them ---------------------------------
+
+
+def head_outline(x: float, spring: float, w: float, rise: float, form: str) -> list[Point]:
+    """An arch's head over the span ``x .. x + w`` springing at ``spring``,
+    from one springing over the top to the other, exactly as the renderer
+    turns it: ``round`` (a semicircle scaled to its rise), ``pointed`` (two
+    arcs struck from the opposite springings, scaled to the rise) or ``ogee``
+    (a cubic that leaves the springing upright, turns about two thirds of the
+    way up and runs concave into the point)."""
+    if form == "round":
+        return [(x + w / 2.0 - w / 2.0 * math.cos(math.pi * i / 16), spring + rise * math.sin(math.pi * i / 16)) for i in range(17)]
+    if form == "ogee":
+        left = []
+        for i in range(15):
+            t = i / 14
+            across = 3 * t * t - 2 * t**3
+            up = 3 * t * (1 - t) ** 2 * 0.50 + 3 * t * t * (1 - t) * 0.12 + t**3
+            left.append((x + w / 2.0 * across, spring + rise * up))
+    elif form == "pointed":
+        k = rise / (w * math.sin(math.pi / 3.0))
+        left = [(x + w - w * math.cos(a), spring + k * w * math.sin(a)) for a in (math.pi / 3.0 * i / 10 for i in range(11))]
+    else:
+        raise GrowError(f"an arch is round, pointed or ogee, not {form!r}")
+    right = [(x + w - (px - x), py) for px, py in reversed(left[:-1])]
+    return [(x, spring), *left, *right, (x + w, spring)]
+
+
+def _height(poly: Sequence[Point], x: float, pick=max) -> float | None:
+    """Where a polyline stands at ``x`` (``pick`` of several where it doubles
+    back); None off its ends."""
+    best = None
+    for (x0, y0), (x1, y1) in zip(poly, poly[1:]):
+        if min(x0, x1) - 1e-9 <= x <= max(x0, x1) + 1e-9:
+            y = pick(y0, y1) if abs(x1 - x0) < 1e-12 else y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+            best = y if best is None else pick(best, y)
+    return best
+
+
+def _clip_profile(poly: Sequence[Point], x0: float, x1: float) -> tuple[Point, ...]:
+    if not poly:
+        return ()
+    inside = [(x, y) for x, y in poly if x0 + 1e-9 < x < x1 - 1e-9]
+    ends = []
+    for x in (x0, x1):
+        y = _height(poly, x)
+        ends.append((x, poly[0][1] if y is None and x <= poly[0][0] else (poly[-1][1] if y is None else y)))
+    return (ends[0], *inside, ends[1])
+
+
+def _floor(cell: Cell) -> tuple[Point, ...]:
+    return cell.floor or ((cell.x, cell.y), (cell.x + cell.w, cell.y))
+
+
+def _ceil(cell: Cell) -> tuple[Point, ...]:
+    return cell.ceil or ((cell.x, cell.y + cell.h), (cell.x + cell.w, cell.y + cell.h))
+
+
+def _arcade(form, x0, span, pitch, count, spring, rise, band, finial) -> list[list[Point]]:
+    """The extrados of a row of ``count`` arches ``span`` wide at ``pitch``,
+    their stone band ``band`` wide included, and the fleuron (``finial``
+    high) on each tip: what stands over them has to clear."""
+    curves: list[list[Point]] = []
+    for k in range(count):
+        x = x0 + k * pitch
+        curves.append(head_outline(x - band, spring, span + 2.0 * band, rise + band, form))
+        if finial > 0.0:
+            cx, tip = x + span / 2.0, spring + rise
+            curves.append([(cx - 0.32 * finial, tip + 0.45 * finial), (cx, tip + finial), (cx + 0.32 * finial, tip + 0.45 * finial)])
+    return curves
+
+
+def _envelope(curves, base: Sequence[Point], x0: float, x1: float) -> tuple[Point, ...]:
+    xs = sorted({x0, x1, *(px for c in [base, *curves] for px, _ in c if x0 < px < x1)})
+    out = []
+    for x in xs:
+        y = _height(base, x)
+        for c in curves:
+            h = _height(c, x)
+            if h is not None:
+                y = h if y is None else max(y, h)
+        out.append((x, y))
+    return tuple(out)
+
+
+def _distance(px: float, py: float, poly: Sequence[Point]) -> float:
+    best = math.inf
+    for (x0, y0), (x1, y1) in zip(poly, poly[1:]):
+        dx, dy = x1 - x0, y1 - y0
+        L = dx * dx + dy * dy
+        t = 0.0 if L < 1e-18 else max(0.0, min(1.0, ((px - x0) * dx + (py - y0) * dy) / L))
+        best = min(best, math.hypot(px - x0 - t * dx, py - y0 - t * dy))
+    return best
+
+
+# --- outlines and piercings -------------------------------------------------------
+
+#: Samples round a full turn of a piercing or a disc.
+_ARC = 96
+
+
+@dataclass
+class _Solid:
+    """An outline waiting for its piercings: drawn when the string is."""
+
+    label: str
+    cell: Cell
+    attrs: dict
+    module: Module
+    where: str
+    discs: list = field(default_factory=list)
+
+
+@dataclass
+class _Rose:
+    """Piercings that overlap, as one opening: star-shaped about the middle
+    of their centres (``reach`` is how far it opens along a ray), with the
+    angles where two of its circles meet (its cusps)."""
+
+    cx: float
+    cy: float
+    discs: list
+    cusps: list
+
+    def reach(self, theta: float) -> float:
+        ux, uy = math.cos(theta), math.sin(theta)
+        best = 0.0
+        for x, y, r in self.discs:
+            dx, dy = x - self.cx, y - self.cy
+            b = ux * dx + uy * dy
+            disc = b * b - (dx * dx + dy * dy) + r * r
+            if disc >= 0.0:
+                best = max(best, b + math.sqrt(disc))
+        return best
+
+    def at(self, theta: float) -> Point:
+        r = self.reach(theta)
+        return (self.cx + r * math.cos(theta), self.cy + r * math.sin(theta))
+
+    def arc(self, a0: float, a1: float) -> list[Point]:
+        """The opening's edge from angle ``a0`` round to ``a1`` (radians,
+        anticlockwise when ``a1 > a0``), its cusps kept sharp."""
+        n = max(1, math.ceil(abs(a1 - a0) / (2 * math.pi) * _ARC))
+        angles = {a0 + (a1 - a0) * i / n for i in range(n + 1)}
+        lo, hi = min(a0, a1), max(a0, a1)
+        for c in self.cusps:
+            for turn in (-2, -1, 0, 1, 2):
+                a = c + turn * 2 * math.pi
+                if lo + 1e-9 < a < hi - 1e-9:
+                    angles.add(a)
+        return [self.at(a) for a in sorted(angles, reverse=a1 < a0)]
+
+
+def _roses(discs: Sequence[tuple[float, float, float]], where: str) -> list[_Rose]:
+    groups: list[list] = []
+    for d in discs:
+        touching = [g for g in groups if any(math.hypot(d[0] - e[0], d[1] - e[1]) < d[2] + e[2] - 1e-9 for e in g)]
+        groups = [g for g in groups if all(g is not t for t in touching)] + [[*(e for t in touching for e in t), d]]
+    out = []
+    for g in groups:
+        cx = math.fsum(d[0] for d in g) / len(g)
+        cy = math.fsum(d[1] for d in g) / len(g)
+        if not any(math.hypot(d[0] - cx, d[1] - cy) <= d[2] + 1e-9 for d in g):
+            raise GrowError(
+                f"{where}: piercings that overlap open as one, about the middle of their centres, so one of them "
+                "must cover that middle (a heart, or foils that reach it)"
+            )
+        rose = _Rose(cx, cy, g, [])
+        for i, (x1, y1, r1) in enumerate(g):
+            for x2, y2, r2 in g[i + 1:]:
+                dd = math.hypot(x2 - x1, y2 - y1)
+                if dd < 1e-12 or dd >= r1 + r2 or dd <= abs(r1 - r2):
+                    continue
+                a = (r1 * r1 - r2 * r2 + dd * dd) / (2 * dd)
+                hgt = math.sqrt(max(0.0, r1 * r1 - a * a))
+                mx, my = x1 + a * (x2 - x1) / dd, y1 + a * (y2 - y1) / dd
+                for sgn in (1, -1):
+                    px, py = mx + sgn * hgt * (y2 - y1) / dd, my - sgn * hgt * (x2 - x1) / dd
+                    theta = math.atan2(py - cy, px - cx)
+                    if abs(rose.reach(theta) - math.hypot(px - cx, py - cy)) < 1e-7:
+                        rose.cusps.append(theta)
+        out.append(rose)
+    return sorted(out, key=lambda r: (r.cx, r.cy))
+
+
+def _close(pts: list[Point]) -> tuple[Point, ...]:
+    out: list[Point] = []
+    for p in pts:
+        if not out or math.hypot(p[0] - out[-1][0], p[1] - out[-1][1]) > 1e-9:
+            out.append(p)
+    if math.hypot(out[0][0] - out[-1][0], out[0][1] - out[-1][1]) > 1e-9:
+        out.append(out[0])
+    return tuple((round(x, 6), round(y, 6)) for x, y in out)
+
+
+_UP, _DOWN = math.pi / 2.0, -math.pi / 2.0
+
+
+def _profile_pieces(solid: _Solid, roses: list[_Rose]) -> list[tuple[Point, ...]]:
+    """A profiled cell's outline, each opening in it cut out. An opening
+    inside is reached by a slit from the ceiling straight down to its top (a
+    joint, drawn); one centred on the cell's left or right edge is a bite out
+    of that edge -- the half the edge leaves. So every outline is one simple
+    polygon, and what the openings show is whatever is behind."""
+    cell = solid.cell
+    x0, x1 = cell.x, cell.x + cell.w
+    floor, ceil = _floor(cell), _ceil(cell)
+    inner, left, right = [], None, None
+    for rose in roses:
+        if abs(rose.cx - x0) < _TOL:
+            left = rose
+        elif abs(rose.cx - x1) < _TOL:
+            right = rose
+        elif x0 < rose.cx < x1:
+            inner.append(rose)
+        else:
+            raise OutsideParent(f"{solid.where}: a piercing at x = {rose.cx:.3f} is outside the {solid.label} it cuts")
+        for a in (2 * math.pi * i / _ARC for i in range(_ARC)):
+            px, py = rose.at(a)
+            if px < x0 - _TOL or px > x1 + _TOL:
+                if rose is left and px < x0 + _TOL or rose is right and px > x1 - _TOL:
+                    continue
+                raise OutsideParent(f"{solid.where}: a piercing breaks out of the side of the {solid.label} it cuts")
+            lo, hi = _height(floor, px), _height(ceil, px, min)
+            if lo is not None and py < lo - _TOL or hi is not None and py > hi + _TOL:
+                raise OutsideParent(f"{solid.where}: a piercing breaks through the {solid.label} it cuts, at ({px:.3f}, {py:.3f})")
+    pts: list[Point] = []
+    # Along the ceiling, left to right, down every slit and round every opening.
+    stops = sorted(inner, key=lambda r: r.cx)
+    for (ax, ay), (bx, by) in zip(ceil, ceil[1:]):
+        pts.append((ax, ay))
+        for rose in stops:
+            if ax <= rose.cx < bx:
+                top = _height(ceil, rose.cx, min)
+                pts += [(rose.cx, top), *rose.arc(_UP, _UP + 2 * math.pi), (rose.cx, top)]
+    pts.append(ceil[-1])
+    # Down the right edge, bitten by an opening centred on it.
+    if right is not None:
+        pts += right.arc(_UP, _UP + math.pi)
+    # Back along the floor, right to left.
+    pts += list(reversed(floor))
+    # Up the left edge.
+    if left is not None:
+        pts += left.arc(_DOWN, _UP)
+    return [_close(pts)]
+
+
+def _round_pieces(solid: _Solid, roses: list[_Rose]) -> list[tuple[Point, ...]]:
+    """A disc's outline, its opening (about its own centre) cut out by a slit
+    from the top; or, where its centre stands on an edge of the rectangle it
+    was made in, the half that edge leaves (a half-oculus against a jamb)."""
+    cell = solid.cell
+    (ox, oy), R = cell.centre, cell.radius
+    if len(roses) > 1 or roses and math.hypot(roses[0].cx - ox, roses[0].cy - oy) > 1e-6:
+        raise GrowError(f"{solid.where}: a round {solid.label} is pierced only about its own centre")
+    rose = roses[0] if roses else None
+    if rose is not None and any(rose.reach(2 * math.pi * i / _ARC) > R - _TOL for i in range(_ARC)):
+        raise OutsideParent(f"{solid.where}: a piercing breaks through the rim of the round {solid.label}")
+    clip = cell.clip or _rect(cell)
+
+    def rim(a0, a1):
+        n = max(1, math.ceil(abs(a1 - a0) / (2 * math.pi) * _ARC))
+        return [(ox + R * math.cos(a0 + (a1 - a0) * i / n), oy + R * math.sin(a0 + (a1 - a0) * i / n)) for i in range(n + 1)]
+
+    if abs(ox - clip.x) < _TOL:
+        pts = rim(_UP, _DOWN) + (rose.arc(_DOWN, _UP) if rose else [])
+    elif abs(ox - clip.x - clip.w) < _TOL:
+        pts = rim(3 * _UP, _UP) + (rose.arc(_UP, 3 * _UP) if rose else [])
+    else:
+        pts = rim(_UP, _UP - 2 * math.pi)
+        if rose is not None:
+            pts += rose.arc(_UP, _UP + 2 * math.pi) + [(ox, oy + R)]
+    return [_close(pts)]
+
+
+def _pieces(solid: _Solid) -> list[Mark]:
+    roses = _roses(solid.discs, solid.where)
+    cell = solid.cell
+    polys = _round_pieces(solid, roses) if cell.centre is not None else _profile_pieces(solid, roses)
+    room = cell.clip if cell.centre is not None and cell.clip is not None else _rect(cell)
+    out = []
+    for pts in polys:
+        xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+        at = Scope(min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys))
+        if not _inside(room, at):
+            raise OutsideParent(
+                f"{solid.where} drew {solid.label} at {at} outside its cell {room}. A grown mark stays inside the "
+                "cell its module draws in"
+            )
+        out.append(Mark(solid.label, at, {**solid.attrs, "points": pts}, solid.module))
+    return out
+
+
+# --- the interpreter --------------------------------------------------------------
 
 
 def _tree(string: Sequence[Module]) -> list:
@@ -496,22 +851,23 @@ def interpret_string(
     lookup: Callable[[str], Any],
     functions: Mapping[str, Callable[..., Any]],
 ) -> list[Mark]:
-    """Draw a grown string into ``scope``, in order."""
-    marks: list[Mark] = []
+    """Draw a grown string into ``scope``, in order. An outline is drawn
+    where it was made in that order, once every piercing of it is known."""
+    drawn: list = []
 
-    def run(items: list, cell: Scope) -> None:
-        pending: list[Scope] = []
-        replicate: list[Scope] | None = None
+    def run(items: list, cell: Cell, solids: list) -> None:
+        pending: list[Cell] = []
+        replicate: list[Cell] | None = None
         for item in items:
             if isinstance(item, list):
                 if replicate is not None:
                     for part in replicate:
-                        run(item, part)
+                        run(item, part, list(solids))
                     replicate = None
                 elif pending:
-                    run(item, pending.pop(0))
+                    run(item, pending.pop(0), list(solids))
                 else:
-                    run(item, cell)
+                    run(item, cell, list(solids))
                 continue
             how = system.interpret.get(item.symbol)
             if how is None:
@@ -519,7 +875,7 @@ def interpret_string(
             if len(how.formals) != len(item.args):
                 raise GrowError(f"{system.id}: {item} is interpreted as {item.symbol}{how.formals}")
             for step in how.steps:
-                cell, made = _draw(system, step, item, how, cell, params, lookup, functions, marks)
+                cell, made = _draw(system, step, item, how, cell, params, lookup, functions, drawn, solids)
                 if made is not None:
                     kind, parts = made
                     if kind == "split":
@@ -527,15 +883,20 @@ def interpret_string(
                     else:
                         pending, replicate = [], parts
 
-    run(_tree(string), scope)
+    run(_tree(string), _cell(scope), [])
+    marks: list[Mark] = []
+    for entry in drawn:
+        marks.extend(_pieces(entry) if isinstance(entry, _Solid) else [entry])
     if len(marks) > MAX_MARKS:
         raise GrowError(f"{system.id}: drew {len(marks)} marks, more than {MAX_MARKS}")
     return marks
 
 
-def _draw(system, step: Draw, module: Module, how: Interpretation, cell: Scope, params, lookup, functions, marks):
+def _draw(system, step: Draw, module: Module, how: Interpretation, cell: Cell, params, lookup, functions, marks, solids):
     where = f"{system.id}: {module}"
-    base = {**_bind(how.formals, module), "cw": cell.w, "ch": cell.h}
+    base = {**dict(cell.names), **_bind(how.formals, module), "cw": cell.w, "ch": cell.h}
+    if cell.centre is not None:
+        base["cr"] = cell.radius
     scope = _Scope(base, params, lookup)
     if step.when is not None and not step.when(scope, functions):
         return cell, None
@@ -547,25 +908,30 @@ def _draw(system, step: Draw, module: Module, how: Interpretation, cell: Scope, 
         bound = base if step.each is None else {**base, "item": item, "i": i}
         sc = _Scope(bound, params, lookup)
         ev = lambda e: e(sc, functions) if isinstance(e, Expr) else e  # noqa: E731
+        f = step.fields
         v = step.verb
         if v in ("split", "repeat"):
-            if "n" in step.fields:
-                weights = [1.0] * int(ev(step.fields["n"]))
+            if "n" in f:
+                weights = [1.0] * int(ev(f["n"]))
             else:
-                weights = ev(step.fields["weights"])
-            made = (v, _parts(cell, step.axis, weights, where))
+                weights = ev(f["weights"])
+            made = (v, [_cell(p, cell, step.axis) for p in _parts(cell, step.axis, weights, where)])
         elif v == "inset":
-            d = ev(step.fields["inset"])
+            d = ev(f["inset"])
             l, b, r, t = (d, d, d, d) if not isinstance(d, (list, tuple)) else d
             if l + r > cell.w + _TOL or b + t > cell.h + _TOL:
                 raise GrowError(f"{where}: inset {d} is larger than its cell {cell}")
-            cell = Scope(cell.x + l, cell.y + b, max(0.0, cell.w - l - r), max(0.0, cell.h - b - t))
+            inner = Scope(cell.x + l, cell.y + b, max(0.0, cell.w - l - r), max(0.0, cell.h - b - t))
+            cell = Cell(inner.x, inner.y, inner.w, inner.h,
+                        floor=_clip_profile(tuple((x, y + b) for x, y in cell.floor), inner.x, inner.x + inner.w),
+                        ceil=_clip_profile(tuple((x, y - t) for x, y in cell.ceil), inner.x, inner.x + inner.w),
+                        names=cell.names)
         elif v == "place":
-            x, y, w, h = (float(ev(a)) for a in step.fields["at"])
+            x, y, w, h = (float(ev(a)) for a in f["at"])
             _mark(marks, step.label, Scope(cell.x + x, cell.y + y, w, h), cell, ev, step, module, where, {})
         elif v == "line":
-            x0, y0, x1, y1 = (float(ev(a)) for a in step.fields["line"])
-            width = float(ev(step.fields["width"]))
+            x0, y0, x1, y1 = (float(ev(a)) for a in f["line"])
+            width = float(ev(f["width"]))
             dx, dy = x1 - x0, y1 - y0
             if abs(dx) < 1e-9 and abs(dy) < 1e-9:
                 continue
@@ -579,6 +945,74 @@ def _draw(system, step: Draw, module: Module, how: Interpretation, cell: Scope, 
                 at = Scope(cell.x + min(x0, x1), cell.y + min(y0, y1), abs(dx), abs(dy))
                 extra = {"direction": "rising" if dx * dy > 0 else "falling"}
                 _mark(marks, step.slant, at, cell, ev, step, module, where, extra)
+        elif v == "over":
+            span = float(ev(f["span"]))
+            curves = _arcade(
+                str(ev(f["over"])), cell.x + float(ev(f.get("start", 0.0))), span, float(ev(f.get("pitch", span))),
+                int(ev(f.get("count", 1))), cell.y + float(ev(f.get("spring", 0.0))), float(ev(f["rise"])),
+                float(ev(f.get("band", 0.0))), float(ev(f.get("finial", 0.0))),
+            )
+            floor = _envelope(curves, _floor(cell), cell.x, cell.x + cell.w)
+            ceil = _ceil(cell)
+            if any(y > _height(ceil, x, min) + _TOL for x, y in floor):
+                raise GrowError(f"{where}: the arches it stands over rise out of its cell {_rect(cell)}")
+            cell = Cell(cell.x, cell.y, cell.w, cell.h, floor=floor, ceil=cell.ceil, names=cell.names)
+        elif v == "arch":
+            rise = float(ev(f["rise"]))
+            if not 0.0 < rise <= cell.h + _TOL:
+                raise GrowError(f"{where}: an arch rising {rise} does not fit its cell {_rect(cell)}")
+            head = head_outline(cell.x, cell.y + cell.h - rise, cell.w, rise, str(ev(f["arch"])))
+            cell = Cell(cell.x, cell.y, cell.w, cell.h, floor=cell.floor, ceil=tuple(head), names=cell.names)
+        elif v == "round":
+            r0 = r = float(ev(f["round"]))
+            clear = None if "fit" not in f else float(ev(f["fit"]))
+            while True:
+                fit_scope = _Scope({**bound, "r": r}, params, lookup)
+                cx, cy = (float(e(fit_scope, functions)) for e in f["at"])
+                cx, cy = cell.x + cx, cell.y + cy
+                if clear is None or (
+                    _distance(cx, cy, _floor(cell)) >= r + clear and _distance(cx, cy, _ceil(cell)) >= r + clear
+                ):
+                    break
+                r -= 0.01
+                if r < 0.25 * r0:
+                    raise GrowError(f"{where}: no round cell from {r0} down to a quarter of it fits its cell {_rect(cell)}")
+            cell = Cell(cx - r, cy - r, 2 * r, 2 * r, centre=(cx, cy), radius=r,
+                        clip=cell.clip if cell.centre is not None else _rect(cell), names=cell.names)
+        elif v == "ring":
+            n, d, size = int(ev(f["ring"])), float(ev(f["radius"])), float(ev(f["size"]))
+            start = float(ev(f.get("start", 90.0)))
+            ox, oy = cell.centre if cell.centre is not None else (cell.x + cell.w / 2.0, cell.y + cell.h / 2.0)
+            clip = cell.clip if cell.centre is not None else _rect(cell)
+            parts = []
+            for k in range(n):
+                angle = start + 360.0 * k / n
+                px, py = ox + d * math.cos(math.radians(angle)), oy + d * math.sin(math.radians(angle))
+                parts.append(Cell(px - size / 2.0, py - size / 2.0, size, size, centre=(px, py), radius=size / 2.0,
+                                  clip=clip, names=(*cell.names, ("angle", angle))))
+            made = ("ring", parts)
+        elif v == "outline":
+            solid = _Solid(step.label, cell, {k: ev(e) for k, e in step.attrs.items()}, module, where)
+            marks.append(solid)
+            solids.append(solid)
+        elif v == "pierce":
+            if not solids:
+                raise GrowError(f"{where}: a pierce with no outline round it to cut")
+            r = float(ev(f["pierce"]))
+            if "at" in f:
+                cx, cy = (cell.x + float(ev(a)) for a in f["at"])
+            else:
+                cx, cy = cell.centre if cell.centre is not None else (cell.x + cell.w / 2.0, cell.y + cell.h / 2.0)
+            if r > 0.0:
+                solids[-1].discs.append((cx, cy, r))
+        elif v == "polygon":
+            pts = tuple((round(cell.x + float(px), 6), round(cell.y + float(py), 6)) for px, py in ev(f["points"]))
+            if len(pts) < 3:
+                raise GrowError(f"{where}: a polygon has at least three points")
+            xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+            at = Scope(min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys))
+            _mark(marks, step.label, at, cell.clip if cell.centre is not None and cell.clip is not None else cell,
+                  ev, step, module, where, {"points": pts + ((pts[0],) if pts[0] != pts[-1] else ())})
     return cell, made
 
 
@@ -587,7 +1021,7 @@ def _mark(marks, label, at: Scope, cell: Scope, ev, step: Draw, module: Module, 
         raise GrowError(f"{where}: a {label} of negative size {at}")
     if not _inside(cell, at):
         raise OutsideParent(
-            f"{where} drew {label} at {at} outside its cell {cell}. A grown mark stays inside the "
+            f"{where} drew {label} at {at} outside its cell {_rect(cell)}. A grown mark stays inside the "
             "cell its module draws in"
         )
     attrs = {k: ev(v) for k, v in step.attrs.items()}

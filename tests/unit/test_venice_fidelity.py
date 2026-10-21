@@ -44,7 +44,11 @@ def test_arches_spring_from_their_capitals_and_an_ogee_has_a_point_and_a_finial(
     building, _ = generate_venice(PalazzoSite(19.0, 1430, K.GRAND))
     ogees = [n for n in walk(building) if n.kind == "opening" and n.props.get("head") == "ogee"]
     assert ogees and all(0.6 <= o.props["head_rise"] / o.props["w"] <= 0.8 for o in ogees if o.props["opening_type"] == "window")
-    assert all(o.props.get("head_finial") == "fleuron" for o in ogees)
+    # Every ogee ends in a fleuron, but under tracery, where its tip runs up into the web.
+    traced = {n.id.rsplit("/light_bay/", 1)[0] for n in walk(building) if n.id.endswith("/tracery/band")}
+    under = [o for o in ogees if any(o.id.startswith(t + "/") for t in traced)]
+    assert under and all(not o.props.get("head_finial") for o in under)
+    assert all(o.props.get("head_finial") == "fleuron" for o in ogees if o not in under)
 
 
 # 2-3. The Byzantine front: centre and wings, its tectonics ----------------------------
@@ -201,31 +205,46 @@ def test_the_polifora_and_wing_windows_stand_in_dentilled_stone_frames():
 
 def test_a_quatrefoil_over_every_colonnette_on_the_traceried_floor_from_1420():
     building, _ = generate_venice(PalazzoSite(19.0, 1430, K.GRAND, seed=4))  # tracery on the first nobile floor
+    # The tracery is grown (venice.tracery): its Istrian stone stands in front
+    # of the storeys, so it is drawn at the building, as outlines.
+    stone = [n for n in building.children if n.kind == "gable" and n.props["form"] == "stoop" and "/tracery/" in n.id]
+    rings = [n for n in stone if any(": Eye(" in e.detail for e in n.trace)]
     for storey in _storeys(building):
-        q = sum(1 for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "quatrefoil")
-        cols = sum(1 for n in storey.children if n.kind == "column" and n.props.get("order") == "colonnette")
+        cols = [n for n in storey.children if n.kind == "column" and n.props.get("order") == "colonnette"]
+        mine = [g for g in rings if g.id.startswith(storey.id + "/")]
         traced = storey.id.endswith("s1")
-        assert q == (cols if traced else 0), storey.id
-    # Round 2: the tracery is one web with the arcade. Each quatrefoil stands
+        # An oculus over every colonnette, and half of one against each jamb.
+        assert len(mine) == (len(cols) + 2 if traced else 0), storey.id
+    # Round 2: the tracery is one web with the arcade. Each oculus stands
     # between the two arch tips beside it, its centre about level with them,
-    # and the stone web begins at the arches' springing, inside the frame.
+    # over its colonnette; the web begins at the arches' springing, inside the
+    # frame, and what it leaves open shows the dark behind the arcade.
     storey = next(s for s in _storeys(building) if s.id.endswith("s1"))
     lights = [n for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "window" and "/centre/" in n.id]
     tips = max(o.props["y"] + o.props["h"] for o in lights)
     spring = min(o.props["y"] + o.props["h"] - o.props["head_rise"] for o in lights)
-    (band,) = [n for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "tracery_band"]
-    assert band.props["y"] == pytest.approx(spring)
+    (band,) = [n for n in walk(storey) if n.kind == "opening" and n.id.endswith("/tracery/band")]
+    assert band.props["opening_type"] == "open_arch" and band.props["y"] == pytest.approx(spring)
     frame = next(n for n in walk(storey) if n.kind == "surround" and n.id.endswith("/frame"))
     assert band.props["y"] + band.props["h"] == pytest.approx(frame.props["y"] + frame.props["h"])
-    for q in (n for n in walk(storey) if n.kind == "opening" and n.props["opening_type"] == "quatrefoil"):
-        cy = q.props["y"] + q.props["h"] / 2.0
-        assert abs(cy - tips) < 0.35
-    bay = next(n for n in walk(storey) if n.kind == "bay" and any(c.props.get("opening_type") == "tracery_band" for c in n.children))
-    assert bay.children[0].props["opening_type"] == "tracery_band"  # drawn behind the arches
+    left, right = band.props["x"], band.props["x"] + band.props["w"]
+    for g in (g for g in stone if g.id.startswith(storey.id + "/")):
+        xs, ys = [p[0] for p in g.props["points"]], [p[1] for p in g.props["points"]]
+        assert left - 1e-6 <= min(xs) and max(xs) <= right + 1e-6 and spring - 1e-6 <= min(ys) and max(ys) <= tips + 1.0
+    cols = sorted(c.props["x"] + c.props["w"] / 2.0 for c in storey.children if c.kind == "column" and c.props.get("order") == "colonnette")
+    whole = sorted((g for g in rings if g.id.startswith(storey.id + "/") and g.props["w"] > 0.7 * max(r.props["w"] for r in rings)), key=lambda g: g.props["x"])
+    assert [g.props["x"] + g.props["w"] / 2.0 for g in whole] == pytest.approx(cols)
+    for g in whole:
+        assert abs(g.props["y"] + g.props["h"] / 2.0 - tips) < 0.35
+    halves = [g for g in rings if g.id.startswith(storey.id + "/") and g not in whole]
+    assert sorted((round(g.props["x"], 6), round(g.props["x"] + g.props["w"], 6)) for g in halves)[0][0] == pytest.approx(left)
+    assert max(g.props["x"] + g.props["w"] for g in halves) == pytest.approx(right)
+    bay = next(n for n in walk(storey) if n.kind == "bay" and any(c.id.endswith("/tracery/band") for c in n.children))
+    assert bay.children[0].id.endswith("/tracery/band")  # drawn behind the arches
     early, _ = generate_venice(PalazzoSite(19.0, 1400, K.GRAND, seed=4))
-    assert not any(n.props.get("opening_type") == "quatrefoil" for n in walk(early))
+    assert not any("/tracery/" in n.id for n in walk(early))
     plain, _ = generate_venice(PalazzoSite(19.0, 1450, K.ORDINARY, seed=4))
-    assert not any(n.props.get("opening_type") == "quatrefoil" for n in walk(plain))
+    assert not any("/tracery/" in n.id for n in walk(plain))
 
 
 # 9-14 -------------------------------------------------------------------------------------------

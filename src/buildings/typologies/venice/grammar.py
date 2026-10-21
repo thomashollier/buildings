@@ -9,8 +9,9 @@ crenellated there.
 The style is its rule file, ``venice.toml`` beside this module; this module
 holds only the situation it takes, the drawings the file names by writer, and
 the entry points. The writers place what the rules decided -- where an arch
-springs from its capital, where a quatrefoil stands over a colonnette, how
-many corbels carry a balcony -- so that the renderer only draws.
+springs from its capital, how many corbels carry a balcony -- so that the
+renderer only draws. The polifora's tracery is not drawn here: the rules
+grow it (``venice.tracery``).
 """
 
 from __future__ import annotations
@@ -50,12 +51,8 @@ class PalazzoSite:
 
 # --- arches -----------------------------------------------------------------------
 
-#: How far each head rises, as a share of its span: a round arch half its span,
-#: an equilateral pointed arch sin 60 deg of it, a Venetian ogee about three
-#: quarters (0.6-0.8 measured).
-HEAD_RISE = {"round": 0.5, "pointed": 0.866, "ogee": 0.75}
-#: A head never takes more than this share of its light's height.
-HEAD_MAX_SHARE = 0.45
+# How far each head rises (``head_rise_share``, ``head_max_share``) is the
+# rule file's: the tracery the rules grow over the arches has to clear them.
 
 
 def _light_span(light: Shape) -> tuple[float, float]:
@@ -70,11 +67,11 @@ def _light_span(light: Shape) -> tuple[float, float]:
 
 def head_rise(light: Shape) -> float:
     """How far a light's arched head rises above its springing."""
-    share = HEAD_RISE.get(light.attr("head", "flat"))
+    share = STYLE.params["head_rise_share"].get(light.attr("head", "flat"))
     if share is None:
         return 0.0
     _x, w = _light_span(light)
-    return min(w * share, light.scope.h * HEAD_MAX_SHARE)
+    return min(w * share, light.scope.h * STYLE.params["head_max_share"])
 
 
 #: A bottle-glass roundel (rui) as drawn.
@@ -225,79 +222,16 @@ def _plutei(shape: Shape) -> list:
                                 "panel_count": max(1, len(lights)), "panel_edges": tuple(edges), "post_w": post})]
 
 
-def _ogee_half(x: float, y: float, w: float, rise: float, steps: int = 14) -> list[tuple[float, float]]:
-    """The left half of an ogee head, springing to tip: it leaves the springing
-    upright, curves in, turns about two thirds of the way up and runs concave
-    into the point (the cubic the head is drawn with)."""
-    pts = []
-    for i in range(steps + 1):
-        t = i / steps
-        pts.append((x + w / 2.0 * (3 * t * t - 2 * t ** 3), y + rise * (3 * t * (1 - t) ** 2 * 0.50 + 3 * t * t * (1 - t) * 0.12 + t ** 3)))
-    return pts
-
-
-def _head_extrados(light: Shape) -> list[tuple[float, float]]:
-    """The outer edge of a light's head, its stone band included, as points:
-    where tracery set over the arcade has to stop."""
-    x, w = _light_span(light)
-    rise = head_rise(light)
-    spring = light.scope.y + light.scope.h - rise
-    band = min(0.14, w * 0.09)
-    x, w, rise = x - band, w + 2.0 * band, rise + band
-    head = light.attr("head", "flat")
-    if head == "ogee":
-        left = _ogee_half(x, spring, w, rise)
-    else:
-        # A round or pointed head, near enough as an arc for clearance.
-        left = [(x + w / 2.0 * (1 - math.cos(a)), spring + rise * math.sin(a)) for a in (math.pi / 2 * k / 12 for k in range(13))]
-    pts = left + [(2 * x + w - px, py) for px, py in reversed(left[:-1])]
-    if head == "ogee" and light.attr("finial", False):
-        f = finial_height(w - 2.0 * band)
-        tip = (x + w / 2.0, spring + rise - band)
-        pts += [(tip[0] - f * 0.32, tip[1] + f * 0.45), (tip[0], tip[1] + f), (tip[0] + f * 0.32, tip[1] + f * 0.45)]
-    return pts
-
-
 def write_tracery(shape: Shape, below, d) -> list:
-    """The tracery of a polifora (Ca' d'Oro, Ca' Foscari, Pisani-Moretta): one
-    web of Istrian stone with the arcade, from the arches' springing to the
-    frame's head, in the same frame. A quatrefoil stands over every colonnette
-    between the two arch tips beside it, as large as clears both arches and the
-    frame's head, so it rises straight off the extrados of the arches rather
-    than sitting in a strip of its own. The web goes first in the bay: the
-    arches are cut out of it when they are drawn over it."""
+    """The tracery of a polifora is grown by the rules (``venice.tracery``):
+    its stone comes up from the grown outlines below. This states only what
+    shows through what the stone leaves open -- the dark of the portego
+    behind the arcade, from the arches' springing to the frame's head -- and
+    it goes first in the bay, behind the arches."""
     s = shape.scope
-    arcade = next(c for c in shape.siblings if c.label == "Arcade")
-    lights = [c for c in arcade.children if c.label == "Light"]
-    cols = [c for c in arcade.children if c.label not in ("Light",)]
-    pitch = lights[0].scope.w + (cols[0].scope.w if cols else 0.0)
-    spring = min(lt.scope.y + lt.scope.h - head_rise(lt) for lt in lights)
-    top = s.y + s.h
-    trace = tuple(shape.trace)
-    nodes: list = [OpeningNode(id=f"{shape.id}/band", kind="opening", trace=trace,
-                               props={"x": s.x, "y": spring, "w": s.w, "h": top - spring, "opening_type": "tracery_band"})]
-    for k, c in enumerate(cols):
-        i = arcade.children.index(c)
-        arches = _head_extrados(arcade.children[i - 1]) + _head_extrados(arcade.children[i + 1])
-        cx = c.scope.x + c.scope.w / 2.0
-        # The largest ring that sits between the two arches under the frame's
-        # head: shrink it till it clears them both.
-        r = min(0.5 * pitch - 0.1, 0.42 * pitch)
-        while r > 0.12:
-            cy = top - 0.08 - r
-            if min(math.hypot(px - cx, py - cy) for px, py in arches) >= r + 0.03:
-                break
-            r -= 0.01
-        cy = top - 0.08 - r
-        nodes.append(
-            OpeningNode(
-                id=f"{shape.id}/quatrefoil{k}",
-                kind="opening",
-                trace=trace,
-                props={"x": cx - r / 0.92, "y": cy - r / 0.92, "w": 2.0 * r / 0.92, "h": 2.0 * r / 0.92, "opening_type": "quatrefoil"},
-            )
-        )
-    return nodes
+    band = OpeningNode(id=f"{shape.id}/band", kind="opening", trace=tuple(shape.trace),
+                       props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "opening_type": "open_arch", "head": "flat"})
+    return [band, *below]
 
 
 def write_course(shape: Shape, below, d) -> list:
@@ -383,15 +317,24 @@ def write_cell(cell: Shape, below, d) -> list:
     its slab goes to the storey, drawn as wide as the balcony is rather than
     as the bay, and its rail stands in front of the colonnettes it guards, so
     it goes up to the building with the other railings."""
-    bay, *rest = kit.write_cell(cell, below, d)
+    # The tracery's stone stands in front of the storey: it goes up to the building.
+    stone = [n for n in below if n.kind == "gable"]
+    bay, *rest = kit.write_cell(cell, [n for n in below if n.kind != "gable"], d)
     out = tuple(n for n in bay.children if n.kind in ("ironwork", "balcony"))
     if out:
         bay = replace(bay, children=tuple(n for n in bay.children if n.kind not in ("ironwork", "balcony")))
-    # A polifora's tracery web lies behind its arches: it goes first.
-    web = tuple(n for n in bay.children if n.props.get("opening_type") == "tracery_band")
+    # What a polifora's tracery leaves open lies behind its arches: it goes first.
+    web = tuple(n for n in bay.children if n.id.endswith("/tracery/band"))
     if web:
         bay = replace(bay, children=web + tuple(n for n in bay.children if n not in web))
-    return [bay, *rest, *out]
+    return [bay, *rest, *out, *stone]
+
+
+def write_storey(storey: Shape, below, d) -> list:
+    """A storey as the kit writes it, except that the tracery's stone, which
+    stands in front of it, goes up to the building."""
+    stone = [n for n in below if n.kind == "gable"]
+    return [*kit.write_storey(storey, [n for n in below if n.kind != "gable"], d), *stone]
 
 
 def write_roof(roof: Shape, below, d) -> list:
@@ -466,6 +409,7 @@ register_writer("venice.cell", write_cell)
 register_writer("venice.fumaiolo", write_fumaiolo)
 register_writer("venice.roof", write_roof)
 register_writer("venice.column", write_column)
+register_writer("venice.storey", write_storey)
 
 STYLE = load_style(Path(__file__).with_name("venice.toml"))
 

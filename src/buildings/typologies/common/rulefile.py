@@ -607,9 +607,20 @@ def _rule(spec: Mapping[str, Any], params: Mapping[str, Any], where: str):
 # ===========================================================================
 
 _RULE_KEYS = {"id", "pred", "left", "right", "when", "to", "weight", "doc"}
-_DRAW_VERBS = ("split", "repeat", "inset", "place", "line")
+_DRAW_VERBS = ("split", "repeat", "inset", "place", "line", "over", "arch", "round", "ring", "outline", "pierce", "polygon")
 _DRAW_KEYS = {"split", "repeat", "inset", "place", "line", "weights", "n", "at", "width", "straight", "slant",
               "attrs", "when", "each"}
+#: The keys each of the shaped verbs takes besides its own, ``when`` and
+#: ``each``; the first set is required.
+_SHAPED = {
+    "over": ({"span", "rise"}, {"pitch", "count", "start", "spring", "band", "finial"}),
+    "arch": ({"rise"}, set()),
+    "round": ({"at"}, {"fit"}),
+    "ring": ({"radius", "size"}, {"start"}),
+    "outline": (set(), {"attrs"}),
+    "pierce": (set(), {"at"}),
+    "polygon": ({"points"}, {"attrs"}),
+}
 
 
 def _lsystem(spec: Mapping[str, Any], where: str) -> _ls.LSystem:
@@ -675,13 +686,15 @@ def _draw(spec: Mapping[str, Any], where: str) -> _ls.Draw:
     verbs = [v for v in _DRAW_VERBS if v in spec]
     if len(verbs) != 1:
         raise RuleFileError(f"{where}: a drawing step has exactly one verb of {list(_DRAW_VERBS)}, got {verbs or list(spec)}")
-    extra = set(spec) - _DRAW_KEYS
-    if extra:
-        raise RuleFileError(f"{where}: unknown key(s) {sorted(extra)}")
     verb = verbs[0]
     when = _expr(spec["when"], f"{where}.when") if "when" in spec else None
     each = _expr(spec["each"], f"{where}.each") if "each" in spec else None
     attrs = _map(spec.get("attrs"), where)
+    if verb in _SHAPED:
+        return _shaped(verb, spec, where, when, each, attrs)
+    extra = set(spec) - _DRAW_KEYS
+    if extra:
+        raise RuleFileError(f"{where}: unknown key(s) {sorted(extra)}")
     if verb in ("split", "repeat"):
         if spec[verb] not in _AXES:
             raise RuleFileError(f"{where}: {verb} along 'x' or 'y', not {spec[verb]!r}")
@@ -707,6 +720,51 @@ def _draw(spec: Mapping[str, Any], where: str) -> _ls.Draw:
         when=when,
         each=each,
     )
+
+
+def _shaped(verb: str, spec: Mapping[str, Any], where: str, when, each, attrs) -> _ls.Draw:
+    """The verbs that shape a cell (``over``, ``arch``, ``round``, ``ring``)
+    or draw an outline (``outline``, ``polygon``) and cut it (``pierce``)."""
+    required, optional = _SHAPED[verb]
+    extra = set(spec) - required - optional - {verb, "when", "each"}
+    if extra:
+        raise RuleFileError(f"{where}: unknown key(s) {sorted(extra)} in {verb!r}")
+    missing = required - set(spec)
+    if missing:
+        raise RuleFileError(f"{where}: {verb!r} needs {sorted(missing)}")
+    if verb in ("outline", "polygon"):
+        fields = {} if verb == "outline" else {"points": _expr(spec["points"], f"{where}.points")}
+        return _ls.Draw(verb, fields=fields, label=spec[verb], attrs=attrs, when=when, each=each)
+    fields: dict[str, Any] = {verb: _expr(spec[verb], f"{where}.{verb}")}
+    for key in (required | optional) - {"attrs"}:
+        if key not in spec:
+            continue
+        if key == "at":
+            if len(spec["at"]) != 2:
+                raise RuleFileError(f"{where}: 'at' is [x, y] in the cell")
+            fields["at"] = [_expr(a, f"{where}.at") for a in spec["at"]]
+        else:
+            fields[key] = _expr(spec[key], f"{where}.{key}")
+    return _ls.Draw(verb, fields=fields, when=when, each=each)
+
+
+def write_stone(shape: Shape, below, d) -> list:
+    """A grown outline (``outline``, ``polygon``) drawn as stone standing in
+    front of the wall: its points are the outline, its piercings cut out."""
+    from buildings.ir.nodes import GableNode
+
+    return [
+        GableNode(
+            id=shape.id,
+            kind="gable",
+            trace=tuple(shape.trace),
+            props={**kit.xywh(shape.scope), "form": "stoop", "points": tuple(shape.attrs["points"]),
+                   "hoist_beam": None, "wall_material": "stone"},
+        )
+    ]
+
+
+WRITERS["grow.stone"] = write_stone
 
 
 def write_slant(shape: Shape, below, d) -> list:

@@ -61,6 +61,8 @@ Colonnette = "venice.colonnette"
 Surround = "venice.surround"
 Balconette = "venice.balconette"
 Tracery = "venice.tracery"
+TraceryStone = "grow.stone"
+Storey = "venice.storey"
 Entablature = "venice.course"
 Frieze = "venice.frieze"
 BaseCourse = "venice.base_course"
@@ -96,6 +98,31 @@ light_min_slender = 2.6         # ...and at least this many widths tall (h:w 2.5
 light_slenderness = 3.2         # a light no taller than this many widths (h:w 2.5-3.5)
 frame_head = 0.35               # the frame's room over an arch's tip
 tracery_h = 0.62                # the tracery's rise over the arch tips: its quatrefoils stand between them
+# How far each head rises, as a share of its span: a round arch half its span,
+# an equilateral pointed arch sin 60 deg of it, a Venetian ogee about three
+# quarters (0.6-0.8 measured); never more than this share of its light's height.
+head_rise_share = { round = 0.5, pointed = 0.866, ogee = 0.75 }
+head_max_share = 0.45
+# The tracery (grown: venice.tracery below). The web stops under the dentils
+# that hang from the frame's head. Its oculi as large as clear the arches
+# beside them (by 3 cm), hung 5 cm under the web's top, from at most 0.42 of
+# the light pitch; the web cut back round each ring by a shadowed reveal. A
+# quatrefoil in each, its four foils (as shares of the oculus's radius) round
+# an open heart: on most houses overlapping, set at 0.4 and 0.34 across, so
+# the cusps between them are short and the ring thick (Ca' d'Oro); on a grand
+# house's broad lights drawn out towards the rim (at 0.46, 0.335 across), so
+# that the ring is thin and the cusps long and sharp (Ca' Foscari).
+frame_dentil = 0.07
+tracery_foils = 4
+oculus_top = 0.05
+oculus_clear = 0.03
+oculus_reveal = 0.02
+foil_at = 0.4
+foil_r = 0.34
+cusp_at = 0.46
+cusp_r = 0.335
+heart_r = 0.26
+cusped_from = 0.9               # the narrowest light (m) whose oculus is cusped
 cornice_h = 0.6
 # --- what the families did differently ---------------------------------------
 # The roof: low (about 18 degrees), hipped, standing back from the front behind
@@ -280,12 +307,14 @@ do = [ { call = "kit.split_cell_around_its_light" } ]
 [[production]]
 id = "venice.light_bay"
 label = "LightBay"
-doc = "A light bay with several lights becomes an arcade. A polifora stands in a rectangular stone frame, with a band of quatrefoil tracery over its arches on the floor that has one; a balcony runs across the foot of any light bay that has one."
+doc = "A light bay with several lights becomes an arcade. A polifora stands in a rectangular stone frame, with a band of quatrefoil tracery over its arches on the floor that has one -- the band begins where the arches spring, so that it is one web with them; a balcony runs across the foot of any light bay that has one."
 let = { lh = "min(light_height, h - sill)", traced = "has('band_h') and band_h > 0" }
 do = [
   { call = "kit.split_light_bay_into_lights", when = "has('lights') and lights" },
   { call = "kit.split_light_bay", when = "not (has('lights') and lights)" },
-  { insert = "Tracery", at = ["x", "y + sill + lh", "w", "band_h"], name = "tracery", when = "traced" },
+  { let = { nl = "len(lights)", lw = "(w - divider_width * (len(lights) - 1)) / len(lights)" }, when = "traced" },
+  { let = { rise = "min(lw * head_rise_share[head], lh * head_max_share)" }, when = "traced" },
+  { insert = "Tracery", at = ["x", "y + sill + lh - rise", "w", "band_h + rise"], name = "tracery", attrs = { arch_rise = "= rise", light_w = "= lw", lights_n = "= nl" }, when = "traced" },
   { insert = "Surround", at = ["x", "y + sill", "w", "lh + (band_h if traced else frame_head)"], name = "frame", attrs = { surround_kind = "= frame_kind" }, when = "has('frame_kind') and frame_kind != 'none'" },
   { insert = "Balconette", at = ["x", "y + sill", "w", "0.95"], name = "balcony", when = "has('balcony') and balcony" },
 ]
@@ -294,6 +323,66 @@ do = [
 id = "venice.light"
 label = "Light"
 do = [ { call = "kit.dress_the_light" } ]
+
+[[production]]
+id = "venice.tracery"
+label = "Tracery"
+doc = "The tracery of a polifora (Ca' d'Oro, Ca' Foscari, Pisani-Moretta) is grown, not drawn: the L-system venice.tracery cuts the web at the arch tips, sets an oculus over every colonnette and half of one against each jamb, and pierces each with a quatrefoil -- cusped, a generation further, on a grand house's broad lights. The web is Istrian stone standing in front of the dark behind the arcade."
+do = [ { grow = "venice.tracery", generations = "3 if klass == 'grand' and light_w >= cusped_from else 2", params = { n = "lights_n", lw = "light_w", pitch = "light_w + divider_width", rise = "arch_rise", band = "min(0.14, light_w * 0.09)", eye = "min(0.5 * (light_w + divider_width) - 0.1, 0.42 * (light_w + divider_width))" } } ]
+
+# --- the tracery, grown -------------------------------------------------------------
+#
+# Over a polifora's arches (photographs: Ca' d'Oro PN1, Ca' Foscari, Pisani-
+# Moretta, Giustinian): a row of oculi, one centred over every colonnette,
+# each as large as fits between the two arch tips beside it and the frame's
+# head, so that it rises straight off the arches' extrados; in each a
+# quatrefoil, its foils on the axes. At the ends the row is cut by the frame:
+# a half oculus against each jamb, its centre on the jamb (Ca' d'Oro, Ca'
+# Foscari). Every arch tip runs up between two oculi to the frame's head.
+#
+# Generation 1 cuts the web at the arch tips: an end cell (half a light) at
+# each jamb, a cell a light pitch wide over each colonnette between. The cell
+# stands over the arches (``over``): its floor is their extrados, stone band
+# and fleuron included. Generation 2 makes every Oculus a stone web with an
+# eye in it -- an oculus beside a Jamb (context) is halved by it -- and every
+# eye a ring of stone pierced by a rose of foils (``ring``); generation 3
+# draws the foils in round an open heart, so that cusps stand between them.
+# Every piece of stone is an outline (``outline``) with its piercings cut out
+# (``pierce``); what they leave open shows the dark behind the arcade.
+
+[[lsystem]]
+id = "venice.tracery"
+doc = "Venetian Gothic polifora tracery: oculi with quatrefoils over the colonnettes, half oculi at the jambs."
+axiom = "Polifora(n)"
+rules = [
+  { id = "venice.tracery.cut_at_the_tips", pred = "Polifora(k)", to = "Arcade(k) [ Jamb Oculus ] [ Spandrels(k - 1) [ Oculus ] ] [ Oculus Jamb ]" },
+  { id = "venice.tracery.halved_by_the_left_jamb", pred = "Oculus", left = "Jamb", to = "Web [ Eye(-1) Rose(tracery_foils, foil_at, foil_r) Heart(heart_r) [ Foil ] ]" },
+  { id = "venice.tracery.halved_by_the_right_jamb", pred = "Oculus", right = "Jamb", to = "Web [ Eye(1) Rose(tracery_foils, foil_at, foil_r) Heart(heart_r) [ Foil ] ]" },
+  { id = "venice.tracery.oculus", pred = "Oculus", to = "Web [ Eye(0) Rose(tracery_foils, foil_at, foil_r) Heart(heart_r) [ Foil ] ]" },
+  { id = "venice.tracery.cusped", pred = "Rose(k, d, p)", when = "d < cusp_at", to = "Rose(k, cusp_at, cusp_r)" },
+]
+interpret = [
+  # The web stands over the arcade: k arches a light wide at the light pitch.
+  { module = "Arcade(k)", do = [
+      { inset = "[0, 0, 0, frame_dentil]" },
+      { over = "head", span = "lw", pitch = "pitch", count = "k", rise = "rise", band = "band" },
+      { split = "x", weights = "[lw / 2, (k - 1) * pitch, lw / 2]" },
+  ] },
+  { module = "Spandrels(k)", repeat = "x", n = "k" },
+  { module = "Web", outline = "TraceryStone" },
+  # The eye: centred over the cell's middle, or on its jamb (s = -1, 1); hung
+  # from the web's top and shrunk until it clears the arches -- so against a
+  # jamb, where the end arch springs from the frame itself, the half oculus
+  # is a little smaller than the others (Ca' Foscari).
+  { module = "Eye(s)", do = [
+      { round = "eye", at = ["cw * (1 + s) / 2", "ch - oculus_top - r"], fit = "oculus_clear" },
+      { pierce = "cr + oculus_reveal" },
+      { outline = "TraceryStone" },
+  ] },
+  { module = "Rose(k, d, p)", ring = "k", radius = "d * cr", size = "2 * p * cr", start = "90" },
+  { module = "Foil", pierce = "cr" },
+  { module = "Heart(q)", pierce = "q * cr" },
+]
 
 [[rule]]
 id = "venice.roles.the_storey_knows_its_floor"
@@ -349,14 +438,14 @@ set = { opening_type = "window", head = "= nobile_head", light_width = "= wing_l
 [[rule]]
 id = "venice.base.the_polifora"
 label = "Cell"
-doc = "On a nobile floor the centre is one opening of slender lights on colonnettes: a light about a metre wide and two and a half to three times as tall, as many of them as fill the centre, capped by what the house can afford (where the cap bites, the polifora is narrower than the centre, wall either side); the same count on both nobile floors, two fewer on a third floor, whose lights stay as slender (a smaller polifora, not broader lights). In a dentilled Istrian frame; quatrefoil tracery rising from its arch tips on the floor the family chose; a stone balcony on corbels under it on the first nobile floor, and on the second in most houses."
+doc = "On a nobile floor the centre is one opening of slender lights on colonnettes: a light about a metre wide and two and a half to three times as tall, as many of them as fill the centre, capped by what the house can afford (where the cap bites, the polifora is narrower than the centre, wall either side); the same count on both nobile floors, two fewer on a third floor, whose lights stay as slender (a smaller polifora, not broader lights). In a dentilled Istrian frame; quatrefoil tracery over its arches on the floor the family chose, their tips running up into it with no fleuron of their own; a stone balcony on corbels under it on the first nobile floor, and on the second in most houses."
 when = "is_bay() and in_parent('Centre') and role in ('nobile', 'third')"
 specificity = 10
 # Never a broad light: no wider than polifora_light_max, nor wider than its
 # height allows at light_min_slender. The count fills the centre at that
 # width, up to the cap; a third floor takes two fewer and stays slender.
 let = { pw = "w - 0.1", sl = "0.15 if role == 'nobile' else 0.4", room = "h - sl - 1.2", cap = "polifora_cap[klass] + (2 if klass == 'grand' and pw >= 8.5 else 0)", n_nob = "max(3, min(cap, -int(-(pw + polifora_div) // (polifora_light_max + polifora_div))))", n = "n_nob if role == 'nobile' else max(3, n_nob - 2)", lw = "min(polifora_light_max, room / light_min_slender, (pw - polifora_div * (n - 1)) / n)" }
-set = { opening_type = "window", head = "= nobile_head", light_width = "= n * lw + polifora_div * (n - 1)", sill = "= sl", light_height = "= min(room, light_slenderness * lw)", lights = "= (1.0,) * n", divider = "Colonnette", divider_width = "= polifora_div", capital_width = 0.42, order = "colonnette", surround_kind = "none", frame_kind = "dentil_panel", finial = true, archivolt = "plain", band_h = "= tracery_h if floor in tracery_on else 0.0", balcony = "= floor == 'nobile1' or (floor == 'nobile2' and pn2_balcony)", rail = "stone", glazing = "= glaze" }
+set = { opening_type = "window", head = "= nobile_head", light_width = "= n * lw + polifora_div * (n - 1)", sill = "= sl", light_height = "= min(room, light_slenderness * lw)", lights = "= (1.0,) * n", divider = "Colonnette", divider_width = "= polifora_div", capital_width = 0.42, order = "colonnette", surround_kind = "none", frame_kind = "dentil_panel", finial = "= floor not in tracery_on", archivolt = "plain", band_h = "= tracery_h if floor in tracery_on else 0.0", balcony = "= floor == 'nobile1' or (floor == 'nobile2' and pn2_balcony)", rail = "stone", glazing = "= glaze" }
 
 
 [[rule]]

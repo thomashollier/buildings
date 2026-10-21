@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import textwrap
 
 import pytest
@@ -306,3 +307,152 @@ def test_size_and_money_set_the_generations_and_the_seed_the_pattern():
             rules |= {c.split(" -> ")[1].split(" ")[0] for c in lat.attrs["growth"]["choices"]}
     assert {"cairo.mashrabiya.square_grid", "cairo.mashrabiya.maymuni"} <= rules
     assert {"cairo.mashrabiya.square_grid_under_a_wheel", "cairo.mashrabiya.maymuni_under_a_wheel"} & rules
+
+
+# --- shaped cells, outlines and piercings ------------------------------------
+
+from buildings.cga.lsystem import head_outline  # noqa: E402
+from buildings.typologies.common.rulefile import _lsystem  # noqa: E402
+
+FN2 = {**FN, "len": len}
+
+
+def _area(pts):
+    return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(pts, pts[1:]))) / 2.0
+
+
+def _grown(spec, scope, n=0, params=None):
+    s = _lsystem({"id": "t", **spec}, "test")
+    string = derive_string(s, n, params=params or {}, lookup=_no_names, functions=FN2).string
+    return interpret_string(s, string, scope, params=params or {}, lookup=_no_names, functions=FN2)
+
+
+def test_head_outline_is_the_renderers_head():
+    from buildings.render.svg.elements import _head_outline
+
+    for form in ("round", "pointed", "ogee"):
+        ours, theirs = head_outline(1.0, 2.0, 0.9, 0.7, form), _head_outline(1.0, 2.0, 0.9, 0.7, form)
+        assert len(ours) == len(theirs)
+        assert [c for p in ours for c in p] == pytest.approx([c for p in theirs for c in p])
+
+
+def test_an_arch_cell_is_outlined_by_its_head_and_a_cell_over_arches_by_their_extrados():
+    light = _grown({"axiom": "L", "interpret": [{"module": "L", "do": [{"arch": "'ogee'", "rise": "0.75"}, {"outline": "Light"}]}]},
+                   Scope(0.0, 0.0, 1.0, 3.0))
+    (mark,) = light
+    pts = mark.attrs["points"]
+    assert pts[0] == pts[-1] and max(y for _x, y in pts) == pytest.approx(3.0)
+    # The outline is the head's: the tip at the middle, the springing 0.75 down.
+    assert (0.5, 3.0) in pts and (0.0, 2.25) in pts
+    web = _grown({"axiom": "W", "interpret": [{"module": "W", "do": [
+        {"over": "'pointed'", "span": "1.0", "pitch": "1.2", "count": "2", "rise": "0.8", "band": "0.1"},
+        {"outline": "Web"}]}]}, Scope(0.0, 0.0, 2.2, 1.5))
+    (mark,) = web
+    pts = mark.attrs["points"]
+    # Over the colonnette between the arches the web comes down to the springing.
+    assert min(y for x, y in pts if 1.05 < x < 1.15) == pytest.approx(0.0)
+    # Over each tip it stands on the extrados: the rise plus the band.
+    assert min(y for x, y in pts if abs(x - 0.5) < 1e-6) == pytest.approx(0.9)
+    with pytest.raises(GrowError, match="rise out of its cell"):
+        _grown({"axiom": "W", "interpret": [{"module": "W", "over": "'ogee'", "span": "1.0", "rise": "2.0"}]}, Scope(0.0, 0.0, 1.0, 1.0))
+
+
+def test_a_ring_places_round_cells_about_a_centre_with_their_angle_bound():
+    marks = _grown({"axiom": "R [ F ]", "interpret": [
+        {"module": "R", "ring": "4", "radius": "1.0", "size": "0.5", "start": "90"},
+        {"module": "F", "place": "Foil", "at": ["0", "0", "cw", "ch"], "attrs": {"angle": "= angle", "radius": "= cr"}},
+    ]}, Scope(-2.0, -2.0, 4.0, 4.0))
+    assert [m.attrs["angle"] for m in marks] == [90.0, 180.0, 270.0, 360.0]
+    assert [(round(m.scope.x + 0.25, 9), round(m.scope.y + 0.25, 9)) for m in marks] == [(0.0, 1.0), (-1.0, 0.0), (0.0, -1.0), (1.0, 0.0)]
+    assert all(m.attrs["radius"] == 0.25 for m in marks)
+
+
+_RING = {"axiom": "E [ R [ F ] H ]", "interpret": [
+    {"module": "E", "do": [{"round": "1.0", "at": ["cw / 2", "ch / 2"]}, {"outline": "Ring"}]},
+    {"module": "R", "ring": "4", "radius": "0.4", "size": "0.68"},
+    {"module": "F", "pierce": "cr"},
+    {"module": "H", "pierce": "0.26"},
+]}
+
+
+def test_an_outline_is_cut_by_its_piercings_into_one_simple_polygon_with_a_slit():
+    (ring,) = _grown(_RING, Scope(0.0, 0.0, 2.0, 2.0))
+    pts = ring.attrs["points"]
+    assert pts[0] == pts[-1] == (1.0, 2.0)  # from the top of the rim
+    # What is left is the disc less the quatrefoil: less than the disc less its
+    # heart, more than the disc less the heart and four whole foils.
+    assert math.pi * (1 - 4 * 0.34**2 - 0.26**2) < _area(pts) < math.pi * (1 - 0.26**2)
+    # Sharp cusps between the foils, on the diagonals, nearer than the foils reach.
+    reach = sorted(math.hypot(x - 1.0, y - 1.0) for x, y in pts if math.hypot(x - 1.0, y - 1.0) < 0.99)
+    assert reach[-1] == pytest.approx(0.74, abs=1e-3) and reach[0] < 0.5
+    # A single disc pierced about its centre: the annulus.
+    (annulus,) = _grown({"axiom": "E [ H ]", "interpret": [
+        {"module": "E", "do": [{"round": "1.0", "at": ["1", "1"]}, {"outline": "Ring"}]},
+        {"module": "H", "pierce": "0.5"}]}, Scope(0.0, 0.0, 2.0, 2.0))
+    assert _area(annulus.attrs["points"]) == pytest.approx(math.pi * 0.75, rel=0.01)
+
+
+def test_an_opening_centred_on_an_edge_is_halved_by_it():
+    # A round cell centred on its cell's left edge keeps the half inside.
+    (half,) = _grown({"axiom": "E [ H ]", "interpret": [
+        {"module": "E", "do": [{"round": "0.5", "at": ["0", "1"]}, {"outline": "Ring"}]},
+        {"module": "H", "pierce": "0.25"}]}, Scope(0.0, 0.0, 1.0, 2.0))
+    assert half.scope.x == pytest.approx(0.0) and half.scope.w == pytest.approx(0.5)
+    assert _area(half.attrs["points"]) == pytest.approx(math.pi * (0.25 - 0.0625) / 2, rel=0.01)
+    # A web pierced by a disc centred on its edge is bitten by it.
+    (web,) = _grown({"axiom": "W [ H ]", "interpret": [
+        {"module": "W", "outline": "Web"}, {"module": "H", "pierce": "0.5", "at": ["0", "1"]}]}, Scope(0.0, 0.0, 1.0, 2.0))
+    assert _area(web.attrs["points"]) == pytest.approx(2.0 - math.pi * 0.25 / 2, rel=0.01)
+
+
+def test_round_cells_fit_and_piercings_stay_inside_what_they_cut():
+    # Fitted: shrunk from 1.0 until it clears the arch under it by 0.05.
+    (eye,) = _grown({"axiom": "W [ E ]", "interpret": [
+        {"module": "W", "over": "'round'", "span": "2.0", "rise": "1.0"},
+        {"module": "E", "do": [{"round": "1.0", "at": ["cw / 2", "ch - 0.1 - r"], "fit": "0.05"}, {"outline": "Eye"}]}]},
+        Scope(0.0, 0.0, 2.0, 2.5))
+    r = eye.scope.w / 2.0
+    assert r < 1.0 and 2.4 - 2 * r - 1.0 >= 0.05 - 1e-9 and 2.4 - 2 * (r + 0.01) - 1.0 < 0.05
+    with pytest.raises(GrowError, match="no outline"):
+        _grown({"axiom": "H", "interpret": [{"module": "H", "pierce": "0.1"}]}, Scope(0.0, 0.0, 1.0, 1.0))
+    with pytest.raises(OutsideParent, match="breaks"):
+        _grown({"axiom": "W [ H ]", "interpret": [{"module": "W", "outline": "Web"}, {"module": "H", "pierce": "0.6"}]},
+               Scope(0.0, 0.0, 1.0, 1.0))
+    with pytest.raises(GrowError, match="middle"):
+        # Four foils that overlap in a ring round a middle none of them covers.
+        _grown({"axiom": "W [ R [ F ] ]", "interpret": [{"module": "W", "outline": "Web"},
+               {"module": "R", "ring": "4", "radius": "0.25", "size": "0.4"}, {"module": "F", "pierce": "cr"}]},
+               Scope(0.0, 0.0, 1.0, 1.0))
+
+
+def test_a_rule_file_checks_the_shaping_verbs_when_it_is_loaded(tmp_path):
+    with pytest.raises(RuleFileError, match="unknown key"):
+        _style(tmp_path, _TOML.replace('repeat = "x", n = "k"', 'ring = "k", radius = "1", size = "1", n = "k"'))
+    with pytest.raises(RuleFileError, match="needs"):
+        _style(tmp_path, _TOML.replace('repeat = "x", n = "k"', 'ring = "k", radius = "1"'))
+    with pytest.raises(RuleFileError, match=r"'at' is \[x, y\]"):
+        _style(tmp_path, _TOML.replace('repeat = "x", n = "k"', 'round = "k", at = ["0", "0", "1"]'))
+
+
+# --- the Venetian tracery ----------------------------------------------------
+
+
+def test_venetian_tracery_is_grown_with_half_oculi_against_the_jambs():
+    from buildings.typologies.venice.grammar import PalazzoSite, derive_venice
+
+    lot, _ = derive_venice(PalazzoSite(19.0, 1430, K.GRAND, seed=4))
+    (tracery,) = [s for s in lot.walk() if s.label == "Tracery"]
+    n = tracery.attr("lights_n")
+    stones = [c for c in tracery.children if c.label == "TraceryStone"]
+    assert len(stones) == 2 * (n + 1)  # a web and a ring per oculus, n - 1 whole and two halves
+    rules = {e.rule for c in stones for e in c.trace}
+    assert {"venice.tracery.halved_by_the_left_jamb", "venice.tracery.halved_by_the_right_jamb", "venice.tracery.oculus"} <= rules
+    rings = [c for c in stones if c.trace[-1].detail.split(": ")[1].startswith("Eye")]
+    halves = [c for c in rings if c.scope.w < 0.6 * max(r.scope.w for r in rings)]
+    assert len(halves) == 2 and {round(h.scope.x, 6) for h in halves} & {round(tracery.scope.x, 6)}
+    # Generation 3 on a grand house's broad lights; 2 elsewhere.
+    grew = next(e for e in tracery.trace if e.inputs.get("lsystem") == "venice.tracery")
+    assert grew.inputs["generations"] == 3
+    lot2, _ = derive_venice(PalazzoSite(16.0, 1430, K.COMFORTABLE, seed=1))
+    t2 = next(s for s in lot2.walk() if s.label == "Tracery")
+    assert next(e for e in t2.trace if e.inputs.get("lsystem") == "venice.tracery").inputs["generations"] == 2

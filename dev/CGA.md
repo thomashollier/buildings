@@ -167,6 +167,33 @@ seed picks the pattern per floor. Each spindle and bead is a `Shape` the
 engine inserted, so containment, write isolation and the trace hold as for
 any other part. `dev/RULES.md`, "Growing ornament", has the file syntax.
 
+Venetian Gothic tracery is the second. A cell need not be a rectangle: it can
+stand **over** a row of arches (its floor their extrados), **be** an arch (its
+ceiling the head), or be **round**, and a **ring** sets round cells about a
+centre. What it draws can be an **outline** (a polygon, the cell's own shape)
+that later modules **pierce**, so the ornament is the stone and its openings
+are what the stone leaves:
+
+```
+LightBay --> ... insert(Tracery, from the arches' springing to the frame's head)
+Tracery  --> grow(venice.tracery, generations = 3 if grand and broad else 2)
+
+Polifora(k)          -> Arcade(k) [ Jamb Oculus ] [ Spandrels(k-1) [ Oculus ] ] [ Oculus Jamb ]
+Jamb < Oculus        -> Web [ Eye(-1) Rose(4, ..) Heart(..) [ Foil ] ]   (halved by the jamb)
+       Oculus > Jamb -> Web [ Eye(1)  Rose(4, ..) Heart(..) [ Foil ] ]
+       Oculus        -> Web [ Eye(0)  Rose(4, ..) Heart(..) [ Foil ] ]
+Rose(k, d, p) : d < cusp_at -> Rose(k, cusp_at, cusp_r)                 (cusped)
+
+Arcade stands over the k arches and is cut at their tips; Web is the cell's
+outline; Eye a round cell fitted between the arches, piercing the Web and
+outlined itself; Rose a ring of round cells, each Foil piercing the Eye.
+```
+
+Each outline is emitted as one simple polygon (an inner opening reached by a
+slit from the top, an opening centred on an edge as a bite out of it, a round
+cell centred on its rectangle's edge halved by it), so the writer only draws
+it: `grow.stone` writes a stone outline standing in front of the wall.
+
 ## Checking it
 
 ```bash
