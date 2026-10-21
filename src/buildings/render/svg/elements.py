@@ -838,6 +838,10 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
         # A post of a timber frame: oak, dark, square-edged, no base or cap.
         canvas.rect(x, y, w, h, _C["timber"], stroke_w=0.0)
         return
+    if order == "louvre":
+        # A slat or stile of a painted louvered leaf; its paint is the rule's.
+        canvas.rect(x, y, w, h, _C.get(f"louvre_{props.get('louvre_paint') or 'green'}", _C["timber"]), stroke_w=0.0)
+        return
     if order == "corner_board":
         # The painted board that closes a timber-clad corner.
         canvas.rect(x, y, w, h, _C["wall_clapboard_cream"], stroke=_C["column_stroke"], stroke_w=0.3)

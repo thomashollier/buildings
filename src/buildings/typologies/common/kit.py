@@ -284,7 +284,8 @@ def write_column(shape: Shape, below, d) -> list[Node]:
             id=shape.id,
             kind="column",
             trace=tuple(shape.trace) + tuple(shape.parent.trace[:1]),
-            props={**xywh(shape.scope), "order": shape.attr("order")},
+            props={**xywh(shape.scope), "order": shape.attr("order"),
+                   **({"louvre_paint": shape.attrs["louvre_paint"]} if "louvre_paint" in shape.attrs else {})},
         )
     ]
 

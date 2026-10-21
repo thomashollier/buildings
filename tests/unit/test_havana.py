@@ -77,3 +77,22 @@ def test_a_plaza_front_opens_in_a_portal():
 def test_a_hundred_seeds_give_a_hundred_fronts(year):
     designs = {_coarse(generate_havana(HavanaSite(12.0, year, BuildingClass.COMFORTABLE, s))[0]) for s in range(100)}
     assert len(designs) >= 80, len(designs)
+
+
+def test_the_builders_choices_vary_across_seeds():
+    """Persianas (grown louvered leaves), pilasters, bodegas and the three
+    mediopunto patterns each turn up on some fronts and not on others."""
+    from buildings.typologies.havana.grammar import derive_havana
+
+    seen = {"Persiana": set(), "Column": set(), "shop": set(), "pattern": set(), "paint": set()}
+    for s in range(60):
+        lot, _ = derive_havana(HavanaSite(12.0, 1800 + s, BuildingClass.COMFORTABLE, s))
+        labels = {x.label for x in lot.walk()}
+        seen["Persiana"].add("Persiana" in labels)
+        seen["Column"].add("Column" in labels)
+        seen["shop"].add(any(x.attrs.get("opening_type") == "shop_bay" for x in lot.walk()))
+        seen["pattern"].add(lot.attrs["fan_pattern"])
+        seen["paint"].add(lot.attrs["louvre_paint"])
+    assert seen["Persiana"] == seen["Column"] == seen["shop"] == {True, False}
+    assert seen["pattern"] == {"fan", "ring", "grid"}
+    assert len(seen["paint"]) >= 3
