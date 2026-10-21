@@ -225,7 +225,8 @@ def write_surround(shape: Shape, below, d) -> list[Node]:
             id=_element_id(shape, "surround"),
             kind="surround",
             trace=trace_of(shape, "surround_kind"),
-            props={**xywh(shape.scope), "surround_kind": shape.attr("surround_kind"), "richness": 0.4},
+            props={**xywh(shape.scope), "surround_kind": shape.attr("surround_kind"), "richness": 0.4,
+                   **({"paint": shape.attr("trim_paint")} if shape.attr("trim_paint", None) else {})},
         )
     ]
 
@@ -236,7 +237,8 @@ def write_keystone(shape: Shape, below, d) -> list[Node]:
             id=_element_id(shape, "keystone"),
             kind="keystone",
             trace=trace_of(shape, "keystone_present"),
-            props={**xywh(shape.scope), "keystone_kind": "plain"},
+            props={**xywh(shape.scope), "keystone_kind": "plain",
+                   **({"paint": shape.attr("trim_paint")} if shape.attr("trim_paint", None) else {})},
         )
     ]
 
@@ -305,6 +307,7 @@ def write_entablature(shape: Shape, below, d) -> list[Node]:
                 "course_kind": shape.attr("course_kind", "entablature"),
                 "projection": s.h,
                 "ornament_count": max(2, round(s.w / 0.5)),
+                **({"paint": shape.attrs["paint"]} if "paint" in shape.attrs else {}),
             },
         )
     ]
@@ -322,6 +325,7 @@ def write_cornice(shape: Shape, below, d) -> list[Node]:
                 "projection": s.h,
                 "cornice_ornament": shape.attrs["cornice_ornament"],
                 "ornament_count": max(3, round(s.w / 0.9) + 1),
+                **({"paint": shape.attrs["paint"]} if "paint" in shape.attrs else {}),
             },
         )
     ]

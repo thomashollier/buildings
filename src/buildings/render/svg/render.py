@@ -523,7 +523,8 @@ _WALL_PAINT = {
     "alabaster": _C["wall_alabaster"],
     "chimney_brick": _C["wall_chimney_brick"],
     "coral_stone": _C["wall_coral_stone"],
-    **{k[len("wall_"):]: v for k, v in _C.items() if k.startswith("wall_iron_")},
+    **{k[len("wall_"):]: v for k, v in _C.items() if k.startswith(("wall_iron_", "wall_brownstone_"))},
+    "brick_romanesque": _C["wall_brick_romanesque"],
     **{k[len("shade_"):] + "_shade": v for k, v in _C.items() if k.startswith("shade_")},
     **{k[len("deep_"):] + "_deep": v for k, v in _C.items() if k.startswith("deep_")},
 }
@@ -632,7 +633,7 @@ def _draw_bay(canvas: Canvas, bay: Node) -> None:
     opening = _first_of_kind(bay, "opening")
     if slot_name in _PIER_KINDS and opening is None:
         el.draw_bay_background(canvas, x, y, w, h)
-    else:
+    elif not bay.props.get("seamless"):
         canvas.line(x, y, x, y + h, _C["pier_line"], 0.3)
         canvas.line(x + w, y, x + w, y + h, _C["pier_line"], 0.3)
 

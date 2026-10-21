@@ -171,6 +171,21 @@ COLORS: dict[str, str] = {
     "wall_iron_buff": "#D6C39C",
     "wall_iron_sage": "#BAC3AC",
     "glass_lilac": "#B4A3C8",
+    # Brownstone: the stone of a whole front, its trim a shade lighter, its
+    # cornice dark; a Romanesque base's rock face and brick.
+    "wall_brownstone_choc": "#6B4A3E",
+    "wall_brownstone_red": "#82574A",
+    "wall_brownstone_rosy": "#8C6455",
+    "wall_brownstone_rock": "#6A4637",
+    "wall_brick_romanesque": "#7E3B2C",
+    "trim_brownstone": "#82594B",
+    "trim_brownstone_choc": "#724F42",
+    "trim_brownstone_red": "#8A5D4F",
+    "trim_brownstone_rosy": "#946A5A",
+    "stoop_brownstone": "#A47C6C",
+    "cornice_black_brown": "#3B2E28",
+    "cornice_dark_brown": "#4A3328",
+    "cornice_dark_green": "#2F3A30",
 }
 
 # The shade of each pastel: a back wall in shadow under a portal, a zocalo,

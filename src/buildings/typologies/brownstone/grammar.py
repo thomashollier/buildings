@@ -48,7 +48,8 @@ def write_stoop(stoop: Shape, below, d) -> list[Node]:
     right = [(s.x + s.w - (px - s.x), py) for px, py in reversed(left)]
     return [GableNode(id=stoop.id, kind="gable", trace=tuple(stoop.trace),
                       props={**kit.xywh(s), "form": "stoop", "points": tuple(left + right),
-                             "hoist_beam": None, "wall_material": "brick_dark"})]
+                             "hoist_beam": None, "wall_material": "brick_dark",
+                             "paint": stoop.attr("stone_paint"), "edge": "cornice_stroke"})]
 
 
 def write_hood(hood: Shape, below, d) -> list[Node]:
@@ -60,17 +61,19 @@ def write_hood(hood: Shape, below, d) -> list[Node]:
         # the head so the frieze sits just over the opening.
         return [CorniceNode(id=hood.id, kind="cornice", trace=tuple(hood.trace),
                             props={"x": s.x, "y": s.y + s.h * 0.75, "w": s.w, "h": s.h, "projection": s.h,
-                                   "cornice_ornament": "bracketed", "ornament_count": 2})]
+                                   "cornice_ornament": "bracketed", "ornament_count": 2, "paint": hood.attr("trim_paint")})]
     return [StringCourseNode(id=hood.id, kind="string_course", trace=tuple(hood.trace),
                              props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "course_kind": "plat_bande",
-                                    "projection": s.h, "ornament_count": 2})]
+                                    "projection": s.h, "ornament_count": 2, "paint": hood.attr("trim_paint")})]
 
 
 def write_cell(cell: Shape, below, d) -> list[Node]:
     """The kit's bay; hoods and lintels belong to the storey's lines, not the bay."""
     lines = [n for n in below if n.kind in ("cornice", "string_course")]
     rest = [n for n in below if n.kind not in ("cornice", "string_course")]
-    return [*kit.write_cell(cell, rest, d), *lines]
+    bay, *others = kit.write_cell(cell, rest, d)
+    # A brownstone front is one plane of stone: no joint is drawn at a bay's edge.
+    return [replace(bay, props={**bay.props, "seamless": True}), *others, *lines]
 
 
 def write_grille(grille: Shape, below, d) -> list[Node]:
@@ -84,7 +87,7 @@ def write_socle(shape: Shape, below, d) -> list[Node]:
     """Rock-faced brownstone in rough courses."""
     s = shape.scope
     return [SocleNode(id=shape.id, kind="socle", trace=tuple(shape.trace),
-                      props={**kit.xywh(s), "treatment": "picturesque_rustication",
+                      props={**kit.xywh(s), "treatment": "picturesque_rustication", "paint": "wall_brownstone_rock",
                              "course_columns": max(1, round(s.w / 0.9)), "course_rows": max(1, round(s.h / 0.4))})]
 
 

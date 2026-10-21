@@ -18,7 +18,7 @@ from buildings.typologies.spanish_colonial.grammar import SpanishSite, derive_sp
 SE = ("Cornice", "Chimney")
 BA = ("Cornice",)
 SC = ()
-BR = ("Cornice", "Hood")
+BR = ("Cornice", "Hood", "Sill")
 
 CASES = [
     ("second_empire_centre", generate_second_empire, derive_second_empire, SecondEmpireSite(30.0, 1872, K.MODEST, seed=1), SE),

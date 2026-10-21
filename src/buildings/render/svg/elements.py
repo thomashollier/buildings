@@ -32,6 +32,21 @@ from buildings.render.svg.colors import COLORS
 _C = COLORS
 
 
+#: The stone colours a trim node (cornice, course, surround, keystone, door
+#: frame) is drawn in, which a stated ``paint`` replaces: a brownstone front's
+#: hoods are its own stone, its cornice dark.
+_TRIM_KEYS = ("cornice", "ornament", "string_course", "keystone", "istrian", "gable_coping", "surround_bare_band",
+              "surround_moulded_architrave", "surround_pedimented", "door", "door_dark")
+
+
+def _palette(props: Mapping[str, object]) -> Mapping[str, str]:
+    paint = _C.get(str(props.get("paint")))
+    if paint is None:
+        return _C
+    keep_door = {k: _C[k] for k in ("door", "door_dark")}
+    return {**_C, **{k: paint for k in _TRIM_KEYS}, **keep_door}
+
+
 def _get(props: Mapping[str, object], key: str, default: object = None) -> object:
     return props[key] if key in props and props[key] is not None else default
 
@@ -639,6 +654,7 @@ def _draw_roundel(canvas: Canvas, cx: float, cy: float, r: float, steps: int = 2
 
 
 def draw_surround(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
+    C = _palette(props)
     surround_form = props.get("surround_kind")
     if not surround_form or surround_form == "none":
         return
@@ -649,7 +665,7 @@ def draw_surround(canvas: Canvas, x: float, y: float, w: float, h: float, props:
         _draw_door_frame(canvas, x, y, w, h, surround_form, props)
         return
     pad = 0.05
-    fill = _C.get(f"surround_{surround_form}", _C["surround_bare_band"])
+    fill = C.get(f"surround_{surround_form}", C["surround_bare_band"])
     stroke_w = {"bare_band": 0.5, "moulded_architrave": 0.9, "pedimented": 0.9, "irregular": 0.6}.get(
         surround_form, 0.5
     )
@@ -664,7 +680,7 @@ def draw_surround(canvas: Canvas, x: float, y: float, w: float, h: float, props:
         canvas.polygon(
             [(ped_x, top), (ped_x + ped_w / 2.0, top + ped_h), (ped_x + ped_w, top)],
             fill,
-            stroke=_C["cornice_stroke"],
+            stroke=C["cornice_stroke"],
             stroke_w=0.7,
         )
     if surround_form == "irregular":
@@ -692,13 +708,14 @@ def _draw_dentil_panel(canvas: Canvas, x: float, y: float, w: float, h: float, n
 
 
 def draw_keystone(canvas: Canvas, cx: float, y_top: float, props: Mapping[str, object]) -> None:
+    C = _palette(props)
     kind = props.get("keystone_kind") or "plain"
     if kind == "patera":
         # A carved roundel set in a spandrel, centred where the IR puts it and
         # as wide as it says.
         r = _num(props, "w", 0.4) / 2.0
-        canvas.circle(cx, y_top, r, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.5)
-        canvas.circle(cx, y_top, r * 0.55, _C["ornament"], stroke=_C["istrian_line"], stroke_w=0.3)
+        canvas.circle(cx, y_top, r, C["istrian"], stroke=C["istrian_line"], stroke_w=0.5)
+        canvas.circle(cx, y_top, r * 0.55, C["ornament"], stroke=C["istrian_line"], stroke_w=0.3)
         return
     w_top, w_bot, h = 0.12, 0.20, 0.18
     if kind == "console_volute":
@@ -711,12 +728,12 @@ def draw_keystone(canvas: Canvas, cx: float, y_top: float, props: Mapping[str, o
         (cx + w_bot / 2, y_top),
         (cx - w_bot / 2, y_top),
     ]
-    canvas.polygon(pts, _C["keystone"], stroke=_C["cornice_stroke"], stroke_w=0.5)
+    canvas.polygon(pts, C["keystone"], stroke=C["cornice_stroke"], stroke_w=0.5)
     if kind in ("mascaron", "figurative_caryatid_atlante"):
-        canvas.circle(cx, y_top + h * 0.55, w_bot * 0.22, _C["ornament"], stroke=_C["cornice_stroke"], stroke_w=0.4)
+        canvas.circle(cx, y_top + h * 0.55, w_bot * 0.22, C["ornament"], stroke=C["cornice_stroke"], stroke_w=0.4)
     elif kind == "console_volute":
-        canvas.circle(cx - w_bot * 0.18, y_top + h * 0.35, w_bot * 0.14, _C["ornament"], stroke=_C["cornice_stroke"], stroke_w=0.3)
-        canvas.circle(cx + w_bot * 0.18, y_top + h * 0.35, w_bot * 0.14, _C["ornament"], stroke=_C["cornice_stroke"], stroke_w=0.3)
+        canvas.circle(cx - w_bot * 0.18, y_top + h * 0.35, w_bot * 0.14, C["ornament"], stroke=C["cornice_stroke"], stroke_w=0.3)
+        canvas.circle(cx + w_bot * 0.18, y_top + h * 0.35, w_bot * 0.14, C["ornament"], stroke=C["cornice_stroke"], stroke_w=0.3)
 
 
 # ---------------------------------------------------------------------------
@@ -725,6 +742,7 @@ def draw_keystone(canvas: Canvas, cx: float, y_top: float, props: Mapping[str, o
 
 
 def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[str, object]) -> None:
+    C = _palette(props)
     projection = _num(props, "projection", 0.1)
     depth = max(0.08, projection * 0.5)
     overhang = 0.10
@@ -750,33 +768,33 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
         rise = reach * 0.45
         canvas.polygon(
             [(x - reach * 0.5, y), (x + w + reach * 0.5, y), (x + w, y + rise), (x, y + rise)],
-            _C["tile"],
-            stroke=_C["tile_line"],
+            C["tile"],
+            stroke=C["tile_line"],
             stroke_w=0.6,
         )
         for k in range(1, 4):
             ty = y + rise * k / 4.0
             inset = reach * 0.5 * (1 - k / 4.0)
-            canvas.line(x - inset, ty, x + w + inset, ty, _C["tile_line"], 0.4)
+            canvas.line(x - inset, ty, x + w + inset, ty, C["tile_line"], 0.4)
         return
     if props.get("cornice_ornament") == "bracketed":
         # A deep crowning cornice on scrolled brackets, the frieze between
         # them: the console's size is the cornice's own stated depth.
         frieze = depth * 1.3
-        canvas.rect(x, y - frieze, w, frieze, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.4)
+        canvas.rect(x, y - frieze, w, frieze, C["cornice"], stroke=C["cornice_stroke"], stroke_w=0.4)
         spacing = w / max(1, n - 1)
         bw = min(0.30, spacing * 0.3)
         for i in range(n):
             bx = x + i * spacing
             canvas.polygon(
                 [(bx - bw / 2, y), (bx + bw / 2, y), (bx + bw / 4, y - frieze * 1.15), (bx - bw / 4, y - frieze * 1.15)],
-                _C["ornament"],
-                stroke=_C["cornice_stroke"],
+                C["ornament"],
+                stroke=C["cornice_stroke"],
                 stroke_w=0.4,
             )
         lip = min(projection * 0.35, 0.35)
-        canvas.rect(x - lip, y, w + 2 * lip, depth * 0.45, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.4)
-        canvas.rect(x - lip * 1.2, y + depth * 0.45, w + 2.4 * lip, depth * 0.3, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.5)
+        canvas.rect(x - lip, y, w + 2 * lip, depth * 0.45, C["cornice"], stroke=C["cornice_stroke"], stroke_w=0.4)
+        canvas.rect(x - lip * 1.2, y + depth * 0.45, w + 2.4 * lip, depth * 0.3, C["cornice"], stroke=C["cornice_stroke"], stroke_w=0.5)
         return
     if props.get("cornice_ornament") in ("console_pair", "dentilled_lijst"):
         _draw_lijst(canvas, x, y, w, projection, n, str(props.get("cornice_ornament")))
@@ -789,14 +807,14 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
         spacing = w / n
         for i in range(n + 1):
             mx = x + i * spacing
-            canvas.rect(mx - 0.05, y - shadow_h - 0.08, 0.10, 0.08, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.3)
+            canvas.rect(mx - 0.05, y - shadow_h - 0.08, 0.10, 0.08, C["cornice"], stroke=C["cornice_stroke"], stroke_w=0.3)
     else:
         spacing = (w + 2 * overhang) / n
         for i in range(n):
             dx = x - overhang + i * spacing + spacing / 2
-            canvas.rect(dx, y - shadow_h - 0.04, 0.06, 0.04, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.3)
-    canvas.rect(x - overhang, y, w + 2 * overhang, depth, _C["cornice"], stroke_w=0.0)
-    canvas.rect(x - overhang, y, w + 2 * overhang, depth, "none", stroke=_C["cornice_stroke"], stroke_w=0.3)
+            canvas.rect(dx, y - shadow_h - 0.04, 0.06, 0.04, C["cornice"], stroke=C["cornice_stroke"], stroke_w=0.3)
+    canvas.rect(x - overhang, y, w + 2 * overhang, depth, C["cornice"], stroke_w=0.0)
+    canvas.rect(x - overhang, y, w + 2 * overhang, depth, "none", stroke=C["cornice_stroke"], stroke_w=0.3)
 
 
 def _draw_corbelled_eave(canvas: Canvas, x: float, y: float, w: float, reach: float, n: int) -> None:
@@ -1022,50 +1040,51 @@ def draw_string_course(canvas: Canvas, x: float, y: float, w: float, props: Mapp
     miniature. The catalogue's fractions absorbed the factor when it went, so
     no existing course moved.
     """
+    C = _palette(props)
     course_kind = props.get("course_kind") or "bandeau"
     depth = max(0.06, _num(props, "projection", 0.05))
     if course_kind == "dentil":
         # A white stone band at the floor line, a row of dentils under it.
         n = _count(props, "ornament_count", 4)
-        canvas.rect(x, y, w, depth, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+        canvas.rect(x, y, w, depth, C["istrian"], stroke=C["istrian_line"], stroke_w=0.4)
         step = w / n
         for i in range(n):
-            canvas.rect(x + (i + 0.3) * step, y - 0.07, step * 0.4, 0.07, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.25)
+            canvas.rect(x + (i + 0.3) * step, y - 0.07, step * 0.4, 0.07, C["istrian"], stroke=C["istrian_line"], stroke_w=0.25)
         return
     if course_kind == "paterae":
         # A band of carved paterae and square formelle in turn, standing on
         # the line the IR gives and as deep as it says.
         n = _count(props, "ornament_count", 3)
-        canvas.rect(x, y, w, depth, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+        canvas.rect(x, y, w, depth, C["istrian"], stroke=C["istrian_line"], stroke_w=0.4)
         step = w / n
         for i in range(n):
             cx, cy = x + (i + 0.5) * step, y + depth / 2.0
             if i % 2 == 0:
                 r = min(depth * 0.36, step * 0.3)
-                canvas.circle(cx, cy, r, _C["ornament"], stroke=_C["istrian_line"], stroke_w=0.4)
-                canvas.circle(cx, cy, r * 0.5, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.3)
+                canvas.circle(cx, cy, r, C["ornament"], stroke=C["istrian_line"], stroke_w=0.4)
+                canvas.circle(cx, cy, r * 0.5, C["istrian"], stroke=C["istrian_line"], stroke_w=0.3)
             else:
                 side = min(depth * 0.62, step * 0.5)
-                canvas.rect(cx - side / 2.0, cy - side / 2.0, side, side, _C["ornament"], stroke=_C["istrian_line"], stroke_w=0.4)
+                canvas.rect(cx - side / 2.0, cy - side / 2.0, side, side, C["ornament"], stroke=C["istrian_line"], stroke_w=0.4)
         return
     if course_kind == "timber_beam":
         # The sill beam a jettied storey stands on, its joist ends showing.
-        canvas.rect(x, y - depth, w, depth, _C["timber"], stroke_w=0.0)
+        canvas.rect(x, y - depth, w, depth, C["timber"], stroke_w=0.0)
         n = _count(props, "ornament_count", 2)
         for i in range(n + 1):
             jx = x + w * i / n
-            canvas.rect(jx - 0.05, y - depth - 0.08, 0.10, 0.08, _C["timber"], stroke_w=0.0)
+            canvas.rect(jx - 0.05, y - depth - 0.08, 0.10, 0.08, C["timber"], stroke_w=0.0)
         return
     if course_kind == "entablature":
         overhang = 0.06
         corona = min(depth * 0.30, 0.12)
-        canvas.rect(x, y - depth, w, depth, _C["string_course"], stroke_w=0.4)
-        canvas.rect(x - overhang, y - corona, w + 2 * overhang, corona, _C["cornice"], stroke_w=0.0)
-        canvas.rect(x - overhang, y - corona, w + 2 * overhang, corona, "none", stroke=_C["cornice_stroke"], stroke_w=0.4)
+        canvas.rect(x, y - depth, w, depth, C["string_course"], stroke_w=0.4)
+        canvas.rect(x - overhang, y - corona, w + 2 * overhang, corona, C["cornice"], stroke_w=0.0)
+        canvas.rect(x - overhang, y - corona, w + 2 * overhang, corona, "none", stroke=C["cornice_stroke"], stroke_w=0.4)
         canvas.line(x, y - depth, x + w, y - depth, "#A09888", 0.8)
         canvas.line(x, y - depth + corona * 0.6, x + w, y - depth + corona * 0.6, "#B8AC98", 0.4)
         return
-    canvas.rect(x, y, w, depth, _C["string_course"], stroke_w=0.4)
+    canvas.rect(x, y, w, depth, C["string_course"], stroke_w=0.4)
     canvas.line(x, y, x + w, y, "#A09888", 0.8)
     canvas.line(x, y + depth, x + w, y + depth, "#C8BCA8", 0.4)
     if course_kind == "plat_bande":
@@ -2001,7 +2020,8 @@ def draw_fanlight(canvas: Canvas, x: float, y: float, w: float, h: float, props:
 def _draw_door_frame(canvas: Canvas, x: float, y: float, w: float, h: float, kind: str, props: Mapping[str, object]) -> None:
     """A door's carved frame: a pilaster each side and an entablature over
     the fanlight; under a pediment, or a scrolled crest, where the IR says."""
-    stone, edge = _C["gable_coping"], _C["cornice_stroke"]
+    C = _palette(props)
+    stone, edge = C["gable_coping"], C["cornice_stroke"]
     pil, ent = 0.17, 0.26
     canvas.rect(x - pil, y, pil, h, stone, stroke=edge, stroke_w=0.4)
     canvas.rect(x + w, y, pil, h, stone, stroke=edge, stroke_w=0.4)
@@ -2018,7 +2038,7 @@ def _draw_door_frame(canvas: Canvas, x: float, y: float, w: float, h: float, kin
         pts = [(cx - half, crown)] + [(cx - half * math.cos(math.pi * k / 12), crown + 0.34 * math.sin(math.pi * k / 12)) for k in range(1, 12)] + [(cx + half, crown)]
         canvas.polygon(pts, stone, stroke=edge, stroke_w=0.5)
         for side in (-1.0, 1.0):
-            canvas.circle(cx + side * (half - 0.1), crown + 0.1, 0.09, _C["ornament"], stroke=edge, stroke_w=0.4)
+            canvas.circle(cx + side * (half - 0.1), crown + 0.1, 0.09, C["ornament"], stroke=edge, stroke_w=0.4)
 
 
 def _draw_plutei(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
