@@ -164,6 +164,13 @@ COLORS: dict[str, str] = {
     "trim_white": "#F4F1EA",
     # The shade inside a recessed entry porch.
     "porch_shadow": "#6E6C72",
+    # Cast iron painted to pass for stone, and the amethyst glass of a vault-light platform.
+    "wall_iron_cream": "#E6DDC6",
+    "wall_iron_white": "#EEEBE3",
+    "wall_iron_grey": "#BEBDB5",
+    "wall_iron_buff": "#D6C39C",
+    "wall_iron_sage": "#BAC3AC",
+    "glass_lilac": "#B4A3C8",
 }
 
 # The shade of each pastel: a back wall in shadow under a portal, a zocalo,

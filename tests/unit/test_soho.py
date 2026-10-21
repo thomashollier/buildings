@@ -66,13 +66,20 @@ def test_the_entrance_is_one_door_and_on_its_side():
 
 
 def test_iron_heads_follow_the_date():
-    def heads(year):
-        building, _ = generate_soho(SohoSite(1, year, Programme.LOFT, BuildingClass.COMFORTABLE))
-        return {n.props["head"] for n in walk(building) if n.props.get("opening_type") == "window"}
+    from collections import Counter
 
-    assert heads(1858) == {"round"}
-    assert heads(1866) == {"segmental"}
-    assert heads(1876) == {"flat"}
+    def heads(year):
+        found = Counter()
+        for seed in range(30):
+            building, _ = generate_soho(SohoSite(1, year, Programme.LOFT, BuildingClass.COMFORTABLE, seed))
+            hs = {n.props["head"] for n in walk(building) if n.props.get("opening_type") == "window"}
+            assert len(hs) == 1  # one head for the whole front
+            found[hs.pop()] += 1
+        return found.most_common(1)[0][0]
+
+    assert heads(1856) == "round"
+    assert heads(1868) == "segmental"
+    assert heads(1878) == "flat"
 
 
 def test_every_part_stands_inside_the_part_it_refines():

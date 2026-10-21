@@ -130,3 +130,20 @@ def test_a_hundred_seeds_give_a_hundred_paris_fronts_on_one_parcel(street, year,
         for s in range(100)
     }
     assert len(designs) >= 80, len(designs)
+
+
+@pytest.mark.parametrize("year", [1860, 1878, 1890])
+def test_a_hundred_seeds_give_a_hundred_brownstones_on_one_lot(year):
+    from buildings.typologies.brownstone.grammar import BrownstoneSite, generate_brownstone
+
+    designs = {_coarse(generate_brownstone(BrownstoneSite(year, BuildingClass.COMFORTABLE, s, 6.1))[0]) for s in range(100)}
+    assert len(designs) >= 80, len(designs)
+
+
+@pytest.mark.parametrize("year", [1858, 1868, 1885])
+def test_a_hundred_seeds_give_a_hundred_soho_lofts_on_one_lot(year):
+    from buildings.typologies.soho.grammar import generate_soho
+    from buildings.typologies.soho.recipes import Programme, SohoSite
+
+    designs = {_coarse(generate_soho(SohoSite(1, year, Programme.LOFT, BuildingClass.COMFORTABLE, s))[0]) for s in range(100)}
+    assert len(designs) >= 80, len(designs)

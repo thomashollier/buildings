@@ -16,6 +16,11 @@ describe = { rule = "soho.recipes.recipe_for", phase = "structure", detail = "f'
 [lot_props]
 year = "= year"
 
+[emit]
+Rail = "kit.column"
+VaultLens = "grow.stone"
+Plate = "grow.stone"
+
 [params]
 lot_width = 7.62               # the Commissioners' Plan lot: 25 ft
 column_w = 0.36                # an engaged iron column on a loft front
@@ -27,6 +32,20 @@ dormer_w = 1.15
 dormer_h = 1.9
 chimney_w = 0.7
 chimney_h = 1.4
+# What the builder chose within a type (variety). An iron front was painted to
+# pass for stone, in one of a few colours; a brick loft's brick varies.
+iron_paints = { iron_cream = 4, iron_white = 2, iron_grey = 2, iron_buff = 2, iron_sage = 1 }
+brick_paints = { brick = 3, brick_dark = 2, brick_buff = 1 }
+corinthian_odds = { modest = 0.15, ordinary = 0.25, comfortable = 0.45, grand = 0.8 }
+# An iron front's window heads by date, as overlapping odds: [last year, [round, segmental, flat]].
+heads = ["round", "segmental", "flat"]
+head_ramp = [[1858, [0.8, 0.15, 0.05]], [1864, [0.5, 0.4, 0.1]], [1870, [0.2, 0.5, 0.3]], [1876, [0.08, 0.32, 0.6]], [9999, [0.05, 0.15, 0.8]]]
+loft_uppers = { early = [3, 4, 5], late = [4, 5, 6] }
+loft_upper_odds = [2, 4, 1]
+storey_jitter = [0.94, 1.06]
+cornice_jitter = [0.8, 1.2]
+crest_odds = { cast_iron_loft = 0.35, brick_store_and_loft = 0.2, federal_rowhouse = 0.0 }   # a name-plate pediment over the cornice
+vault_lights = 0.75             # a vault-light platform before the store
 
 # Each type's vocabulary and proportions. Where money or date changes a value
 # within a type, both values are listed.
@@ -117,12 +136,18 @@ do = [
   # Date and programme choose the type; money only chooses within it.
   { set = { type = "= 'federal_rowhouse' if programme == 'dwelling' else 'cast_iron_loft' if 1848 <= year < 1880 and klass in ('comfortable', 'grand') else 'brick_store_and_loft'" } },
   { set = { r = "= types[type]" } },
-  { let = { grand = "klass == 'grand'" } },
-  { set = { storey_heights = "= [r.ground_storey_grand if grand else r.ground_storey] + geometric(r.first_upper_grand if grand else r.first_upper, r.taper, r.upper_storeys_1870 if year >= 1870 else r.upper_storeys)", fire_escape = "= r.fire_escape_grand if grand else r.fire_escape" } },
+  { let = { grand = "klass == 'grand'", loft = "type != 'federal_rowhouse'" } },
+  { let = { n_up = "draw('uppers', loft_uppers['late' if year >= 1870 else 'early'], loft_upper_odds) if loft else r.upper_storeys", k = "between('storey_jitter', storey_jitter[0], storey_jitter[1])" } },
+  { set = { storey_heights = "= [(r.ground_storey_grand if grand else r.ground_storey) * k] + geometric((r.first_upper_grand if grand else r.first_upper) * k, r.taper, n_up)", fire_escape = "= r.fire_escape_grand if grand else r.fire_escape" } },
+  { set = { paint = "= draw('iron_paint', iron_paints) if type == 'cast_iron_loft' else draw('brick_paint', brick_paints) if type == 'brick_store_and_loft' else 'brick'", iron_head = "= draw('head', heads, step(head_ramp, year))", corinthian = "= chance('corinthian', corinthian_odds[klass])", cornice_depth = "= r.cornice_projection * between('cornice_jitter', cornice_jitter[0], cornice_jitter[1])", crest = "= chance('crest', crest_odds[type])", vault = "= loft and chance('vault', vault_lights)" } },
   { fit = "x", end = "r.end", bay = "r.bay", as = "rhythm", min_bays = 2 },
   { let = { front = "fsum(storey_heights)" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
   { insert = "Roof", at = ["0.0", "front", "w", "roof_rise"], name = "roof", when = "r.pitched_roof" },
+  # A name-plate pediment over the middle of the cornice.
+  { insert = "Crest", at = ["w / 2.0 - min(2.4, w * 0.3)", "front + cornice_depth * 0.37", "2 * min(2.4, w * 0.3)", "1.2"], name = "crest", when = "crest" },
+  # The vault-light platform before the store: iron set with lilac glass.
+  { insert = "Vault", at = ["0.0", "0.0", "w", "0.16"], name = "vault", when = "vault" },
 ]
 
 [[production]]
@@ -141,7 +166,7 @@ do = [
       { insert = "Column", at = ["item.x", "y", "item.w", "h - entablature"], name = "column{i}" },
   ] },
   { insert = "Entablature", at = ["x", "y + h - entablature", "w", "entablature"], name = "entablature", when = "role == 'base' or (r.entablature_every_floor and role != 'top')" },
-  { insert = "Cornice", at = ["x", "y + h", "w", "r.cornice_projection"], name = "cornice", attrs = { cornice_ornament = "= r.cornice_ornament" }, when = "role == 'top'" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "= r.cornice_ornament" }, when = "role == 'top'" },
   { let = { spans = "bay_spans(rhythm, x)" } },
   { insert = "FireEscape", at = ["spans[len(spans) // 2 - 1].x + spans[len(spans) // 2 - 1].w * 0.08", "y", "(spans[len(spans) // 2].x + spans[len(spans) // 2].w * 0.92) - (spans[len(spans) // 2 - 1].x + spans[len(spans) // 2 - 1].w * 0.08)", "fire_escape_rail"], name = "fire_escape", when = "fire_escape and role != 'base' and len(spans) >= 2" },
 ]
@@ -204,16 +229,16 @@ set = { role = "= 'base' if index == 0 else 'top' if index == count - 1 else 'up
 id = "soho.base.materials_of_the_front"
 label = "Storey"
 layer = "roles"
-doc = "A store front is iron whatever the floors over it are made of."
-set = { wall_material = "= r.ground_material if index == 0 else r.wall_material" }
+doc = "A store front is iron whatever the floors over it are made of; an iron front is painted in the builder's colour, a brick loft laid in the builder's brick."
+set = { wall_material = "= ((paint if type == 'cast_iron_loft' else 'cast_iron') if r.ground_material == 'cast_iron' else r.ground_material) if index == 0 else (paint if r.wall_material in ('cast_iron', 'brick') and type != 'federal_rowhouse' else r.wall_material)" }
 
 [[rule]]
 id = "soho.class.iron_order"
 label = "Storey"
 layer = "class"
-doc = "A grand iron front is Corinthian; an ordinary one is a plain Doric."
+doc = "An iron front's order is the builder's: Corinthian on most grand fronts, a plain Doric on most others."
 when = "r.columns"
-set = { order = "= 'corinthian' if klass == 'grand' else 'doric'" }
+set = { order = "= 'corinthian' if corinthian else 'doric'" }
 
 [[rule]]
 id = "soho.base.end_piers_are_wall"
@@ -250,6 +275,46 @@ set = { opening_type = "pedestrian_entrance", head = "= 'round' if federal else 
 id = "soho.period.iron_heads_of_their_date"
 label = "Cell"
 layer = "period"
-doc = "An iron front's window heads follow its date: round to the early 1860s, segmental to the early 1870s, flat after."
+doc = "An iron front's window heads follow its date, as odds: mostly round to the early 1860s, segmental around 1870, flat after; one head for the whole front."
 when = "type == 'cast_iron_loft' and is_bay() and role != 'base'"
-set = { head = "= 'round' if year < 1862 else 'segmental' if year < 1872 else 'flat'" }
+set = { head = "= iron_head", keystone_present = "= iron_head == 'round'" }
+
+[[production]]
+id = "soho.crest"
+label = "Crest"
+doc = "A name plate over the cornice, grown: a triangular or segmental pediment over a panel."
+do = [ { grow = "soho.crest", generations = 1, params = { segmental = "iron_head != 'flat'", face = "'wall_' + paint if type == 'cast_iron_loft' else 'wall_cast_iron'" } } ]
+
+[[production]]
+id = "soho.vault"
+label = "Vault"
+doc = "A vault-light platform, grown: an iron frame set with rows of small lilac glass lenses."
+do = [ { grow = "soho.vault", generations = 2, params = { n = "max(8, round(w / 0.16))" } } ]
+
+# --- the grown ironwork -----------------------------------------------------------
+
+[[lsystem]]
+id = "soho.crest"
+doc = "A name plate: a panel, and over it a pediment, triangular or segmental."
+axiom = "Crest"
+rules = [
+  { id = "soho.crest.segmental", pred = "Crest", when = "segmental", to = "Panel Arc" },
+  { id = "soho.crest.triangular", pred = "Crest", when = "not segmental", to = "Panel Tri" },
+]
+interpret = [
+  { module = "Panel", polygon = "Plate", points = "[[cw * 0.15, 0.0], [cw * 0.85, 0.0], [cw * 0.85, ch * 0.45], [cw * 0.15, ch * 0.45]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  { module = "Tri", polygon = "Plate", points = "[[0.0, ch * 0.45], [cw, ch * 0.45], [cw / 2, ch]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  { module = "Arc", polygon = "Plate", points = "[[0.0, ch * 0.45], [cw, ch * 0.45], [cw * 0.93, ch * 0.62], [cw * 0.8, ch * 0.78], [cw * 0.65, ch * 0.9], [cw * 0.5, ch * 0.94], [cw * 0.35, ch * 0.9], [cw * 0.2, ch * 0.78], [cw * 0.07, ch * 0.62]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+]
+
+[[lsystem]]
+id = "soho.vault"
+doc = "A vault-light platform: an iron frame, and a lens in every cell of it."
+axiom = "Platform"
+rules = [ { id = "soho.vault.lenses", pred = "Platform", to = "Frame Rx(n) [ Ry(2) [ Lens ] ]" } ]
+interpret = [
+  { module = "Frame", place = "Rail", at = ["0", "0", "cw", "ch"], attrs = { order = "iron" } },
+  { module = "Rx(k)", repeat = "x", n = "k" },
+  { module = "Ry(k)", repeat = "y", n = "k" },
+  { module = "Lens", polygon = "VaultLens", points = "[[cw * 0.3, ch * 0.2], [cw * 0.7, ch * 0.2], [cw * 0.8, ch * 0.5], [cw * 0.7, ch * 0.8], [cw * 0.3, ch * 0.8], [cw * 0.2, ch * 0.5]]", attrs = { paint = "glass_lilac" } },
+]

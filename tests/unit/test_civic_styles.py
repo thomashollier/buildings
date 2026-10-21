@@ -135,16 +135,27 @@ def test_spanish_tower_rises_clear_of_a_low_tile_roof_and_ground_windows_are_gri
 
 
 def test_brownstone_dress_by_date_and_the_stoop_climbs_to_the_parlour_door():
-    assert [brownstone_dress(y) for y in (1860, 1878, 1888)] == ["italianate", "neo_grec", "romanesque"]
+    from collections import Counter
+
+    def dress(year):
+        return Counter(derive_brownstone(BrownstoneSite(year, K.ORDINARY, seed))[0].attrs["kind"] for seed in range(30)).most_common(1)[0][0]
+
+    assert [dress(y) for y in (1860, 1878, 1892)] == ["italianate", "neo_grec", "romanesque"]
+    assert brownstone_dress(1860) == "italianate"
     for site in (BrownstoneSite(1860, K.ORDINARY, 0), BrownstoneSite(1888, K.ORDINARY, 1)):
         b, _ = generate_brownstone(site)
-        stoop = next(n for n in walk(b) if n.kind == "gable" and n.props["form"] == "stoop")
+        stoop = next(n for n in walk(b) if n.kind == "gable" and n.id.endswith("/stoop"))
         door = next(n for n in walk(b) if n.kind == "opening" and n.props["opening_type"] == "pedestrian_entrance")
         assert math.isclose(stoop.props["y"] + stoop.props["h"], door.props["y"])
         assert stoop.props["x"] <= door.props["x"] + door.props["w"] / 2.0 <= stoop.props["x"] + stoop.props["w"]
 
-    def hoods(year):
-        b, _ = generate_brownstone(BrownstoneSite(year, K.ORDINARY))
-        return {n.kind for n in walk(b) if n.id.endswith("/hood")}
+    def hoods(year, seed):
+        lot, _ = derive_brownstone(BrownstoneSite(year, K.ORDINARY, seed))
+        b, _ = generate_brownstone(BrownstoneSite(year, K.ORDINARY, seed))
+        return lot.attrs["kind"], {n.kind for n in walk(b) if n.id.endswith("/hood")}
 
-    assert hoods(1860) == {"cornice"} and hoods(1878) == {"string_course"} and hoods(1888) == set()
+    for seed in range(12):
+        for year in (1860, 1878, 1892):
+            kind, found = hoods(year, seed)
+            expect = {"italianate": [{"cornice"}, {"string_course"}], "neo_grec": [{"string_course"}], "romanesque": [set()]}[kind]
+            assert found in expect, (year, seed, kind, found)
