@@ -25,24 +25,40 @@ year = "= year"
 Top = "victorian.top"
 Turret = "victorian.turret"
 Stoop = "victorian.stoop"
-Patio = "kit.balconette"
+Patio = "victorian.fence"
 
 [params]
-heights = [2.1, 3.6, 3.3]       # raised basement, parlour floor, chamber floor
-# How much of the bay zone each angled face takes, seen from the street.
-# How much of the bay zone each angled face takes, by the bay's shape.
-side_share = { slanted = 0.2, square = 0.07 }
+# Storey heights as ranges (fidelity review R-8: observer 1.8-2.7 / 3.8-4.6 /
+# 3.4-4.0 m from riser counts and a 12 ft parlour ceiling).
+basement_h = [2.0, 2.6]
+parlour_h = [3.8, 4.3]
+chamber_h = [3.4, 3.8]
+third_h = 3.3
+# The type by date as an overlapping ramp, not hard cuts (R-6, Bulletin 18):
+# [last year, [italianate, stick, queen_anne]].
+kind_ramp = [[1877, [1, 0, 0]], [1879, [0.9, 0.1, 0]], [1881, [0.7, 0.3, 0]], [1883, [0.5, 0.5, 0]], [1885, [0.3, 0.65, 0.05]], [1887, [0.1, 0.6, 0.3]], [1889, [0, 0.45, 0.55]], [1891, [0, 0.25, 0.75]], [9999, [0, 0.1, 0.9]]]
+kinds = ["italianate", "stick", "queen_anne"]
+# A third storey is rare (R-4: Liberty Street 1 in ~30); rich houses more often.
+third_storey = { modest = 0.03, ordinary = 0.03, comfortable = 0.10, grand = 0.50 }
+# How much of the bay zone each angled face takes, by the bay's shape: an
+# Italianate half-octagon is one window per face (R-2: 0.25).
+side_share = { slanted = 0.25, square = 0.07 }
 # The bay's shape by type: Italianate slanted, Stick square, Queen Anne either.
 bay_forms = { italianate = { slanted = 4, square = 1 }, stick = { square = 4, slanted = 1 }, queen_anne = { slanted = 1, square = 1 } }
 # Per-floor dress by type: [option, weight on the parlour floor, weight above].
-heads = { italianate = [["segmental", 3, 3], ["round", 2, 1], ["flat", 1, 2]], stick = [["flat", 4, 4], ["segmental", 1, 1]], queen_anne = [["flat", 3, 3], ["round", 1, 1]] }
-hoods = { italianate = [["pedimented", 3, 1], ["moulded_architrave", 2, 3], ["bare_band", 0, 1]], stick = [["moulded_architrave", 2, 2], ["bare_band", 1, 2]], queen_anne = [["bare_band", 2, 3], ["moulded_architrave", 1, 1]] }
+heads = { italianate = [["segmental", 0.6, 0.7], ["round", 0.4, 0.3]], stick = [["flat", 4, 4], ["segmental", 1, 1]], queen_anne = [["flat", 3, 3], ["round", 1, 1]] }
+# Italianate hoods (O-3): pediments 0.45, arched hood mould 0.45, flat 0.1.
+hoods = { italianate = [["pedimented", 0.55, 0.35], ["moulded_architrave", 0.4, 0.5], ["bare_band", 0.05, 0.15]], stick = [["moulded_architrave", 2, 2], ["bare_band", 1, 2]], queen_anne = [["bare_band", 2, 3], ["moulded_architrave", 1, 1]] }
 belts = { italianate = { entablature = 2, dentil = 1 }, stick = { entablature = 1, plat_bande = 1 }, queen_anne = { dentil = 1, entablature = 1 } }
 paints = ["clapboard_sage", "clapboard_blue", "clapboard_cream", "clapboard_rose"]
 corner_orders = { corner_board = 3, corinthian = 1 }
 corner_board = 0.14
 extra_floor = 3.1               # a second chamber floor
 patio_w = 1.3                   # a side yard behind a fence, beside the entry
+stoop_w = [1.1, 1.5]            # a wooden stair, front-on, under the door (R-1)
+riser = 0.18
+# The door hood by type (R-3): [option, weight].
+door_hoods = { italianate = { pedimented = 0.6, moulded_architrave = 0.4 }, stick = { pedimented = 0.8, moulded_architrave = 0.2 }, queen_anne = { moulded_architrave = 0.5, pedimented = 0.4, bare_band = 0.1 } }
 # The layouts a lot of its width allows. The seed stands for the builder.
 #   single_left / single_right: one bay window, the entry beside it
 #   double: a bay either side of a central entry, on a wide lot
@@ -54,20 +70,23 @@ id = "victorian.lot"
 label = "Lot"
 doc = "The house front, its layout, what crowns it, the stoop up to the door, and a side yard where the builder left one."
 do = [
-  { set = { kind = "= 'italianate' if year < 1880 else 'stick' if year < 1888 else 'queen_anne'" } },
-  { set = { layout = "= 'double' if w >= 8.4 else draw('layout', ['single_left', 'single_right'])", storey_heights = "= heights + ([extra_floor] if (klass == 'grand' or chance('extra_floor', 0.33)) else [])", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)" } },
-  { let = { patio = "patio_w if (layout != 'double' and w >= 6.8 and chance('patio', 0.25)) else 0.0" } },
+  { set = { kind = "= draw('kind', kinds, step(kind_ramp, year))" } },
+  { set = { base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)" } },
+  { set = { storey_heights = "= [base_h, between('parlour_h', parlour_h[0], parlour_h[1]), between('chamber_h', chamber_h[0], chamber_h[1])] + ([third_h] if chance('third_storey', third_storey[klass]) else [])" } },
+  { let = { patio = "patio_w if (layout != 'double' and w >= 6.8 and chance('patio', 0.5 if (w >= 10 or klass == 'grand') else 0.10)) else 0.0" } },
   # The facade stands beside the side yard, which is on the entry's side.
   { let = { fx = "patio if layout == 'single_right' else 0.0", fw = "w - patio", front = "fsum(storey_heights)" } },
-  { set = { bay_x = "= fx + fw * 0.45 if layout == 'single_right' else fx", bay_w = "= fw * (0.36 if layout == 'double' else 0.55)", entry_x = "= fx if layout == 'single_right' else fx + fw * (0.36 if layout == 'double' else 0.55)", entry_w = "= fw * (0.28 if layout == 'double' else 0.45)" } },
+  { set = { bay_x = "= fx + fw * (1 - bay_share) if layout == 'single_right' else fx", bay_w = "= fw * (0.36 if layout == 'double' else bay_share)", entry_x = "= fx if layout == 'single_right' else fx + fw * (0.36 if layout == 'double' else bay_share)", entry_w = "= fw * (0.28 if layout == 'double' else 1 - bay_share)" } },
   # With a turret over the bay, the gable crowns only the rest of the front.
-  { let = { turret = "kind == 'queen_anne' and klass in ('comfortable', 'grand') and chance('turret', 0.7 if klass == 'grand' else 0.4)", bay_right = "layout == 'single_right'" } },
+  { let = { turret = "kind == 'queen_anne' and chance('turret', 0.4 if klass == 'grand' else 0.25 if klass == 'comfortable' else 0.15)", bay_right = "layout == 'single_right'", gable_h = "0.62 * fw" } },
   { insert = "Facade", at = ["fx", "0.0", "fw", "front"], name = "facade" },
-  { insert = "Top", at = ["fx", "front", "fw", "1.6 if kind != 'queen_anne' else 3.4"], name = "top", attrs = { kind = "= kind" }, when = "not turret" },
-  { insert = "Top", at = ["fx if bay_right else bay_x + bay_w", "front", "(bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)", "3.4"], name = "top", attrs = { kind = "= kind" }, when = "turret" },
+  { insert = "Top", at = ["fx", "front", "fw", "between('false_front', 1.3, 1.8) if kind != 'queen_anne' else gable_h"], name = "top", attrs = { kind = "= kind" }, when = "not turret" },
+  { insert = "Top", at = ["fx if bay_right else bay_x + bay_w", "front", "(bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)", "max(3.0, 0.62 * ((bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)))"], name = "top", attrs = { kind = "= kind" }, when = "turret" },
   { insert = "Turret", at = ["bay_x + 0.15", "front - storey_heights[-1]", "bay_w - 0.3", "storey_heights[-1] + 2.6 + 3.2"], name = "turret", when = "turret" },
-  { insert = "Stoop", at = ["entry_x + 0.25", "0.0", "entry_w - 0.5", "heights[0]"], name = "stoop" },
-  { insert = "Patio", at = ["(0.0 if bay_right else fx + fw) + 0.1", "0.0", "patio - 0.2", "1.5"], name = "patio", when = "patio > 0" },
+  # A wooden stair seen front-on, centred under the door (R-1).
+  { let = { sw = "between('stoop_w', stoop_w[0], stoop_w[1])" } },
+  { insert = "Stoop", at = ["entry_x + entry_w / 2.0 - sw / 2.0", "0.0", "sw", "base_h"], name = "stoop", attrs = { risers = "= max(5, round(base_h / riser))" } },
+  { insert = "Patio", at = ["(0.0 if bay_right else fx + fw) + 0.1", "0.0", "patio - 0.2", "1.8"], name = "patio", when = "patio > 0" },
 ]
 
 [[production]]
@@ -81,18 +100,24 @@ id = "victorian.storey"
 label = "Storey"
 do = [
   # A facade floor is cut by the layout: the bay's zone and the entry's.
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'single_left'", parts = [
-      { label = "BayZone", size = "w * 0.55", name = "bay_zone" },
-      { label = "EntryZone", size = "w - w * 0.55", name = "entry" },
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret', 'third') and layout == 'single_left'", parts = [
+      { label = "BayZone", size = "w * bay_share", name = "bay_zone" },
+      { label = "EntryZone", size = "w - w * bay_share", name = "entry" },
   ] },
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'single_right'", parts = [
-      { label = "EntryZone", size = "w * 0.45", name = "entry" },
-      { label = "BayZone", size = "w - w * 0.45", name = "bay_zone" },
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret', 'third') and layout == 'single_right'", parts = [
+      { label = "EntryZone", size = "w * (1 - bay_share)", name = "entry" },
+      { label = "BayZone", size = "w - w * (1 - bay_share)", name = "bay_zone" },
   ] },
-  { split = "x", when = "role not in ('parapet', 'attic', 'turret') and layout == 'double'", parts = [
+  { split = "x", when = "role not in ('parapet', 'attic', 'turret', 'third') and layout == 'double'", parts = [
       { label = "BayZone", size = "w * 0.36", name = "bay_zone" },
       { label = "EntryZone", size = "w * 0.28", name = "entry" },
       { label = "BayZone", size = "w - w * 0.36 - w * 0.28", name = "bay_zone_2" },
+  ] },
+  # A rare third storey stands over the bay's cornice: three plain sashes.
+  { split = "x", when = "role == 'third'", parts = [
+      { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
+      { repeat = "range(3)", label = "Cell", size = "(w - 0.8) / 3", name = "x{n}", slot = "bay" },
+      { label = "Cell", size = "0.4", name = "x{n}", slot = "end" },
   ] },
   # The false front: boards over a frieze and a bracketed cornice.
   { split = "x", when = "role == 'parapet'", parts = [ { label = "Cell", size = "w", name = "x0", slot = "end" } ] },
@@ -144,7 +169,7 @@ label = "Top"
 doc = "A Queen Anne front ends in a gable with a window in it; the others in a false front, a parapet of boards over a bracketed cornice."
 do = [
   { let = { aw = "(min(w * 0.36, 1.8) if w > 5 else w * 0.5)" } },
-  { insert = "Storey", at = ["x + (w - aw) / 2.0", "y + 0.35", "aw", "1.9"], name = "attic", attrs = { role = "attic" }, when = "kind == 'queen_anne'" },
+  { insert = "Storey", at = ["x + (w - aw) / 2.0", "y + 0.35", "aw", "min(1.9, h * 0.55)"], name = "attic", attrs = { role = "attic" }, when = "kind == 'queen_anne'" },
   { insert = "Storey", at = ["x", "y", "w", "h"], name = "false_front", attrs = { role = "parapet" }, when = "kind != 'queen_anne'" },
 ]
 
@@ -188,12 +213,20 @@ id = "victorian.roles.floor_and_paint"
 label = "Storey"
 layer = "roles"
 doc = "Basement, parlour, chamber -- or the role a crowning storey was given -- and one paint for the whole house, chosen by its seed."
-set = { role = "= role if has('role') else ['basement', 'parlour', 'chamber', 'chamber'][index]", wall_material = "= paint" }
+set = { role = "= role if has('role') else ['basement', 'parlour', 'chamber', 'third'][index]", wall_material = "= paint" }
 
 [[rule]]
 id = "victorian.base.wall"
 label = "Cell"
 when = "not is_bay()"
+set = { opening_type = "none" }
+
+[[rule]]
+id = "victorian.base.a_narrow_return_is_blank"
+label = "Cell"
+doc = "A square bay's return seen in elevation is a sliver under half a metre: blank boards, not a window (V-BAY-2)."
+when = "is_bay() and has('face') and face == 'side' and w < 0.5"
+specificity = 20
 set = { opening_type = "none" }
 
 [[rule]]
@@ -207,14 +240,14 @@ id = "victorian.base.a_tall_sash"
 label = "Cell"
 doc = "Every face and every opening bay holds a tall sash. Its head, hood and glazing are drawn once per floor from the type's weights -- the parlour floor weighted to the richer dress -- so a floor always matches itself."
 when = "is_bay() and role != 'basement'"
-let = { living = "role in ('parlour', 'chamber')", front = "has('face') and face == 'front'", col = "1 if role == 'parlour' else 2" }
-set = { opening_type = "window", head = "= draw('head', column(heads[kind], 0), column(heads[kind], col), per='Storey')", light_width = "= max(0.3, w - 0.45 if front else min(w - 0.3, 1.1))", sill = "= 0.55 if living else 0.4", light_height = "= h - (0.55 if living else 0.4) - (0.55 if living else 0.35)", surround_kind = "= draw('hood', column(hoods[kind], 0), column(hoods[kind], col), per='Storey')", keystone_present = "= kind == 'italianate' and chance('keystone', 0.6, per='Storey')", glazing = "sash", frame_paint = "white", sash_cols = "= draw('panes', [1, 2], [1, 2], per='Storey')", sash_rows = 1 }
+let = { living = "role in ('parlour', 'chamber', 'third')", front = "has('face') and face == 'front'", col = "1 if role == 'parlour' else 2" }
+set = { opening_type = "window", head = "= draw('head', column(heads[kind], 0), column(heads[kind], col), per='Storey')", light_width = "= max(0.3, ((min(w - 0.45, 1.15) if kind == 'italianate' else w - 0.45) if front else min(w - 0.3, 1.1)))", sill = "= 0.55 if living else 0.4", light_height = "= h - (0.55 if living else 0.4) - (0.55 if living else 0.35)", surround_kind = "= draw('hood', column(hoods[kind], 0), column(hoods[kind], col), per='Storey')", keystone_present = "= kind == 'italianate' and chance('keystone', 0.6, per='Storey')", glazing = "sash", frame_paint = "white", sash_cols = "= draw('panes', [1, 2], [1, 2], per='Storey')", sash_rows = 1 }
 
 [[rule]]
 id = "victorian.base.a_pair_in_the_front_face"
 label = "Cell"
-doc = "The bay's front face is wide enough for a pair of sashes; most builders paired them, and a round-headed floor always does (a round head over one wide sash never occurs)."
-when = "is_bay() and role != 'basement' and has('face') and face == 'front' and w > 2.2 and (chance('pair', 0.7, per='Storey') or draw('head', column(heads[kind], 0), column(heads[kind], 1 if role == 'parlour' else 2), per='Storey') == 'round')"
+doc = "A Stick or Queen Anne bay's wide front face often takes a pair of sashes, and a round-headed floor always does; an Italianate half-octagon has one window per face (V-BAY-1)."
+when = "is_bay() and role != 'basement' and kind != 'italianate' and has('face') and face == 'front' and w > 2.2 and (chance('pair', 0.7, per='Storey') or draw('head', column(heads[kind], 0), column(heads[kind], 1 if role == 'parlour' else 2), per='Storey') == 'round')"
 set = { lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.16 }
 
 [[rule]]
@@ -223,4 +256,4 @@ label = "Cell"
 doc = "The parlour floor's entry bay is the front door, under a transom."
 when = "is_bay() and role == 'parlour' and in_parent('EntryZone')"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", head = "= 'segmental' if kind == 'italianate' else 'flat'", light_width = 1.1, sill = 0.0, light_height = "= h - 0.45", lights = "= None" }
+set = { opening_type = "pedestrian_entrance", head = "= 'segmental' if kind == 'italianate' else 'flat'", light_width = "= 1.3 if kind == 'italianate' else 1.1", sill = 0.0, light_height = "= h - 0.7", lights = "= None", surround_kind = "= draw('door_hood', door_hoods[kind])", keystone_present = "= kind == 'italianate'" }

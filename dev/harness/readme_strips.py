@@ -150,10 +150,10 @@ def strips():
         "victorian": ("San Francisco Victorian (victorian.toml)", [
             ("Italianate, 1872, 25 ft", generate_victorian(VictorianSite(1872, K.ORDINARY, 0))[0]),
             ("Italianate, 1878, 20 ft, mirrored", generate_victorian(VictorianSite(1878, K.MODEST, 1, 6.1))[0]),
-            ("Stick, 1883, double bay, 30 ft", generate_victorian(VictorianSite(1883, K.COMFORTABLE, 2, 9.1))[0]),
-            ("Stick, 1886, side yard", generate_victorian(VictorianSite(1886, K.ORDINARY, 3, 8.2))[0]),
-            ("Queen Anne, 1892, extra floor", generate_victorian(VictorianSite(1892, K.ORDINARY, 5))[0]),
-            ("Queen Anne, 1895, turret", generate_victorian(VictorianSite(1895, K.GRAND, 1))[0]),
+            ("Italianate, 1874, double bay, 40 ft", generate_victorian(VictorianSite(1874, K.GRAND, 0, 12.2))[0]),
+            ("Stick, 1886, side yard", generate_victorian(VictorianSite(1886, K.ORDINARY, 1, 8.2))[0]),
+            ("Queen Anne, 1892", generate_victorian(VictorianSite(1892, K.ORDINARY, 1))[0]),
+            ("Queen Anne, 1895, turret", generate_victorian(VictorianSite(1895, K.GRAND, 13))[0]),
         ]),
         "renaissance": ("Renaissance palazzo (renaissance.toml)", [
             ("1446, Rucellai, 7 bays", generate_renaissance(RenaissanceSite(24.0, 1446, K.ORDINARY, seed=0))[0]),

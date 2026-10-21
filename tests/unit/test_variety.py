@@ -52,8 +52,8 @@ def test_a_round_head_is_never_over_one_wide_front_sash():
     for seed in range(60):
         lot, _ = derive_victorian(VictorianSite(1875, BuildingClass.ORDINARY, seed))
         for c in lot.walk():
-            if c.label == "Cell" and c.attrs.get("face") == "front" and c.attrs.get("head") == "round" and c.scope.w > 2.2:
-                assert c.attrs.get("lights"), c.id
+            if c.label == "Cell" and c.attrs.get("head") == "round" and not c.attrs.get("lights"):
+                assert c.attrs["light_width"] <= 1.3, c.id
 
 
 def test_draws_are_reproducible():

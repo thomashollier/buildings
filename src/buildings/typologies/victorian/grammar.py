@@ -32,7 +32,6 @@ class VictorianSite:
     seed: int = 0
     width: float = LOT
 
-_PAINTS = ("clapboard_sage", "clapboard_blue", "clapboard_cream", "clapboard_rose")
 
 
 def _site(shape: Shape) -> "VictorianSite":
@@ -47,7 +46,7 @@ def write_top(top: Shape, below, d) -> list:
     return [
         GableNode(id=top.id, kind="gable", trace=tuple(top.trace),
                   props={**{"x": s.x, "y": s.y, "w": s.w, "h": s.h}, "form": "front_gable", "points": pts,
-                         "hoist_beam": None, "wall_material": _PAINTS[_site(top).seed % len(_PAINTS)]}),
+                         "hoist_beam": None, "wall_material": top.attr("paint")}),
         *below,
     ]
 
@@ -67,7 +66,44 @@ def write_turret(turret: Shape, below, d) -> list:
 
 register_writer("victorian.top", write_top)
 register_writer("victorian.turret", write_turret)
-register_writer("victorian.stoop", kit.write_stoop)
+def write_stoop(stoop: Shape, below, d) -> list:
+    """The wooden stair up to the parlour door, seen front-on: a stack of
+    treads between two strings, a newel post at the foot of each (R-1)."""
+    s = stoop.scope
+    n = int(stoop.attrs.get("risers", 12))
+    rise = s.h / n
+    string, newel_w, newel_h = 0.09, 0.2, 1.05
+    nodes = []
+
+    def piece(suffix, x0, y0, x1, y1):
+        nodes.append(GableNode(id=f"{stoop.id}/{suffix}", kind="gable", trace=tuple(stoop.trace),
+                               props={"x": x0, "y": y0, "w": x1 - x0, "h": y1 - y0, "form": "stoop",
+                                      "points": ((x0, y0), (x0, y1), (x1, y1), (x1, y0)),
+                                      "hoist_beam": None, "wall_material": "stone"}))
+
+    for k in range(n):
+        y0 = s.y + k * rise
+        piece(f"tread{k}", s.x + string, y0 + 0.012, s.x + s.w - string, y0 + rise)
+    # The strings rise to the door, a railing above them; newels at the foot.
+    piece("string_l", s.x, s.y, s.x + string, s.y + s.h + 0.9)
+    piece("string_r", s.x + s.w - string, s.y, s.x + s.w, s.y + s.h + 0.9)
+    piece("newel_l", s.x - newel_w / 2.0, s.y, s.x + newel_w / 2.0, s.y + newel_h)
+    piece("newel_r", s.x + s.w - newel_w / 2.0, s.y, s.x + s.w + newel_w / 2.0, s.y + newel_h)
+    return nodes
+
+
+def write_fence(fence: Shape, below, d) -> list:
+    """A board fence and gate across a side yard, in the house's paint."""
+    s = fence.scope
+    h = 1.8
+    return [GableNode(id=fence.id, kind="gable", trace=tuple(fence.trace),
+                      props={"x": s.x, "y": s.y, "w": s.w, "h": h, "form": "stoop",
+                             "points": ((s.x, s.y), (s.x, s.y + h), (s.x + s.w, s.y + h), (s.x + s.w, s.y)),
+                             "hoist_beam": None, "wall_material": fence.attr("paint")})]
+
+
+register_writer("victorian.stoop", write_stoop)
+register_writer("victorian.fence", write_fence)
 
 STYLE = load_style(Path(__file__).with_name("victorian.toml"))
 
@@ -84,7 +120,7 @@ def generate_victorian(site: VictorianSite, *, refine: Callable[[Grammar], Gramm
     return STYLE.generate(site, refine=refine)
 
 
-def victorian_type(year: int) -> str:
-    """The type the rule file gives a house of this date."""
-    lot, _ = derive_victorian(VictorianSite(year, BuildingClass.ORDINARY))
+def victorian_type(year: int, seed: int = 0) -> str:
+    """The type the rule file draws for a house of this date and builder."""
+    lot, _ = derive_victorian(VictorianSite(year, BuildingClass.ORDINARY, seed))
     return lot.attrs["kind"]

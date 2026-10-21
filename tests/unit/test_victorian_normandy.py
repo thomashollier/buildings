@@ -35,24 +35,34 @@ def test_each_derives_traces_renders_and_repeats(name, generate, derive, site):
             assert shape.parent.scope.contains(shape.scope), shape
 
 
-def test_the_date_chooses_the_victorian_and_a_square_bay_shows_less_side():
-    assert [victorian_type(y) for y in (1875, 1885, 1892)] == ["italianate", "stick", "queen_anne"]
+def test_the_date_weights_the_victorian_type_and_a_square_bay_shows_less_side():
+    def kinds(year):
+        return [victorian_type(year, seed) for seed in range(60)]
 
-    def side_share(year):
-        lot, _ = derive_victorian(VictorianSite(year, BuildingClass.ORDINARY))
+    assert set(kinds(1875)) == {"italianate"}
+    assert kinds(1886).count("stick") > 25 and "italianate" in kinds(1886)
+    assert kinds(1895).count("queen_anne") > 45
+
+    def side_share(seed):
+        lot, _ = derive_victorian(VictorianSite(1886, BuildingClass.ORDINARY, seed))
         zone = next(s for s in lot.walk() if s.label == "BayZone" and s.attr("role") == "parlour")
         cells = [c for c in zone.children if c.label == "Cell"]
-        return cells[0].scope.w / zone.scope.w
+        return lot.attrs["bay_form"], cells[0].scope.w / zone.scope.w
 
-    assert side_share(1875) > 2 * side_share(1885)
+    shares = dict(side_share(seed) for seed in range(40))
+    assert shares["slanted"] > 2 * shares["square"]
 
 
-def test_a_grand_queen_anne_gets_a_turret_and_an_ordinary_one_does_not():
+def test_turrets_are_rarer_on_an_ordinary_queen_anne_than_a_grand_one():
     def turrets(klass):
-        b, _ = generate_victorian(VictorianSite(1895, klass))
-        return [n for n in walk(b) if n.kind == "storey" and n.props["role"] == "turret"]
+        n = 0
+        for seed in range(80):
+            b, _ = generate_victorian(VictorianSite(1897, klass, seed))
+            n += any(x.kind == "storey" and x.props["role"] == "turret" for x in walk(b))
+        return n
 
-    assert turrets(BuildingClass.GRAND) and not turrets(BuildingClass.ORDINARY)
+    ordinary, grand = turrets(BuildingClass.ORDINARY), turrets(BuildingClass.GRAND)
+    assert 0 < ordinary < grand
 
 
 def test_the_town_house_is_jettied_and_no_post_crosses_a_window():
