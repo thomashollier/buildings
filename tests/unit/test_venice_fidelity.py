@@ -132,8 +132,17 @@ def test_balconies_are_stone_balustrades_on_corbels_iron_only_as_a_later_variant
                 if "/centre/" in n.id:
                     assert n.props["ironwork_pattern"] == "stone_balustrade"
     assert rails["stone_balustrade"] > 3 * rails[None]
+    # A Veneto-Byzantine loggia has no balusters: solid marble plutei, or nothing.
     building, _ = generate_venice(PalazzoSite(30.0, 1225, K.GRAND))
-    assert any(n.kind == "ironwork" and n.props.get("ironwork_pattern") == "stone_balustrade" for n in building.children)
+    patterns = {n.props.get("ironwork_pattern") for n in building.children if n.kind == "ironwork"}
+    assert patterns == {"pluteus"}
+    pluteus = next(n for n in building.children if n.kind == "ironwork")
+    assert len(pluteus.props["panel_edges"]) == pluteus.props["panel_count"] + 1
+    open_loggias = sum(
+        not any(n.kind == "ironwork" for n in generate_venice(PalazzoSite(16.0, 1250, K.ORDINARY, seed=s))[0].children)
+        for s in range(20)
+    )
+    assert 0 < open_loggias < 20
 
 
 # 6. The storey stack ----------------------------------------------------------------------
@@ -239,7 +248,12 @@ def test_the_water_gate_is_an_open_arch_whose_head_is_the_familys():
 
 def test_istrian_corners_a_base_course_and_the_wall_by_family():
     building, _ = generate_venice(PalazzoSite(19.0, 1430, K.GRAND))
-    assert sum(1 for n in building.children if n.kind == "column" and n.props["order"] == "dentil_strip") == 2
+    assert sum(1 for n in building.children if n.kind == "column" and n.props["order"] in ("dentil_strip", "quoins")) == 2
+    corners = Counter(
+        next(n.props["order"] for n in generate_venice(PalazzoSite(16.0, 1440, K.ORDINARY, seed=s))[0].children if n.kind == "column")
+        for s in range(20)
+    )
+    assert corners["quoins"] > 0 and corners["dentil_strip"] > 0
     assert any(n.kind == "socle" and n.props["treatment"] == "istrian_course" for n in walk(building))
     walls = Counter(_lot_attrs(PalazzoSite(16.0, 1440, K.ORDINARY, seed=s))["palazzo_wall"] for s in SEEDS)
     assert walls == {"brick": 40, "stucco_rose": 30, "stucco": 20, "plaster_ochre": 10}
@@ -286,9 +300,55 @@ def test_a_narrow_palazzetto_has_one_wing():
     assert [c.label for c in st.children if c.label in ("Wing", "Centre")] in (["Centre", "Wing"], ["Wing", "Centre"])
 
 
-def test_a_hipped_tiled_roof_and_funnel_chimneys():
+def test_a_low_roof_behind_the_cornice_and_funnel_chimneys_by_family():
     building, _ = generate_venice(PalazzoSite(19.0, 1430, K.GRAND))
-    assert any(n.kind == "gable" and n.props["wall_material"] == "tile_red" for n in building.children)
     assert sum(1 for n in building.children if n.kind == "special" and n.props["element"] == "fumaiolo") == 2
     cornice = next(n for n in walk(building) if n.kind == "cornice")
     assert cornice.props["cornice_ornament"] == "corbelled_eave" and cornice.props["projection"] >= 0.6
+    roofs, counts, plinths = 0, set(), set()
+    for s in range(20):
+        b, _ = generate_venice(PalazzoSite(19.0, 1430, K.GRAND, seed=s))
+        top = next(n for n in walk(b) if n.kind == "cornice")
+        for roof in (n for n in b.children if n.kind == "gable" and n.props["wall_material"] == "tile_red"):
+            roofs += 1
+            # a sliver at most, standing back from the front, behind the cornice
+            assert roof.props["h"] <= 1.2 and roof.props["x"] >= 1.0
+            assert roof.props["y"] >= top.props["y"] + 0.3
+        counts.add(sum(1 for n in b.children if n.kind == "special"))
+        plinths.add(next(n for n in walk(b) if n.kind == "socle").props["h"])
+    assert 0 < roofs < 20 and len(counts) >= 2 and len(plinths) >= 3
+
+
+# Round 3 of the blind test ---------------------------------------------------------
+
+
+def test_the_palazzo_stands_in_the_canal_with_steps_at_the_gate():
+    from buildings.render.svg.colors import COLORS
+    from buildings.render.svg.render import render
+
+    for site in (PalazzoSite(16.0, 1410, K.COMFORTABLE), PalazzoSite(16.0, 1250, K.COMFORTABLE, seed=1)):
+        building, _ = generate_venice(site)
+        assert building.props["ground"] == "canal"
+        svg = render(building)
+        assert COLORS["water"] in svg and COLORS["ground"] not in svg
+    building, _ = generate_venice(PalazzoSite(16.0, 1410, K.COMFORTABLE))
+    steps = [n for n in walk(building) if n.kind == "socle" and n.props["treatment"] == "water_steps"]
+    assert steps and all(s.props["y"] < 0 for s in steps)
+
+
+def test_some_lights_are_rondel_glazed_or_shuttered():
+    glazings = Counter()
+    for s in range(20):
+        building, _ = generate_venice(PalazzoSite(16.0, 1430, K.ORDINARY, seed=s))
+        for o in walk(building):
+            if o.kind == "opening" and o.props.get("glazing"):
+                glazings[o.props["glazing"]] += 1
+                if o.props["glazing"] == "rondel":
+                    assert o.props["rondel_cols"] >= 2 and o.props["rondel_rows"] >= 2
+    assert glazings["rondel"] > 0 and glazings["scuri"] > 0
+
+
+def test_byzantine_stilted_arches_have_an_extradosed_archivolt_down_the_stilt():
+    building, _ = generate_venice(PalazzoSite(16.0, 1250, K.COMFORTABLE, seed=1))
+    arches = [o for o in walk(building) if o.kind == "opening" and o.props.get("head") == "round"]
+    assert arches and all(o.props["archivolt"] == "extradosed" and o.props["archivolt_stilt"] > 0 for o in arches)

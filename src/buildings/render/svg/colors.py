@@ -115,4 +115,28 @@ COLORS: dict[str, str] = {
     "void": "#2B3138",
     "roof_coppi": "#A9644A",
     "roof_coppi_line": "#7E4634",
+    # The setting a lot states (``ground``): a canal's water, a brick quay.
+    "water": "#5E7F87",
+    "water_light": "#86A3A8",
+    "water_dark": "#4A666E",
+    "quay_brick": "#8C5E4A",
+    "quay_joint": "#74493A",
+    "quay_kerb": "#B9B2A4",
+    "wet_stone": "#9DA39A",
+    # Joinery paint a light states (``frame_paint``) and what fills its lights.
+    "frame_white": "#F4F1EA",
+    "frame_ochre": "#C9A46A",
+    "glass_leaded": "#55697C",
+    "came": "#2E3640",
+    "shutter_red": "#8A3A2C",
+    "shutter_green": "#3F5B48",
+    "scuri": "#5E4632",
+    "scuri_line": "#3E2E20",
+    "rondel": "#8FA3A3",
+    "rondel_line": "#55686A",
+    # Marble plutei, and the brick of a relieving arch.
+    "marble": "#F3EFE7",
+    "marble_line": "#A39A8A",
+    "arch_brick": "#B0604A",
+    "arch_brick_line": "#6E3426",
 }

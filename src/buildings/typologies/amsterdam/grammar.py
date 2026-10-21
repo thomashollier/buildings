@@ -14,14 +14,15 @@ Nothing here decides; it draws around the shapes the rules placed.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Callable
 
 from buildings.cga import Grammar, Shape
-from buildings.ir.nodes import BuildingNode, GableNode, IronworkNode, Node
+from buildings.ir.nodes import BuildingNode, CorniceNode, GableNode, IronworkNode, KeystoneNode, Node
 from buildings.site import BuildingClass
 from buildings.trace import TraceEntry, TraceLog
+from buildings.typologies.common import kit
 from buildings.typologies.common.rulefile import load_style, register_writer
 
 @dataclass(frozen=True)
@@ -74,6 +75,32 @@ def _inset(line: Pts, d: float) -> Pts:
     return out
 
 
+def _volute_r(a: float, ch: float) -> float:
+    return min(0.34, 0.3 * ch, 0.26 * a)
+
+
+def _scroll(ledge: float, y0: float, x1: float, ch: float) -> Pts:
+    """A claw piece's outline, from its foot on the ledge to the tier wall at
+    ``ch`` up: round a volute at the outer foot, then a hollow (cavetto) sweep
+    rising into the wall -- a carved scroll, not a quarter circle."""
+    rv = _volute_r(x1 - ledge, ch)
+    cx, cy = ledge + rv, y0 + rv
+    curl = [(cx + rv * math.cos(t), cy + rv * math.sin(t)) for t in (math.pi * (1.5 - k / 10) for k in range(11))]
+    p0 = curl[-1]
+    p1 = (x1, y0 + ch)
+    sweep = _bezier(p0, (p0[0] + (p1[0] - p0[0]) * 0.55, p0[1] + 0.02), (p1[0] - 0.02, p0[1] + (p1[1] - p0[1]) * 0.4), p1, 14)
+    return [(cx, y0), *curl, *sweep]
+
+
+def _spiral_band(cx: float, cy: float, r: float, band: float) -> Pts:
+    """A spiral of one and a half turns as a band ``band`` wide: the volute
+    carved on a scroll's foot."""
+    turns = [k / 18 for k in range(28)]
+    outer = [(cx + (r - r * 0.55 * t) * math.cos(math.pi * (0.5 - 2 * t)), cy + (r - r * 0.55 * t) * math.sin(math.pi * (0.5 - 2 * t))) for t in turns]
+    inner = [(cx + (r - band - r * 0.55 * t) * math.cos(math.pi * (0.5 - 2 * t)), cy + (r - band - r * 0.55 * t) * math.sin(math.pi * (0.5 - 2 * t))) for t in turns]
+    return outer + list(reversed(inner))
+
+
 def _parts(gable: Shape):
     storeys = [c.children[0].scope for c in gable.children if c.label == "GableTier"]
     crown = next((c.scope for c in gable.children if c.label == "Crown"), None)
@@ -123,17 +150,20 @@ def _neck(gable: Shape):
     for i, st in enumerate(storeys):
         ledge = bx + (st.x - bx) * 0.1
         a, ch = st.x - ledge, min(1.5, 0.55 * st.h)
-        curve = [(st.x - a * math.cos(t), by + ch * math.sin(t)) for t in (math.pi / 2 * k / 12 for k in range(13))]
+        curve = _scroll(ledge, by, st.x, ch)
         pts += curve + [(st.x, st.y + st.h)]
-        trim.append((f"claw{i}", [(ledge, by), *curve[1:], (st.x, by)]))
-        # Carved in it: an inner leaf, and a volute against the tier above.
-        inner = [(st.x - 0.62 * a * math.cos(t), by + 0.62 * ch * math.sin(t)) for t in (math.pi / 2 * k / 10 for k in range(11))]
-        trim.append((f"leaf{i}", [(st.x - 0.62 * a, by), *inner[1:], (st.x, by)]))
-        rv = min(0.2, ch * 0.14)
-        trim.append((f"volute{i}", _disc(st.x - rv * 1.1, by + ch - rv * 0.9, rv)))
-        # The scroll's curl at its foot.
-        r = min(0.2, a * 0.12)
-        trim.append((f"curl{i}", _disc(ledge + r * 1.1, by + r * 1.1, r)))
+        trim.append((f"claw{i}", [*curve, (st.x, by)]))
+        # Carved in it: the volute's eye and its spiral at the foot, an
+        # acanthus leaf rising along the scroll's back, a small curl where the
+        # scroll meets the tier above.
+        rv = _volute_r(a, ch)
+        cx_v, cy_v = ledge + rv, by + rv
+        trim.append((f"volute{i}", _spiral_band(cx_v, cy_v, rv * 0.78, rv * 0.18)))
+        trim.append((f"eye{i}", _disc(cx_v + rv * 0.08, cy_v - rv * 0.05, rv * 0.24)))
+        leaf = _scroll(ledge + rv * 1.2, by + rv * 0.6, st.x - a * 0.12, ch * 0.62)
+        trim.append((f"leaf{i}", [*leaf, (st.x - a * 0.12, by + rv * 0.6)]))
+        rt = min(0.13, a * 0.08)
+        trim.append((f"curl{i}", _disc(st.x - rt * 1.1, by + ch - rt * 0.2, rt)))
         bx, by = st.x, st.y + st.h
     top = storeys[-1].y + storeys[-1].h
     nx = storeys[-1].x - PEDIMENT_OVERHANG
@@ -210,8 +240,23 @@ def _lijst(gable: Shape):
         trim = [("curl", _disc(foot + 0.25, g.y + 0.3, 0.2))]
     else:
         ox = st.x - 0.12
-        left = [(ox, g.y), (ox, top), (ox - 0.08, top), (ox - 0.08, top + 0.12), (cx, apex)]
+        kind = gable.attrs["top"]
+        if kind == "dormer_arched":
+            # A round-headed dormer under a moulded arch.
+            half = cx - (ox - 0.08)
+            arc = [(cx - half * math.cos(t), top + 0.12 + (crown.h - 0.12) * math.sin(t)) for t in (math.pi / 2 * k / 10 for k in range(1, 11))]
+            left = [(ox, g.y), (ox, top), (ox - 0.08, top), (ox - 0.08, top + 0.12), *arc]
+        elif kind == "dormer_flat":
+            # A flat-topped dormer under its own little cornice.
+            left = [(ox, g.y), (ox, top), (ox - 0.14, top), (ox - 0.14, top + 0.22), (cx, top + 0.22)]
+        else:
+            left = [(ox, g.y), (ox, top), (ox - 0.08, top), (ox - 0.08, top + 0.12), (cx, apex)]
         trim = []
+        if kind in ("dormer_arched", "dormer_flat"):
+            # Scrolled cheeks against the dormer's sides, on the cornice.
+            cheek = _bezier((ox - 0.42, g.y), (ox - 0.1, g.y + 0.02), (ox, g.y + 0.2), (ox, g.y + 0.75), 10)
+            trim.append(("cheek", [(ox - 0.42, g.y), *cheek, (ox, g.y)]))
+            trim.append(("cheek_curl", _disc(ox - 0.3, g.y + 0.12, 0.1)))
     beam = (cx, top - 0.45)
     return left, beam, trim
 
@@ -298,15 +343,61 @@ def write_stoop(stoop: Shape, below, d) -> list[Node]:
 
 
 def write_anchor(anchor: Shape, below, d) -> list[Node]:
-    """A wrought-iron wall anchor's visible bar."""
+    """A wrought-iron wall anchor's forged end, in the form the rules gave it."""
     s = anchor.scope
     return [IronworkNode(id=anchor.id, kind="ironwork", trace=tuple(anchor.trace),
-                         props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "guards": "balcon_filant", "max_gap": 0.5, "ornament_count": 1})]
+                         props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "guards": "wall", "ironwork_pattern": "wall_anchor",
+                                "anchor_form": anchor.attr("anchor_form", "bar")})]
+
+
+#: What a window or door light states beyond its rectangle, as the rules set it.
+_LIGHT_STATED = ("glazing", "frame_paint", "frame_w", "bar_w", "sash_cols", "sash_rows", "came_count",
+                 "transom_at", "shutter_paint", "fanlight_h", "fanlight_bars", "fanlight_pattern")
+_ARCH_STATED = ("relieving_arch_rise", "relieving_ring", "relieving_reach")
+
+
+def write_light(light: Shape, below, d) -> list[Node]:
+    """The kit's opening, with what the rules said of its glazing, its door's
+    fanlight, and the relieving arch over its head: the arch's bricks one
+    ``voussoir`` each along its ring."""
+    opening, *rest = kit.write_light(light, below, d)
+    props = dict(opening.props)
+    for key in _LIGHT_STATED:
+        value = light.attr(key, None)
+        if value is not None and value != "":
+            props[key] = value
+    if light.attr("relieving_arch", False) and light.attr("opening_type") == "window":
+        for key in _ARCH_STATED:
+            props[key] = light.attr(key)
+        span = light.scope.w + 2.0 * float(light.attr("relieving_reach"))
+        props["voussoirs"] = max(5, round(span * 1.15 / float(STYLE.params["voussoir"])))
+    return [replace(opening, props=props), *rest]
+
+
+def write_keystone(shape: Shape, below, d) -> list[Node]:
+    """The keystone at the crown of the relieving arch over its window."""
+    s = shape.scope
+    rise = float(shape.attr("relieving_arch_rise", 0.0)) if shape.attr("relieving_arch", False) else 0.0
+    return [KeystoneNode(id=kit._element_id(shape, "keystone"), kind="keystone", trace=kit.trace_of(shape, "keystone_present"),
+                         props={"x": s.x, "y": s.y + rise - 0.04, "w": s.w, "h": 0.0, "keystone_kind": "plain"})]
+
+
+def write_cornice(shape: Shape, below, d) -> list[Node]:
+    """The lijst: its profile and its count of consoles or dentils as the
+    rules set them, as deep as the builder made it."""
+    s = shape.scope
+    return [CorniceNode(id=shape.id, kind="cornice", trace=tuple(shape.trace),
+                        props={"x": s.x, "y": s.y, "w": s.w, "h": s.h, "projection": s.h,
+                               "cornice_ornament": shape.attrs["cornice_ornament"],
+                               "ornament_count": int(shape.attrs["ornament_count"])})]
 
 
 register_writer("amsterdam.gable", write_gable)
 register_writer("amsterdam.anchor", write_anchor)
 register_writer("amsterdam.stoop", write_stoop)
+register_writer("amsterdam.light", write_light)
+register_writer("amsterdam.keystone", write_keystone)
+register_writer("amsterdam.cornice", write_cornice)
 
 STYLE = load_style(Path(__file__).with_name("amsterdam.toml"))
 

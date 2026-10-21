@@ -187,15 +187,29 @@ def _height_on(outline: Sequence[tuple[float, float]], at_x: float) -> float:
     return max(y for _x, y in outline)
 
 
-def _draw_head_band(canvas: Canvas, x: float, y_spring: float, w: float, rise: float, head_form: str, band_kind: str) -> None:
+def _draw_head_band(canvas: Canvas, x: float, y_spring: float, w: float, rise: float, head_form: str, band_kind: str, stilt: float = 0.0) -> None:
     """The stone band an arch is turned in: the head's outline and the same
     outline struck a band wider, filled between. A dentilled band carries a
-    second, outer line."""
+    second, outer line. An extradosed archivolt is a thin raised moulding
+    round the extrados, carried down the stilt to the impost it springs from."""
     if rise <= 1e-9 or head_form not in _ARCHED:
         return
     band = min(0.14, w * 0.09)
     inner = _head_outline(x, y_spring, w, rise, head_form)
     outer = _head_outline(x - band, y_spring, w + 2 * band, rise + band, head_form)
+    if band_kind == "extradosed":
+        foot = y_spring - stilt
+        ring = [(x - band, foot), *outer, (x + w + band, foot)]
+        hole = [(x, foot), *inner, (x + w, foot)]
+        canvas.polygon(ring + list(reversed(hole)), _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+        mould = band * 0.45
+        rim = _head_outline(x - band - mould, y_spring, w + 2 * (band + mould), rise + band + mould, head_form)
+        rim = [(x - band - mould, foot), *rim, (x + w + band + mould, foot)]
+        for (x0, y0), (x1, y1) in zip(rim, rim[1:]):
+            canvas.line(x0, y0, x1, y1, _C["istrian_line"], 0.9)
+        for (x0, y0), (x1, y1) in zip(ring, ring[1:]):
+            canvas.line(x0, y0, x1, y1, _C["istrian"], 0.6)
+        return
     canvas.polygon(outer + list(reversed(inner)), _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
     if band_kind == "dentil":
         outer2 = _head_outline(x - band * 0.45, y_spring, w + band * 0.9, rise + band * 0.45, head_form)
@@ -257,7 +271,7 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
             for i in range(1, bars):
                 bx = x + w * i / bars
                 canvas.line(bx, springing, bx, _height_on(outline, bx), _C["iron"], 0.5)
-        _draw_head_band(canvas, x, springing, w, rise, head_form, str(props.get("archivolt") or "plain"))
+        _draw_head_band(canvas, x, springing, w, rise, head_form, str(props.get("archivolt") or "plain"), _num(props, "archivolt_stilt", 0.0))
         if props.get("head_finial"):
             _draw_finial(canvas, x + w / 2.0, y + h, _num(props, "finial_h", 0.0))
         return
@@ -422,6 +436,15 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
         # does.
         arched = head_form in ("round", "segmental", "irregular", "ogee")
         fan_h = head_h if arched else min(head_h, max(0.22, body_w * 0.4), h)
+        if props.get("fanlight_h"):
+            # A fanlight as tall as the IR says, its bars as many as it says.
+            fan_h = min(_num(props, "fanlight_h"), h)
+            body_top = y + h - fan_h
+            canvas.rect(body_x, y, body_w, body_top - y, _C["door"], stroke=_C["door_dark"], stroke_w=1.0)
+            _draw_door_panels(canvas, body_x, y, body_w, body_top - y)
+            canvas.line(body_x + body_w / 2.0, y, body_x + body_w / 2.0, body_top, _C["door_dark"], 1.4)
+            draw_fanlight(canvas, body_x, body_top, body_w, fan_h, props)
+            return
         body_bot = y
         body_top = y + h - fan_h
         # A14.1: on the lower register of a two-storey arch there is no
@@ -450,12 +473,20 @@ def draw_opening(canvas: Canvas, x: float, y: float, w: float, h: float, props: 
     body_bot = y
     body_top = y + h - (head_h if head_form in _ARCHED else 0.0)
     body_top = max(body_bot, body_top)
-    canvas.rect(body_x, body_bot, body_w, body_top - body_bot, _C["window"], stroke=_C["window_frame"], stroke_w=0.8)
-    springing = _draw_head(canvas, body_x, y + h, body_w, head_h, head_form, _C["window"])
+    glazing = props.get("glazing")
+    if props.get("relieving_arch_rise"):
+        draw_relieving_arch(canvas, x, y + h, w, props)
+    glass = _GLASS_FILL.get(str(glazing), _C["window"])
+    canvas.rect(body_x, body_bot, body_w, body_top - body_bot, glass, stroke=_C["window_frame"], stroke_w=0.8)
+    springing = _draw_head(canvas, body_x, y + h, body_w, head_h, head_form, glass)
+    if glazing in GLAZINGS:
+        draw_glazing(canvas, body_x, body_bot, body_w, springing - body_bot, props)
     if props.get("archivolt"):
-        _draw_head_band(canvas, body_x, springing, body_w, head_h, head_form, str(props.get("archivolt")))
+        _draw_head_band(canvas, body_x, springing, body_w, head_h, head_form, str(props.get("archivolt")), _num(props, "archivolt_stilt", 0.0))
     if props.get("head_finial"):
         _draw_finial(canvas, body_x + body_w / 2.0, y + h, _num(props, "finial_h", 0.0))
+    if glazing in GLAZINGS:
+        return
     mid_x = body_x + body_w / 2.0
     canvas.line(mid_x, body_bot, mid_x, springing, _C["window_frame"], 0.6)
     transom_y = body_bot + (springing - body_bot) * 0.62
@@ -614,6 +645,9 @@ def draw_surround(canvas: Canvas, x: float, y: float, w: float, h: float, props:
     if surround_form == "dentil_panel":
         _draw_dentil_panel(canvas, x, y, w, h, _count(props, "ornament_count", 3))
         return
+    if surround_form in ("door_pilasters", "door_pediment", "door_scrolls"):
+        _draw_door_frame(canvas, x, y, w, h, surround_form, props)
+        return
     pad = 0.05
     fill = _C.get(f"surround_{surround_form}", _C["surround_bare_band"])
     stroke_w = {"bare_band": 0.5, "moulded_architrave": 0.9, "pedimented": 0.9, "irregular": 0.6}.get(
@@ -744,6 +778,12 @@ def draw_cornice(canvas: Canvas, x: float, y: float, w: float, props: Mapping[st
         canvas.rect(x - lip, y, w + 2 * lip, depth * 0.45, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.4)
         canvas.rect(x - lip * 1.2, y + depth * 0.45, w + 2.4 * lip, depth * 0.3, _C["cornice"], stroke=_C["cornice_stroke"], stroke_w=0.5)
         return
+    if props.get("cornice_ornament") in ("console_pair", "dentilled_lijst"):
+        _draw_lijst(canvas, x, y, w, projection, n, str(props.get("cornice_ornament")))
+        return
+    if props.get("cornice_ornament") == "dentil_eave":
+        _draw_dentil_eave(canvas, x, y, w, max(0.3, projection), n)
+        return
     if props.get("cornice_ornament") == "modillioned":
         # Modillions: chunky brackets, evenly spread along the run.
         spacing = w / n
@@ -812,7 +852,30 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
     if order == "dentil_strip":
         # A strip of white stone up a corner, its inner edge dentilled.
         canvas.rect(x, y, w, h, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+        teeth = _count(props, "course_rows", 0)
+        if teeth > 1:
+            # The saw-tooth (dente di sega) along the edge facing the wall.
+            inner = x + w if props.get("side") == "left" else x
+            out = 1.0 if props.get("side") == "left" else -1.0
+            tooth = h / teeth
+            depth = _num(props, "tooth_depth", 0.0)
+            pts = [(inner, y)]
+            for i in range(teeth):
+                pts += [(inner + out * depth, y + (i + 0.5) * tooth), (inner, y + (i + 1) * tooth)]
+            canvas.polygon(pts, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+            return
         canvas.line(x + w * 0.5, y, x + w * 0.5, y + h, _C["istrian_line"], 1.2, dash="1.2,1.4")
+        return
+    if order == "quoins":
+        # Istrian quoins up a corner: long and short blocks in turn, the short
+        # ones as wide as the IR's ``short_w``; ``course_rows`` of them.
+        n = _count(props, "course_rows", 2)
+        short = _num(props, "short_w", w)
+        left = props.get("side") == "left"
+        for i in range(n):
+            bw = w if i % 2 == 0 else short
+            bx = x if left else x + w - bw
+            canvas.rect(bx, y + h * i / n, bw, h / n, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
         return
     if order == "piloti":
         # A round concrete post: no base, no capital, a shadow down one side.
@@ -988,10 +1051,26 @@ def draw_string_course(canvas: Canvas, x: float, y: float, w: float, props: Mapp
 def draw_socle(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
     treatment = props.get("treatment") or "flat_incised_refends"
     fill = _C.get(f"socle_{treatment}", _C["wall_ground"])
+    if treatment == "water_steps":
+        # Stone steps going down into the canal at a gate: ``course_rows``
+        # treads, each a little wider than the one over it, the lower ones
+        # under the water line and showing through it.
+        rows = _count(props, "course_rows", 1)
+        spread = _num(props, "step_spread", 0.0)
+        for r in range(rows):
+            top = y + h - h * r / rows
+            grow = spread * (r + 1)
+            canvas.rect(x - grow, top - h / rows, w + 2 * grow, h / rows, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+        canvas.rect(x - spread * rows, y, w + 2 * spread * rows, h - _num(props, "dry_h", 0.0), _C["water"], stroke_w=0.0, opacity=0.55)
+        return
     if treatment == "istrian_course":
         # Courses of white stone, the joints of each course breaking those
         # of the one below.
         canvas.rect(x, y, w, h, fill, stroke=_C["istrian_line"], stroke_w=0.4)
+        tide = _num(props, "tide_h", 0.0)
+        if tide > 1e-9:
+            # The wet, weed-dark foot the tide leaves on the stone.
+            canvas.rect(x, y, w, tide, _C["wet_stone"], stroke_w=0.0)
         cols = _count(props, "course_columns", 1)
         rows = _count(props, "course_rows", 1)
         for r in range(rows):
@@ -1140,6 +1219,12 @@ def draw_ironwork(canvas: Canvas, x: float, y: float, w: float, h: float, props:
         return
     if pattern == "stone_balustrade":
         _draw_stone_balustrade(canvas, x, y, w, h, _bays_for_gap(w, _num(props, "max_gap", 0.0)))
+        return
+    if pattern == "pluteus":
+        _draw_plutei(canvas, x, y, w, h, props)
+        return
+    if pattern == "wall_anchor":
+        draw_wall_anchor(canvas, x, y, w, h, str(props.get("anchor_form") or "bar"))
         return
 
     # A12.2: "guards" is the IR's own word (compose.py, A6.5/A6.6) for what
@@ -1711,3 +1796,296 @@ def draw_fumaiolo(canvas: Canvas, x: float, y: float, w: float, h: float, head_w
         _C["wall_chimney_brick"], stroke=_C["outline"], stroke_w=0.4,
     )
     canvas.rect(cx - head_w / 2.0 - 0.04, y + h, head_w + 0.08, 0.1, _C["istrian"], stroke=_C["istrian_line"], stroke_w=0.4)
+
+
+# ---------------------------------------------------------------------------
+# Settings, glazing and the smaller carved and wrought details a lot states
+# ---------------------------------------------------------------------------
+
+#: The settings a lot can state under its front (``ground``).
+SETTINGS = frozenset({"canal", "quay"})
+
+
+def draw_setting(canvas: Canvas, width_px: float, height_px: float, setting: str) -> None:
+    """The band under the building, across the whole drawing: canal water
+    lapping the front, or a brick quay along the canal with its stone edge
+    and the water beyond. Its courses and ripples are drawing, not measure."""
+    x0 = -canvas.x_origin / canvas.scale
+    x1 = (width_px - canvas.x_origin) / canvas.scale
+    bottom = (canvas.y_origin - height_px) / canvas.scale
+    water_top = 0.0
+    if setting == "quay":
+        kerb = -0.62
+        canvas.rect(x0, kerb, x1 - x0, -kerb, _C["quay_brick"], stroke_w=0.0)
+        for jy, dash in ((-0.2, "5,1.2"), (-0.41, "5,1.2")):
+            canvas.line(x0, jy, x1, jy, _C["quay_joint"], 0.6)
+            canvas.line(x0, jy + 0.1, x1, jy + 0.1, _C["quay_joint"], 0.3, dash=dash)
+        canvas.rect(x0, kerb - 0.12, x1 - x0, 0.12, _C["quay_kerb"], stroke=_C["istrian_line"], stroke_w=0.4)
+        water_top = kerb - 0.12
+    canvas.rect(x0, bottom, x1 - x0, water_top - bottom, _C["water"], stroke_w=0.0)
+    canvas.line(x0, water_top, x1, water_top, _C["water_dark"], 1.2)
+    for depth, dash in ((0.18, "14,7"), (0.42, "9,12"), (0.7, "16,10"), (0.98, "7,13")):
+        if water_top - depth > bottom:
+            canvas.line(x0, water_top - depth, x1, water_top - depth, _C["water_light"], 0.7, dash=dash)
+
+
+#: The glazing a light can state (``glazing``), each drawn in its own way.
+GLAZINGS = frozenset({"sash", "cross_leaded", "rondel", "scuri"})
+#: What shows through a light of each glazing.
+_GLASS_FILL = {"cross_leaded": _C["glass_leaded"], "rondel": _C["rondel"]}
+#: Joinery paint (``frame_paint``).
+_FRAME_PAINT = {"white": _C["frame_white"], "ochre": _C["frame_ochre"]}
+#: Shutter paint (``shutter_paint``).
+_SHUTTER_PAINT = {"red": _C["shutter_red"], "green": _C["shutter_green"]}
+
+
+def _lattice(canvas: Canvas, x: float, y: float, w: float, h: float, n: int, color: str) -> None:
+    """Diamond leading across a light: ``n`` cames each way."""
+    if n < 2 or w <= 1e-9 or h <= 1e-9:
+        return
+    pitch = (w + h) / n
+    for k in range(1, n):
+        c = k * pitch
+        # x' + y' = c, and its mirror x' + (h - y') = c
+        ax, ay = max(0.0, c - h), min(c, h)
+        bx, by = min(c, w), c - min(c, w)
+        canvas.line(x + ax, y + ay, x + bx, y + by, color, 0.3)
+        canvas.line(x + ax, y + h - ay, x + bx, y + h - by, color, 0.3)
+
+
+def draw_glazing(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
+    """What fills a light below its springing, as the IR states it: sashes of
+    small panes in painted frames; a cross window with leaded lights (its
+    lower lights perhaps shuttered); bottle-glass roundels; or closed wooden
+    shutters (scuri). Every count and every bar width is the IR's."""
+    kind = props.get("glazing")
+    paint = _FRAME_PAINT.get(str(props.get("frame_paint")), _C["window_frame"])
+    frame = _num(props, "frame_w", 0.0)
+    bar = _num(props, "bar_w", 0.0)
+    if h <= 1e-9 or w <= 1e-9:
+        return
+    if kind == "sash":
+        cols = _count(props, "sash_cols", 1)
+        rows = _count(props, "sash_rows", 1)
+        canvas.rect(x, y, w, h, paint, stroke=_C["window_frame"], stroke_w=0.4)
+        sash_h = (h - 2 * frame - bar) / 2.0
+        pane_w = (w - 2 * frame - (cols - 1) * bar) / cols
+        pane_h = (sash_h - (rows - 1) * bar) / rows
+        for s in range(2):
+            sy = y + frame + s * (sash_h + bar)
+            for i in range(cols):
+                for j in range(rows):
+                    canvas.rect(x + frame + i * (pane_w + bar), sy + j * (pane_h + bar), pane_w, pane_h, _C["window"], stroke_w=0.0)
+        return
+    if kind == "cross_leaded":
+        cames = _count(props, "came_count", 0)
+        shutters = _SHUTTER_PAINT.get(str(props.get("shutter_paint")))
+        transom = y + h * _num(props, "transom_at", 0.6)
+        canvas.rect(x, y, w, h, paint, stroke=_C["window_frame"], stroke_w=0.4)
+        half = (w - 2 * frame - bar) / 2.0
+        for i in range(2):
+            lx = x + frame + i * (half + bar)
+            upper_y = transom + bar / 2.0
+            upper_h = y + h - frame - upper_y
+            canvas.rect(lx, upper_y, half, upper_h, _C["glass_leaded"], stroke_w=0.0)
+            _lattice(canvas, lx, upper_y, half, upper_h, cames, _C["came"])
+            lower_h = transom - bar / 2.0 - (y + frame)
+            if shutters is not None:
+                canvas.rect(lx, y + frame, half, lower_h, shutters, stroke=_C["door_dark"], stroke_w=0.4)
+                canvas.line(lx, y + frame, lx + half, y + frame + lower_h, _C["door_dark"], 0.3)
+            else:
+                canvas.rect(lx, y + frame, half, lower_h, _C["glass_leaded"], stroke_w=0.0)
+                _lattice(canvas, lx, y + frame, half, lower_h, cames, _C["came"])
+        return
+    if kind == "rondel":
+        cols = _count(props, "rondel_cols", 1)
+        rows = _count(props, "rondel_rows", 1)
+        pw, ph = w / cols, h / rows
+        r = min(pw, ph) * 0.46
+        for i in range(cols):
+            for j in range(rows):
+                canvas.circle(x + (i + 0.5) * pw, y + (j + 0.5) * ph, r, _C["rondel"], stroke=_C["rondel_line"], stroke_w=0.3)
+        return
+    if kind == "scuri":
+        canvas.rect(x, y, w, h, _C["scuri"], stroke=_C["scuri_line"], stroke_w=0.5)
+        canvas.line(x + w / 2.0, y, x + w / 2.0, y + h, _C["scuri_line"], 0.6)
+        inset = min(w * 0.08, 0.08)
+        for i in range(2):
+            lx = x + i * w / 2.0 + inset
+            for lo, hi in ((0.06, 0.45), (0.53, 0.94)):
+                canvas.rect(lx, y + h * lo, w / 2.0 - 2 * inset, h * (hi - lo), "none", stroke=_C["scuri_line"], stroke_w=0.35)
+
+
+def draw_relieving_arch(canvas: Canvas, x: float, y_top: float, w: float, props: Mapping[str, object]) -> None:
+    """A segmental brick relieving arch over a window head: as far past the
+    jambs, as high and as deep in its ring as the IR says, in ``voussoirs``
+    bricks."""
+    rise = _num(props, "relieving_arch_rise", 0.0)
+    ring = _num(props, "relieving_ring", 0.0)
+    reach = _num(props, "relieving_reach", 0.0)
+    n = _count(props, "voussoirs", 2)
+    if rise <= 1e-9 or ring <= 1e-9:
+        return
+    half = w / 2.0 + reach
+    radius = (half * half + rise * rise) / (2.0 * rise)
+    cx, cy = x + w / 2.0, y_top + rise - radius
+    a0 = math.asin(min(1.0, half / radius))
+    angles = [math.pi / 2.0 + a0 - 2.0 * a0 * k / 24 for k in range(25)]
+    inner = [(cx + radius * math.cos(a), cy + radius * math.sin(a)) for a in angles]
+    outer = [(cx + (radius + ring) * math.cos(a), cy + (radius + ring) * math.sin(a)) for a in angles]
+    canvas.polygon(inner + list(reversed(outer)), _C["arch_brick"], stroke=_C["arch_brick_line"], stroke_w=0.4)
+    for k in range(1, n):
+        a = math.pi / 2.0 + a0 - 2.0 * a0 * k / n
+        canvas.line(cx + radius * math.cos(a), cy + radius * math.sin(a), cx + (radius + ring) * math.cos(a), cy + (radius + ring) * math.sin(a), _C["arch_brick_line"], 0.3)
+
+
+def draw_fanlight(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
+    """The glazed light over a door, in its painted frame, its bars radiating
+    from the transom's middle or standing upright, as many as the IR says."""
+    paint = _FRAME_PAINT.get(str(props.get("frame_paint")), _C["door_dark"])
+    canvas.rect(x, y, w, h, paint, stroke=_C["door_dark"], stroke_w=0.6)
+    frame = _num(props, "frame_w", 0.0)
+    gx, gy, gw, gh = x + frame, y + frame, w - 2 * frame, h - 2 * frame
+    canvas.rect(gx, gy, gw, gh, _C["window"], stroke_w=0.0)
+    bars = _count(props, "fanlight_bars", 0)
+    weight = 0.9
+    if props.get("fanlight_pattern") == "radiating":
+        # Spokes from the middle of the transom to points spread evenly
+        # round the light's other three edges, and a hub over them.
+        perimeter = 2 * gh + gw
+        for i in range(1, bars):
+            t = perimeter * i / bars
+            if t < gh:
+                px, py = gx, gy + t
+            elif t < gh + gw:
+                px, py = gx + (t - gh), gy + gh
+            else:
+                px, py = gx + gw, gy + gh - (t - gh - gw)
+            canvas.line(gx + gw / 2.0, gy, px, py, paint, weight)
+        canvas.circle(gx + gw / 2.0, gy, min(gw, gh) * 0.22, paint, stroke=_C["door_dark"], stroke_w=0.3)
+        return
+    for i in range(1, bars):
+        bx = gx + gw * i / bars
+        canvas.line(bx, gy, bx, gy + gh, paint, weight)
+
+
+def _draw_door_frame(canvas: Canvas, x: float, y: float, w: float, h: float, kind: str, props: Mapping[str, object]) -> None:
+    """A door's carved frame: a pilaster each side and an entablature over
+    the fanlight; under a pediment, or a scrolled crest, where the IR says."""
+    stone, edge = _C["gable_coping"], _C["cornice_stroke"]
+    pil, ent = 0.17, 0.26
+    canvas.rect(x - pil, y, pil, h, stone, stroke=edge, stroke_w=0.4)
+    canvas.rect(x + w, y, pil, h, stone, stroke=edge, stroke_w=0.4)
+    for px in (x - pil, x + w):
+        canvas.rect(px - 0.02, y + h - 0.1, pil + 0.04, 0.1, stone, stroke=edge, stroke_w=0.3)
+    top = y + h
+    canvas.rect(x - pil - 0.04, top, w + 2 * pil + 0.08, ent, stone, stroke=edge, stroke_w=0.4)
+    canvas.rect(x - pil - 0.1, top + ent, w + 2 * pil + 0.2, 0.08, stone, stroke=edge, stroke_w=0.5)
+    crown = top + ent + 0.08
+    if kind == "door_pediment":
+        canvas.polygon([(x - pil - 0.1, crown), (x + w / 2.0, crown + 0.42), (x + w + pil + 0.1, crown)], stone, stroke=edge, stroke_w=0.6)
+    elif kind == "door_scrolls":
+        cx, half = x + w / 2.0, w / 2.0 + pil
+        pts = [(cx - half, crown)] + [(cx - half * math.cos(math.pi * k / 12), crown + 0.34 * math.sin(math.pi * k / 12)) for k in range(1, 12)] + [(cx + half, crown)]
+        canvas.polygon(pts, stone, stroke=edge, stroke_w=0.5)
+        for side in (-1.0, 1.0):
+            canvas.circle(cx + side * (half - 0.1), crown + 0.1, 0.09, _C["ornament"], stroke=edge, stroke_w=0.4)
+
+
+def _draw_plutei(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
+    """A parapet of solid marble slabs (plutei) between small posts, one slab
+    under each arch: each carved with a framed roundel and its cross."""
+    n = _count(props, "panel_count", 1)
+    post = _num(props, "post_w", 0.0)
+    marble, edge = _C["marble"], _C["marble_line"]
+    pitch = w / n
+    canvas.rect(x, y, w, h, marble, stroke=edge, stroke_w=0.4)
+    for i in range(n + 1):
+        px = x + i * pitch - post / 2.0
+        canvas.rect(max(x, px), y, post, h, _C["istrian"], stroke=edge, stroke_w=0.4)
+    for i in range(n):
+        px = x + i * pitch + post / 2.0
+        pw = pitch - post
+        inset = min(pw, h) * 0.12
+        canvas.rect(px + inset, y + inset, pw - 2 * inset, h - 2 * inset, "none", stroke=edge, stroke_w=0.35)
+        r = min(pw, h) * 0.26
+        cx, cy = px + pw / 2.0, y + h / 2.0
+        canvas.circle(cx, cy, r, _C["ornament"], stroke=edge, stroke_w=0.35)
+        canvas.line(cx - r, cy, cx + r, cy, edge, 0.3)
+        canvas.line(cx, cy - r, cx, cy + r, edge, 0.3)
+    canvas.rect(x - 0.03, y + h - 0.08, w + 0.06, 0.08, _C["istrian"], stroke=edge, stroke_w=0.4)
+
+
+def draw_wall_anchor(canvas: Canvas, x: float, y: float, w: float, h: float, form: str) -> None:
+    """The forged end of a wall anchor (muuranker) in its rectangle: an S, a
+    fleur-de-lis, a saltire or a plain bar, as the IR names it."""
+    iron, wt = _C["iron"], 1.5
+    cx, cy = x + w / 2.0, y + h / 2.0
+    if form == "s":
+        rx, ry = w * 0.45, h * 0.25
+        top = [(cx + rx * math.cos(a), y + h * 0.75 + ry * math.sin(a)) for a in (math.pi * (0.15 + 1.35 * k / 12) for k in range(13))]
+        low = [(cx + rx * math.cos(a), y + h * 0.25 + ry * math.sin(a)) for a in (math.pi * (0.5 - 1.35 * k / 12) for k in range(13))]
+        line = top + low[1:]
+        for (x0, y0), (x1, y1) in zip(line, line[1:]):
+            canvas.line(x0, y0, x1, y1, iron, wt)
+        return
+    if form == "fleur":
+        canvas.line(cx, y, cx, y + h, iron, wt)
+        for sy, sign in ((y + h, -1.0), (y, 1.0)):
+            for side in (-1.0, 1.0):
+                pts = [(cx, sy + sign * h * 0.22)] + [(cx + side * w * 0.45 * math.sin(math.pi * k / 8), sy + sign * h * (0.22 - 0.2 * math.sin(math.pi * k / 16))) for k in range(1, 9)]
+                for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+                    canvas.line(x0, y0, x1, y1, iron, wt * 0.8)
+        canvas.line(cx - w * 0.3, cy, cx + w * 0.3, cy, iron, wt)
+        return
+    if form == "x":
+        canvas.line(x, y, x + w, y + h, iron, wt)
+        canvas.line(x, y + h, x + w, y, iron, wt)
+        canvas.circle(cx, cy, min(w, h) * 0.09, iron, stroke=iron, stroke_w=0.3)
+        return
+    canvas.line(cx, y, cx, y + h, iron, wt)
+
+
+def _draw_lijst(canvas: Canvas, x: float, y: float, w: float, projection: float, n: int, kind: str) -> None:
+    """A canal house's straight cornice (lijst), hanging from the line it
+    crowns: a frieze, and over it a corona as deep as the IR's projection.
+    ``console_pair``: a few big carved consoles (``n``) with festoons between;
+    ``dentilled_lijst``: the plain later lijst, a row of ``n`` dentils."""
+    depth = max(0.08, projection * 0.5)
+    stone, edge = _C["cornice"], _C["cornice_stroke"]
+    frieze = depth * 1.2
+    canvas.rect(x, y - frieze, w, frieze, stone, stroke=edge, stroke_w=0.4)
+    lip = min(projection * 0.35, 0.35)
+    if kind == "console_pair":
+        spacing = (w - 0.3) / max(1, n - 1)
+        for i in range(n):
+            bx = x + 0.15 + i * spacing
+            canvas.polygon([(bx - 0.13, y), (bx + 0.13, y), (bx + 0.08, y - frieze * 1.25), (bx - 0.08, y - frieze * 1.25)], _C["ornament"], stroke=edge, stroke_w=0.5)
+            canvas.circle(bx, y - 0.11, 0.08, _C["ornament"], stroke=edge, stroke_w=0.4)
+            canvas.circle(bx, y - frieze * 1.25 + 0.06, 0.05, _C["ornament"], stroke=edge, stroke_w=0.3)
+        for i in range(n - 1):
+            a, b = x + 0.15 + i * spacing + 0.18, x + 0.15 + (i + 1) * spacing - 0.18
+            if b - a > 0.3:
+                sag = [(a + (b - a) * k / 10, y - frieze * 0.25 - frieze * 0.45 * math.sin(math.pi * k / 10)) for k in range(11)]
+                for (x0, y0), (x1, y1) in zip(sag, sag[1:]):
+                    canvas.line(x0, y0, x1, y1, edge, 0.6)
+    else:
+        step = w / n
+        for i in range(n):
+            canvas.rect(x + (i + 0.25) * step, y - 0.1, step * 0.5, 0.09, stone, stroke=edge, stroke_w=0.25)
+    canvas.rect(x - lip, y, w + 2 * lip, depth * 0.5, stone, stroke=edge, stroke_w=0.5)
+    canvas.rect(x - lip * 0.6, y + depth * 0.5, w + 1.2 * lip, depth * 0.22, stone, stroke=edge, stroke_w=0.4)
+
+
+def _draw_dentil_eave(canvas: Canvas, x: float, y: float, w: float, reach: float, n: int) -> None:
+    """A Venetian stone cornice with no corbels: a band of ``n`` dentils (dente
+    di sega) under a moulded corona, the tile edge just showing over it."""
+    stone, edge = _C["istrian"], _C["istrian_line"]
+    band = reach * 0.4
+    canvas.rect(x, y, w, band, stone, stroke=edge, stroke_w=0.4)
+    step = w / n
+    for i in range(n):
+        tx = x + i * step
+        canvas.polygon([(tx, y + band), (tx + step / 2.0, y + band * 0.35), (tx + step, y + band)], _C["istrian_line"], stroke=edge, stroke_w=0.2)
+    canvas.rect(x - reach * 0.25, y + band, w + reach * 0.5, reach * 0.35, stone, stroke=edge, stroke_w=0.5)
+    canvas.rect(x - reach * 0.35, y + band + reach * 0.35, w + reach * 0.7, reach * 0.25, _C["roof_coppi"], stroke=_C["roof_coppi_line"], stroke_w=0.5)

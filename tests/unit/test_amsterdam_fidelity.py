@@ -228,7 +228,7 @@ def test_a_cornice_house_has_a_dormer_or_crest_with_a_beam_and_a_cornice_inside_
     bx, _ = ids["b/gable"].props["hoist_beam"]
     assert abs(bx - site.width / 2) < 1e-6
     (cornice,) = [n for n in walk(building) if n.kind == "cornice"]
-    assert cornice.props["cornice_ornament"] == "bracketed" and cornice.props["projection"] >= 0.8
+    assert cornice.props["cornice_ornament"] in ("bracketed", "console_pair", "dentilled_lijst") and cornice.props["projection"] >= 0.8
     lip = min(cornice.props["projection"] * 0.35, 0.35)  # the drawn lip, see elements.draw_cornice
     assert cornice.props["x"] - lip >= -1e-6 and cornice.props["x"] + cornice.props["w"] + lip <= site.width + 1e-6
 
@@ -290,3 +290,73 @@ def test_the_stoop_never_runs_across_a_souterrain_window():
                         for f in flights:
                             xs = [x for x, _ in f.props["points"]]
                             assert max(xs) <= win.props["x"] + 1e-6 or min(xs) >= win.props["x"] + win.props["w"] - 1e-6
+
+
+# --- Round 3 of the blind test: variety, setting, glazing, detail ------------
+
+def test_the_house_stands_on_a_brick_quay_and_the_renderer_draws_it():
+    building, _ = generate_amsterdam(CanalSite(6.6, 1720, K.ORDINARY, 0))
+    assert building.props["ground"] == "quay"
+    from buildings.render.svg.colors import COLORS
+    svg = render(building)
+    assert COLORS["quay_brick"] in svg and COLORS["ground"] not in svg
+
+
+def test_cross_windows_with_leaded_lights_before_1700_white_small_pane_sashes_after():
+    def windows(year, seed=0):
+        building, _ = generate_amsterdam(CanalSite(6.6, year, K.ORDINARY, seed))
+        return [o.props for st in _storeys(building)[1:] for o in _openings(st, "window")]
+    early = windows(1640)
+    assert {w["glazing"] for w in early} == {"cross_leaded"} and all(w["came_count"] >= 4 for w in early)
+    for year, panes in ((1730, 12), (1770, 9), (1820, 6)):
+        ws = windows(year)
+        assert {w["glazing"] for w in ws} == {"sash"} and {w["frame_paint"] for w in ws} == {"white"}
+        bel = ws[0]
+        assert bel["sash_cols"] * bel["sash_rows"] == pytest.approx(panes, abs=3)
+    # the panes grow with the date
+    assert windows(1730)[0]["sash_rows"] > windows(1820)[0]["sash_rows"]
+
+
+def test_relieving_arches_over_early_windows_rarely_after_1750():
+    def arched(year):
+        return sum(
+            any("relieving_arch_rise" in o.props for o in _openings(_storeys(generate_amsterdam(CanalSite(6.6, year, K.ORDINARY, s))[0])[1], "window"))
+            for s in range(20)
+        )
+    assert arched(1630) == 20 and 0 < arched(1720) < 20 and arched(1790) == 0
+    building, _ = generate_amsterdam(CanalSite(6.6, 1630, K.ORDINARY, 0))
+    win = _openings(_storeys(building)[2], "window")[0]
+    assert win.props["voussoirs"] >= 5
+    (key,) = [n for n in walk(_storeys(building)[2]) if n.kind == "keystone"][:1]
+    assert key.props["y"] > win.props["y"] + win.props["h"]  # at the arch's crown, not on the lintel
+
+
+def test_wall_anchors_are_forged_shapes_and_the_door_has_a_frame_and_a_fanlight():
+    building, _ = generate_amsterdam(CanalSite(6.6, 1760, K.ORDINARY, 0))
+    anchors = [n for n in walk(building) if n.kind == "ironwork" and n.props.get("ironwork_pattern") == "wall_anchor"]
+    assert anchors and {a.props["anchor_form"] for a in anchors} <= {"s", "fleur", "x", "bar"}
+    forms = {derive_amsterdam(CanalSite(6.6, 1640, K.ORDINARY, s))[0].attrs["anchor_form"] for s in range(6)}
+    assert forms <= {"fleur", "x"} and len(forms) == 2
+    (door,) = _openings(_storeys(building)[1], "pedestrian_entrance")
+    assert 0.6 <= door.props["fanlight_h"] <= 1.0 and door.props["fanlight_bars"] >= 4
+    frame = [n for n in walk(_storeys(building)[1]) if n.kind == "surround" and n.props["surround_kind"].startswith("door_")]
+    assert frame
+
+
+def test_claw_pieces_are_scrolls_with_a_volute():
+    building, _ = generate_amsterdam(CanalSite(7.2, 1690, K.COMFORTABLE, 1))
+    ids = {n.id: n for n in walk(building)}
+    claw = ids["b/gable/claw0"].props["points"]
+    assert len(claw) > 20  # a carved outline, not a quarter circle
+    assert "b/gable/volute0" in ids and "b/gable/eye0" in ids
+
+
+def test_cornice_houses_differ_in_cornice_dormer_and_storeys():
+    sites = [CanalSite(7.0, 1800, K.ORDINARY, s) for s in range(12)]
+    cornices, depths, tops, heights = set(), set(), set(), set()
+    for site in sites:
+        lot, _ = derive_amsterdam(site)
+        cornices.add(lot.attrs["cornice_kind"]); depths.add(lot.attrs["cornice_d"])
+        tops.add(next(c for c in lot.children if c.label == "Gable").attrs["top"])
+        heights.add(round(lot.attrs["storey_heights"][1], 2))
+    assert len(cornices) >= 2 and len(depths) == 3 and len(tops) >= 3 and len(heights) >= 3

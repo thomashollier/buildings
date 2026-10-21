@@ -168,10 +168,16 @@ def render(node: Node | Sequence[Node], *, width_px: int = 1200, labels: bool = 
         f'<rect x="0" y="0" width="{canvas_w_px:.2f}" height="{canvas_h_px:.2f}" fill="{_C["sky"]}"/>'
     )
     ground_y = canvas.y(0.0)
-    canvas.elements.append(
-        f'<rect x="0" y="{ground_y:.2f}" width="{canvas_w_px:.2f}" '
-        f'height="{(canvas_h_px - ground_y):.2f}" fill="{_C["ground"]}"/>'
-    )
+    # The setting is the lot's to state (``ground``): a canal, a quay. Where
+    # it states none the building stands on the plain green band.
+    setting = building.props.get("ground")
+    if setting in el.SETTINGS:
+        el.draw_setting(canvas, canvas_w_px, canvas_h_px, setting)
+    else:
+        canvas.elements.append(
+            f'<rect x="0" y="{ground_y:.2f}" width="{canvas_w_px:.2f}" '
+            f'height="{(canvas_h_px - ground_y):.2f}" fill="{_C["ground"]}"/>'
+        )
 
     draw_building(canvas, building, labels)
 

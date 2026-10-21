@@ -77,6 +77,10 @@ def head_rise(light: Shape) -> float:
     return min(w * share, light.scope.h * HEAD_MAX_SHARE)
 
 
+#: A bottle-glass roundel (rui) as drawn.
+RONDEL = 0.24
+
+
 def finial_height(width: float) -> float:
     """The fleuron over an ogee's tip, by the span it crowns."""
     return min(0.32, 0.2 * width)
@@ -97,6 +101,17 @@ def write_light(light: Shape, below, d) -> list:
         props["finial_h"] = finial_height(w)
     if light.attr("archivolt", None):
         props["archivolt"] = light.attr("archivolt")
+        if light.attr("archivolt") == "extradosed":
+            # The moulding runs down the stilt to the capital the arch springs from.
+            props["archivolt_stilt"] = float(light.attr("stilt", 0.0))
+    glazing = light.attr("glazing", None)
+    if kind == "window" and glazing:
+        props["glazing"] = glazing
+        if glazing == "rondel":
+            # Bottle-glass roundels, drawn a little larger than the real 12 cm
+            # so that they read at the scale of a whole front.
+            props["rondel_cols"] = max(2, round(w / RONDEL))
+            props["rondel_rows"] = max(2, round((s.h - rise) / RONDEL))
     if kind == "water_gate":
         # An iron grille across the lunette, its bars about 0.3 m apart.
         props["grille_bars"] = max(3, round(w / 0.3))
@@ -178,6 +193,8 @@ def write_balconette(shape: Shape, below, d) -> list:
     under a polifora), projecting about half a metre; or, put in later, an
     iron rail on a thin slab."""
     s = shape.scope
+    if shape.attr("rail", "stone") == "plutei":
+        return _plutei(shape)
     stone = shape.attr("rail", "stone") == "stone"
     corbels = 2 if s.w < 1.6 else (3 if s.w < 2.6 else max(4, min(8, round(s.w / 1.1) + 1)))
     platform = {**kit.xywh(s), "continuous": False, "projection": 0.5 if stone else 0.35, "bracket_count": corbels}
@@ -191,6 +208,21 @@ def write_balconette(shape: Shape, below, d) -> list:
         BalconyNode(id=f"{shape.id}/platform", kind="balcony", trace=tuple(shape.trace), props=platform),
         IronworkNode(id=f"{shape.id}/rail", kind="ironwork", trace=tuple(shape.trace), props=rail),
     ]
+
+
+def _plutei(shape: Shape) -> list:
+    """A Veneto-Byzantine loggia's parapet: a solid marble slab (pluteus) under
+    each arch, between posts standing under the colonnettes, on the loggia's
+    floor -- no projecting balcony and no balusters."""
+    s = shape.scope
+    arcade = next((c for c in shape.siblings if c.label == "Arcade"), None)
+    lights = [c for c in arcade.children if c.label == "Light"] if arcade is not None else []
+    cols = [c for c in arcade.children if c.label != "Light"] if arcade is not None else []
+    edges = [s.x] + [c.scope.x + c.scope.w / 2.0 for c in cols] + [s.x + s.w]
+    post = min((c.scope.w for c in cols), default=0.2) * 0.8
+    return [IronworkNode(id=f"{shape.id}/rail", kind="ironwork", trace=tuple(shape.trace),
+                         props={**kit.xywh(s), "h": 0.9, "guards": "balcon_filant", "ironwork_pattern": "pluteus",
+                                "panel_count": max(1, len(lights)), "panel_edges": tuple(edges), "post_w": post})]
 
 
 def _ogee_half(x: float, y: float, w: float, rise: float, steps: int = 14) -> list[tuple[float, float]]:
@@ -306,15 +338,44 @@ def write_base_course(shape: Shape, below, d) -> list:
         x0 = max(x0, b)
     if s.x + s.w > x0 + 1e-6:
         runs.append((x0, s.x + s.w))
-    return [
+    rows = int(shape.attr("rows", 2))
+    nodes = [
         SocleNode(
             id=f"{shape.id}{k}",
             kind="socle",
             trace=tuple(shape.trace),
-            props={"x": a, "y": s.y, "w": b - a, "h": s.h, "treatment": "istrian_course", "course_rows": 2, "course_columns": max(1, round((b - a) / 1.1))},
+            props={"x": a, "y": s.y, "w": b - a, "h": s.h, "treatment": "istrian_course", "course_rows": rows,
+                   "course_columns": max(1, round((b - a) / 1.1)), "tide_h": min(TIDE_BAND, s.h * 0.4)},
         )
         for k, (a, b) in enumerate(runs)
     ]
+    # At each gate, Istrian steps go down from its threshold into the water.
+    for k, (a, b) in enumerate(gaps):
+        nodes.append(SocleNode(id=f"{shape.id}/steps{k}", kind="socle", trace=tuple(shape.trace),
+                               props={"x": a + 0.1, "y": s.y - STEPS_DEPTH, "w": b - a - 0.2, "h": STEPS_DEPTH,
+                                      "treatment": "water_steps", "course_rows": 3, "step_spread": 0.08, "dry_h": 0.18}))
+    return nodes
+
+
+#: The weed-dark foot of the stone, and how deep a gate's steps go under the water drawn.
+TIDE_BAND = 0.22
+STEPS_DEPTH = 0.6
+
+
+def write_column(shape: Shape, below, d) -> list:
+    """A corner of Istrian stone: a strip whose inner edge is cut in a saw
+    tooth about 0.3 m long, or quoins of long and short blocks about 0.45 m
+    high (the short ones three fifths as wide)."""
+    (node,) = kit.write_column(shape, below, d)
+    order, h = shape.attr("order"), shape.scope.h
+    extra: dict[str, object] = {}
+    if shape.attr("side", None):
+        extra["side"] = shape.attr("side")
+    if order == "dentil_strip":
+        extra.update({"course_rows": max(2, round(h / 0.3)), "tooth_depth": 0.1})
+    elif order == "quoins":
+        extra.update({"course_rows": max(2, round(h / 0.45)), "short_w": shape.scope.w * 0.6})
+    return [replace(node, props={**node.props, **extra})]
 
 
 def write_cell(cell: Shape, below, d) -> list:
@@ -404,6 +465,7 @@ register_writer("venice.base_course", write_base_course)
 register_writer("venice.cell", write_cell)
 register_writer("venice.fumaiolo", write_fumaiolo)
 register_writer("venice.roof", write_roof)
+register_writer("venice.column", write_column)
 
 STYLE = load_style(Path(__file__).with_name("venice.toml"))
 

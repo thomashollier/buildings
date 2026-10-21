@@ -21,11 +21,16 @@ describe = { rule = "amsterdam.canal_house", phase = "structure", detail = "f'ca
 
 [lot_props]
 year = "= year"
+# The front stands on a brick quay along the canal.
+ground = "quay"
 
 [emit]
 Gable = "amsterdam.gable"
 Stoop = "amsterdam.stoop"
 Anchor = "amsterdam.anchor"
+Light = "amsterdam.light"
+Keystone = "amsterdam.keystone"
+Cornice = "amsterdam.cornice"
 
 [params]
 bay = [1.8, 2.2, 2.6]             # a tall cross-window and its pier
@@ -80,6 +85,51 @@ lijst_crest = [1.3, 3.0]          # [height, width] of a raised crest (verhoogde
 crest_from = 1700
 crest_until = 1780
 cornice_depth = 0.9               # a console cornice, stopping at the party walls
+cornice_depths = [0.8, 0.9, 1.05] # ...as deep as its builder made it
+# The cornice's profile by date, drawn by the builder: [year limit, [[cumulative share, kind], ...]].
+# Bracketed: a row of consoles (Louis XIV); console_pair: a few big carved
+# consoles with festoons (Louis XV-XVI); dentilled_lijst: the plain later lijst.
+cornice_by_date = [
+  [1739, [[0.65, "bracketed"], [1.0, "console_pair"]]],
+  [1789, [[0.55, "console_pair"], [1.0, "bracketed"]]],
+  [9999, [[0.55, "dentilled_lijst"], [0.85, "bracketed"], [1.0, "console_pair"]]],
+]
+console_pitch = 2.6               # one big console about every 2.6 m
+dentil_pitch = 0.16
+# The dormer over a cornice: pedimented, arched, or flat-topped between
+# scrolled cheeks; a share of the front, varied by the builder.
+dormer_by_seed = [[0.45, "dormer"], [0.75, "dormer_arched"], [1.0, "dormer_flat"]]
+dormer_scale = [1.0, 0.88, 1.15]
+# Wall-anchor ends: lilies and saltires early, S-anchors in the 18th century,
+# plain bars late.
+anchor_by_date = [[1664, ["fleur", "x", "fleur"]], [1749, ["s", "fleur", "s"]], [9999, ["s", "bar", "s"]]]
+# --- glazing ----------------------------------------------------------------------
+# Before 1700 a cross window (kruiskozijn) with leaded lights, its lower lights
+# often shuttered; from 1700 sash windows of small panes in white frames, the
+# panes growing with the date: about 12 over 12 to 1750, 9 over 9 to 1800,
+# 6 over 6 after.
+sash_from = 1700
+pane_h_by_date = [[1749, 0.33], [1799, 0.43], [9999, 0.6]]
+sash_rows_by_date = [[1749, 4], [1799, 3], [9999, 2]]   # at most this many rows a sash: 12, 9, 6 panes
+sash_frame = 0.07                 # the frame round the sashes
+sash_bar = 0.035                  # a glazing bar
+cames_per_light = 7                    # leaded cames each way across a light
+transom_share = 0.62                 # a cross window's transom, of its height
+shutters_by_seed = ["red", "green", "none"]
+# --- relieving arches -------------------------------------------------------------
+# A segmental brick arch over each window head: on every early front, most
+# 17th-century ones, some to 1750, none after (the share of fronts, by date).
+relieving_by_date = [[1664, 1.0], [1699, 0.8], [1749, 0.35], [9999, 0.0]]
+arch_rise = 0.2
+arch_ring = 0.11
+arch_reach = 0.1
+voussoir = 0.11                   # a brick on edge in the ring
+# --- the door ---------------------------------------------------------------------
+# A carved frame round the bel-etage door and a fanlight over it: upright bars
+# to about 1750, radiating ones after; the frame's crown is the builder's.
+door_frames = ["door_pilasters", "door_pediment", "door_scrolls"]
+fanlight_share = 0.24             # of the door's height
+fanlight_max = 1.0
 # The stoop: treads of a ship's stair, climbing parallel to the front.
 tread_rise = 0.19
 tread_run = 0.27
@@ -91,7 +141,7 @@ doc = "Bays fitted to the frontage (up to seven on a wide or grand front); the b
 do = [
   # The builder (the seed) stands behind each draw: the gable, the door side,
   # the brick, the trim. Each is mixed differently so they do not move together.
-  { let = { u_form = "((seed * 37 + 11) % 100 + 0.5) / 100.0", u_wall = "((seed * 53 + (seed // 2) * 31 + 29) % 100 + 0.5) / 100.0", jit = "1.0 + ((seed * 23 + 7) % 11 - 5) / 100.0" } },
+  { let = { u_form = "((seed * 37 + 11) % 100 + 0.5) / 100.0", u_wall = "((seed * 53 + (seed // 2) * 31 + 29) % 100 + 0.5) / 100.0", jit = "1.0 + ((seed * 23 + 7) % 11 - 5) / 100.0", jb = "1.0 + ((seed * 31 + 5) % 7 - 3) / 100.0", u_cor = "((seed * 41 + 17) % 100 + 0.5) / 100.0", u_dorm = "((seed * 61 + 3) % 100 + 0.5) / 100.0", u_rel = "((seed * 47 + 11) % 100 + 0.5) / 100.0" } },
   { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 7, when = "width >= wide_from or klass == 'grand'" },
   { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2, max_bays = 3, when = "not (width >= wide_from or klass == 'grand')" },
   { let = { nb = "len(bay_spans(rhythm, 0.0))" } },
@@ -99,7 +149,7 @@ do = [
   { set = { glass = "= step(glass_by_date, year)", souterrain = "= step(souterrain_by_date, year)", early = "= year < early_until" } },
   # The storeys taper up the front, but never so far that the top one drops under upper_min.
   { let = { nu = "uppers_early if early else (uppers_lijst if form == 'straight' else uppers_classic)" } },
-  { set = { storey_heights = "= [souterrain, bel_etage * jit] + geometric(first * jit, max(taper, (upper_min / (first * jit)) ** (1.0 / max(1, nu - 1))), nu)" } },
+  { set = { storey_heights = "= [souterrain, bel_etage * jb] + geometric(first * jit, max(taper, (upper_min / (first * jit)) ** (1.0 / max(1, nu - 1))), nu)" } },
   # Brick: bright red before 1665; then mostly dark, a fifth tarred black,
   # a late lijst front sometimes plastered white, a grand one in sandstone.
   { set = { wall = "= 'brick' if early else ('travertine' if (klass == 'grand' and form == 'straight' and seed % 3 == 0) else ('plaster_white' if (form == 'straight' and year >= 1790 and u_wall > 0.80) else ('basalt' if u_wall > 0.78 else 'brick_dark')))" } },
@@ -108,6 +158,9 @@ do = [
   # The door: in the middle of five bays, otherwise in an outer bay, left or
   # right as the builder (or the neighbour's mirror) has it.
   { set = { door_at = "= 'middle' if (nb >= 5 and nb % 2 == 1) else ['first', 'last'][seed % 2]" } },
+  # The builder's hand in the rest: the cornice's profile and depth, the wall
+  # anchors' ends, the window heads' arches, the shutters, the door's frame.
+  { set = { cornice_kind = "= step(step(cornice_by_date, year), u_cor)", cornice_d = "= cornice_depths[(seed * 7 + 1) % 3]", anchor_form = "= step(anchor_by_date, year)[(seed * 13 + 4) % 3]", relieved = "= u_rel < step(relieving_by_date, year)", shutter_paint = "= shutters_by_seed[(seed * 3 + 1) % 3]", door_frame = "= door_frames[0] if year < sash_from else door_frames[(seed * 5 + (2 if klass == 'grand' else 0)) % 3]", fan_pattern = "= 'upright' if year < 1750 or (seed * 19 + 3) % 10 < 3 else 'radiating'" } },
   { let = { front = "fsum(storey_heights)", door_i = "nb // 2 if door_at == 'middle' else (0 if door_at == 'first' else nb - 1)" } },
   { let = { door = "bay_spans(rhythm, 0.0)[door_i]", run = "(round(souterrain / tread_rise) - 1) * tread_run" } },
   { let = { st_l = "max(0.0, door.x - (run if door_at != 'first' else 0.6))", st_r = "min(w, door.x + door.w + (run if door_at != 'last' else 0.6))" } },
@@ -118,8 +171,9 @@ do = [
   # The stoop climbs from the street to the door, parallel to the front.
   { insert = "Stoop", at = ["st_l", "0.0", "st_r - st_l", "souterrain"], name = "stoop", attrs = { side = "= door_at", door_x = "= door.x", door_w = "= door.w", treads = "= round(souterrain / tread_rise) - 1" } },
   { let = { lijst_crested = "form == 'straight' and year >= crest_from and year < crest_until and (seed // 2) % 2 == 1" } },
-  { let = { gtiers = "([[lijst_crest[0], lijst_crest[1] / w]] if lijst_crested else [[lijst_dormer[0], lijst_dormer[1] / w]]) if form == 'straight' else tiers[form]" } },
-  { insert = "Gable", at = ["0.0", "front", "w", "fsum(column(gtiers, 0)) + crowns[form]"], name = "gable", attrs = { form = "= form", top = "= 'crest' if lijst_crested else ('dormer' if form == 'straight' else form)", gtiers = "= gtiers", wall = "= wall", trim = "= trim", foot = "= bell_foot", cap = "= bell_cap if form == 'bell' else step_top" } },
+  { let = { dscale = "dormer_scale[(seed * 5 + 2) % 3]" } },
+  { let = { gtiers = "([[lijst_crest[0], lijst_crest[1] / w]] if lijst_crested else [[lijst_dormer[0] * (0.5 + 0.5 * dscale), lijst_dormer[1] * dscale / w]]) if form == 'straight' else tiers[form]" } },
+  { insert = "Gable", at = ["0.0", "front", "w", "fsum(column(gtiers, 0)) + crowns[form]"], name = "gable", attrs = { form = "= form", top = "= 'crest' if lijst_crested else (step(dormer_by_seed, u_dorm) if form == 'straight' else form)", gtiers = "= gtiers", wall = "= wall", trim = "= trim", foot = "= bell_foot", cap = "= bell_cap if form == 'bell' else step_top" } },
 ]
 
 [[production]]
@@ -136,12 +190,12 @@ label = "Storey"
 doc = "A storey is cut by its rhythm; an early front is banded in sandstone at its sills and over its window heads; the top storey of a house with no gable carries a console cornice that stops at the party walls."
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
-  { insert = "Entablature", at = ["x", "y + h - head_band + 0.12", "w", "0.12"], name = "head_band", attrs = { course_kind = "bandeau" }, when = "early and role in ('base', 'upper', 'top')" },
+  { insert = "Entablature", at = ["x", "y + h - head_band - 0.12", "w", "0.12"], name = "head_band", attrs = { course_kind = "bandeau" }, when = "early and role in ('base', 'upper', 'top')" },
   { insert = "Entablature", at = ["x", "y + (0.35 if role == 'base' else 0.75) - 0.24", "w", "0.12"], name = "sill_band", attrs = { course_kind = "bandeau" }, when = "early and role in ('base', 'upper', 'top')" },
   # Iron wall anchors tie the front to the floor beams, one in each end pier at every floor.
-  { insert = "Anchor", at = ["x + size_of(rhythm[0]) / 2.0 - 0.03", "y + h - 0.5", "0.06", "0.45"], name = "anchor_l", when = "role in ('basement', 'base', 'upper')" },
-  { insert = "Anchor", at = ["x + w - size_of(rhythm[-1]) / 2.0 - 0.03", "y + h - 0.5", "0.06", "0.45"], name = "anchor_r", when = "role in ('basement', 'base', 'upper')" },
-  { insert = "Cornice", at = ["x + 0.32", "y + h", "w - 0.64", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "bracketed" }, when = "role == 'top' and form == 'straight'" },
+  { insert = "Anchor", at = ["x + size_of(rhythm[0]) / 2.0 - 0.12", "y + h - 0.6", "0.24", "0.5"], name = "anchor_l", attrs = { anchor_form = "= anchor_form" }, when = "role in ('basement', 'base', 'upper')" },
+  { insert = "Anchor", at = ["x + w - size_of(rhythm[-1]) / 2.0 - 0.12", "y + h - 0.6", "0.24", "0.5"], name = "anchor_r", attrs = { anchor_form = "= anchor_form" }, when = "role in ('basement', 'base', 'upper')" },
+  { insert = "Cornice", at = ["x + 0.37", "y + h", "w - 0.74", "cornice_d"], name = "cornice", attrs = { cornice_ornament = "= cornice_kind", ornament_count = "= (max(2, round((w - 0.74) / console_pitch) + 1) if cornice_kind == 'console_pair' else (max(8, round((w - 0.74) / dentil_pitch)) if cornice_kind == 'dentilled_lijst' else max(3, round((w - 0.74) / 0.9) + 1)))" }, when = "role == 'top' and form == 'straight'" },
 ]
 
 [[production]]
@@ -204,10 +258,10 @@ set = { opening_type = "none" }
 [[rule]]
 id = "amsterdam.base.a_bay_holds_a_tall_window"
 label = "Cell"
-doc = "Every bay holds a window, tallest on the bel-etage (sill 0.35 m) and shrinking up the front (sills 0.6 m) but never square: about 2.5, 1.9, 1.7, 1.5 times as tall as wide going up, a low top storey's sash narrower rather than squatter; a sash no wider than 1.4 m. Before 1665 under a relieving arch with a keystone, after it in a flush white frame."
+doc = "Every bay holds a window, tallest on the bel-etage (sill 0.35 m) and shrinking up the front (sills 0.6 m) but never square: about 2.5, 1.9, 1.7, 1.5 times as tall as wide going up, a low top storey's sash narrower rather than squatter; a sash no wider than 1.4 m. Before 1700 a cross window of leaded lights in an ochre frame, its lower lights shuttered in many houses; from 1700 two sashes of small panes in a white frame, the panes larger as the date advances (12, 9, 6 a sash). A brick relieving arch over the head on every early front (with a keystone), on most to 1700 and some to 1750."
 when = "is_bay()"
 let = { sill_h = "0.35 if role == 'base' else 0.45 if role == 'gable' else (0.5 if role == 'top' and form == 'straight' else upper_sill)", clear = "0.2 if role == 'top' and form == 'straight' else 0.3 if role == 'gable' else 0.0", lh = "h - sill_h - head_band - clear" }
-set = { opening_type = "window", head = "flat", light_width = "= min(light_max, glass * w) if role == 'gable' else min(light_max, glass * w, lh / light_min_ratio)", sill = "= sill_h", light_height = "= lh", surround_kind = "= 'none' if early else 'bare_band'", keystone_present = "= early" }
+set = { opening_type = "window", head = "flat", light_width = "= min(light_max, glass * w) if role == 'gable' else min(light_max, glass * w, lh / light_min_ratio)", sill = "= sill_h", light_height = "= lh", surround_kind = "none", keystone_present = "= early and relieved", glazing = "= 'sash' if year >= sash_from else 'cross_leaded'", frame_paint = "= 'white' if year >= sash_from else 'ochre'", frame_w = "= sash_frame", bar_w = "= sash_bar", sash_cols = 3, sash_rows = "= min(step(sash_rows_by_date, year), max(1, round(lh / 2.0 / step(pane_h_by_date, year))))", came_count = "= cames_per_light", transom_at = "= transom_share", shutter_paint = "= shutter_paint if role in ('base', 'upper') else 'none'", relieving_arch = "= relieved", relieving_arch_rise = "= arch_rise", relieving_ring = "= arch_ring", relieving_reach = "= arch_reach" }
 
 [[rule]]
 id = "amsterdam.base.the_souterrain_lights"
@@ -215,7 +269,7 @@ label = "Cell"
 doc = "The half-basement is lit by low windows just over the street."
 when = "is_bay() and role == 'basement'"
 specificity = 10
-set = { opening_type = "window", head = "flat", light_width = "= glass * w", sill = 0.2, light_height = "= h - 0.2 - 0.2", surround_kind = "none", keystone_present = false }
+set = { opening_type = "window", head = "flat", light_width = "= glass * w", sill = 0.2, light_height = "= h - 0.2 - 0.2", surround_kind = "none", keystone_present = false, relieving_arch = false, shutter_paint = "none", sash_rows = "= min(step(sash_rows_by_date, year), max(1, round((h - 0.4) / 2.0 / step(pane_h_by_date, year))))" }
 
 [[rule]]
 id = "amsterdam.base.no_window_behind_the_flight"
@@ -236,10 +290,10 @@ set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 0.9, 
 [[rule]]
 id = "amsterdam.base.the_door_up_the_stoop"
 label = "Cell"
-doc = "The door is up the stoop, in an outer bay (the middle one of five), its fanlight's head level with the windows'."
+doc = "The door is up the stoop, in an outer bay (the middle one of five), its fanlight's head level with the windows'; a carved frame of pilasters and an entablature round it (a pediment or a scrolled crest on it from 1700, as the builder had it), a fanlight of upright bars over it, radiating ones after 1750 in most houses."
 when = "is_bay() and role == 'base' and ((door_at == 'first' and is_first_bay()) or (door_at == 'last' and is_last_bay()) or (door_at == 'middle' and is_middle_bay()))"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.2, sill = 0.0, light_height = "= h - head_band" }
+set = { opening_type = "pedestrian_entrance", head = "flat", light_width = 1.2, sill = 0.0, light_height = "= h - head_band", surround_kind = "= door_frame", keystone_present = false, fanlight_h = "= min(fanlight_max, fanlight_share * (h - head_band))", fanlight_bars = "= 6 if fan_pattern == 'upright' else 9", fanlight_pattern = "= fan_pattern" }
 
 [[rule]]
 id = "amsterdam.base.the_attic_hatch"
