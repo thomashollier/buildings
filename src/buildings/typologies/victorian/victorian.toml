@@ -36,9 +36,9 @@ Rail = "kit.column"
 [params]
 # Storey heights as ranges (fidelity review R-8: observer 1.8-2.7 / 3.8-4.6 /
 # 3.4-4.0 m from riser counts and a 12 ft parlour ceiling).
-basement_h = [2.0, 2.6]
-parlour_h = [3.8, 4.3]
-chamber_h = [3.4, 3.8]
+basement_h = [2.25, 2.7]      # photo check: sidewalk to cornice 11.1-12.0 m on 21 Italianates
+parlour_h = [4.0, 4.2]
+chamber_h = [3.5, 3.7]
 third_h = 3.3
 # The type by date as an overlapping ramp, not hard cuts (R-6, Bulletin 18):
 # [last year, [italianate, stick, queen_anne]].
@@ -52,7 +52,9 @@ side_share = { slanted = 0.25, square = 0.07 }
 # The bay's shape by type: Italianate slanted, Stick square, Queen Anne either.
 bay_forms = { italianate = { slanted = 4, square = 1 }, stick = { square = 4, slanted = 1 }, queen_anne = { slanted = 1, square = 1 } }
 # Per-floor dress by type: [option, weight on the parlour floor, weight above].
-heads = { italianate = [["segmental", 0.6, 0.7], ["round", 0.4, 0.3]], stick = [["flat", 4, 4], ["segmental", 1, 1]], queen_anne = [["flat", 3, 3], ["round", 1, 1]] }
+# Photo check (21 Italianates): heads are a per-house choice -- round 0.55,
+# segmental 0.25, flat 0.20 -- the same on every floor.
+heads = { italianate = [["round", 0.55, 0.55], ["segmental", 0.25, 0.25], ["flat", 0.2, 0.2]], stick = [["flat", 4, 4], ["segmental", 1, 1]], queen_anne = [["flat", 3, 3], ["round", 1, 1]] }
 # Italianate hoods (O-3): pediments 0.45, arched hood mould 0.45, flat 0.1.
 hoods = { italianate = [["pedimented", 0.55, 0.35], ["moulded_architrave", 0.4, 0.5], ["bare_band", 0.05, 0.15]], stick = [["moulded_architrave", 2, 2], ["bare_band", 1, 2]], queen_anne = [["bare_band", 2, 3], ["moulded_architrave", 1, 1]] }
 belts = { italianate = { entablature = 2, dentil = 1 }, stick = { entablature = 1, plat_bande = 1 }, queen_anne = { dentil = 1, entablature = 1 } }
@@ -66,10 +68,13 @@ shingle_band = 0.7              # a band of fish-scale shingles across the gable
 scale_w = 0.16                  # one shingle, butt to butt
 spindle_pitch = 0.11
 spindle_w = 0.035
-stoop_w = [1.1, 1.5]            # a wooden stair, front-on, under the door (R-1)
+stoop_w = [1.4, 1.8]            # a wooden stair, front-on, under a single door (photo check)
+stoop_w_pair = [1.9, 2.5]       # under paired leaves
 riser = 0.18
 # The door hood by type (R-3): [option, weight].
-door_hoods = { italianate = { pedimented = 0.6, moulded_architrave = 0.4 }, stick = { pedimented = 0.8, moulded_architrave = 0.2 }, queen_anne = { moulded_architrave = 0.5, pedimented = 0.4, bare_band = 0.1 } }
+# Italianate entry (photo check): console hood 0.35, framed recess 0.35,
+# columned portico 0.30 (0.8 grand) -- drawn as hood, pediment, pediment.
+door_hoods = { italianate = { moulded_architrave = 0.35, pedimented = 0.65 }, stick = { pedimented = 0.8, moulded_architrave = 0.2 }, queen_anne = { moulded_architrave = 0.5, pedimented = 0.4, bare_band = 0.1 } }
 # The layouts a lot of its width allows. The seed stands for the builder.
 #   single_left / single_right: one bay window, the entry beside it
 #   double: a bay either side of a central entry, on a wide lot
@@ -82,7 +87,7 @@ label = "Lot"
 doc = "The house front, its layout, what crowns it, the stoop up to the door, and a side yard where the builder left one."
 do = [
   { set = { kind = "= draw('kind', kinds, step(kind_ramp, year))" } },
-  { set = { base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)" } },
+  { set = { door_pair = "= chance('door_pair', 0.7 if kind == 'italianate' else 0.3)", it_pair = "= kind == 'italianate' and chance('it_pair', 0.15)", base_h = "= between('basement_h', basement_h[0], basement_h[1])", layout = "= 'double' if (w >= 12.0 or (klass == 'grand' and w >= 10.5)) and kind == 'italianate' else draw('layout', ['single_left', 'single_right'])", bay_share = "= between('bay_share', 0.45, 0.56)", bay_form = "= draw('bay_form', bay_forms[kind])", paint = "= draw('paint', paints)", corner_order = "= draw('corner_order', corner_orders)" } },
   { set = { storey_heights = "= [base_h, between('parlour_h', parlour_h[0], parlour_h[1]), between('chamber_h', chamber_h[0], chamber_h[1])] + ([third_h] if chance('third_storey', third_storey[klass]) else [])" } },
   { let = { patio = "patio_w if (layout != 'double' and w >= 6.8 and chance('patio', 0.5 if (w >= 10 or klass == 'grand') else 0.10)) else 0.0" } },
   # The facade stands beside the side yard, which is on the entry's side.
@@ -95,7 +100,7 @@ do = [
   { insert = "Top", at = ["fx if bay_right else bay_x + bay_w", "front", "(bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)", "max(3.0, 0.62 * ((bay_x - fx) if bay_right else (fx + fw - bay_x - bay_w)))"], name = "top", attrs = { kind = "= kind" }, when = "turret" },
   { insert = "Turret", at = ["bay_x + 0.15", "front - storey_heights[-1]", "bay_w - 0.3", "storey_heights[-1] + 2.6 + 3.2"], name = "turret", when = "turret" },
   # A wooden stair seen front-on, centred under the door (R-1).
-  { let = { sw = "between('stoop_w', stoop_w[0], stoop_w[1])" } },
+  { let = { sw = "min(entry_w - 0.3, between('stoop_w', stoop_w_pair[0], stoop_w_pair[1]) if door_pair else between('stoop_w', stoop_w[0], stoop_w[1]))" } },
   { insert = "Stoop", at = ["entry_x + entry_w / 2.0 - sw / 2.0", "0.0", "sw", "base_h"], name = "stoop", attrs = { risers = "= max(5, round(base_h / riser))" } },
   { insert = "Patio", at = ["(0.0 if bay_right else fx + fw) + 0.1", "0.0", "patio - 0.2", "1.8"], name = "patio", when = "patio > 0" },
 ]
@@ -148,7 +153,8 @@ do = [
       { label = "Cell", size = "w * 0.4", name = "x1", slot = "bay" },
       { label = "Cell", size = "w * 0.3", name = "x2", slot = "end" },
   ] },
-  { let = { side = "w * side_share[bay_form]" } },
+  # Photo check: an Italianate half-octagon's side faces take 0.29 of the bay.
+  { let = { side = "w * (0.29 if kind == 'italianate' and bay_form == 'slanted' else side_share[bay_form])" } },
   { split = "x", when = "role != 'basement'", parts = [
       { label = "Cell", size = "side", name = "x0", slot = "bay", attrs = { face = "side" } },
       { label = "Cell", size = "w - 2 * side", name = "x1", slot = "bay", attrs = { face = "front" } },
@@ -316,13 +322,13 @@ label = "Cell"
 doc = "Every face and every opening bay holds a tall sash. Its head, hood and glazing are drawn once per floor from the type's weights -- the parlour floor weighted to the richer dress -- so a floor always matches itself."
 when = "is_bay() and role != 'basement'"
 let = { living = "role in ('parlour', 'chamber', 'third')", front = "has('face') and face == 'front'", col = "1 if role == 'parlour' else 2" }
-set = { opening_type = "window", head = "= draw('head', column(heads[kind], 0), column(heads[kind], col), per='Storey')", light_width = "= max(0.3, ((min(w - 0.45, 1.15) if kind == 'italianate' else w - 0.45) if front else min(w - 0.3, 1.1)))", sill = "= 0.55 if living else 0.4", light_height = "= h - (0.55 if living else 0.4) - (0.55 if living else 0.35)", surround_kind = "= draw('hood', column(hoods[kind], 0), column(hoods[kind], col), per='Storey')", keystone_present = "= kind == 'italianate' and chance('keystone', 0.6, per='Storey')", glazing = "sash", frame_paint = "white", sash_cols = "= draw('panes', [1, 2], [1, 2], per='Storey')", sash_rows = 1 }
+set = { opening_type = "window", head = "= draw('head', column(heads[kind], 0), column(heads[kind], col), per='Lot' if kind == 'italianate' else 'Storey')", light_width = "= max(0.3, ((min(w - 0.45, 1.15) if kind == 'italianate' else w - 0.45) if front else min(w - 0.3, 1.1)))", sill = "= 0.55 if living else 0.4", light_height = "= h - (0.55 if living else 0.4) - (0.55 if living else 0.35)", surround_kind = "= draw('hood', column(hoods[kind], 0), column(hoods[kind], col), per='Storey')", keystone_present = "= kind == 'italianate' and chance('keystone', 0.6, per='Storey')", glazing = "sash", frame_paint = "white", sash_cols = "= draw('panes', [1, 2], [1, 2], per='Storey')", sash_rows = 1 }
 
 [[rule]]
 id = "victorian.base.a_pair_in_the_front_face"
 label = "Cell"
 doc = "A Stick or Queen Anne bay's wide front face often takes a pair of sashes, and a round-headed floor always does; an Italianate half-octagon has one window per face (V-BAY-1)."
-when = "is_bay() and role != 'basement' and kind != 'italianate' and has('face') and face == 'front' and w > 2.2 and (chance('pair', 0.7, per='Storey') or draw('head', column(heads[kind], 0), column(heads[kind], 1 if role == 'parlour' else 2), per='Storey') == 'round')"
+when = "is_bay() and role != 'basement' and has('face') and face == 'front' and w > 1.4 and ((kind == 'italianate' and it_pair) or (kind != 'italianate' and w > 2.2 and (chance('pair', 0.7, per='Storey') or draw('head', column(heads[kind], 0), column(heads[kind], 1 if role == 'parlour' else 2), per='Storey') == 'round')))"
 set = { lights = "= (1.0, 1.0)", divider = "Mullion", divider_width = 0.16 }
 
 [[rule]]
@@ -331,4 +337,4 @@ label = "Cell"
 doc = "The parlour floor's entry bay is the front door, under a transom."
 when = "is_bay() and role == 'parlour' and in_parent('EntryZone')"
 specificity = 10
-set = { opening_type = "pedestrian_entrance", head = "= 'segmental' if kind == 'italianate' else 'flat'", light_width = "= 1.3 if kind == 'italianate' else 1.1", sill = 0.0, light_height = "= h - 0.7", lights = "= None", surround_kind = "= draw('door_hood', door_hoods[kind])", keystone_present = "= kind == 'italianate'" }
+set = { opening_type = "pedestrian_entrance", head = "= 'segmental' if kind == 'italianate' else 'flat'", light_width = "= 1.3 if door_pair else 1.0", sill = 0.0, light_height = "= h - 0.7", lights = "= None", surround_kind = "= draw('door_hood', door_hoods[kind])", keystone_present = "= kind == 'italianate'" }
