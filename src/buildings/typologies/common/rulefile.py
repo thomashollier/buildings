@@ -124,7 +124,57 @@ def _same_label(shape: Shape) -> list[Shape]:
     return [s for s in shape.siblings if s.label == shape.label]
 
 
-def _functions(shape: Shape) -> dict[str, Callable[..., Any]]:
+def _anchor(shape: Shape, per: str | None) -> Shape:
+    """The shape a draw belongs to: the shape itself, the whole lot, or the
+    nearest shape (itself or an ancestor) with the label ``per``."""
+    if per is None:
+        return shape
+    node = shape
+    if per == "Lot":
+        while node.parent is not None:
+            node = node.parent
+        return node
+    while node is not None and node.label != per:
+        node = node.parent
+    if node is None:
+        raise ExprError(f"draw(..., per={per!r}): {shape.id} ({shape.label}) has no {per} above it")
+    return node
+
+
+def _drawer(shape: Shape, rng: DecisionStream | None):
+    """Stochastic choices, each from its own stream addressed by the shape it
+    belongs to and a key, so adding a draw anywhere never reshuffles another,
+    and two floors (or two houses) choose independently."""
+
+    def stream(key: str, per: str | None):
+        if rng is None:
+            raise ExprError(f"draw({key!r}): random draws are not available here (a production guard or a site attribute)")
+        return rng.at(f"draw/{_anchor(shape, per).id}/{key}")
+
+    def draw(key: str, options, weights=None, per: str | None = None):
+        if isinstance(options, Mapping):
+            options, weights = list(options.keys()), list(options.values())
+        options = list(options)
+        if not options:
+            raise ExprError(f"draw({key!r}): no options")
+        r = stream(key, per)
+        if weights is None:
+            return r.choice(options)
+        weights = [float(w) for w in weights]
+        if len(weights) != len(options) or sum(weights) <= 0:
+            raise ExprError(f"draw({key!r}): weights must match the options and not all be zero")
+        return r.choices(options, weights=weights, k=1)[0]
+
+    def between(key: str, lo: float, hi: float, per: str | None = None) -> float:
+        return stream(key, per).uniform(float(lo), float(hi))
+
+    def chance(key: str, p: float, per: str | None = None) -> bool:
+        return stream(key, per).random() < float(p)
+
+    return {"draw": draw, "between": between, "chance": chance}
+
+
+def _functions(shape: Shape, rng: DecisionStream | None = None) -> dict[str, Callable[..., Any]]:
     def bays() -> list[Shape]:
         return [c for c in shape.siblings if kit.is_bay(c)]
 
@@ -191,6 +241,11 @@ def _functions(shape: Shape) -> dict[str, Callable[..., Any]]:
         # across ``light`` (a scope, or None), one either side of it, and one
         # closing the run where ``last``; clamped inside the run.
         "frame_posts": _frame_posts,
+        # Stochastic alternatives: draw(key, options[, weights][, per]),
+        # between(key, lo, hi[, per]), chance(key, p[, per]). ``per`` names the
+        # shape the choice belongs to ("Storey", "Lot", ...; default the shape
+        # itself), so every window of a floor can share one draw.
+        **_drawer(shape, rng),
     }
 
 
@@ -300,11 +355,18 @@ class _Env:
     """Name resolution for one shape: locals, the shape's own geometry and
     place, the file's parameters, then the shape's attributes up the tree."""
 
-    def __init__(self, shape: Shape, params: Mapping[str, Any], local: Mapping[str, Any] | None = None) -> None:
+    def __init__(
+        self,
+        shape: Shape,
+        params: Mapping[str, Any],
+        local: Mapping[str, Any] | None = None,
+        rng: DecisionStream | None = None,
+    ) -> None:
         self.shape = shape
         self.params = params
         self.local: dict[str, Any] = dict(local or {})
-        self.functions = _functions(shape)
+        self.rng = rng
+        self.functions = _functions(shape, rng)
 
     def lookup(self, name: str) -> Any:
         if name in self.local:
@@ -334,7 +396,7 @@ class _Env:
         return expr(self.lookup, self.functions)
 
     def child(self, **local: Any) -> _Env:
-        return _Env(self.shape, self.params, {**self.local, **local})
+        return _Env(self.shape, self.params, {**self.local, **local}, self.rng)
 
 
 #: The functions an expression may call; checked when the file is loaded.
@@ -571,7 +633,7 @@ def _production(
     lets = [(k, _expr(e, f"{where}.let.{k}")) for k, e in spec.get("let", {}).items()]
 
     def body(shape: Shape, d: Derivation) -> None:
-        env = _lets(_Env(shape, params), lets)
+        env = _lets(_Env(shape, params, rng=d.rng), lets)
         for op in ops:
             env = op.run(shape, d, env)
 
@@ -584,18 +646,44 @@ def _production(
     return Production(spec["id"], spec["label"], body, guard=guard, priority=spec.get("priority", 0))
 
 
+def _picks(spec: Mapping[str, Any] | None, where: str):
+    """``pick = { per = "Storey", head = { segmental = 3, round = 1 } }``: each
+    attribute drawn from weighted options (weights may be expressions), once
+    per ``per`` shape."""
+    if spec is None:
+        return None
+    spec = dict(spec)
+    per = spec.pop("per", None)
+    table: dict[str, tuple[list[Any], list[Any]]] = {}
+    for name, options in spec.items():
+        if not isinstance(options, Mapping) or not options:
+            raise RuleFileError(f"{where}.{name}: options are a table of option = weight")
+        table[name] = (list(options.keys()), [_expr(w, f"{where}.{name}.{o}") for o, w in options.items()])
+    return per, table
+
+
 def _rule(spec: Mapping[str, Any], params: Mapping[str, Any], where: str):
     when = _expr(spec["when"], f"{where}.when") if "when" in spec else None
     lets = [(k, _expr(e, f"{where}.let.{k}")) for k, e in spec.get("let", {}).items()]
-    values = _map(spec["set"], f"{where}.set")
+    values = _map(spec.get("set"), f"{where}.set")
+    picks = _picks(spec.get("pick"), f"{where}.pick")
+    if not values and not picks:
+        raise RuleFileError(f"{where}: a rule needs 'set' or 'pick'")
     rule_id, specificity = spec["id"], spec.get("specificity", 0)
 
     def rule(shape: Shape, rng: DecisionStream) -> Attrs | None:
-        env = _Env(shape, params)
+        env = _Env(shape, params, rng=rng)
         if when is not None and not env.eval(when):
             return None
         env = _lets(env, lets)
-        return Attrs(_eval_map(env, values), rule=rule_id, specificity=specificity)
+        out = _eval_map(env, values)
+        if picks is not None:
+            per, table = picks
+            draw = env.functions["draw"]
+            for name, (options, weights) in table.items():
+                ws = [_run(env, w) for w in weights]
+                out[name] = draw(f"{rule_id}/{name}", options, ws, per)
+        return Attrs(out, rule=rule_id, specificity=specificity)
 
     rule.__name__ = rule_id.rsplit(".", 1)[-1]
     rule.__doc__ = spec.get("doc")
@@ -844,7 +932,7 @@ class Style:
 _KEYS = {
     "production": {"id", "label", "when", "priority", "doc", "let", "do"},
     "lsystem": {"id", "doc", "axiom", "ignore", "rules", "interpret"},
-    "rule": {"id", "label", "layer", "when", "let", "set", "specificity", "doc"},
+    "rule": {"id", "label", "layer", "when", "let", "set", "pick", "specificity", "doc"},
     "layer": {"name", "order"},
 }
 _TOP = {"style", "params", "lot_props", "emit", "production", "rule", "layer", "lsystem"}
@@ -880,6 +968,7 @@ def _check(data: Mapping[str, Any], path: Path) -> None:
         ops(prod.get("do", ()))
     for rule in data.get("rule", ()):
         written.update((rule.get("set") or {}).keys())
+        written.update(k for k in (rule.get("pick") or {}) if k != "per")
     shadowed = sorted(written & params)
     if shadowed:
         raise RuleFileError(

@@ -55,7 +55,7 @@ _CMP = {
 _ALLOWED = (
     ast.Expression, ast.Constant, ast.Name, ast.Load, ast.BinOp, ast.UnaryOp, ast.BoolOp,
     ast.Compare, ast.IfExp, ast.Call, ast.List, ast.Tuple, ast.Subscript, ast.Attribute,
-    ast.JoinedStr, ast.FormattedValue, ast.And, ast.Or, ast.Not, ast.USub, ast.UAdd,
+    ast.JoinedStr, ast.FormattedValue, ast.keyword, ast.And, ast.Or, ast.Not, ast.USub, ast.UAdd,
     *_BIN, *_CMP,
 )
 _SCOPE_FIELDS = frozenset({"x", "y", "w", "h"})
@@ -77,6 +77,8 @@ class Expr:
                 raise ExprError(f"{type(node).__name__} is not allowed in a rule expression: {src!r}")
             if isinstance(node, ast.Call) and not isinstance(node.func, ast.Name):
                 raise ExprError(f"only named functions may be called: {src!r}")
+            if isinstance(node, ast.keyword) and node.arg is None:
+                raise ExprError(f"**keywords are not allowed: {src!r}")
             if isinstance(node, ast.Attribute) and node.attr.startswith("_"):
                 raise ExprError(f"private attribute {node.attr!r} in {src!r}")
         self._tree = tree.body
@@ -132,7 +134,7 @@ def _eval(node: ast.AST, lookup, functions, src: str) -> Any:
         fn = functions.get(node.func.id)
         if fn is None:
             raise ExprError(f"unknown function {node.func.id!r} in {src!r}")
-        return fn(*[ev(a) for a in node.args])
+        return fn(*[ev(a) for a in node.args], **{k.arg: ev(k.value) for k in node.keywords})
     if isinstance(node, ast.List):
         return [ev(e) for e in node.elts]
     if isinstance(node, ast.Tuple):

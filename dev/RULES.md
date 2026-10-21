@@ -258,6 +258,45 @@ against each jamb half of one -- a context rule, `Jamb < Oculus` -- with a
 third generation drawing the foils out into a cusped quatrefoil on a grand
 house's broad lights.
 
+## Stochastic alternatives: `draw`, `chance`, `between` and `pick`
+
+A style's builders chose; the rules say what they chose among and how often.
+Any expression may draw:
+
+```toml
+layout = "= draw('layout', ['single_left', 'single_right'])"          # equal odds
+bay_form = "= draw('bay_form', bay_forms[kind])"   # a param table: { slanted = 4, square = 1 }
+head = "= draw('head', ['segmental', 'round', 'flat'], [3, 1, 2], per='Storey')"
+extra = "= chance('extra_floor', 0.33)"
+depth = "= between('cornice_depth', 0.8, 1.05, per='Lot')"
+```
+
+and a rule may list weighted options directly, the weights being numbers or
+expressions:
+
+```toml
+[[rule]]
+label = "Cell"
+when = "kind == 'italianate'"
+pick = { per = "Storey", head = { segmental = 3, round = 1, flat = "2 if role != 'parlour' else 1" } }
+```
+
+- **Where a draw belongs.** `per` names the shape the choice is made for:
+  the shape itself (the default), `"Lot"` (once per building), or any label
+  above it (`"Storey"`: every cell of a floor gets the same answer, two floors
+  may differ). Two draws with the same key on the same shape agree, so a rule
+  can read back another rule's choice by repeating its draw.
+- **Independence.** Each draw is its own stream, addressed by
+  `seed / that shape's id / key`. Adding a draw anywhere never reshuffles any
+  other, the way `grow`'s stochastic rules work, and the Paris generator's
+  decision streams before it.
+- **Determinism.** The same site gives the same building, forever.
+- Draws are available in productions and rules, not in production guards.
+
+`tests/unit/test_variety.py` holds each converted style to it: 100 seeds on
+one fixed site must give at least 80 designs that differ by more than a
+quarter of a metre somewhere.
+
 ## What stays in Python
 
 - **The engine and the shared kit:** window anatomy and IR writers.
