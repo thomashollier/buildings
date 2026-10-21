@@ -61,7 +61,7 @@ def write_light(light: Shape, below, d) -> list:
     """A light, with what a two-storey carriage arch states: which register it
     is, how tall its leaves stand, what fills its head."""
     out = kit.write_light(light, below, d)
-    extra = {k: light.attrs[k] for k in ("arch_register", "leaf_height", "head_infill") if k in light.attrs}
+    extra = {k: light.attr(k) for k in ("arch_register", "leaf_height", "head_infill") if light.attr(k, None) is not None}
     if not extra:
         return out
     node = out[0]
