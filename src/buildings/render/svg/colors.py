@@ -148,4 +148,23 @@ COLORS: dict[str, str] = {
     "marble_line": "#A39A8A",
     "arch_brick": "#B0604A",
     "arch_brick_line": "#6E3426",
+    # Havana: coloured glass in a mediopunto, louvre paints, coral limestone,
+    # the tile of a colonial roof.
+    "glass_red": "#B4483C",
+    "glass_blue": "#3E6EA6",
+    "glass_amber": "#D8A13C",
+    "glass_green": "#4E8C5C",
+    "louvre_white": "#ECEAE3",
+    "louvre_grey": "#8C8F8C",
+    "louvre_grey_line": "#6F726F",
+    "wall_coral_stone": "#CBBE9F",
+    "coral_stone_joint": "#B3A688",
+    "tile_red_dark": "#8C3D2B",
+    "trim_white": "#F4F1EA",
 }
+
+# The shade of each pastel: a back wall in shadow under a portal, a zocalo,
+# the darker tone a trim is painted in. Darkened, not chosen per use.
+for _name in ("stucco_blue", "stucco_mint", "stucco_yellow", "stucco_rose", "stucco_peach", "plaster_white", "stucco_aqua", "coral_stone"):
+    _hex = COLORS[f"wall_{_name}"]
+    COLORS[f"shade_{_name}"] = "#" + "".join(f"{int(int(_hex[i:i + 2], 16) * 0.8):02X}" for i in (1, 3, 5))

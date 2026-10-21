@@ -821,10 +821,11 @@ def draw_brace(canvas: Canvas, x: float, y: float, w: float, h: float, props: Ma
     """A diagonal timber across its own rectangle, rising left to right or
     falling, as the IR says."""
     stroke = float(props.get("stroke_w", 2.2))
+    color = _C.get(str(props.get("paint")), _C["timber"])
     if props.get("direction") == "rising":
-        canvas.line(x, y, x + w, y + h, _C["timber"], stroke)
+        canvas.line(x, y, x + w, y + h, color, stroke)
     else:
-        canvas.line(x, y + h, x + w, y, _C["timber"], stroke)
+        canvas.line(x, y + h, x + w, y, color, stroke)
 
 
 def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: Mapping[str, object]) -> None:
@@ -841,6 +842,14 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
     if order == "louvre":
         # A slat or stile of a painted louvered leaf; its paint is the rule's.
         canvas.rect(x, y, w, h, _C.get(f"louvre_{props.get('louvre_paint') or 'green'}", _C["timber"]), stroke_w=0.0)
+        return
+    if order == "louvre_panel":
+        # A panel of a painted leaf: the leaf's paint, its moulding a darker line.
+        canvas.rect(x, y, w, h, _C.get(f"louvre_{props.get('louvre_paint') or 'green'}", _C["timber"]), stroke=_C["scuri_line"], stroke_w=0.4)
+        return
+    if order == "iron":
+        # A bar or rail of wrought or cast iron.
+        canvas.rect(x, y, w, h, _C["iron"], stroke_w=0.0)
         return
     if order == "corner_board":
         # The painted board that closes a timber-clad corner.
@@ -891,8 +900,9 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
     cap_h = min(0.30, h * 0.09) if order == "corinthian" else min(0.14, h * 0.05)
     shaft_w = w * (0.78 if order != "pilaster" else 0.9)
     sx = x + (w - shaft_w) / 2.0
-    canvas.rect(x, y, w, base_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
-    canvas.rect(sx, y + base_h, shaft_w, h - base_h - cap_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
+    stone = _C.get(str(props.get("paint")), _C["column"])
+    canvas.rect(x, y, w, base_h, stone, stroke=_C["column_stroke"], stroke_w=0.4)
+    canvas.rect(sx, y + base_h, shaft_w, h - base_h - cap_h, stone, stroke=_C["column_stroke"], stroke_w=0.4)
     if order != "pilaster":
         # Fluting reads as two hairlines on a shaft this narrow.
         for f in (0.33, 0.67):
@@ -907,7 +917,7 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
         )
         canvas.line(x + w * 0.2, y + h - cap_h * 0.45, x + w * 0.8, y + h - cap_h * 0.45, _C["column_stroke"], 0.3)
     else:  # doric and pilaster: a plain block capital
-        canvas.rect(x, y + h - cap_h, w, cap_h, _C["column"], stroke=_C["column_stroke"], stroke_w=0.4)
+        canvas.rect(x, y + h - cap_h, w, cap_h, stone, stroke=_C["column_stroke"], stroke_w=0.4)
 
 
 def _draw_colonnette(canvas: Canvas, x: float, y: float, w: float, h: float, shaft_w: float, order: str) -> None:
@@ -963,6 +973,15 @@ def draw_gable_mass(canvas: Canvas, props: Mapping[str, object], wall: str) -> N
     pts = [(float(a), float(b)) for a, b in (props.get("points") or ())]
     if len(pts) >= 3:
         canvas.polygon(pts, wall, stroke_w=0.0)
+
+
+def draw_outline_edge(canvas: Canvas, props: Mapping[str, object], color: str) -> None:
+    """A thin line round a painted outline, where it states an edge."""
+    pts = [(float(a), float(b)) for a, b in (props.get("points") or ())]
+    if not color or len(pts) < 2:
+        return
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        canvas.line(x0, y0, x1, y1, color, 0.35)
 
 
 def draw_gable_coping(canvas: Canvas, props: Mapping[str, object]) -> None:
@@ -1088,7 +1107,7 @@ def draw_socle(canvas: Canvas, x: float, y: float, w: float, h: float, props: Ma
                 if x < jx < x + w:
                     canvas.line(jx, ry, jx, ry + h / rows, _C["istrian_line"], 0.3)
         return
-    canvas.rect(x, y, w, h, fill, stroke_w=0.5)
+    canvas.rect(x, y, w, h, _C.get(str(props.get("paint")), fill), stroke_w=0.5)
     # A7.2: the coursing of a socle is how finely the ground storey is worked,
     # and that is ornament density, not a fact about how big the wall is. So
     # the number of stones across and courses up arrives stated — this module

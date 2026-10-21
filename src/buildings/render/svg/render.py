@@ -270,8 +270,12 @@ def draw_building(canvas: Canvas, building: Node, labels: bool = False) -> None:
     for gable in gables:
         el.draw_gable_coping(canvas, gable.props)
     for stoop in stoops:
-        el.draw_gable_mass(canvas, stoop.props, _C["stoop"])
-        el.draw_gable_coping(canvas, stoop.props)
+        # A grown outline in a stated paint is that paint, edged as it says.
+        el.draw_gable_mass(canvas, stoop.props, _paint(stoop.props.get("paint"), _C["stoop"]))
+        if stoop.props.get("paint"):
+            el.draw_outline_edge(canvas, stoop.props, _paint(stoop.props.get("edge"), ""))
+        else:
+            el.draw_gable_coping(canvas, stoop.props)
     # Piers that run through several storeys belong to the building, and stand
     # in front of every storey they cross.
     for column in _children_of_kind(building, "column"):
@@ -518,7 +522,21 @@ _WALL_PAINT = {
     "vermilion": _C["wall_vermilion"],
     "alabaster": _C["wall_alabaster"],
     "chimney_brick": _C["wall_chimney_brick"],
+    "coral_stone": _C["wall_coral_stone"],
+    **{k[len("shade_"):] + "_shade": v for k, v in _C.items() if k.startswith("shade_")},
 }
+
+#: Materials laid in ashlar courses, drawn as a joint every course.
+_COURSED = frozenset({"coral_stone"})
+_COURSE = 0.45
+
+
+def _paint(name: object, default: str) -> str:
+    """The colour a stated paint name is drawn in: a wall paint, or any named
+    colour of the palette; ``default`` where none is stated."""
+    if not name:
+        return default
+    return _WALL_PAINT.get(str(name)) or _C.get(str(name), default)
 
 #: Materials laid in horizontal boards, drawn as a line every board.
 _BOARDED = frozenset({"clapboard_sage", "clapboard_blue", "clapboard_cream", "clapboard_rose"})
@@ -549,6 +567,11 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
         while k * _BOARD < h - 1e-9:
             canvas.line(sx, y + k * _BOARD, sx + sw, y + k * _BOARD, _C["clapboard_line"], 0.4)
             k += 1
+    if storey.props.get("wall_material") in _COURSED:
+        k = 1
+        while k * _COURSE < h - 1e-9:
+            canvas.line(sx, y + k * _COURSE, sx + sw, y + k * _COURSE, _C["coral_stone_joint"], 0.35)
+            k += 1
 
     for child in storey.children:
         if child.kind == "socle":
@@ -568,6 +591,15 @@ def _draw_storey(canvas: Canvas, storey: Node, facade_w: float, labels: bool) ->
             el.draw_column(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
         elif child.kind == "brace":
             el.draw_brace(canvas, _num(child.props, "x"), _num(child.props, "y"), _num(child.props, "w"), _num(child.props, "h"), child.props)
+    # Grown outlines a storey puts up (a fanlight's panes, an arcade's face)
+    # stand in front of everything else on it, in the paint they state.
+    for child in storey.children:
+        if child.kind == "gable":
+            el.draw_gable_mass(canvas, child.props, _paint(child.props.get("paint"), _C["stoop"]))
+            if child.props.get("paint"):
+                el.draw_outline_edge(canvas, child.props, _paint(child.props.get("edge"), ""))
+            else:
+                el.draw_gable_coping(canvas, child.props)
 
     canvas.line(sx, y, sx + sw, y, _C["outline"], 0.5)
 

@@ -847,7 +847,8 @@ def write_stone(shape: Shape, below, d) -> list:
             kind="gable",
             trace=tuple(shape.trace),
             props={**kit.xywh(shape.scope), "form": "stoop", "points": tuple(shape.attrs["points"]),
-                   "hoist_beam": None, "wall_material": "stone"},
+                   "hoist_beam": None, "wall_material": "stone",
+                   **{k: shape.attrs[k] for k in ("paint", "edge") if k in shape.attrs}},
         )
     ]
 
@@ -865,7 +866,8 @@ def write_slant(shape: Shape, below, d) -> list:
             kind="brace",
             trace=tuple(shape.trace),
             props={**kit.xywh(shape.scope), "direction": shape.attrs["direction"],
-                   **({"stroke_w": float(shape.attrs["stroke_w"])} if "stroke_w" in shape.attrs else {})},
+                   **({"stroke_w": float(shape.attrs["stroke_w"])} if "stroke_w" in shape.attrs else {}),
+                   **({"paint": shape.attrs["paint"]} if "paint" in shape.attrs else {})},
         )
     ]
 

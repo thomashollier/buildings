@@ -46,7 +46,7 @@ def test_it_derives_traces_renders_and_repeats(site):
     assert "<svg" in render(building)
     lot, _ = derive_havana(site)
     for shape in lot.walk():
-        if shape.parent is not None and shape.label not in ("Cornice", "Balcon", "Tejaroz"):
+        if shape.parent is not None and shape.label not in ("Cornice", "Balcon"):
             assert shape.parent.scope.contains(shape.scope), shape
 
 
@@ -57,19 +57,42 @@ def test_the_date_weights_the_manner():
 
 
 def test_ornament_is_grown():
-    lot, _ = derive_havana(HavanaSite(12.0, 1740, BuildingClass.COMFORTABLE, 2))
-    labels = {s.label for s in lot.walk()}
-    assert {"Mediopunto", "Reja"} <= labels
-    grown = [s for s in lot.walk() if s.label in ("Mediopunto", "Reja", "Balcon")]
-    assert all(s.attrs.get("growth") is None or s.children for s in grown)
-    assert any(s.children for s in grown)
+    labels = set()
+    for seed in range(12):
+        lot, _ = derive_havana(HavanaSite(12.0, 1740, BuildingClass.COMFORTABLE, seed, seed % 2 == 0))
+        labels |= {s.label for s in lot.walk()}
+        grown = [s for s in lot.walk() if s.label in ("Mediopunto", "Reja", "Balcon", "Persiana")]
+        assert all(s.children for s in grown)
+    assert {"Mediopunto", "Reja", "Persiana", "Balcon"} <= labels
+
+
+def test_every_opening_is_leaves_not_glass():
+    """Each window and upper opening is filled by its grown leaves, under the head."""
+    for seed in range(20):
+        lot, _ = derive_havana(HavanaSite(14.0, 1850, BuildingClass.COMFORTABLE, seed))
+        for storey in (s for s in lot.walk() if s.label == "Storey" and s.attrs.get("role") == "upper"):
+            windows = [c for c in storey.children if c.label == "Cell" and c.attrs.get("opening_type") == "window"]
+            leaves = [c for c in storey.children if c.label == "Persiana"]
+            assert len(leaves) == len(windows)
+
+
+def test_openings_leave_a_band_of_wall_overhead():
+    for seed in range(30):
+        lot, _ = derive_havana(HavanaSite(12.0, 1760 + seed * 5, BuildingClass.ORDINARY, seed))
+        for c in lot.walk():
+            if c.label == "Cell" and c.attrs.get("opening_type") == "window" and c.parent.attrs.get("role") == "upper":
+                assert 2.4 <= c.attrs["light_height"] <= 3.6
+                assert c.scope.h - c.attrs["sill"] - c.attrs["light_height"] >= 0.85
 
 
 def test_a_plaza_front_opens_in_a_portal():
     portals = 0
     for seed in range(20):
-        b, _ = generate_havana(HavanaSite(16.0, 1820, BuildingClass.COMFORTABLE, seed, True))
-        portals += any(n.props.get("opening_type") == "open_arch" for n in walk(b))
+        lot, _ = derive_havana(HavanaSite(16.0, 1820, BuildingClass.COMFORTABLE, seed, True))
+        portals += any(s.label == "Arch" for s in lot.walk())
+        if lot.attrs["portal"]:
+            ground = next(s for s in lot.walk() if s.label == "Storey")
+            assert ground.attrs["wall_material"].endswith("_shade")
     assert portals >= 10
 
 
@@ -80,17 +103,17 @@ def test_a_hundred_seeds_give_a_hundred_fronts(year):
 
 
 def test_the_builders_choices_vary_across_seeds():
-    """Persianas (grown louvered leaves), pilasters, bodegas and the three
-    mediopunto patterns each turn up on some fronts and not on others."""
+    """Louvred leaves, pilasters, bodegas and the three mediopunto patterns
+    each turn up on some fronts and not on others."""
     from buildings.typologies.havana.grammar import derive_havana
 
     seen = {"Persiana": set(), "Column": set(), "shop": set(), "pattern": set(), "paint": set()}
     for s in range(60):
         lot, _ = derive_havana(HavanaSite(12.0, 1800 + s, BuildingClass.COMFORTABLE, s))
         labels = {x.label for x in lot.walk()}
-        seen["Persiana"].add("Persiana" in labels)
+        seen["Persiana"].add(lot.attrs["louvred"])
         seen["Column"].add("Column" in labels)
-        seen["shop"].add(any(x.attrs.get("opening_type") == "shop_bay" for x in lot.walk()))
+        seen["shop"].add(lot.attrs["shop"])
         seen["pattern"].add(lot.attrs["fan_pattern"])
         seen["paint"].add(lot.attrs["louvre_paint"])
     assert seen["Persiana"] == seen["Column"] == seen["shop"] == {True, False}
