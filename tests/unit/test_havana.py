@@ -81,8 +81,8 @@ def test_openings_leave_a_band_of_wall_overhead():
         lot, _ = derive_havana(HavanaSite(12.0, 1760 + seed * 5, BuildingClass.ORDINARY, seed))
         for c in lot.walk():
             if c.label == "Cell" and c.attrs.get("opening_type") == "window" and c.parent.attrs.get("role") == "upper":
-                assert 2.4 <= c.attrs["light_height"] <= 3.6
-                assert c.scope.h - c.attrs["sill"] - c.attrs["light_height"] >= 0.85
+                assert 2.3 <= c.attrs["light_height"] <= 3.6
+                assert c.scope.h - c.attrs["sill"] - c.attrs["light_height"] >= 1.15
 
 
 def test_a_plaza_front_opens_in_a_portal():
@@ -117,5 +117,5 @@ def test_the_builders_choices_vary_across_seeds():
         seen["pattern"].add(lot.attrs["fan_pattern"])
         seen["paint"].add(lot.attrs["louvre_paint"])
     assert seen["Persiana"] == seen["Column"] == seen["shop"] == {True, False}
-    assert seen["pattern"] == {"fan", "ring", "grid"}
+    assert seen["pattern"] == {"fan", "ring"}
     assert len(seen["paint"]) >= 3

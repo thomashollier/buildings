@@ -896,8 +896,8 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
         canvas.rect(x, y, w, h, _C["wall_render_white"], stroke=_C["column_stroke"], stroke_w=0.4)
         canvas.rect(x + w * 0.62, y, w * 0.38, h, "#D8D6D0", stroke_w=0.0)
         return
-    base_h = min(0.12, h * 0.05)
-    cap_h = min(0.30, h * 0.09) if order == "corinthian" else min(0.14, h * 0.05)
+    base_h = _num(props, "base_h", min(0.12, h * 0.05))
+    cap_h = _num(props, "cap_h", min(0.30, h * 0.09) if order == "corinthian" else min(0.14, h * 0.05))
     shaft_w = w * (0.78 if order != "pilaster" else 0.9)
     sx = x + (w - shaft_w) / 2.0
     stone = _C.get(str(props.get("paint")), _C["column"])

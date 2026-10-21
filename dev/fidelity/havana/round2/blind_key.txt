@@ -1,0 +1,16 @@
+img00: eclectic, 1922, 19.0 m, GRAND, plaza=True, portal=False, shop=False, seed=1014
+img01: colonial, 1725, 9.0 m, GRAND, plaza=False, portal=False, shop=False, seed=1001
+img02: eclectic, 1895, 17.0 m, MODEST, plaza=False, portal=False, shop=True, seed=1011
+img03: neoclassical, 1865, 17.0 m, MODEST, plaza=True, portal=False, shop=False, seed=1009
+img04: neoclassical, 1850, 10.5 m, ORDINARY, plaza=True, portal=True, shop=False, seed=1008
+img05: neoclassical, 1835, 19.0 m, COMFORTABLE, plaza=False, portal=False, shop=True, seed=1007
+img06: colonial, 1785, 9.0 m, MODEST, plaza=False, portal=False, shop=False, seed=1004
+img07: colonial, 1795, 15.0 m, MODEST, plaza=True, portal=True, shop=False, seed=1005
+img08: colonial, 1750, 17.0 m, ORDINARY, plaza=False, portal=False, shop=False, seed=1002
+img09: colonial, 1690, 15.0 m, GRAND, plaza=False, portal=False, shop=False, seed=1000
+img10: neoclassical, 1878, 9.0 m, COMFORTABLE, plaza=True, portal=False, shop=True, seed=1010
+img11: eclectic, 1928, 9.0 m, ORDINARY, plaza=False, portal=False, shop=True, seed=1015
+img12: neoclassical, 1915, 9.0 m, ORDINARY, plaza=True, portal=False, shop=False, seed=1013
+img13: neoclassical, 1815, 13.5 m, MODEST, plaza=True, portal=True, shop=False, seed=1006
+img14: eclectic, 1905, 15.0 m, COMFORTABLE, plaza=True, portal=True, shop=False, seed=1012
+img15: colonial, 1765, 13.5 m, MODEST, plaza=False, portal=False, shop=False, seed=1003

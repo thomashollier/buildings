@@ -285,7 +285,7 @@ def write_column(shape: Shape, below, d) -> list[Node]:
             kind="column",
             trace=tuple(shape.trace) + tuple(shape.parent.trace[:1]),
             props={**xywh(shape.scope), "order": shape.attr("order"),
-                   **{k: shape.attrs[k] for k in ("louvre_paint", "paint") if k in shape.attrs}},
+                   **{k: shape.attrs[k] for k in ("louvre_paint", "paint", "cap_h", "base_h") if k in shape.attrs}},
         )
     ]
 
