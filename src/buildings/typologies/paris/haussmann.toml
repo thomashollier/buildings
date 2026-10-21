@@ -317,10 +317,10 @@ set = { opening_type = "pedestrian_entrance", head = "= 'round' if cochere else 
 [[rule]]
 id = "haussmann.base.the_carriage_arch_rises_through_the_entresol"
 label = "Cell"
-doc = "On most fronts with an entresol (photo check R12: 0.7) the porte cochere's arch rises through it: the rez-de-chaussee holds the leaves under a carved tympanum, the entresol the arch's round head."
+doc = "On most fronts with an entresol (photo check R12: 0.7) the porte cochere's arch rises through it: the rez-de-chaussee holds the leaves under a carved tympanum, the entresol the arch's round head, its crown kept under the base's entablature."
 when = "is_bay() and nth - 1 == door_bay and door == 'cochere' and mid == 'entresol' and arch_through and floor in ('ground', 'entresol')"
 specificity = 30
-set = { opening_type = "= 'carriage_entrance' if floor == 'ground' else 'entrance_arch_head'", head = "= 'flat' if floor == 'ground' else 'round'", light_width = 2.6, sill = 0.0, light_height = "= h", surround_kind = "moulded_architrave", keystone_present = "= floor == 'entresol'", arch_register = "= 'leaves' if floor == 'ground' else 'head'", leaf_height = "= h - 0.7", head_infill = "tympanum" }
+set = { opening_type = "= 'carriage_entrance' if floor == 'ground' else 'entrance_arch_head'", head = "= 'flat' if floor == 'ground' else 'round'", light_width = 2.6, sill = 0.0, light_height = "= h if floor == 'ground' else h - 0.45 - 0.2", surround_kind = "moulded_architrave", keystone_present = "= floor == 'entresol'", arch_register = "= 'leaves' if floor == 'ground' else 'head'", leaf_height = "= h - 0.7", head_infill = "tympanum" }
 
 [[rule]]
 id = "haussmann.class.the_noble_floor_is_pedimented"
