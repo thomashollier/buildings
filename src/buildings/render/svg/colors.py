@@ -169,3 +169,4 @@ COLORS: dict[str, str] = {
 for _name in ("stucco_blue", "stucco_mint", "stucco_yellow", "stucco_rose", "stucco_peach", "plaster_white", "stucco_aqua", "coral_stone"):
     _hex = COLORS[f"wall_{_name}"]
     COLORS[f"shade_{_name}"] = "#" + "".join(f"{int(int(_hex[i:i + 2], 16) * 0.8):02X}" for i in (1, 3, 5))
+    COLORS[f"deep_{_name}"] = "#" + "".join(f"{int(int(_hex[i:i + 2], 16) * 0.6):02X}" for i in (1, 3, 5))

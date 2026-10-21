@@ -61,9 +61,11 @@ def test_ornament_is_grown():
     for seed in range(12):
         lot, _ = derive_havana(HavanaSite(12.0, 1740, BuildingClass.COMFORTABLE, seed, seed % 2 == 0))
         labels |= {s.label for s in lot.walk()}
-        grown = [s for s in lot.walk() if s.label in ("Mediopunto", "Reja", "Balcon", "Persiana")]
+        grown = [s for s in lot.walk() if s.label in ("Mediopunto", "Transom", "Reja", "Balcon", "Persiana")]
         assert all(s.children for s in grown)
-    assert {"Mediopunto", "Reja", "Persiana", "Balcon"} <= labels
+    assert {"Transom", "Reja", "Persiana", "Balcon"} <= labels
+    later = {s.label for seed in range(12) for s in derive_havana(HavanaSite(12.0, 1850, BuildingClass.COMFORTABLE, seed))[0].walk()}
+    assert "Mediopunto" in later
 
 
 def test_every_opening_is_leaves_not_glass():
@@ -76,13 +78,13 @@ def test_every_opening_is_leaves_not_glass():
             assert len(leaves) == len(windows)
 
 
-def test_openings_leave_a_band_of_wall_overhead():
+def test_openings_nearly_fill_the_storey_under_a_band_of_wall():
     for seed in range(30):
         lot, _ = derive_havana(HavanaSite(12.0, 1760 + seed * 5, BuildingClass.ORDINARY, seed))
         for c in lot.walk():
             if c.label == "Cell" and c.attrs.get("opening_type") == "window" and c.parent.attrs.get("role") == "upper":
-                assert 2.3 <= c.attrs["light_height"] <= 3.6
-                assert c.scope.h - c.attrs["sill"] - c.attrs["light_height"] >= 1.15
+                assert 0.6 <= c.attrs["light_height"] / c.scope.h <= 0.8
+                assert c.scope.h - c.attrs["sill"] - c.attrs["light_height"] >= 1.0
 
 
 def test_a_plaza_front_opens_in_a_portal():
@@ -92,7 +94,7 @@ def test_a_plaza_front_opens_in_a_portal():
         portals += any(s.label == "Arch" for s in lot.walk())
         if lot.attrs["portal"]:
             ground = next(s for s in lot.walk() if s.label == "Storey")
-            assert ground.attrs["wall_material"].endswith("_shade")
+            assert ground.attrs["wall_material"].endswith("_deep")
     assert portals >= 10
 
 

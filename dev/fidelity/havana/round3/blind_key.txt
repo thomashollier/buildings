@@ -1,0 +1,16 @@
+img00: colonial, 1765, 17.0 m, COMFORTABLE, plaza=False, portal=False, shop=False, seed=2003
+img01: colonial, 1785, 13.5 m, GRAND, plaza=False, portal=False, shop=False, seed=2004
+img02: eclectic, 1905, 15.0 m, COMFORTABLE, plaza=True, portal=False, shop=True, seed=2012
+img03: colonial, 1795, 19.0 m, ORDINARY, plaza=False, portal=False, shop=True, seed=2005
+img04: neoclassical, 1850, 10.5 m, GRAND, plaza=False, portal=False, shop=False, seed=2008
+img05: colonial, 1815, 9.0 m, COMFORTABLE, plaza=True, portal=False, shop=False, seed=2006
+img06: neoclassical, 1865, 12.0 m, COMFORTABLE, plaza=False, portal=False, shop=False, seed=2009
+img07: colonial, 1690, 15.0 m, COMFORTABLE, plaza=False, portal=False, shop=False, seed=2000
+img08: eclectic, 1922, 10.5 m, ORDINARY, plaza=True, portal=False, shop=True, seed=2014
+img09: colonial, 1750, 13.5 m, ORDINARY, plaza=False, portal=False, shop=False, seed=2002
+img10: neoclassical, 1878, 10.5 m, COMFORTABLE, plaza=False, portal=False, shop=False, seed=2010
+img11: eclectic, 1915, 17.0 m, COMFORTABLE, plaza=True, portal=False, shop=True, seed=2013
+img12: eclectic, 1895, 12.0 m, COMFORTABLE, plaza=True, portal=False, shop=False, seed=2011
+img13: colonial, 1725, 13.5 m, MODEST, plaza=False, portal=False, shop=True, seed=2001
+img14: eclectic, 1928, 15.0 m, GRAND, plaza=True, portal=True, shop=False, seed=2015
+img15: neoclassical, 1835, 12.0 m, GRAND, plaza=False, portal=False, shop=True, seed=2007

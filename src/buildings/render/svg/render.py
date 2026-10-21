@@ -524,6 +524,7 @@ _WALL_PAINT = {
     "chimney_brick": _C["wall_chimney_brick"],
     "coral_stone": _C["wall_coral_stone"],
     **{k[len("shade_"):] + "_shade": v for k, v in _C.items() if k.startswith("shade_")},
+    **{k[len("deep_"):] + "_deep": v for k, v in _C.items() if k.startswith("deep_")},
 }
 
 #: Materials laid in ashlar courses, drawn as a joint every course.
