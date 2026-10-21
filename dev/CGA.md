@@ -137,6 +137,36 @@ and refused to pick; the fix was the narrower rule's specificity.
 
 `python3 dev/harness/soho_sheet.py OUT_DIR --sf-normandy` draws them.
 
+## Growing ornament inside a shape
+
+`cga/lsystem.py` adds a third kind of operation beside `split` and `insert`:
+`grow(d, shape, lsystem, generations=...)` runs a parametric L-system inside
+one shape's scope and inserts what it draws as that shape's children. The
+split grammar decides where the ornament goes and how big it is; the
+L-system decides what it is, by rewriting. The Cairo mashrabiya is the first:
+
+```
+Light   --> ... insert(Lattice)
+Lattice --> grow(cairo.mashrabiya, generations = 3 + halvings)
+
+Screen(a,b)    -> Frame Inset [ Body(a,b) ]
+Body(a,b)      -> Sy(..) [ Field(..,0) ] [ Rail ] [ Wheel ]    weight 2   (tall screen)
+               |  Sy(..) [ Field(..,1) ] [ Rail ] [ Wheel ]    weight 1
+               |  Field(a,b,0)  weight 2  |  Field(a,b,1)  weight 1   (otherwise)
+Field(a,b,p)   -> Rx(round(a/unit)) [ Ry(round(b/unit)) [ Cell(..,p) ] ]
+Cell(a,b,p)    -> Rx(2) [ Ry(2) [ Cell(a/2, b/2, p) ] ]        while a bead fits
+
+Cell(_,_,0) draws a bead-and-spindle cross, Cell(_,_,1) a maymuni X of beads,
+Wheel a ring and spokes of beads round a hub.
+```
+
+The string stays short (a `repeat` draws its branch once per part), the
+drawing multiplies. Generations follow the screen's size and the owner's
+money (a modest house's mesh is twice as coarse, one generation short); the
+seed picks the pattern per floor. Each spindle and bead is a `Shape` the
+engine inserted, so containment, write isolation and the trace hold as for
+any other part. `dev/RULES.md`, "Growing ornament", has the file syntax.
+
 ## Checking it
 
 ```bash

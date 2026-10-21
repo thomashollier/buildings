@@ -50,6 +50,7 @@ What a file cannot express it names: the shared window anatomy
 
 from __future__ import annotations
 
+import dataclasses
 import math
 import tomllib
 from dataclasses import dataclass, field
@@ -72,6 +73,7 @@ from buildings.cga import (
     interpret,
 )
 from buildings.cga.expr import Expr, ExprError
+from buildings.cga import lsystem as _ls
 from buildings.ir.nodes import BuildingNode
 from buildings.rng import DecisionStream
 from buildings.solver.fitting import PlacedSlot, SlotKind, SlotSpec
@@ -141,6 +143,10 @@ def _functions(shape: Shape) -> dict[str, Callable[..., Any]]:
         "sin": math.sin,
         "cos": math.cos,
         "pi": lambda: math.pi,
+        "sqrt": math.sqrt,
+        "log2": math.log2,
+        "ceil": math.ceil,
+        "floor": math.floor,
         "is_bay": lambda: kit.is_bay(shape),
         "is_first_bay": lambda: bool(bays()) and shape is bays()[0],
         "is_last_bay": lambda: bool(bays()) and shape is bays()[-1],
@@ -386,8 +392,8 @@ def _slot_for(name: str, start: float, size: float) -> PlacedSlot:
 class _Op:
     """One verb of a production body, compiled."""
 
-    def __init__(self, spec: Mapping[str, Any], where: str) -> None:
-        verbs = [v for v in ("set", "let", "fit", "split", "insert", "each", "call", "refuse") if v in spec]
+    def __init__(self, spec: Mapping[str, Any], where: str, systems: Mapping[str, Any] | None = None) -> None:
+        verbs = [v for v in ("set", "let", "fit", "split", "insert", "each", "call", "refuse", "grow") if v in spec]
         if len(verbs) != 1:
             raise RuleFileError(f"{where}: an operation has exactly one verb, got {verbs or list(spec)}")
         self.verb = verbs[0]
@@ -426,13 +432,31 @@ class _Op:
             self.attrs = _map(spec.get("attrs"), where)
         elif v == "each":
             self.items = _expr(spec["each"], where)
-            self.body = [_Op(o, f"{where}.do[{i}]") for i, o in enumerate(spec["do"])]
+            self.body = [_Op(o, f"{where}.do[{i}]", systems) for i, o in enumerate(spec["do"])]
         elif v == "refuse":
             self.message = spec["refuse"]
+        elif v == "grow":
+            self._grow(spec, where, systems or {})
         elif v == "call":
             if spec["call"] not in PRODUCTIONS:
                 raise RuleFileError(f"{where}: no production named {spec['call']!r}")
             self.fn = PRODUCTIONS[spec["call"]]
+
+    def _grow(self, spec: Mapping[str, Any], where: str, systems: Mapping[str, Any]) -> None:
+        extra = set(spec) - {"grow", "generations", "params", "seed", "as", "name", "axiom", "when"}
+        if extra:
+            raise RuleFileError(f"{where}: unknown key(s) {sorted(extra)} in a grow")
+        if spec["grow"] not in systems:
+            raise RuleFileError(f"{where}: no [[lsystem]] with id {spec['grow']!r}")
+        system = systems[spec["grow"]]
+        if "axiom" in spec:
+            system = dataclasses.replace(system, axiom=_ls.parse_modules(spec["axiom"], f"{where}.axiom", _expr))
+        self.system = system
+        self.generations = _expr(spec.get("generations", 0), f"{where}.generations")
+        self.grow_params = [(k, _expr(e, f"{where}.params.{k}")) for k, e in (spec.get("params") or {}).items()]
+        self.stream = _expr(spec["seed"], f"{where}.seed") if "seed" in spec else None
+        self.prefix = spec.get("name", "g")
+        self.store = spec.get("as")
 
     def _part(self, p: Mapping[str, Any], where: str) -> dict[str, Any]:
         out = {
@@ -476,6 +500,31 @@ class _Op:
                 inner = env.child(item=item, i=i)
                 for op in self.body:
                     inner = op.run(shape, d, inner)
+        elif v == "grow":
+            # Parameters are evaluated in order, each seeing the ones before.
+            values: dict[str, Any] = {}
+            for k, compiled in self.grow_params:
+                values[k] = _run(env.child(**values), compiled)
+            inner = env.child(**values)
+            growth = _ls.grow(
+                d,
+                shape,
+                self.system,
+                generations=int(_run(inner, self.generations)),
+                params=values,
+                lookup=env.lookup,
+                functions=env.functions,
+                stream=None if self.stream is None else str(_run(inner, self.stream)),
+                name=self.prefix,
+            )
+            if self.store is not None:
+                shape.attrs[self.store] = {
+                    "lsystem": self.system.id,
+                    "generations": growth.generations,
+                    "modules": len(growth.string),
+                    "marks": growth.marks,
+                    "choices": tuple(growth.choices),
+                }
         elif v == "call":
             self.fn(shape, d)
         elif v == "refuse":
@@ -515,8 +564,10 @@ class _Op:
 # ===========================================================================
 
 
-def _production(spec: Mapping[str, Any], params: Mapping[str, Any], where: str) -> Production:
-    ops = [_Op(o, f"{where}.do[{i}]") for i, o in enumerate(spec.get("do", ()))]
+def _production(
+    spec: Mapping[str, Any], params: Mapping[str, Any], where: str, systems: Mapping[str, Any] | None = None
+) -> Production:
+    ops = [_Op(o, f"{where}.do[{i}]", systems) for i, o in enumerate(spec.get("do", ()))]
     lets = [(k, _expr(e, f"{where}.let.{k}")) for k, e in spec.get("let", {}).items()]
 
     def body(shape: Shape, d: Derivation) -> None:
@@ -549,6 +600,130 @@ def _rule(spec: Mapping[str, Any], params: Mapping[str, Any], where: str):
     rule.__name__ = rule_id.rsplit(".", 1)[-1]
     rule.__doc__ = spec.get("doc")
     return rule
+
+
+# ===========================================================================
+# L-systems grown inside a shape
+# ===========================================================================
+
+_RULE_KEYS = {"id", "pred", "left", "right", "when", "to", "weight", "doc"}
+_DRAW_VERBS = ("split", "repeat", "inset", "place", "line")
+_DRAW_KEYS = {"split", "repeat", "inset", "place", "line", "weights", "n", "at", "width", "straight", "slant",
+              "attrs", "when", "each"}
+
+
+def _lsystem(spec: Mapping[str, Any], where: str) -> _ls.LSystem:
+    """A ``[[lsystem]]`` table: an axiom, rewriting rules and how each symbol
+    is drawn in its cell. See ``dev/RULES.md``, "Growing ornament"."""
+    try:
+        rules = []
+        for i, r in enumerate(spec.get("rules", ())):
+            rw = f"{where}: rule {r.get('id', i)}"
+            extra = set(r) - _RULE_KEYS
+            if extra:
+                raise RuleFileError(f"{rw}: unknown key(s) {sorted(extra)}")
+            symbol, formals = _ls.parse_pattern(r["pred"], rw)
+            left = _ls.parse_pattern(r["left"], rw) if "left" in r else None
+            right = _ls.parse_pattern(r["right"], rw) if "right" in r else None
+            names = [*formals, *(left[1] if left else ()), *(right[1] if right else ())]
+            if len(set(names)) != len(names):
+                raise RuleFileError(f"{rw}: a formal parameter is named twice across the rule's context")
+            rules.append(
+                _ls.LRule(
+                    id=r.get("id", f"{spec['id']}.{symbol}.{i}"),
+                    symbol=symbol,
+                    formals=formals,
+                    successor=_ls.parse_modules(r["to"], f"{rw}.to", _expr),
+                    when=_expr(r["when"], f"{rw}.when") if "when" in r else None,
+                    weight=_expr(r["weight"], f"{rw}.weight") if "weight" in r else None,
+                    left=left,
+                    right=right,
+                )
+            )
+        interpret: dict[str, _ls.Interpretation] = {}
+        for i, entry in enumerate(spec.get("interpret", ())):
+            iw = f"{where}: interpret {entry.get('module', i)}"
+            symbol, formals = _ls.parse_pattern(entry["module"], iw)
+            if symbol in interpret:
+                raise RuleFileError(f"{iw}: {symbol!r} is interpreted twice")
+            steps = entry.get("do")
+            if steps is None:
+                steps = [{k: v for k, v in entry.items() if k != "module"}]
+            elif set(entry) - {"module", "do"}:
+                raise RuleFileError(f"{iw}: an entry with 'do' has no other keys")
+            interpret[symbol] = _ls.Interpretation(
+                symbol, formals, tuple(_draw(s, f"{iw}.do[{k}]") for k, s in enumerate(steps))
+            )
+        extra = set(spec) - _KEYS["lsystem"]
+        if extra:
+            raise RuleFileError(f"{where}: unknown key(s) {sorted(extra)}")
+        return _ls.LSystem(
+            id=spec["id"],
+            axiom=_ls.parse_modules(spec["axiom"], f"{where}.axiom", _expr),
+            rules=tuple(rules),
+            interpret=interpret,
+            ignore=frozenset(spec.get("ignore", ())),
+            doc=spec.get("doc", ""),
+        )
+    except _ls.GrowError as exc:
+        raise RuleFileError(str(exc)) from exc
+    except KeyError as exc:
+        raise RuleFileError(f"{where}: missing {exc.args[0]!r}") from exc
+
+
+def _draw(spec: Mapping[str, Any], where: str) -> _ls.Draw:
+    verbs = [v for v in _DRAW_VERBS if v in spec]
+    if len(verbs) != 1:
+        raise RuleFileError(f"{where}: a drawing step has exactly one verb of {list(_DRAW_VERBS)}, got {verbs or list(spec)}")
+    extra = set(spec) - _DRAW_KEYS
+    if extra:
+        raise RuleFileError(f"{where}: unknown key(s) {sorted(extra)}")
+    verb = verbs[0]
+    when = _expr(spec["when"], f"{where}.when") if "when" in spec else None
+    each = _expr(spec["each"], f"{where}.each") if "each" in spec else None
+    attrs = _map(spec.get("attrs"), where)
+    if verb in ("split", "repeat"):
+        if spec[verb] not in _AXES:
+            raise RuleFileError(f"{where}: {verb} along 'x' or 'y', not {spec[verb]!r}")
+        if ("n" in spec) == ("weights" in spec):
+            raise RuleFileError(f"{where}: a {verb} takes 'n' or 'weights'")
+        key = "n" if "n" in spec else "weights"
+        return _ls.Draw(verb, _AXES[spec[verb]], {key: _expr(spec[key], f"{where}.{key}")}, when=when, each=each)
+    if verb == "inset":
+        return _ls.Draw(verb, fields={"inset": _expr(spec["inset"], f"{where}.inset")}, when=when, each=each)
+    if verb == "place":
+        if len(spec.get("at", ())) != 4:
+            raise RuleFileError(f"{where}: 'at' is [x, y, w, h] in the cell")
+        at = [_expr(a, f"{where}.at") for a in spec["at"]]
+        return _ls.Draw(verb, fields={"at": at}, label=spec["place"], attrs=attrs, when=when, each=each)
+    if len(spec["line"]) != 4 or "width" not in spec:
+        raise RuleFileError(f"{where}: a line is [x0, y0, x1, y1] in the cell, with a 'width'")
+    return _ls.Draw(
+        verb,
+        fields={"line": [_expr(a, f"{where}.line") for a in spec["line"]], "width": _expr(spec["width"], f"{where}.width")},
+        label=spec.get("straight", "Bar"),
+        slant=spec.get("slant", "Slant"),
+        attrs=attrs,
+        when=when,
+        each=each,
+    )
+
+
+def write_slant(shape: Shape, below, d) -> list:
+    """A grown diagonal: a bar across its own rectangle, rising or falling."""
+    from buildings.ir.nodes import BraceNode
+
+    return [
+        BraceNode(
+            id=shape.id,
+            kind="brace",
+            trace=tuple(shape.trace),
+            props={**kit.xywh(shape.scope), "direction": shape.attrs["direction"]},
+        )
+    ]
+
+
+WRITERS["grow.slant"] = write_slant
 
 
 @dataclass
@@ -610,10 +785,11 @@ class Style:
 
 _KEYS = {
     "production": {"id", "label", "when", "priority", "doc", "let", "do"},
+    "lsystem": {"id", "doc", "axiom", "ignore", "rules", "interpret"},
     "rule": {"id", "label", "layer", "when", "let", "set", "specificity", "doc"},
     "layer": {"name", "order"},
 }
-_TOP = {"style", "params", "lot_props", "emit", "production", "rule", "layer"}
+_TOP = {"style", "params", "lot_props", "emit", "production", "rule", "layer", "lsystem"}
 
 
 def _check(data: Mapping[str, Any], path: Path) -> None:
@@ -662,8 +838,15 @@ def load_style(path: str | Path) -> Style:
     meta = data.get("style") or {}
     name = meta.get("name") or path.stem
     params = dict(data.get("params") or {})
+    systems: dict[str, _ls.LSystem] = {}
+    for i, spec in enumerate(data.get("lsystem", ())):
+        system = _lsystem(spec, f"{path.name}: lsystem {spec.get('id', i)}")
+        if system.id in systems:
+            raise RuleFileError(f"{path.name}: two [[lsystem]] tables with id {system.id!r}")
+        systems[system.id] = system
     productions = tuple(
-        _production(p, params, f"{path.name}: production {p.get('id', i)}") for i, p in enumerate(data.get("production", ()))
+        _production(p, params, f"{path.name}: production {p.get('id', i)}", systems)
+        for i, p in enumerate(data.get("production", ()))
     )
     layers_spec = {l["name"]: l.get("order", 0) for l in data.get("layer", ())}
     by_label: dict[str, dict[str, list]] = {}

@@ -27,6 +27,7 @@ from buildings.cga.rules import (
     under,
 )
 from buildings.cga.shape import X, Y, Attributes, LockedAttributes, Part, Scope, Shape
+from buildings.cga.lsystem import GrowConflict, GrowError, LSystem, grow
 
 __all__ = [
     "Attrs",
@@ -35,6 +36,10 @@ __all__ = [
     "Candidate",
     "Derivation",
     "Grammar",
+    "GrowConflict",
+    "GrowError",
+    "LSystem",
+    "grow",
     "Layer",
     "LockedAttributes",
     "OutsideParent",

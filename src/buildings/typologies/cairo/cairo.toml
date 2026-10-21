@@ -33,7 +33,9 @@ year = "= year"
 Storey = "cairo.storey"
 Cell = "cairo.cell"
 Box = "kit.storey"
-Lattice = "cairo.lattice"
+Rail = "kit.column"
+Spindle = "kit.column"
+Bead = "kit.column"
 Corbel = "cairo.corbel"
 Hood = "cairo.hood"
 Cresting = "cairo.cresting"
@@ -62,6 +64,11 @@ corbel_toe = 0.35                  # the corbel's foot as a share of the oriel's
 oriel_pane = 0.75                  # one latticed panel of an oriel
 oriel_patterns = ["centre", "alternate", "all"]
 lattice_gap = 0.06                 # the mesh of a mashrabiya, INFERRED from close views
+# The turned wood a mashrabiya is grown from (cairo.mashrabiya below).
+lattice_spindle = 0.03             # a turned spindle's thickness
+lattice_bead = 0.06                # the bead turned where spindles cross
+lattice_frame = 0.045              # the screen's frame
+lattice_rail = 0.05                # the rail between the field and the crown
 hood_rise = 1.25
 muqarnas_tiers = 4
 muqarnas_before = 1700             # stalactite hoods are Mamluk and early Ottoman
@@ -154,6 +161,78 @@ doc = "A light is screened by its mashrabiya, under its head."
 do = [
   { call = "kit.dress_the_light" },
   { insert = "Lattice", at = ["x", "y", "w", "h - (w / 2.0 if head == 'round' else w * 0.75 if head == 'ogee' else 0.0)"], name = "lattice", when = "has('screen_gap') and screen_gap" },
+]
+
+[[production]]
+id = "cairo.lattice"
+label = "Lattice"
+doc = "A mashrabiya is grown, not drawn: the L-system cairo.mashrabiya rewrites the screen into a frame, a field and on a tall screen a crown, the field into near-square cells, then every cell into four, generation by generation, until the mesh is the stated gap. So the screen's size sets the generations, and money the gap: a modest house's turner worked to twice the mesh, a generation short. Each floor (and the oriels) draws its pattern from the family's seed."
+do = [ { grow = "cairo.mashrabiya", seed = "role", as = "growth", params = { bar = "lattice_spindle", bead = "lattice_bead", frame = "min(lattice_frame, w * 0.08)", rail = "lattice_rail", side = "min(w, h) - 2 * frame", pitch = "(screen_gap + bar) * (2 if klass == 'modest' else 1)", halvings = "max(0, round(log2(side / pitch)) - 2)", unit = "pitch * 2 ** halvings" }, generations = "3 + halvings" } ]
+
+# --- the mashrabiya, grown ---------------------------------------------------
+#
+# Turned-wood lattice (Bayt al-Suhaymi, Bayt al-Kritliyya, the Gayer-Anderson
+# house): a frame, and inside it a field of short turned spindles meeting at
+# beads, either square to the frame or on the diagonal (maymuni); a tall
+# screen keeps a square panel at its top for a wheel of spindles round a hub.
+# Generation 1 frames the screen, 2 chooses the pattern (by weight, from the
+# seed), 3 squares the field into cells of 'unit' (as near square as its
+# proportions allow: a lozenge of the maymuni grid wants 45 degrees), and
+# every generation after splits each cell into four, halving the mesh. What is left
+# is drawn: a cell of the square grid as a cross with a bead where its arms
+# meet and half a spool at each arm's end (two halves make the spool between
+# two beads); a diagonal cell as an X with a bead at its middle and a quarter
+# bead in each corner.
+
+[[lsystem]]
+id = "cairo.mashrabiya"
+doc = "A mashrabiya screen of turned wood."
+axiom = "Screen(w, h)"
+rules = [
+  { id = "cairo.mashrabiya.framed", pred = "Screen(a, b)", to = "Frame Inset [ Body(a - 2 * frame, b - 2 * frame) ]" },
+  # The pattern: a tall screen keeps a square crown over its field.
+  { id = "cairo.mashrabiya.square_grid_under_a_wheel", pred = "Body(a, b)", when = "b > 1.6 * a", weight = 2, to = "Sy(b - a - rail, rail, a) [ Field(a, b - a - rail, 0) ] [ Rail ] [ Wheel ]" },
+  { id = "cairo.mashrabiya.maymuni_under_a_wheel", pred = "Body(a, b)", when = "b > 1.6 * a", weight = 1, to = "Sy(b - a - rail, rail, a) [ Field(a, b - a - rail, 1) ] [ Rail ] [ Wheel ]" },
+  { id = "cairo.mashrabiya.square_grid", pred = "Body(a, b)", when = "b <= 1.6 * a", weight = 2, to = "Field(a, b, 0)" },
+  { id = "cairo.mashrabiya.maymuni", pred = "Body(a, b)", when = "b <= 1.6 * a", weight = 1, to = "Field(a, b, 1)" },
+  # Squaring: as many cells across and up as the field's proportions give.
+  { id = "cairo.mashrabiya.squared", pred = "Field(a, b, p)", to = "Rx(max(1, round(a / unit))) [ Ry(max(1, round(b / unit))) [ Cell(a / max(1, round(a / unit)), b / max(1, round(b / unit)), p) ] ]" },
+  # Every generation after: each cell into four, while a bead still fits.
+  { id = "cairo.mashrabiya.quartered", pred = "Cell(a, b, p)", when = "min(a, b) > 2.4 * bead", to = "Rx(2) [ Ry(2) [ Cell(a / 2, b / 2, p) ] ]" },
+]
+interpret = [
+  { module = "Frame", do = [
+      { place = "Rail", at = ["0", "0", "cw", "frame"], attrs = { order = "timber" } },
+      { place = "Rail", at = ["0", "ch - frame", "cw", "frame"], attrs = { order = "timber" } },
+      { place = "Rail", at = ["0", "frame", "frame", "ch - 2 * frame"], attrs = { order = "timber" } },
+      { place = "Rail", at = ["cw - frame", "frame", "frame", "ch - 2 * frame"], attrs = { order = "timber" } },
+  ] },
+  { module = "Inset", inset = "frame" },
+  { module = "Sy(f, r, c)", split = "y", weights = "[f, r, c]" },
+  { module = "Rx(n)", repeat = "x", n = "n" },
+  { module = "Ry(n)", repeat = "y", n = "n" },
+  { module = "Rail", place = "Rail", at = ["0", "0", "cw", "ch"], attrs = { order = "timber" } },
+  { module = "Cell(a, b, p)", do = [
+      # The square grid: a cross, a bead, half a spool at each arm's end.
+      { when = "p == 0", line = ["0", "ch / 2", "cw", "ch / 2"], width = "min(bar, 0.3 * min(cw, ch))", straight = "Spindle", attrs = { order = "timber" } },
+      { when = "p == 0", line = ["cw / 2", "0", "cw / 2", "ch"], width = "min(bar, 0.3 * min(cw, ch))", straight = "Spindle", attrs = { order = "timber" } },
+      { when = "p == 0 and min(cw, ch) > 3.5 * bead", place = "Bead", at = ["0", "ch / 2 - 0.35 * bead", "0.3 * bead", "0.7 * bead"], attrs = { order = "timber" } },
+      { when = "p == 0 and min(cw, ch) > 3.5 * bead", place = "Bead", at = ["cw - 0.3 * bead", "ch / 2 - 0.35 * bead", "0.3 * bead", "0.7 * bead"], attrs = { order = "timber" } },
+      { when = "p == 0 and min(cw, ch) > 3.5 * bead", place = "Bead", at = ["cw / 2 - 0.35 * bead", "0", "0.7 * bead", "0.3 * bead"], attrs = { order = "timber" } },
+      { when = "p == 0 and min(cw, ch) > 3.5 * bead", place = "Bead", at = ["cw / 2 - 0.35 * bead", "ch - 0.3 * bead", "0.7 * bead", "0.3 * bead"], attrs = { order = "timber" } },
+      # The maymuni grid: an X of beads on the diagonals, and a quarter bead in each corner.
+      { when = "p == 1", each = "[[0.25, 0.25], [0.75, 0.75], [0.25, 0.75], [0.75, 0.25]]", place = "Bead", at = ["item[0] * cw - 0.45 * bar", "item[1] * ch - 0.45 * bar", "0.9 * bar", "0.9 * bar"], attrs = { order = "timber" } },
+      { when = "p == 1", each = "[[0, 0], [1, 0], [0, 1], [1, 1]]", place = "Bead", at = ["item[0] * (cw - min(bead, 0.5 * cw) * 0.375)", "item[1] * (ch - min(bead, 0.5 * ch) * 0.375)", "min(bead, 0.5 * cw) * 0.375", "min(bead, 0.5 * ch) * 0.375"], attrs = { order = "timber" } },
+      # Either way, a bead where the arms meet (smaller on the diagonal, where four meet in a corner too).
+      { place = "Bead", at = ["cw / 2 - min(bead * (1 - 0.25 * p), 0.42 * min(cw, ch)) / 2", "ch / 2 - min(bead * (1 - 0.25 * p), 0.42 * min(cw, ch)) / 2", "min(bead * (1 - 0.25 * p), 0.42 * min(cw, ch))", "min(bead * (1 - 0.25 * p), 0.42 * min(cw, ch))"], attrs = { order = "timber" } },
+  ] },
+  # The crown: a wheel of turned beads -- a ring of forty, eight spokes of five, a hub.
+  { module = "Wheel", do = [
+      { each = "range(40)", place = "Bead", at = ["cw / 2 + 0.42 * min(cw, ch) * cos(i * pi() / 20) - 0.6 * bar", "ch / 2 + 0.42 * min(cw, ch) * sin(i * pi() / 20) - 0.6 * bar", "1.2 * bar", "1.2 * bar"], attrs = { order = "timber" } },
+      { each = "range(40)", place = "Bead", at = ["cw / 2 + 0.42 * min(cw, ch) * (i % 5 + 2) / 7 * cos((i // 5) * pi() / 4 + pi() / 8) - 0.5 * bar", "ch / 2 + 0.42 * min(cw, ch) * (i % 5 + 2) / 7 * sin((i // 5) * pi() / 4 + pi() / 8) - 0.5 * bar", "bar", "bar"], attrs = { order = "timber" } },
+      { place = "Bead", at = ["cw / 2 - 1.25 * bead", "ch / 2 - 1.25 * bead", "2.5 * bead", "2.5 * bead"], attrs = { order = "timber" } },
+      { each = "[[0.1, 0.1], [0.9, 0.1], [0.1, 0.9], [0.9, 0.9]]", place = "Bead", at = ["max(0, item[0] * cw - bead / 2)", "max(0, item[1] * ch - bead / 2)", "min(bead, cw)", "min(bead, ch)"], attrs = { order = "timber" } },
+  ] },
 ]
 
 # --- rules -------------------------------------------------------------------

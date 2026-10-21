@@ -19,11 +19,11 @@ from pathlib import Path
 from typing import Callable
 
 from buildings.cga import Grammar, Shape
-from buildings.ir.nodes import BuildingNode, GableNode, IronworkNode
+from buildings.ir.nodes import BuildingNode, GableNode
 from buildings.site import BuildingClass
 from buildings.trace import TraceLog
 from buildings.typologies.common import kit
-from buildings.typologies.common.kit import trace_of, xywh
+from buildings.typologies.common.kit import xywh
 from buildings.typologies.common.rulefile import load_style, register_writer
 from buildings.typologies.sanaa.grammar import lift  # also registers the qamariya
 
@@ -39,19 +39,6 @@ class CairoSite:
 def _gable(shape: Shape, pts, form: str, material: str) -> GableNode:
     return GableNode(id=shape.id, kind="gable", trace=tuple(shape.trace),
                      props={**xywh(shape.scope), "form": form, "points": tuple(pts), "hoist_beam": None, "wall_material": material})
-
-
-def write_lattice(shape: Shape, below, d) -> list:
-    """A mashrabiya screen of turned timber over a light."""
-    return [
-        IronworkNode(
-            id=f"{shape.parent.id}/lattice",
-            kind="ironwork",
-            trace=trace_of(shape, "screen_gap"),
-            props={**xywh(shape.scope), "guards": "opening", "ironwork_pattern": "timber_lattice",
-                   "max_gap": shape.attr("screen_gap"), "ornament_count": 2},
-        )
-    ]
 
 
 def write_corbel(shape: Shape, below, d) -> list:
@@ -114,7 +101,6 @@ def write_cresting(shape: Shape, below, d) -> list:
     return [_gable(shape, pts, "straight", shape.attr("wall_material"))]
 
 
-register_writer("cairo.lattice", write_lattice)
 register_writer("cairo.corbel", write_corbel)
 register_writer("cairo.hood", write_hood)
 register_writer("cairo.cresting", write_cresting)

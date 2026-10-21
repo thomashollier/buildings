@@ -90,6 +90,7 @@ do = [ ...operations... ]
 | `{ set = {...} }`, `{ let = {...} }` | Writes the shape in hand; binds names for later operations. |
 | `{ call = "kit.split_cell_around_its_light" }` | Runs a named Python production: the shared window anatomy. |
 | `{ refuse = "message" }` | Declines a situation the style does not model (with a `when`), raising `Refused`, a `ValueError`. |
+| `{ grow = "lsystem.id", generations = "n", params = {...} }` | Grows a `[[lsystem]]` inside the shape: see "Growing ornament" below. |
 
 Any operation may carry its own `when`.
 
@@ -121,7 +122,7 @@ A name resolves to the first of these that has it:
 Functions:
 
 - arithmetic and lists: `min max abs round len sum fsum float int range
-  column(rows, key) every_other(items) sin cos pi()`;
+  column(rows, key) every_other(items) sin cos pi() sqrt log2 ceil floor`;
 - regulation and proportion: `step(table, value)` (a step table read the way
   a decree is), `stepping(start, step, floor)` (a setback law's widths),
   `geometric(first, ratio, n)` (storeys that taper);
@@ -145,12 +146,95 @@ When the file is loaded, the loader refuses:
   parameter first, so the attribute would be written and never read. This is
   exactly the mistake converting Amsterdam produced, before the check existed.
 
+## Growing ornament: `grow` and `[[lsystem]]`
+
+Productions place things; they do not grow them. Self-similar ornament (a
+lattice, tracery) used to be drawn by a Python writer around a shape the
+rules placed. `grow` lets a rule file grow it instead: a production hands
+**one shape's scope** to a parametric L-system, which rewrites a string of
+modules for some generations and is then drawn as **nested cells** inside
+that scope. The engine is in `src/buildings/cga/lsystem.py`.
+
+```toml
+[[production]]
+id = "cairo.lattice"
+label = "Lattice"
+do = [ { grow = "cairo.mashrabiya",            # the [[lsystem]] id
+         generations = "3 + halvings",         # an expression
+         params = { bar = "lattice_spindle", side = "min(w, h)", halvings = "max(0, round(log2(side / 0.09)) - 2)" },
+         seed = "role",                        # optional: the random stream's key (default: the shape's id)
+         as = "growth",                        # optional: store a summary attribute
+         name = "g" } ]                        # optional: child ids are <shape>/g0, g1, ...
+
+[[lsystem]]
+id = "cairo.mashrabiya"
+axiom = "Screen(w, h)"
+ignore = []                                    # symbols context matching looks past
+rules = [
+  { id = "cairo.mashrabiya.framed", pred = "Screen(a, b)", to = "Frame Inset [ Body(a, b) ]" },
+  { id = "...square_grid", pred = "Body(a, b)", when = "b <= 1.6 * a", weight = 2, to = "Field(a, b, 0)" },
+  { id = "...maymuni",     pred = "Body(a, b)", when = "b <= 1.6 * a", weight = 1, to = "Field(a, b, 1)" },
+  { id = "...quartered",   pred = "Cell(a, b, p)", when = "min(a, b) > 2.4 * bead", to = "Rx(2) [ Ry(2) [ Cell(a / 2, b / 2, p) ] ]" },
+  # context: { pred = "A", left = "B(x)", right = "C", to = "..." }
+]
+interpret = [
+  { module = "Rx(n)", repeat = "x", n = "n" },
+  { module = "Inset", inset = "frame" },
+  { module = "Cell(a, b, p)", do = [
+      { line = ["0", "ch / 2", "cw", "ch / 2"], width = "bar", straight = "Spindle", slant = "Slant", attrs = { order = "timber" } },
+      { place = "Bead", at = ["cw / 2 - bead / 2", "ch / 2 - bead / 2", "bead", "bead"], attrs = { order = "timber" } },
+  ] },
+]
+```
+
+**Modules.** `Name(expr, ...)` or a one-character symbol (`+`, `-`, ...),
+and `[` `]` for a branch. Arguments in the axiom and in successors are rule
+expressions (the same whitelisted language, checked when the file loads);
+they see the rule's formal parameters, the grow's `params`, then the grown
+shape's names (`w`, `h`, attributes up the tree, `[params]`).
+
+**Rewriting.** Every module is rewritten in parallel, each generation. Of the
+rules whose predecessor (symbol and arity), `left`/`right` context and `when`
+match, context-sensitive rules beat context-free ones. If more than one is
+left, all must carry a `weight` and one is drawn from the site's seed at a
+path naming the L-system, the `seed` key, the generation, the symbol and its
+occurrence: deterministic, and independent of every other decision. Several
+matches without weights raise `GrowConflict` (a tie is a defect, as between
+productions). A module no rule matches is copied. Left context looks past
+whole branches and out of its own; right context stays in its branch.
+Limits: 16 generations, 50 000 modules, 20 000 marks.
+
+**Interpretation.** The state is a cell, starting as the grown shape's scope.
+Per symbol, `interpret` gives one step or a `do` list of steps:
+
+| Step | Does |
+|---|---|
+| `{ split = "x", weights = "[a, b]" }` | cuts the cell by weights; each following `[ ... ]` draws in the next part |
+| `{ repeat = "y", n = "k" }` | cuts the cell into `k` equal parts; the following `[ ... ]` draws once in each |
+| `{ inset = "d" }` or `"[l, b, r, t]"` | shrinks the cell (forgotten at the branch's `]`) |
+| `{ place = "Label", at = [x, y, w, h], attrs = {...} }` | a rectangle, in cell-local metres |
+| `{ line = [x0, y0, x1, y1], width = "t", straight = "Bar", slant = "Slant" }` | a bar square to the cell (`straight`), or a diagonal across its box (`slant`, with `direction` rising or falling) |
+
+Any step may carry `when` and `each` (with `item` and `i` bound). Names in a
+step: `cw` and `ch` (the cell's size) and the module's formal parameters,
+then as above. A `[` with no pending part draws in a copy of the cell.
+
+**What it guarantees.** Every mark becomes a child shape of the grown one,
+inserted by the engine, so the engine's `OutsideParent` check applies; a mark
+must also lie inside the cell its module draws in. Each child's trace has the
+engine's `insert` entry and one naming the L-system, the rule that wrote its
+module and the generation it was written in; the grown shape carries one
+entry for the whole growth (generations, the final string, every stochastic
+choice and what it beat). The children's labels are written by whatever
+`[emit]` names (`kit.column` for timber, `grow.slant` for a diagonal brace),
+so nothing new reaches the renderer.
+
 ## What stays in Python
 
 - **The engine and the shared kit:** window anatomy and IR writers.
 - **Drawings a file names by writer:** Amsterdam's gable outline (step, neck,
   bell), the Victorian false-front gable, turret cone and stoop, Normandy's
-  braces and gable, Kyoto's lattice, the Corbusian pavilion screen, the Art
+  braces and gable, Kyoto's lattice (Cairo's mashrabiya is grown, above), the Corbusian pavilion screen, the Art
   Deco spire. These are outlines drawn around shapes the rules placed, not
   decisions.
 - **The measured Paris generator.** By design, it reads Daly through its own
