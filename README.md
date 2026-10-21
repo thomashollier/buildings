@@ -214,6 +214,12 @@ Six buildings from each ruleset, one scale per strip
 
 ![pagoda](docs/strips/pagoda.png)
 
+### Old Havana
+
+**Old Havana (La Habana Vieja)** — street fronts of the walled city in three manners the date draws from overlapping odds: colonial (two tall floors, sometimes an entresuelo, openings to the floor behind wooden rejas, a long wooden balcony under a tile tejaroz, the tile alero), neoclassical (an arcaded portal on a plaza, iron balconies, a balustered pretil) and eclectic (more floors, iron balconies, a carved crest). The mediopunto fanlights, the rejas and every baluster are grown; the builder (seed) picks the pastel, the balconies and the door.
+
+![havana](docs/strips/havana.png)
+
 ### Housing
 
 **Lisbon Pombaline building** — the post-1755 standard elevation: the street's rank sets the floors and the balconies, and every window above the stone shop doors is one width on one rhythm, under a cornice and a tiled mansard; later owners clad the front in azulejos and raise it a floor.
@@ -381,7 +387,7 @@ src/buildings/
     classical/ deco/ georgian/ gothic_cathedral/ kyoto/ miami_deco/
     modernist/ movie_palace/ normandy/ pagoda/ pombaline/ renaissance/
     romanesque/ sanaa/ second_empire/ shophouse/ soho/ soviet_panel/
-    spanish_colonial/ tudor/ venice/ victorian/
+    spanish_colonial/ tudor/ venice/ victorian/ havana/
                   each: <style>.toml (the rules) + grammar.py (site type,
                   named drawings, generate/derive)
   block/          frontage subdivision, adjacency, shared datums

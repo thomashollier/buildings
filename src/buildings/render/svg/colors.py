@@ -82,6 +82,11 @@ COLORS: dict[str, str] = {
     "wall_clapboard_rose": "#C99A9A",
     "wall_plaster_ochre": "#DDC08A",
     # Materials the newer rulesets name.
+    "wall_stucco_blue": "#A9C6D8",
+    "wall_stucco_mint": "#B4D8C6",
+    "wall_stucco_yellow": "#E9D48A",
+    "wall_stucco_aqua": "#9FCFCB",
+    "wall_stucco_peach": "#EDBE9A",
     "wall_brownstone": "#7A5446",
     "wall_slate": "#4F5A63",
     "wall_tile_red": "#B5523B",

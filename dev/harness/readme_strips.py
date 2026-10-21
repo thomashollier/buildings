@@ -299,7 +299,18 @@ def _deco_family():
     m = lambda site: generate_miami_deco(site)[0]  # noqa: E731
     p = lambda site: generate_movie_palace(site)[0]  # noqa: E731
     v = lambda site: generate_venice(site)[0]  # noqa: E731
+    from buildings.typologies.havana.grammar import HavanaSite, generate_havana
+
+    hv = lambda site: generate_havana(site)[0]  # noqa: E731
     return {
+        "havana": ("Old Havana (havana.toml)", [
+            ("colonial, 1720, 11 m", hv(HavanaSite(11.0, 1720, K.COMFORTABLE, 0))),
+            ("colonial, 1760, 14 m", hv(HavanaSite(14.0, 1760, K.GRAND, 4))),
+            ("neoclassical, 1820, plaza portal", hv(HavanaSite(16.0, 1820, K.COMFORTABLE, 2, True))),
+            ("neoclassical, 1850, 12 m", hv(HavanaSite(12.0, 1850, K.ORDINARY, 3))),
+            ("eclectic, 1905, 14 m", hv(HavanaSite(14.0, 1905, K.COMFORTABLE, 4))),
+            ("eclectic, 1920, 18 m", hv(HavanaSite(18.0, 1920, K.GRAND, 5))),
+        ]),
         "deco_civic": ("Art Deco civic: courthouse, city hall, federal building (civic.toml)", [
             ("1931, county courthouse, ordinary", g("civic", 30.0, 1931, K.ORDINARY, seed=0)),
             ("1936, county courthouse, modest", g("civic", 26.0, 1936, K.MODEST, seed=1)),
