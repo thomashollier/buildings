@@ -57,7 +57,19 @@ def write_storey(storey: Shape, below, d) -> list:
     return [replace(node, children=socles + rest), *out[1:]]
 
 
+def write_light(light: Shape, below, d) -> list:
+    """A light, with what a two-storey carriage arch states: which register it
+    is, how tall its leaves stand, what fills its head."""
+    out = kit.write_light(light, below, d)
+    extra = {k: light.attrs[k] for k in ("arch_register", "leaf_height", "head_infill") if k in light.attrs}
+    if not extra:
+        return out
+    node = out[0]
+    return [replace(node, props={**node.props, **extra}), *out[1:]]
+
+
 register_writer("haussmann.rustication", write_rustication)
+register_writer("haussmann.light", write_light)
 register_writer("haussmann.storey", write_storey)
 
 STYLE = load_style(Path(__file__).with_name("haussmann.toml"))

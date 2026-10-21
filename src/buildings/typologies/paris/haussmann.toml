@@ -25,6 +25,7 @@ Rosette = "kit.column"
 Slant = "grow.slant"
 Rustication = "haussmann.rustication"
 Storey = "haussmann.storey"
+Light = "haussmann.light"
 
 [params]
 # The facade height a street allows, as each regulation's step table:
@@ -105,7 +106,7 @@ do = [
   { set = { base_h = "= base", mid = "= mid", noble_h = "= noble", lettings = "= lettings", shop = "= shop", up_h = "= up" } },
   { let = { front = "base + noble + fsum(geometric(up, taper, lettings))" } },
   { fit = "x", end = "end", bay = "bay", as = "rhythm", min_bays = 2 },
-  { set = { motif = "= draw('railing_motif', [0, 1, 2], step(railing_motifs, year))", light_width = "= between('light_w', light_w[0], light_w[1])", noble_filant = "= chance('noble_filant', p_noble_filant[klass])", top_filant = "= chance('top_filant', p_top_filant[klass])", door = "= 'cochere' if chance('cochere', (cochere_wide if w >= 16 else cochere)[klass]) else 'pietonne'", refends = "= year >= 1853 and chance('refends', rusticated)", filant_extent = "= draw('filant_extent', noble_filant_extent)", pediments = "= draw('pediments', pediment_floor) if klass in ('grand', 'comfortable') else 'none'" } },
+  { set = { motif = "= draw('railing_motif', [0, 1, 2], step(railing_motifs, year))", light_width = "= between('light_w', light_w[0], light_w[1])", noble_filant = "= chance('noble_filant', p_noble_filant[klass])", top_filant = "= chance('top_filant', p_top_filant[klass])", door = "= 'cochere' if chance('cochere', (cochere_wide if w >= 16 else cochere)[klass]) else 'pietonne'", refends = "= year >= 1853 and chance('refends', rusticated)", arch_through = "= chance('arch_through', 0.7)", filant_extent = "= draw('filant_extent', noble_filant_extent)", pediments = "= draw('pediments', pediment_floor) if klass in ('grand', 'comfortable') else 'none'" } },
   # The entrance by parity (R13): the middle of an odd run, or one of the outer
   # bays of an even one.
   { let = { nb = "len(bay_spans(rhythm, 0.0))" } },
@@ -312,6 +313,14 @@ when = "is_bay() and floor == 'ground' and nth - 1 == door_bay"
 specificity = 20
 let = { cochere = "door == 'cochere'" }
 set = { opening_type = "pedestrian_entrance", head = "= 'round' if cochere else 'flat'", light_width = "= 2.6 if cochere else 1.4", sill = 0.0, light_height = "= h - 0.35", surround_kind = "moulded_architrave", keystone_present = "= cochere" }
+
+[[rule]]
+id = "haussmann.base.the_carriage_arch_rises_through_the_entresol"
+label = "Cell"
+doc = "On most fronts with an entresol (photo check R12: 0.7) the porte cochere's arch rises through it: the rez-de-chaussee holds the leaves under a carved tympanum, the entresol the arch's round head."
+when = "is_bay() and nth - 1 == door_bay and door == 'cochere' and mid == 'entresol' and arch_through and floor in ('ground', 'entresol')"
+specificity = 30
+set = { opening_type = "= 'carriage_entrance' if floor == 'ground' else 'entrance_arch_head'", head = "= 'flat' if floor == 'ground' else 'round'", light_width = 2.6, sill = 0.0, light_height = "= h", surround_kind = "moulded_architrave", keystone_present = "= floor == 'entresol'", arch_register = "= 'leaves' if floor == 'ground' else 'head'", leaf_height = "= h - 0.7", head_infill = "tympanum" }
 
 [[rule]]
 id = "haussmann.class.the_noble_floor_is_pedimented"
