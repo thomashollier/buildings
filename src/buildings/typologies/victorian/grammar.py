@@ -118,6 +118,18 @@ def write_storey(storey: Shape, below, d) -> list:
     return [replace(node, children=socles + rest), *out[1:]]
 
 
+def write_light(light: Shape, below, d) -> list:
+    """The kit's light, glazed as the rules say: double-hung sashes, the
+    meeting rail at half height."""
+    out = kit.write_light(light, below, d)
+    extra = {k: light.attr(k) for k in ("glazing", "sash_cols", "sash_rows", "frame_paint", "frame_w", "bar_w")
+             if light.attr(k, None) is not None}
+    if not extra or out[0].kind != "opening" or out[0].props.get("opening_type") != "window":
+        return out
+    return [replace(out[0], props={**out[0].props, **extra}), *out[1:]]
+
+
+register_writer("victorian.light", write_light)
 register_writer("victorian.porch_shade", write_porch_shade)
 register_writer("victorian.storey", write_storey)
 register_writer("victorian.stoop", write_stoop)

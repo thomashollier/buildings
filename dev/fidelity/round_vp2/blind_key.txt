@@ -1,0 +1,16 @@
+img00.png	paris	street 12.0 parcel 10.0 1869 grand cafe seed 421
+img01.png	victorian	italianate	7.62 m 1867 ordinary seed 42
+img02.png	victorian	italianate	6.1 m 1872 ordinary seed 154
+img03.png	paris	street 9.0 parcel 10.0 1881 ordinary shop seed 718
+img04.png	victorian	italianate	6.1 m 1874 grand seed 300
+img05.png	victorian	stick	7.62 m 1890 modest seed 672
+img06.png	victorian	stick	6.1 m 1879 ordinary seed 719
+img07.png	paris	street 20.0 parcel 22.0 1878 grand carriage seed 328
+img08.png	victorian	queen_anne	8.4 m 1892 modest seed 525
+img09.png	paris	street 24.0 parcel 22.0 1892 modest residential seed 145
+img10.png	paris	street 15.0 parcel 10.0 1894 modest residential seed 995
+img11.png	paris	street 20.0 parcel 10.0 1867 modest office seed 753
+img12.png	paris	street 9.0 parcel 10.0 1885 modest carriage seed 156
+img13.png	victorian	italianate	7.62 m 1869 ordinary seed 65
+img14.png	paris	street 20.0 parcel 10.0 1884 modest office seed 453
+img15.png	victorian	queen_anne	8.4 m 1897 grand seed 791

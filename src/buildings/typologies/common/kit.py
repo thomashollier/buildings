@@ -274,7 +274,8 @@ def write_cell(cell: Shape, below: Sequence[Node], d) -> list[Node]:
             kind="bay",
             trace=trace_of(cell, "opening_type"),
             children=tuple(sorted(own, key=lambda n: (_BAY_ORDER.index(n.kind), n.id))),
-            props={**xywh(cell.scope), "slot_name": cell.attrs["slot"].name, "is_special": False},
+            props={**xywh(cell.scope), "slot_name": cell.attrs["slot"].name, "is_special": False,
+                   **({"seamless": True} if cell.attr("seamless", None) else {})},
         ),
         *columns,
     ]

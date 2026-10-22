@@ -48,7 +48,7 @@ mid_weights = { grand = { shop = [0.6, 0.4, 0.0], house = [0.0, 0.8, 0.2] }, com
 # The noble floor by class (R3, Daly medians and ranges), and the letting floor.
 principal = { grand = [3.9, 4.3], comfortable = [3.6, 4.1], ordinary = [3.3, 3.5], modest = [3.0, 3.1] }
 upper = { grand = 3.45, comfortable = 3.1, ordinary = 3.0, modest = 2.9 }
-taper = 0.95                    # each letting floor this fraction of the one below
+taper = 0.92                    # each letting floor this fraction of the one below (round 2: the floors fall off visibly)
 bay = [2.1, 2.8, 3.5]           # the masonry's rhythm (R19, Daly)
 end = [0.2, 0.35, 0.75]
 # Windows (R5): one absolute width; the class is in the noble floor's height.
@@ -57,11 +57,11 @@ noble_light_h = { grand = 2.9, comfortable = 2.25, ordinary = 2.15, modest = 2.1
 light_aspect = 1.9
 balcony_deck_min = 6.0          # 1823: no projecting balcony with its deck under 6 m
 # Balconies (R6): a filant on the noble floor and on the top floor, by class.
-noble_filant_extent = { full = 0.8, central = 0.2 }   # photo check B2
+noble_filant_extent = { full = 0.9, central = 0.1 }   # photo check B2
 letting_balconies = [[1859, [1.0, 0.0, 0.0]], [9999, [0.4, 0.35, 0.25]]]   # [rails, grouped, per window], photo check R2
 pediment_floor = { noble = 0.3, above = 0.25, none = 0.45 }   # photo check R11
-p_noble_filant = { grand = 0.85, comfortable = 0.85, ordinary = 0.5, modest = 0.1 }
-p_top_filant = { grand = 0.85, comfortable = 0.8, ordinary = 0.6, modest = 0.4 }
+p_noble_filant = { grand = 0.95, comfortable = 0.9, ordinary = 0.85, modest = 0.6 }   # round 2: the noble floor's filant is the rule
+p_top_filant = { grand = 0.85, comfortable = 0.85, ordinary = 0.85, modest = 0.7 }
 # The comble (R8): one level or two, by date and envelope.
 h_comble_one = { before_1884 = 3.2, after_1884 = 4.0 }
 h_comble_two = { before_1884 = 4.6, after_1884 = 5.6 }   # blind judges: 6.5 m read 1.7-2.2 storeys too tall
@@ -114,10 +114,10 @@ do = [
   # The comble (R8): before 1884 a brisis and a low terrasson inside the 45
   # degree line; after, the taller arc and a steeper break. Two levels when the
   # envelope allows.
-  { let = { pre = "year < 1884", two = "chance('two_level_comble', (0.4 if legal >= 17.55 and street_width >= 20 else 0.1) if year < 1884 else 0.6)" } },
-  { set = { comble_two = "= two" } },
+  { let = { pre = "year < 1884", two = "lettings + (2 if mid != 'none' else 1) >= 4 and chance('two_level_comble', (0.4 if legal >= 17.55 and street_width >= 20 else 0.1) if year < 1884 else 0.6)" } },
+  { set = { comble_two = "= two", seamless = true } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
-  { insert = "Roof", at = ["0.0", "front", "w", "(h_comble_two.before_1884 if pre else h_comble_two.after_1884) if two else (h_comble_one.before_1884 if pre else h_comble_one.after_1884)"], name = "roof", attrs = { pitch = "= 45.0", lower_pitch = "= (45.0 if two else 60.0) if pre else 72.0", upper_pitch = "= (45.0 if two else 20.0) if pre else 30.0", break_pct = "= (1.0 if two else 0.4) if pre else 0.65", roof_material = "zinc_roofing", dormer_form = "= draw('dormer_form', dormer_forms['rich' if klass in ('grand', 'comfortable') else 'plain'])" } },
+  { insert = "Roof", at = ["0.0", "front", "w", "min((h_comble_two.before_1884 if pre else h_comble_two.after_1884) if two else (h_comble_one.before_1884 if pre else h_comble_one.after_1884), max(3.0, front * 0.25))"], name = "roof", attrs = { pitch = "= 45.0", lower_pitch = "= (45.0 if two else 60.0) if pre else 72.0", upper_pitch = "= (45.0 if two else 20.0) if pre else 30.0", break_pct = "= (1.0 if two else 0.4) if pre else 0.65", roof_material = "zinc_roofing", dormer_form = "= draw('dormer_form', dormer_forms['rich' if klass in ('grand', 'comfortable') else 'plain'])" } },
 ]
 
 [[production]]

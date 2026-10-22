@@ -78,10 +78,10 @@ ecl_uppers = [2, 3, 4]
 ecl_upper_odds = [3, 4, 2]
 # Bays, centre to centre, and the wall at each end.
 bays = { colonial = [3.0, 3.6, 4.4], neoclassical = [3.0, 3.4, 4.0], eclectic = [3.0, 3.4, 4.0] }
-portal_bay = [4.0, 4.4, 5.0]
+portal_bay = [3.4, 3.8, 4.4]     # round 4: more, narrower arches
 end = [0.6, 1.0, 1.8]
 # Openings stop well under the ceiling: a band of wall over each.
-open_w = [1.3, 1.6]
+open_w = [1.5, 1.9]             # round 4: openings take half the bay
 up_ratio = [0.7, 0.78]          # an upper opening, sill to head, times the storey: openings nearly fill it
 p_door_line = [0.72, 0.82]        # the ground floor's door head, times its height; the rejas stop on the same line
 p_g_sill = [0.4, 0.6]             # a ground window's sill, behind its reja
@@ -134,7 +134,7 @@ p_tile_roof = 0.3                 # a two-storey colonial house without an entre
 p_roof_rise = [0.6, 1.0]          # little of the roof shows from the street
 pretil_forms = { plain = 2.5, balustrade = 4, urns = 2.5, iron = 1 }
 bracketed = { neoclassical = 0.2, eclectic = 0.6 }   # a cornice on consoles, else on modillions
-p_crest = { neoclassical = 0.2, eclectic = 0.7 }
+p_crest = { neoclassical = 0.15, eclectic = 0.3 }
 p_cartouche = 0.85
 p_zaguan_portada = 0.6          # a colonial zaguan framed by pilasters and an entablature
 
@@ -169,7 +169,7 @@ do = [
   { set = { pilastered = "= chance('pilasters', pilasters[manner]) and not tile_roof", cap_h = "= between('pilaster_cap', pilaster_cap[0], pilaster_cap[1])", band_h = "= between('portal_band', portal_band[0], portal_band[1])", portada = "= manner == 'colonial' and chance('portada', p_zaguan_portada)", cornice_kind = "= 'bracketed' if (manner != 'colonial' and chance('bracketed', bracketed[manner])) else 'modillioned'", corner_pilasters = "= manner != 'colonial' and chance('corner_pilasters', 0.6)", shop = "= not portal and chance('bodega', bodega[manner])", roll = "= chance('roll', roll_shutter)", sign = "= chance('sign', shop_sign)", portal_round = "= chance('portal_round', p_portal_round)" } },
   { set = { pretil_form = "= 'tiled' if manner == 'colonial' else draw('pretil_form', pretil_forms)", crest = "= manner != 'colonial' and chance('crest', p_crest[manner])", cartouche = "= chance('cartouche', p_cartouche)", roof_rise = "= between('roof_rise', p_roof_rise[0], p_roof_rise[1])" } },
   { set = { door_bay = "= nb // 2 if (nb % 2 == 1 and chance('door_middle', 0.5)) else draw('door_side', [0, nb - 1])" } },
-  { let = { front = "fsum(storey_heights)", top_h = "0.7 if manner == 'eclectic' else 0.5", crest_w = "min(3.6, max(2.2, 1.2 * (w - 2.0) / max(nb, 1)))" } },
+  { let = { front = "fsum(storey_heights)", top_h = "0.7 if manner == 'eclectic' else 0.5", crest_w = "w * 0.3" } },
   { let = { pretil_y = "front + (top_h * (0.375 if cornice_kind == 'bracketed' else 0.5) if manner != 'colonial' else 0.17)" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
   # A colonial roof: the tile alero and the slope over it.
@@ -183,7 +183,7 @@ do = [
   ] },
   { insert = "Column", at = ["0.0", "pretil_y", "0.36", "pretil_h * (0.72 if pretil_form == 'urns' else 1.0)"], name = "die_l", when = "not tile_roof and manner != 'colonial'", attrs = { order = "corner_board" } },
   { insert = "Column", at = ["w - 0.36", "pretil_y", "0.36", "pretil_h * (0.72 if pretil_form == 'urns' else 1.0)"], name = "die_r", when = "not tile_roof and manner != 'colonial'", attrs = { order = "corner_board" } },
-  { insert = "Crest", at = ["w / 2.0 - crest_w / 2.0", "pretil_y + (1.25 if pretil_form == 'urns' else 1.0) - 0.12", "crest_w", "1.5"], name = "crest_panel", when = "crest" },
+  { insert = "Crest", at = ["w / 2.0 - crest_w / 2.0", "pretil_y", "crest_w", "(1.25 if pretil_form == 'urns' else 1.0) + 1.3"], name = "crest_panel", when = "crest" },
 ]
 
 [[production]]
@@ -214,6 +214,11 @@ do = [
       { let = { hh = "fan_h if manner == 'colonial' else ow / 2.0" } },
       { insert = "Mediopunto", at = ["sp.x + sp.w / 2.0 - ow / 2.0", "top - hh", "ow", "hh"], name = "mediopunto{i}", when = "(door or role == 'upper') and manner != 'colonial'" },
       { insert = "Transom", at = ["sp.x + sp.w / 2.0 - ow / 2.0", "top - hh", "ow", "hh"], name = "transom{i}", when = "(door or role == 'upper') and manner == 'colonial'" },
+  ] },
+  # Every other round head is glazed in a plain fan of clear panes, never left dark.
+  { each = "range(len(spans))", when = "role == 'upper' and head_form == 'round' and not (fanlights and principal)", do = [
+      { let = { ow = "min(open_width, spans[item].w - 0.5)" } },
+      { insert = "Mediopunto", at = ["spans[item].x + spans[item].w / 2.0 - ow / 2.0", "y + sill_h + open_h - ow / 2.0", "ow", "ow / 2.0"], name = "fan{i}", attrs = { plain = true } },
   ] },
   # A grilled transom over a door with a flat head, and over a bodega's doors.
   { each = "range(len(spans))", when = "role == 'ground'", do = [
@@ -247,10 +252,10 @@ do = [
   ] },
   # An order of pilasters between the bays; at the ends of some later fronts.
   { each = "column_lines(rhythm, x, 0.32)", when = "pilastered and not (role == 'ground' and portal)", do = [
-      { insert = "Column", at = ["item.x", "y", "item.w", "h - (0.25 if index < count - 1 else 0.0)"], name = "pilaster{i}", attrs = { order = "pilaster", paint = "= trim", cap_h = "= cap_h", base_h = "= cap_h * 0.7" } },
+      { insert = "Column", at = ["item.x", "y", "item.w", "h - 0.25"], name = "pilaster{i}", attrs = { order = "pilaster", paint = "= trim", cap_h = "= cap_h", base_h = "= cap_h * 0.7" } },
   ] },
-  { insert = "Column", at = ["x", "y", "0.45", "h - (0.25 if index < count - 1 else 0.0)"], name = "corner_l", when = "corner_pilasters and not pilastered and not (role == 'ground' and portal)", attrs = { order = "pilaster", paint = "= trim", cap_h = "= cap_h", base_h = "= cap_h * 0.7" } },
-  { insert = "Column", at = ["x + w - 0.45", "y", "0.45", "h - (0.25 if index < count - 1 else 0.0)"], name = "corner_r", when = "corner_pilasters and not pilastered and not (role == 'ground' and portal)", attrs = { order = "pilaster", paint = "= trim", cap_h = "= cap_h", base_h = "= cap_h * 0.7" } },
+  { insert = "Column", at = ["x", "y", "0.45", "h - 0.25"], name = "corner_l", when = "corner_pilasters and not pilastered and not (role == 'ground' and portal)", attrs = { order = "pilaster", paint = "= trim", cap_h = "= cap_h", base_h = "= cap_h * 0.7" } },
+  { insert = "Column", at = ["x + w - 0.45", "y", "0.45", "h - 0.25"], name = "corner_r", when = "corner_pilasters and not pilastered and not (role == 'ground' and portal)", attrs = { order = "pilaster", paint = "= trim", cap_h = "= cap_h", base_h = "= cap_h * 0.7" } },
   # A colonial zaguan's portada: pilasters either side, an entablature over.
   { each = "[door_bay]", when = "role == 'ground' and portada and not portal and not shop and h - door_h >= 1.25", do = [
       { let = { sp = "spans[item]", dw = "min(door_width, spans[item].w - 0.3)" } },
@@ -272,7 +277,7 @@ do = [
   { insert = "Arch", at = ["spans[-1].x + spans[-1].w + 0.28", "y", "x + w - spans[-1].x - spans[-1].w - 0.28", "h"], name = "pier_r", when = "role == 'ground' and portal and x + w - spans[-1].x - spans[-1].w - 0.28 > 0.05", attrs = { solid = true } },
   # Balconies on the upper floors.
   { let = { long = "role == 'upper' and has_balcony and principal and (gallery if manner == 'colonial' else chance('long', long_balcony))" } },
-  { let = { each_bal = "role == 'upper' and has_balcony and not long and not (manner == 'colonial' and gallery)", guard = "role == 'upper' and not has_balcony", lx = "(spans[0].x - 0.3) if manner == 'colonial' else x + 0.1", lw = "(spans[-1].x + spans[-1].w - spans[0].x + 0.6) if manner == 'colonial' else w - 0.2" } },
+  { let = { each_bal = "role == 'upper' and has_balcony and not long and not (manner == 'colonial' and gallery)", guard = "role == 'upper' and not has_balcony", lx = "(spans[0].x - 0.3) if manner == 'colonial' else x + 0.35", lw = "(spans[-1].x + spans[-1].w - spans[0].x + 0.6) if manner == 'colonial' else w - 0.7" } },
   { insert = "Balcon", at = ["lx", "y", "lw", "1.05"], name = "balcon", when = "long", attrs = { rail_kind = "= railing", projection = "= long_proj", slab_depth = "= 0.2 if manner == 'colonial' else 0.32", slab_kind = "= 'timber' if manner == 'colonial' else 'stone'", bracket_drop = "= 0.0 if manner == 'colonial' else 0.3" } },
   { each = "range(len(spans))", when = "each_bal", do = [
       { let = { sp = "spans[item]", bw = "min(spans[item].w - 0.2, min(open_width, spans[item].w - 0.5) * each_w)" } },
@@ -284,8 +289,8 @@ do = [
       { insert = "Balcon", at = ["sp.x + sp.w / 2.0 - ow / 2.0 - 0.08", "y", "ow + 0.16", "0.95"], name = "rail{i}", attrs = { rail_kind = "= 'wood' if colonial_wood else 'bars'", projection = 0.12, slab_depth = 0.1, slab_kind = "stone", bracket_drop = 0.0 } },
   ] },
   # Guardavecinos: a fan of iron spikes at each end of a long balcony.
-  { insert = "Guarda", at = ["lx", "y + 1.05", "0.16", "0.95"], name = "guarda_l", when = "long and guarda", attrs = { side = "left" } },
-  { insert = "Guarda", at = ["lx + lw - 0.16", "y + 1.05", "0.16", "0.95"], name = "guarda_r", when = "long and guarda", attrs = { side = "right" } },
+  { insert = "Guarda", at = ["lx", "y + 1.05", "0.9", "0.9"], name = "guarda_l", when = "long and guarda", attrs = { side = "left" } },
+  { insert = "Guarda", at = ["lx + lw - 0.9", "y + 1.05", "0.9", "0.9"], name = "guarda_r", when = "long and guarda", attrs = { side = "right" } },
   # The colonial gallery: posts at a steady pitch carrying its tile cover.
   { each = "range(len(spans) + 1)", when = "long and manner == 'colonial'", do = [
       { let = { px = "lx if item == 0 else lx + lw - 0.14 if item == len(spans) else spans[item].x - 0.07" } },
@@ -305,7 +310,7 @@ do = [
 id = "havana.mediopunto"
 label = "Mediopunto"
 doc = "A mediopunto, grown: coloured panes in white tracery round a hub -- a fan, a fan crossed by a ring, or a vitral grid; on a colonial house a fan of wooden slats in the flat head."
-do = [ { grow = "havana.mediopunto", generations = 1, params = { rays = "max(5, min(9, round(w / 0.2)))", pattern = "'fan' if manner == 'colonial' else fan_pattern", wooden = "manner == 'colonial'", cols = "max(4, round(w / 0.22))", rows = "max(2, round(h / 0.22))", slat = "'louvre_' + louvre_paint" } } ]
+do = [ { grow = "havana.mediopunto", generations = 1, params = { plain = "has('plain') and plain", rays = "max(5, min(9, round(w / 0.2)))", pattern = "'fan' if manner == 'colonial' else fan_pattern", wooden = "manner == 'colonial'", cols = "max(4, round(w / 0.22))", rows = "max(2, round(h / 0.22))", slat = "'louvre_' + louvre_paint" } } ]
 
 [[production]]
 id = "havana.transom"
@@ -409,13 +414,13 @@ doc = "A half-round fanlight: a white ground of tracery, clear panes in a fan wi
 axiom = "Fan"
 rules = [
   { id = "havana.mediopunto.slats", pred = "Fan", when = "wooden", to = "Dark Wedges Hub" },
-  { id = "havana.mediopunto.fan", pred = "Fan", when = "not wooden and pattern == 'fan'", to = "White Wedges Hub" },
-  { id = "havana.mediopunto.ringed", pred = "Fan", when = "not wooden and pattern == 'ring'", to = "White Inner Outer Hub" },
+  { id = "havana.mediopunto.fan", pred = "Fan", when = "not wooden and (plain or pattern == 'fan')", to = "White Wedges Hub" },
+  { id = "havana.mediopunto.ringed", pred = "Fan", when = "not wooden and not plain and pattern == 'ring'", to = "White Inner Outer Hub" },
 ]
 interpret = [
   { module = "Dark", polygon = "Ground", points = "[[0.0, 0.0], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "scuri_line" } },
   { module = "White", polygon = "Ground", points = "[[0.0, 0.0], [cw, 0.0], [cw / 2 + cw / 2 * cos(pi() / 8), ch * sin(pi() / 8)], [cw / 2 + cw / 2 * cos(pi() / 4), ch * sin(pi() / 4)], [cw / 2 + cw / 2 * cos(3 * pi() / 8), ch * sin(3 * pi() / 8)], [cw / 2, ch], [cw / 2 - cw / 2 * cos(3 * pi() / 8), ch * sin(3 * pi() / 8)], [cw / 2 - cw / 2 * cos(pi() / 4), ch * sin(pi() / 4)], [cw / 2 - cw / 2 * cos(pi() / 8), ch * sin(pi() / 8)]]", attrs = { paint = "trim_white" } },
-  { module = "Wedges", each = "range(rays)", polygon = "Pane", points = "[[cw / 2, 0.0], [cw / 2 + 0.93 * cw / 2 * cos(pi() * item / rays + 0.06), 0.93 * ch * sin(pi() * item / rays + 0.06)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * (item + 0.5) / rays), 0.93 * ch * sin(pi() * (item + 0.5) / rays)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * (item + 1) / rays - 0.06), 0.93 * ch * sin(pi() * (item + 1) / rays - 0.06)]]", attrs = { paint = "= slat if wooden else ('glass_clear' if item % 2 == 0 else glass[0])" } },
+  { module = "Wedges", each = "range(rays)", polygon = "Pane", points = "[[cw / 2, 0.0], [cw / 2 + 0.93 * cw / 2 * cos(pi() * item / rays + 0.06), 0.93 * ch * sin(pi() * item / rays + 0.06)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * (item + 0.5) / rays), 0.93 * ch * sin(pi() * (item + 0.5) / rays)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * (item + 1) / rays - 0.06), 0.93 * ch * sin(pi() * (item + 1) / rays - 0.06)]]", attrs = { paint = "= slat if wooden else ('glass_clear' if (plain or item % 2 == 0) else glass[0])" } },
   { module = "Inner", each = "range(rays)", polygon = "Pane", points = "[[cw / 2, 0.0], [cw / 2 + 0.5 * cw / 2 * cos(pi() * item / rays + 0.08), 0.5 * ch * sin(pi() * item / rays + 0.08)], [cw / 2 + 0.5 * cw / 2 * cos(pi() * (item + 1) / rays - 0.08), 0.5 * ch * sin(pi() * (item + 1) / rays - 0.08)]]", attrs = { paint = "glass_clear" } },
   { module = "Outer", each = "range(rays)", polygon = "Pane", points = "[[cw / 2 + 0.58 * cw / 2 * cos(pi() * item / rays + 0.05), 0.58 * ch * sin(pi() * item / rays + 0.05)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * item / rays + 0.04), 0.93 * ch * sin(pi() * item / rays + 0.04)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * (item + 0.5) / rays), 0.93 * ch * sin(pi() * (item + 0.5) / rays)], [cw / 2 + 0.93 * cw / 2 * cos(pi() * (item + 1) / rays - 0.04), 0.93 * ch * sin(pi() * (item + 1) / rays - 0.04)], [cw / 2 + 0.58 * cw / 2 * cos(pi() * (item + 1) / rays - 0.05), 0.58 * ch * sin(pi() * (item + 1) / rays - 0.05)]]", attrs = { paint = "= glass[item % 2]" } },
   { module = "Hub", do = [ { round = "min(cw / 2, ch) * 0.16", at = ["cw / 2", "0"] }, { outline = "Hub", attrs = { paint = "= slat if wooden else 'trim_white'", edge = "scuri_line" } } ] },
@@ -511,14 +516,11 @@ interpret = [
 
 [[lsystem]]
 id = "havana.guardavecino"
-doc = "A guardavecino as an elevation shows it, edge on: an iron bar at the balcony's end with its spikes rising outward."
+doc = "A guardavecino: a quarter fan of iron spikes rising from a balcony's end at the party wall."
 axiom = "Fan"
 rules = [ { id = "havana.guardavecino.spikes", pred = "Fan", to = "Spikes" } ]
 interpret = [
-  { module = "Spikes", do = [
-      { place = "Rail", at = ["(0.0 if left else cw - 0.025)", "0", "0.025", "ch"], attrs = { order = "iron" } },
-      { each = "range(1, 8)", line = ["(0.0 if left else cw)", "ch * item / 8.5", "(cw if left else 0.0)", "ch * item / 8.5 + 0.09"], width = "0.02", slant = "Spike", attrs = { stroke_w = 0.6, paint = "iron" } },
-  ] },
+  { module = "Spikes", each = "range(1, 8)", line = ["(0.0 if left else cw)", "0.0", "(0.0 if left else cw) + (1.0 if left else -1.0) * 0.95 * cw * cos(pi() / 2 * item / 8)", "0.95 * ch * sin(pi() / 2 * item / 8)"], width = "0.02", slant = "Spike", attrs = { stroke_w = 0.7, paint = "iron" } },
 ]
 
 [[lsystem]]
@@ -531,7 +533,7 @@ rules = [
   { id = "havana.arch.pier", pred = "Bay", when = "solid", to = "Pier" },
 ]
 interpret = [
-  { module = "Spandrel", polygon = "Face", points = "[[0.0, 0.0], [0.28, 0.0], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.0625), (cw / 2 - 0.28) * sin(pi() * 0.0625)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.1250), (cw / 2 - 0.28) * sin(pi() * 0.1250)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.1875), (cw / 2 - 0.28) * sin(pi() * 0.1875)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.2500), (cw / 2 - 0.28) * sin(pi() * 0.2500)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.3125), (cw / 2 - 0.28) * sin(pi() * 0.3125)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.3750), (cw / 2 - 0.28) * sin(pi() * 0.3750)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.4375), (cw / 2 - 0.28) * sin(pi() * 0.4375)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.5000), (cw / 2 - 0.28) * sin(pi() * 0.5000)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.5625), (cw / 2 - 0.28) * sin(pi() * 0.5625)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.6250), (cw / 2 - 0.28) * sin(pi() * 0.6250)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.6875), (cw / 2 - 0.28) * sin(pi() * 0.6875)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.7500), (cw / 2 - 0.28) * sin(pi() * 0.7500)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.8125), (cw / 2 - 0.28) * sin(pi() * 0.8125)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.8750), (cw / 2 - 0.28) * sin(pi() * 0.8750)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.9375), (cw / 2 - 0.28) * sin(pi() * 0.9375)], [cw - 0.28, 0.0], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "= face", edge = "= edge" } },
+  { module = "Spandrel", polygon = "Face", points = "[[0.0, 0.0], [0.28, 0.0], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.02083), (cw / 2 - 0.28) * sin(pi() * 0.02083)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.04167), (cw / 2 - 0.28) * sin(pi() * 0.04167)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.06250), (cw / 2 - 0.28) * sin(pi() * 0.06250)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.08333), (cw / 2 - 0.28) * sin(pi() * 0.08333)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.10417), (cw / 2 - 0.28) * sin(pi() * 0.10417)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.12500), (cw / 2 - 0.28) * sin(pi() * 0.12500)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.14583), (cw / 2 - 0.28) * sin(pi() * 0.14583)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.16667), (cw / 2 - 0.28) * sin(pi() * 0.16667)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.18750), (cw / 2 - 0.28) * sin(pi() * 0.18750)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.20833), (cw / 2 - 0.28) * sin(pi() * 0.20833)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.22917), (cw / 2 - 0.28) * sin(pi() * 0.22917)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.25000), (cw / 2 - 0.28) * sin(pi() * 0.25000)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.27083), (cw / 2 - 0.28) * sin(pi() * 0.27083)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.29167), (cw / 2 - 0.28) * sin(pi() * 0.29167)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.31250), (cw / 2 - 0.28) * sin(pi() * 0.31250)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.33333), (cw / 2 - 0.28) * sin(pi() * 0.33333)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.35417), (cw / 2 - 0.28) * sin(pi() * 0.35417)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.37500), (cw / 2 - 0.28) * sin(pi() * 0.37500)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.39583), (cw / 2 - 0.28) * sin(pi() * 0.39583)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.41667), (cw / 2 - 0.28) * sin(pi() * 0.41667)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.43750), (cw / 2 - 0.28) * sin(pi() * 0.43750)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.45833), (cw / 2 - 0.28) * sin(pi() * 0.45833)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.47917), (cw / 2 - 0.28) * sin(pi() * 0.47917)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.50000), (cw / 2 - 0.28) * sin(pi() * 0.50000)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.52083), (cw / 2 - 0.28) * sin(pi() * 0.52083)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.54167), (cw / 2 - 0.28) * sin(pi() * 0.54167)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.56250), (cw / 2 - 0.28) * sin(pi() * 0.56250)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.58333), (cw / 2 - 0.28) * sin(pi() * 0.58333)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.60417), (cw / 2 - 0.28) * sin(pi() * 0.60417)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.62500), (cw / 2 - 0.28) * sin(pi() * 0.62500)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.64583), (cw / 2 - 0.28) * sin(pi() * 0.64583)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.66667), (cw / 2 - 0.28) * sin(pi() * 0.66667)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.68750), (cw / 2 - 0.28) * sin(pi() * 0.68750)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.70833), (cw / 2 - 0.28) * sin(pi() * 0.70833)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.72917), (cw / 2 - 0.28) * sin(pi() * 0.72917)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.75000), (cw / 2 - 0.28) * sin(pi() * 0.75000)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.77083), (cw / 2 - 0.28) * sin(pi() * 0.77083)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.79167), (cw / 2 - 0.28) * sin(pi() * 0.79167)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.81250), (cw / 2 - 0.28) * sin(pi() * 0.81250)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.83333), (cw / 2 - 0.28) * sin(pi() * 0.83333)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.85417), (cw / 2 - 0.28) * sin(pi() * 0.85417)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.87500), (cw / 2 - 0.28) * sin(pi() * 0.87500)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.89583), (cw / 2 - 0.28) * sin(pi() * 0.89583)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.91667), (cw / 2 - 0.28) * sin(pi() * 0.91667)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.93750), (cw / 2 - 0.28) * sin(pi() * 0.93750)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.95833), (cw / 2 - 0.28) * sin(pi() * 0.95833)], [cw / 2 - (cw / 2 - 0.28) * cos(pi() * 0.97917), (cw / 2 - 0.28) * sin(pi() * 0.97917)], [cw - 0.28, 0.0], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "= face", edge = "= edge" } },
   { module = "Pier", polygon = "Face", points = "[[0.0, 0.0], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "= face", edge = "= edge" } },
   { module = "Beam", polygon = "Face", points = "[[0.0, 0.0], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "= face", edge = "= edge" } },
 ]
@@ -583,7 +585,7 @@ doc = "A pretil: plain under a moulded coping; a balustrade between solid dies; 
 axiom = "Pretil"
 rules = [
   { id = "havana.pretil.plain", pred = "Pretil", when = "form == 'plain'", to = "Wall Coping" },
-  { id = "havana.pretil.tiled", pred = "Pretil", when = "form == 'tiled'", to = "Wall TileCoping" },
+  { id = "havana.pretil.tiled", pred = "Pretil", when = "form == 'tiled'", to = "Wall Coping" },
   { id = "havana.pretil.balustrade", pred = "Pretil", when = "form == 'balustrade'", to = "Coping Inset [ Fill ]" },
   { id = "havana.pretil.urns", pred = "Pretil", when = "form == 'urns'", to = "Low" },
   { id = "havana.pretil.iron", pred = "Pretil", when = "form == 'iron'", to = "Coping Inset [ Bars ]" },
@@ -648,7 +650,7 @@ id = "havana.roles.floor"
 label = "Storey"
 layer = "roles"
 doc = "The ground floor, the entresuelo where there is one, the principal floor and those over it; one wall for the whole front (bare stone, or a pastel), its shade behind a portal; how tall the openings stand, with a band of wall over each that the balcony's corbels above clear; and which floor's openings carry a mediopunto (the principal floor's, and the zaguan's)."
-set = { role = "= 'ground' if index == 0 else 'entresuelo' if (entresuelo and index == 1) else 'upper'", principal = "= index == 1 + (1 if entresuelo else 0)", wall_material = "= paint + '_deep' if (index == 0 and portal) else paint", sill_h = "= g_sill if index == 0 else 0.05", door_h = "= min(h * door_line, h - 0.9)", open_h = "= (min(h * door_line, h - 0.9) - g_sill) if index == 0 else min(h * up_open_h, h - 1.05)", win_head = "= ('flat' if fanlights else head_form) if index == 0 else head_form", hh = "= (0.0 if fanlights else head_h) if index == 0 else (head_h if (index == 1 + (1 if entresuelo else 0) or manner != 'colonial') else 0.0)" }
+set = { role = "= 'ground' if index == 0 else 'entresuelo' if (entresuelo and index == 1) else 'upper'", principal = "= index == 1 + (1 if entresuelo else 0)", wall_material = "= paint + '_deep' if (index == 0 and portal) else paint", sill_h = "= g_sill if index == 0 else 0.05", door_h = "= min(h * door_line, h - 0.9, (h - band_h - 0.6) if (index == 0 and portal) else 99.0)", open_h = "= (min(h * door_line, h - 0.9, (h - band_h - 0.6) if portal else 99.0) - g_sill) if index == 0 else min(h * up_open_h, h - 1.05)", win_head = "= ('flat' if fanlights else head_form) if index == 0 else head_form", hh = "= (0.0 if fanlights else head_h) if index == 0 else (head_h if (index == 1 + (1 if entresuelo else 0) or manner != 'colonial') else 0.0)" }
 
 [[rule]]
 id = "havana.base.end_piers_are_wall"
