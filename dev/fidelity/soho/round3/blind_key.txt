@@ -1,0 +1,16 @@
+img00: cast_iron_loft, 1868, 2 lot(s), MODEST, head=segmental, seed=7006
+img01: cast_iron_loft, 1885, 2 lot(s), MODEST, head=segmental, seed=7013
+img02: brick_store_and_loft, 1874, 1 lot(s), ORDINARY, head=segmental, seed=7009
+img03: brick_store_and_loft, 1892, 3 lot(s), ORDINARY, head=flat, seed=7015
+img04: cast_iron_loft, 1854, 3 lot(s), GRAND, head=round, seed=7001
+img05: brick_store_and_loft, 1888, 2 lot(s), ORDINARY, head=flat, seed=7014
+img06: cast_iron_loft, 1876, 1 lot(s), GRAND, head=flat, seed=7010
+img07: cast_iron_loft, 1860, 1 lot(s), COMFORTABLE, head=segmental, seed=7003
+img08: brick_store_and_loft, 1879, 2 lot(s), MODEST, head=flat, seed=7011
+img09: brick_store_and_loft, 1882, 2 lot(s), MODEST, head=segmental, seed=7012
+img10: brick_store_and_loft, 1866, 1 lot(s), COMFORTABLE, head=segmental, seed=7005
+img11: brick_store_and_loft, 1863, 2 lot(s), COMFORTABLE, head=round, seed=7004
+img12: cast_iron_loft, 1872, 1 lot(s), GRAND, head=segmental, seed=7008
+img13: brick_store_and_loft, 1857, 3 lot(s), ORDINARY, head=round, seed=7002
+img14: cast_iron_loft, 1850, 2 lot(s), COMFORTABLE, head=round, seed=7000
+img15: cast_iron_loft, 1870, 1 lot(s), GRAND, head=flat, seed=7007

@@ -100,4 +100,4 @@ def test_storeys_get_shorter_as_they_climb():
         uppers = heights[1:]
         assert heights[0] > uppers[0], heights
         assert all(a > b for a, b in zip(uppers, uppers[1:])), heights
-        assert uppers[-1] / uppers[0] > 0.85, heights
+        assert 0.7 < uppers[-1] / uppers[0] < 0.95, heights

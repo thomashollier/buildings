@@ -58,7 +58,7 @@ colonnettes = { modest = 0.45, ordinary = 0.45, comfortable = 0.8, grand = 0.8 }
 sash_kinds = { two_over_two = 7, one_over_one = 3 }
 frame_paints = { brown = 4, green = 3, black = 3 }
 # Fire escapes (fix 3): a stack of balconies with a stair between each pair and a drop ladder.
-escape_odds = { cast_iron_loft = 0.55, brick_store_and_loft = 0.65, federal_rowhouse = 0.0 }
+escape_odds = { cast_iron_loft = 0.7, brick_store_and_loft = 0.65, federal_rowhouse = 0.0 }
 escape_bays = { two = 6, three = 4 }
 freight_bay = 0.55              # a wide freight door at the end opposite the stair door (not grand)
 water_tank = 0.3
@@ -118,7 +118,7 @@ sill = 0.75
 head_gap = 0.70               # the entablature and the spandrel under it
 columns = true
 entablature_every_floor = true
-cornice_projection = 1.0      # a cast or pressed bracketed cornice
+cornice_projection = 1.4      # a cast or pressed bracketed cornice, deep over its frieze (round 3)
 cornice_ornament = "bracketed"
 pitched_roof = false
 fire_escape = true
@@ -143,7 +143,7 @@ sill = 0.80
 head_gap = 0.55               # a stone lintel and a brick course
 columns = false
 entablature_every_floor = false
-cornice_projection = 0.85     # a pressed-metal bracketed cornice
+cornice_projection = 1.2      # a pressed-metal bracketed cornice
 cornice_ornament = "bracketed"
 pitched_roof = false
 fire_escape = true
@@ -168,7 +168,7 @@ do = [
   # The top storey grows by the cornice's frieze, so its windows keep their height.
   { set = { cornice_depth = "= r.cornice_projection * between('cornice_jitter', cornice_jitter[0], cornice_jitter[1])" } },
   { set = { frieze = "= cornice_depth * 0.65 if (loft and r.cornice_ornament == 'bracketed') else 0.0" } },
-  { set = { storey_heights = "= [((r.first_upper_grand if grand else r.first_upper) * k * between('store_ratio', store_ratio[0], store_ratio[1])) if loft else (r.ground_storey_grand if grand else r.ground_storey) * k] + geometric((r.first_upper_grand if grand else r.first_upper) * k, (0.98 if type == 'cast_iron_loft' else 0.97) if loft else r.taper, n_up - 1) + [((r.first_upper_grand if grand else r.first_upper) * k * ((0.98 if type == 'cast_iron_loft' else 0.97) if loft else r.taper) ** (n_up - 1)) + frieze]", fire_escape = "= chance('fire_escape', escape_odds[type])", escape_w = "= draw('escape_bays', escape_bays)", escape_centred = "= chance('escape_centred', 0.5)", escape_left = "= chance('escape_left', 0.5)" } },
+  { set = { storey_heights = "= [((r.first_upper_grand if grand else r.first_upper) * k * between('store_ratio', store_ratio[0], store_ratio[1])) if loft else (r.ground_storey_grand if grand else r.ground_storey) * k] + geometric((r.first_upper_grand if grand else r.first_upper) * k, (0.96 if type == 'cast_iron_loft' else 0.96) if loft else r.taper, n_up - 1) + [((r.first_upper_grand if grand else r.first_upper) * k * ((0.96 if type == 'cast_iron_loft' else 0.96) if loft else r.taper) ** (n_up - 1)) + frieze]", fire_escape = "= chance('fire_escape', escape_odds[type])", escape_w = "= draw('escape_bays', escape_bays)", escape_centred = "= chance('escape_centred', 0.5)", escape_left = "= chance('escape_left', 0.5)" } },
   { set = { paint = "= draw('iron_paint', iron_paints) if type == 'cast_iron_loft' else draw('brick_paint', brick_paints) if type == 'brick_store_and_loft' else 'brick'", iron_head = "= draw('head', heads, step(head_ramp, year))", corinthian = "= chance('corinthian', p_corinthian)", crest = "= loft and chance('crest', crest_odds['brick' if type == 'brick_store_and_loft' else 'one' if lots == 1 else 'more'])", vault = "= loft and chance('vault', vault_lights)", shop_paint = "= draw('shop_paint', shop_paints) if (type == 'cast_iron_loft' and chance('dark_shop', dark_shop)) else ''", colonnetted = "= chance('colonnettes', colonnettes[klass])", sash = "= draw('sash', sash_kinds)", frame_paint = "= draw('frame_paint', frame_paints)", motif = "= draw('apron', apron_motifs)", door_left = "= chance('door_left', 0.5) if loft else True", freight = "= loft and klass != 'grand' and chance('freight', freight_bay)", tank = "= loft and chance('tank', water_tank)", pediment_h = "= between('pediment_h', 0.8, 1.8 if klass == 'grand' else 1.3)" } },
   { fit = "x", end = "r.end", bay = "r.bay", as = "rhythm", min_bays = 2 },
   { let = { front = "fsum(storey_heights)", nb = "len(bay_spans(rhythm, 0.0))" } },
@@ -201,7 +201,7 @@ doc = "A storey is cut by the facade's rhythm; columns stand on its piers, an en
 do = [
   { split = "x", by = "rhythm", label = "Cell" },
   { each = "column_lines(rhythm, x, column_w)", when = "r.columns or (role == 'base' and type == 'brick_store_and_loft')", do = [
-      { insert = "Column", at = ["item.x", "y", "item.w", "h - entablature"], name = "column{i}", attrs = { order = "= 'corinthian' if (r.columns and corinthian) else 'doric'" } },
+      { insert = "Column", at = ["item.x", "y", "item.w", "h - entablature"], name = "column{i}", attrs = { order = "= 'corinthian' if (r.columns and corinthian) else 'doric'", cap_h = "= 0.38 if type != 'federal_rowhouse' else 0.14", base_h = "= 0.28 if type != 'federal_rowhouse' else 0.12" } },
   ] },
   { insert = "Entablature", at = ["x", "y + h - entablature - (frieze if role == 'top' else 0.0)", "w", "entablature"], name = "entablature", when = "role == 'base' or r.entablature_every_floor" },
   { insert = "Cornice", at = ["x", "y + h", "w", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "= 'modillioned' if type != 'federal_rowhouse' else r.cornice_ornament" }, when = "role == 'top'" },
@@ -316,7 +316,7 @@ id = "soho.base.a_bay_holds_a_window"
 label = "Cell"
 doc = "Every bay above the street holds a window, its share of the bay set by what the front is made of; under a deep cornice the top floor's windows stop short of its frieze."
 when = "is_bay()"
-let = { clear = "frieze if role == 'top' else 0.0" }
+let = { clear = "(frieze + (0.3 if type == 'brick_store_and_loft' else 0.0)) if role == 'top' else 0.0" }
 set = { opening_type = "window", head = "flat", light_width = "= (iron_share[iron_head] if type == 'cast_iron_loft' else r.window_share) * w", sill = "= r.sill", light_height = "= h - r.sill - (iron_head_gap if type == 'cast_iron_loft' else r.head_gap) - clear", surround_kind = "none", keystone_present = "= type == 'federal_rowhouse'", glazing = "sash", sash_cols = "= 2 if sash == 'two_over_two' else 1", sash_rows = 1, frame_paint = "= frame_paint if type != 'federal_rowhouse' else 'white'", frame_w = 0.07, bar_w = 0.05 }
 
 [[rule]]
@@ -334,7 +334,7 @@ doc = "One bay of the ground floor is the door: to the stair at the side of a lo
 when = "is_bay() and role == 'base' and (is_first_bay() if (door_left if type != 'federal_rowhouse' else r.door_side == 'left') else is_last_bay())"
 specificity = 20
 let = { federal = "type == 'federal_rowhouse'" }
-set = { glazing = "= None", opening_type = "pedestrian_entrance", head = "= 'round' if federal else 'flat'", light_width = "= door_w", sill = 0.0, light_height = "= min(h - 0.35, 2.95 if federal else h - 0.85)", surround_kind = "= 'moulded_architrave' if federal else 'none'", keystone_present = "= federal" }
+set = { glazing = "= None", opening_type = "pedestrian_entrance", head = "= 'round' if federal else 'flat'", light_width = "= door_w", sill = 0.0, light_height = "= min(h - 0.35, 2.95) if federal else h - entablature - 0.05", surround_kind = "= 'moulded_architrave' if federal else 'none'", keystone_present = "= federal" }
 
 [[rule]]
 id = "soho.base.the_freight_door"
@@ -440,7 +440,10 @@ interpret = [
   { module = "Rail", place = "Deck", at = ["0", "0.93", "cw", "0.04"], attrs = { order = "iron" } },
   { module = "Rx(k)", repeat = "x", n = "k" },
   { module = "Bar", place = "Deck", at = ["cw / 2 - 0.008", "0.09", "0.016", "0.84"], attrs = { order = "iron" } },
-  { module = "Stair", line = ["(cw * 0.12 if flip else cw * 0.88)", "0.1", "(cw * 0.88 if flip else cw * 0.12)", "ch - 0.05"], width = "0.05", slant = "Escape", attrs = { stroke_w = 2.6, paint = "iron" } },
+  { module = "Stair", do = [
+      { line = ["(cw * 0.5 if flip else cw * 0.92)", "0.1", "(cw * 0.92 if flip else cw * 0.5)", "ch - 0.05"], width = "0.05", slant = "Escape", attrs = { stroke_w = 2.2, paint = "iron" } },
+      { line = ["(cw * 0.5 + 0.12 if flip else cw * 0.92 - 0.12)", "0.1", "(cw * 0.92 - 0.12 if flip else cw * 0.5 + 0.12)", "ch - 0.05"], width = "0.05", slant = "Escape", attrs = { stroke_w = 1.0, paint = "iron" } },
+  ] },
   { module = "Gooseneck", do = [
       { place = "Deck", at = ["cw * 0.85", "0.95", "0.03", "ch - 1.4"], attrs = { order = "iron" } },
       { place = "Deck", at = ["cw * 0.85 + 0.35", "0.95", "0.03", "ch - 1.4"], attrs = { order = "iron" } },
