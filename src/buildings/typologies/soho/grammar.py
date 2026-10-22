@@ -14,10 +14,27 @@ from typing import Callable
 from buildings.cga import Grammar
 from buildings.ir.nodes import BuildingNode
 from buildings.trace import TraceLog
-from buildings.typologies.common.rulefile import load_style
+from buildings.cga import Shape
+from buildings.typologies.common import kit
+from buildings.typologies.common.rulefile import load_style, register_writer
 from buildings.typologies.soho.recipes import SohoSite
 
 __all__ = ["STYLE", "soho_grammar", "derive_soho", "generate_soho"]
+
+def write_light(light: Shape, below, d) -> list:
+    """The kit's light, glazed as the rules say: double-hung sashes in a dark
+    frame, and a moulded archivolt round a round head."""
+    from dataclasses import replace
+
+    out = kit.write_light(light, below, d)
+    extra = {k: light.attr(k) for k in ("glazing", "sash_cols", "sash_rows", "frame_paint", "frame_w", "bar_w", "archivolt")
+             if light.attr(k, None) is not None}
+    if not extra or out[0].kind != "opening":
+        return out
+    return [replace(out[0], props={**out[0].props, **extra}), *out[1:]]
+
+
+register_writer("soho.light", write_light)
 
 STYLE = load_style(Path(__file__).with_name("soho.toml"))
 

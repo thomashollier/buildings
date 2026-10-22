@@ -91,10 +91,13 @@ def test_every_part_stands_inside_the_part_it_refines():
 
 
 def test_storeys_get_shorter_as_they_climb():
+    """Each loft floor is a little lower than the one under it; the top floor
+    also holds the cornice's frieze, so its windows keep their height."""
     for site in (IRON, IRON_WIDE, BRICK):
-        building, _ = generate_soho(site)
-        heights = [n.props["h"] for n in building.children if n.kind == "storey"]
+        lot, _ = derive_soho(site)
+        heights = list(lot.attrs["storey_heights"])
+        heights[-1] -= lot.attrs["frieze"]
         uppers = heights[1:]
         assert heights[0] > uppers[0], heights
         assert all(a > b for a, b in zip(uppers, uppers[1:])), heights
-        assert uppers[-1] / uppers[0] < 0.85, heights
+        assert uppers[-1] / uppers[0] > 0.85, heights

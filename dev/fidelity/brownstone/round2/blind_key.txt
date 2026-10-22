@@ -1,0 +1,16 @@
+img00: neo_grec, 1890, 6.7 m, ORDINARY, bay=False, seed=3014
+img01: early, 1853, 6.4 m, ORDINARY, bay=False, seed=3001
+img02: italianate, 1859, 7.6 m, ORDINARY, bay=False, seed=3003
+img03: italianate, 1871, 6.7 m, ORDINARY, bay=False, seed=3007
+img04: neo_grec, 1880, 6.1 m, MODEST, bay=False, seed=3010
+img05: romanesque, 1883, 7.6 m, MODEST, bay=False, seed=3011
+img06: italianate, 1862, 6.7 m, MODEST, bay=False, seed=3004
+img07: neo_grec, 1888, 6.1 m, ORDINARY, bay=False, seed=3013
+img08: italianate, 1865, 6.4 m, GRAND, bay=False, seed=3005
+img09: italianate, 1849, 5.8 m, COMFORTABLE, bay=False, seed=3000
+img10: neo_grec, 1892, 5.5 m, ORDINARY, bay=False, seed=3015
+img11: neo_grec, 1868, 6.7 m, COMFORTABLE, bay=True, seed=3006
+img12: neo_grec, 1886, 7.6 m, GRAND, bay=True, seed=3012
+img13: italianate, 1856, 6.7 m, ORDINARY, bay=False, seed=3002
+img14: neo_grec, 1874, 5.5 m, MODEST, bay=False, seed=3008
+img15: italianate, 1877, 7.0 m, MODEST, bay=False, seed=3009

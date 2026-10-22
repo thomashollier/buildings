@@ -1882,7 +1882,8 @@ GLAZINGS = frozenset({"sash", "cross_leaded", "rondel", "scuri"})
 #: What shows through a light of each glazing.
 _GLASS_FILL = {"cross_leaded": _C["glass_leaded"], "rondel": _C["rondel"]}
 #: Joinery paint (``frame_paint``).
-_FRAME_PAINT = {"white": _C["frame_white"], "ochre": _C["frame_ochre"]}
+_FRAME_PAINT = {"white": _C["frame_white"], "ochre": _C["frame_ochre"], "brown": _C["frame_brown"],
+                "green": _C["frame_green"], "black": _C["frame_black"]}
 #: Shutter paint (``shutter_paint``).
 _SHUTTER_PAINT = {"red": _C["shutter_red"], "green": _C["shutter_green"]}
 

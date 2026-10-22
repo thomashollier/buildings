@@ -35,11 +35,11 @@ class BrownstoneSite:
 
 
 def write_stoop(stoop: Shape, below, d) -> list[Node]:
-    """The stoop seen from the street: a stack of treads, flaring a little at
-    the foot where its balustrade scrolls out."""
+    """The stoop seen from the street: its stack of treads, between the
+    cheek walls and rails the rule file grows."""
     s = stoop.scope
     n = max(4, round(s.h / 0.18))
-    flare = 0.25
+    flare = 0.0  # the stoop's sides are its cheek walls, drawn with its rails
     left = [(s.x - flare, s.y)]
     for k in range(n):
         y1 = s.y + s.h * (k + 1) / n
@@ -84,10 +84,10 @@ def write_grille(grille: Shape, below, d) -> list[Node]:
 
 
 def write_socle(shape: Shape, below, d) -> list[Node]:
-    """Rock-faced brownstone in rough courses."""
+    """Rock-faced brownstone, in level courses."""
     s = shape.scope
     return [SocleNode(id=shape.id, kind="socle", trace=tuple(shape.trace),
-                      props={**kit.xywh(s), "treatment": "picturesque_rustication", "paint": "wall_brownstone_rock",
+                      props={**kit.xywh(s), "treatment": "flat_incised_refends", "paint": "wall_brownstone_rock",
                              "course_columns": max(1, round(s.w / 0.9)), "course_rows": max(1, round(s.h / 0.4))})]
 
 

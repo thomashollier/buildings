@@ -170,6 +170,14 @@ COLORS: dict[str, str] = {
     "wall_iron_grey": "#BEBDB5",
     "wall_iron_buff": "#D6C39C",
     "wall_iron_sage": "#BAC3AC",
+    "wall_iron_bluegrey": "#AEB7BD",
+    "wall_iron_ochre": "#D1B176",
+    "wall_iron_black": "#3A3B3A",
+    "wall_iron_charcoal": "#4E504F",
+    "wall_iron_dkgreen": "#3D4F42",
+    "frame_brown": "#4A3426",
+    "frame_green": "#2F4A38",
+    "frame_black": "#262626",
     "glass_lilac": "#B4A3C8",
     # Brownstone: the stone of a whole front, its trim a shade lighter, its
     # cornice dark; a Romanesque base's rock face and brick.
@@ -183,6 +191,7 @@ COLORS: dict[str, str] = {
     "trim_brownstone_red": "#8A5D4F",
     "trim_brownstone_rosy": "#946A5A",
     "stoop_brownstone": "#A47C6C",
+    "stoop_line": "#6E4E42",
     "cornice_black_brown": "#3B2E28",
     "cornice_dark_brown": "#4A3328",
     "cornice_dark_green": "#2F3A30",
@@ -194,3 +203,9 @@ for _name in ("stucco_blue", "stucco_mint", "stucco_yellow", "stucco_rose", "stu
     _hex = COLORS[f"wall_{_name}"]
     COLORS[f"shade_{_name}"] = "#" + "".join(f"{int(int(_hex[i:i + 2], 16) * 0.8):02X}" for i in (1, 3, 5))
     COLORS[f"deep_{_name}"] = "#" + "".join(f"{int(int(_hex[i:i + 2], 16) * 0.6):02X}" for i in (1, 3, 5))
+
+# The recessed panel of an iron front (an apron under a sill, a spandrel over
+# a head): the front's own paint, a shade darker.
+for _name in [k[len("wall_"):] for k in COLORS if k.startswith("wall_iron_")]:
+    _hex = COLORS[f"wall_{_name}"]
+    COLORS[f"panel_{_name}"] = "#" + "".join(f"{int(int(_hex[i:i + 2], 16) * 0.92):02X}" for i in (1, 3, 5))

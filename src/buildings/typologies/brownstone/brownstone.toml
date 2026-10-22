@@ -34,6 +34,7 @@ year = "= year"
 [emit]
 Stoop = "brownstone.stoop"
 Sill = "brownstone.hood"
+Console = "grow.stone"
 Rail = "kit.column"
 Picket = "kit.column"
 Finial = "grow.stone"
@@ -61,7 +62,7 @@ window_ws = [1.05, 1.25]
 bedroom_heads = { flat = 3, segmental = 2 }                   # an Italianate bedroom window
 italianate_doors = { door_pediment = 7, door_scrolls = 3 }    # consoles under a pediment, or scrolled consoles
 bay_odds = 0.45                 # of fronts wide enough, a bay front
-neo_grec_full_bay = 0.5         # a Neo-Grec bay through the house, else two storeys
+neo_grec_full_bay = 1.0         # a bay through the house: one stopping short leaves the floors over it off its axes
 uppers = { modest = [1, 2], ordinary = [2, 2], comfortable = [2, 3], grand = [3, 3] }
 stoop_ws = [1.7, 2.1]
 # The builder's choices within a dress.
@@ -72,7 +73,7 @@ cornice_hs = [0.75, 1.0]
 # The stoop's balustrade (seen edge on): brownstone on an Italianate stoop,
 # cast iron on most later ones; and the iron fence round the areaway.
 p_iron_stoop = { early = 0.6, italianate = 0.85, neo_grec = 0.7, romanesque = 0.3 }
-areaway_fence = 0.85
+areaway_fence = 0.95
 picket_pitch = 0.13
 entry_share = 0.36              # the door's bay of the three
 bay_front_min = 5.8             # a lot narrower than about 19 ft has a flat front
@@ -96,6 +97,14 @@ do = [
   { set = { bay_top = "= 2 if (kind == 'neo_grec' and not chance('full_bay', neo_grec_full_bay)) else len(storey_heights) - 1" } },
   { let = { front = "fsum(storey_heights)", ew = "w * entry_share" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  # The cornice's brackets, on the piers and never over a window: at each end,
+  # at the door's bay, and on the window zone's middle pier (or the bay's arrises).
+  { let = { wz = "w - ew", zx = "ew if entry_left else 0.0" } },
+  { let = { mid = "zx + 0.3 + (wz - 0.6 - wz * 0.17) / 2.0 + wz * 0.085" } },
+  { let = { piers = "[0.2, w - 0.2, ew if entry_left else w - ew] + ([zx + wz * side_share, zx + wz * (1 - side_share)] if (bay_front and bay_top >= len(storey_heights) - 1) else [mid])" } },
+  { each = "piers", when = "kind in ('italianate', 'neo_grec')", do = [
+      { insert = "Bracket", at = ["max(0.0, min(w - 0.3, item - 0.15))", "front - 0.62", "0.3", "0.62 + cornice_depth * 0.2"], name = "bracket{i}" },
+  ] },
   { let = { sx = "(ew / 2.0 if entry_left else w - ew / 2.0) - sw / 2.0" } },
   { insert = "Stoop", at = ["sx", "0.0", "sw", "base_h"], name = "stoop", attrs = { stone_paint = "stoop_brownstone" } },
   # The stoop's balustrades, seen edge on, and its newels at the foot.
@@ -120,7 +129,9 @@ do = [
   { split = "x", when = "not entry_left", parts = [ { label = "WindowZone", size = "w - ew", name = "windows" }, { label = "EntryZone", size = "ew", name = "entry" } ] },
   { insert = "Socle", at = ["x", "y", "w", "h"], name = "rockface", when = "kind == 'romanesque' and role in ('basement', 'parlour')" },
   { insert = "Entablature", at = ["x", "y + h - 0.25", "w", "0.25"], name = "water_table", attrs = { course_kind = "bandeau", paint = "= trim_paint" }, when = "role == 'basement'" },
-  { insert = "Cornice", at = ["x", "y + h", "w", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "= 'modillioned' if kind in ('romanesque', 'early') else 'bracketed'", paint = "= cornice_paint" }, when = "index == count - 1" },
+  # The cornice's frieze; its brackets stand on the piers (put up by the lot).
+  { insert = "Entablature", at = ["x", "y + h - 0.55", "w", "0.55"], name = "frieze", attrs = { course_kind = "entablature", paint = "= cornice_paint" }, when = "index == count - 1 and kind in ('italianate', 'neo_grec')" },
+  { insert = "Cornice", at = ["x", "y + h", "w", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "modillioned", paint = "= cornice_paint" }, when = "index == count - 1" },
 ]
 
 [[production]]
@@ -160,7 +171,7 @@ do = [ { split = "x", parts = [
 id = "brownstone.stoop_rail"
 label = "StoopRail"
 doc = "The stoop's two balustrades seen edge on, grown: a brownstone wall with a newel block at its foot, or cast iron -- a newel post with an urn and the rail's edge rising to the door."
-do = [ { grow = "brownstone.stoop_rail", generations = 1, params = { iron = "iron_stoop", climb = "base_h + 0.95" } } ]
+do = [ { grow = "brownstone.stoop_rail", generations = 1, params = { iron = "iron_stoop", climb = "base_h + 0.95", risers = "max(5, round(base_h / 0.18))", rise = "base_h / max(5, round(base_h / 0.18))" } } ]
 
 [[production]]
 id = "brownstone.areaway"
@@ -186,7 +197,7 @@ doc = "The light, its keystone and frame; an iron grille over a basement window;
 do = [
   { call = "kit.dress_the_light" },
   { insert = "Grille", at = ["x", "y", "w", "h"], name = "grille", when = "has('grille') and grille" },
-  { insert = "Hood", at = ["x - 0.1", "y + h", "w + 0.2", "0.32 if hood == 'bracketed' else 0.26"], name = "hood", attrs = { hood_kind = "= hood" }, when = "hood != 'none'" },
+  { insert = "Hood", at = ["x - 0.1", "y + h", "w + 0.2", "((0.42 if role == 'parlour' else 0.3) if hood == 'bracketed' else (0.3 if role == 'parlour' else 0.22))"], name = "hood", attrs = { hood_kind = "= hood" }, when = "hood != 'none'" },
   { insert = "Sill", at = ["x - 0.1", "y - 0.12", "w + 0.2", "0.12"], name = "sill", attrs = { hood_kind = "sill" }, when = "has('hood') and opening_type == 'window' and role != 'basement' and not (kind == 'romanesque' and role == 'parlour')" },
 ]
 
@@ -237,7 +248,7 @@ label = "Cell"
 doc = "Parlour windows reach nearly to the floor, round-headed on an Italianate or Romanesque front; bedroom windows are shorter, segmental in the Italianate, square in the Neo-Grec, square in the Romanesque but arched on its top floor. The Italianate hoods every opening on consoles, the Neo-Grec gives it an incised lintel, the Romanesque a keystone."
 when = "is_bay() and role != 'basement'"
 let = { parlour = "role == 'parlour'", top = "level == len(storey_heights) - 1", front = "has('face') and face == 'front'", side = "has('face') and face == 'side'" }
-set = { opening_type = "window", head = "= (parlour_head if parlour else ('segmental' if (top and chance('top_head', 0.6)) else bedroom_head)) if kind == 'italianate' else (('round' if (parlour or top) else 'flat') if kind == 'romanesque' else 'flat')", light_width = "= min(1.9, w - 0.5) if front else ((w - 0.22) if side else min(window_w, w - 0.3))", sill = "= 0.55 if parlour else 0.75", light_height = "= h - (0.55 + 0.95 if parlour else 0.75 + 0.55) - (0.25 if top else 0.0)", surround_kind = "= 'none' if kind in ('neo_grec', 'early') else 'moulded_architrave'", keystone_present = "= kind == 'romanesque' and (parlour or top)", grille = false, hood = "= hood_kind if kind == 'italianate' else ('lintel' if kind in ('neo_grec', 'early') else 'none')" }
+set = { opening_type = "window", head = "= (parlour_head if parlour else ('segmental' if (top and chance('top_head', 0.6, per='Storey')) else bedroom_head)) if kind == 'italianate' else (('round' if (parlour or top) else 'flat') if kind == 'romanesque' else 'flat')", light_width = "= min(1.9, w - 0.5) if front else ((w - 0.22) if side else min(window_w, w - 0.3))", sill = "= 0.55 if parlour else 0.75", light_height = "= h - (0.55 + 0.95 if parlour else 0.75 + 0.55) - (0.85 if top else 0.0)", surround_kind = "= 'none' if kind in ('neo_grec', 'early') else 'moulded_architrave'", keystone_present = "= kind == 'romanesque' and (parlour or top)", grille = false, hood = "= 'none' if (top and kind == 'italianate' and level > 2) else hood_kind if kind == 'italianate' else ('lintel' if kind in ('neo_grec', 'early') else 'none')" }
 
 [[rule]]
 id = "brownstone.base.the_door"
@@ -254,19 +265,22 @@ id = "brownstone.stoop_rail"
 doc = "A stoop's balustrades edge on: on each side a brownstone wall to the door's height with a newel block at its foot, or an iron rail's edge over a cast-iron newel and urn."
 axiom = "Stoop"
 rules = [
-  { id = "brownstone.stoop_rail.stone", pred = "Stoop", when = "not iron", to = "StoneSide(0) StoneSide(1)" },
-  { id = "brownstone.stoop_rail.iron", pred = "Stoop", when = "iron", to = "IronSide(0) IronSide(1)" },
+  { id = "brownstone.stoop_rail.stone", pred = "Stoop", when = "not iron", to = "Treads StoneSide(0) StoneSide(1)" },
+  { id = "brownstone.stoop_rail.iron", pred = "Stoop", when = "iron", to = "Treads IronSide(0) IronSide(1)" },
 ]
 interpret = [
   { module = "StoneSide(k)", do = [
-      { polygon = "Newel", points = "[[(0.0 if k == 0 else cw - 0.42), 0.0], [(0.42 if k == 0 else cw), 0.0], [(0.42 if k == 0 else cw), 1.15], [(0.0 if k == 0 else cw - 0.42), 1.15]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
+      { polygon = "Newel", points = "[[(0.0 if k == 0 else cw - 0.44), 0.0], [(0.44 if k == 0 else cw), 0.0], [(0.44 if k == 0 else cw), 1.2], [(0.0 if k == 0 else cw - 0.44), 1.2]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
       { polygon = "Newel", points = "[[(0.05 if k == 0 else cw - 0.37), 1.15], [(0.37 if k == 0 else cw - 0.05), 1.15], [(0.37 if k == 0 else cw - 0.05), climb], [(0.05 if k == 0 else cw - 0.37), climb]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
       { polygon = "Newel", points = "[[(0.0 if k == 0 else cw - 0.42), 1.15], [(0.42 if k == 0 else cw), 1.15], [(0.42 if k == 0 else cw), 1.27], [(0.0 if k == 0 else cw - 0.42), 1.27]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
   ] },
+  { module = "Treads", each = "range(1, risers)", polygon = "Newel", points = "[[0.3, rise * item - 0.012], [cw - 0.3, rise * item - 0.012], [cw - 0.3, rise * item + 0.012], [0.3, rise * item + 0.012]]", attrs = { paint = "stoop_line" } },
   { module = "IronSide(k)", do = [
-      { place = "Rail", at = ["(0.2 if k == 0 else cw - 0.24)", "1.0", "0.04", "climb - 1.0"], attrs = { order = "iron" } },
-      { place = "Rail", at = ["(0.07 if k == 0 else cw - 0.37)", "0.0", "0.3", "1.15"], attrs = { order = "iron" } },
-      { polygon = "Finial", points = "[[(0.11 if k == 0 else cw - 0.33), 1.15], [(0.33 if k == 0 else cw - 0.11), 1.15], [(0.38 if k == 0 else cw - 0.06), 1.28], [(0.3 if k == 0 else cw - 0.14), 1.4], [(0.22 if k == 0 else cw - 0.22), 1.46], [(0.14 if k == 0 else cw - 0.3), 1.4], [(0.06 if k == 0 else cw - 0.38), 1.28]]", attrs = { paint = "iron" } },
+      { polygon = "Newel", points = "[[(0.05 if k == 0 else cw - 0.37), 0.0], [(0.37 if k == 0 else cw - 0.05), 0.0], [(0.37 if k == 0 else cw - 0.05), climb - 0.9], [(0.05 if k == 0 else cw - 0.37), climb - 0.9]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
+      { each = "range(4)", place = "Rail", at = ["(0.08 if k == 0 else cw - 0.34) + item * 0.08", "climb - 0.9", "0.018", "0.9"], attrs = { order = "iron" } },
+      { place = "Rail", at = ["(0.05 if k == 0 else cw - 0.37)", "climb - 0.06", "0.32", "0.06"], attrs = { order = "iron" } },
+      { place = "Rail", at = ["(0.03 if k == 0 else cw - 0.41)", "0.0", "0.38", "1.2"], attrs = { order = "iron" } },
+      { polygon = "Finial", points = "[[(0.1 if k == 0 else cw - 0.34), 1.2], [(0.34 if k == 0 else cw - 0.1), 1.2], [(0.4 if k == 0 else cw - 0.04), 1.33], [(0.3 if k == 0 else cw - 0.14), 1.45], [(0.22 if k == 0 else cw - 0.22), 1.5], [(0.14 if k == 0 else cw - 0.3), 1.45], [(0.04 if k == 0 else cw - 0.4), 1.33]]", attrs = { paint = "iron" } },
   ] },
 ]
 
@@ -294,4 +308,23 @@ interpret = [
       { place = "Picket", at = ["cw / 2 - 0.009", "0.0", "0.018", "ch - 0.2"], attrs = { order = "iron" } },
       { polygon = "Finial", points = "[[cw / 2 - 0.025, ch - 0.2], [cw / 2 + 0.025, ch - 0.2], [cw / 2, ch - 0.1]]", attrs = { paint = "iron" } },
   ] },
+]
+
+[[production]]
+id = "brownstone.bracket"
+label = "Bracket"
+doc = "A cornice bracket, grown: a scrolled console, wider at its head than its foot."
+do = [ { grow = "brownstone.bracket", generations = 1, params = { angular = "kind == 'neo_grec'" } } ]
+
+[[lsystem]]
+id = "brownstone.bracket"
+doc = "A cornice bracket: a scroll (Italianate) or a stepped, incised block (Neo-Grec)."
+axiom = "B"
+rules = [
+  { id = "brownstone.bracket.scroll", pred = "B", when = "not angular", to = "Scroll" },
+  { id = "brownstone.bracket.angular", pred = "B", when = "angular", to = "Block" },
+]
+interpret = [
+  { module = "Scroll", polygon = "Console", points = "[[cw * 0.3, 0.0], [cw * 0.7, 0.0], [cw * 0.75, ch * 0.15], [cw * 0.62, ch * 0.32], [cw * 0.7, ch * 0.62], [cw, ch * 0.85], [cw, ch], [0.0, ch], [0.0, ch * 0.85], [cw * 0.3, ch * 0.62], [cw * 0.38, ch * 0.32], [cw * 0.25, ch * 0.15]]", attrs = { paint = "= cornice_paint", edge = "cornice_stroke" } },
+  { module = "Block", polygon = "Console", points = "[[cw * 0.3, 0.0], [cw * 0.7, 0.0], [cw * 0.7, ch * 0.4], [cw * 0.85, ch * 0.4], [cw * 0.85, ch * 0.75], [cw, ch * 0.75], [cw, ch], [0.0, ch], [0.0, ch * 0.75], [cw * 0.15, ch * 0.75], [cw * 0.15, ch * 0.4], [cw * 0.3, ch * 0.4]]", attrs = { paint = "= cornice_paint", edge = "cornice_stroke" } },
 ]

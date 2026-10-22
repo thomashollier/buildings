@@ -17,14 +17,19 @@ describe = { rule = "soho.recipes.recipe_for", phase = "structure", detail = "f'
 year = "= year"
 
 [emit]
+Light = "soho.light"
 Rail = "kit.column"
+Deck = "kit.column"
+Escape = "grow.slant"
+Apron = "grow.stone"
+TankBody = "grow.stone"
 VaultLens = "grow.stone"
 Plate = "grow.stone"
 
 [params]
 lot_width = 7.62               # the Commissioners' Plan lot: 25 ft
 column_w = 0.36                # an engaged iron column on a loft front
-entablature = 0.42             # the iron entablature crowning each floor
+entablature = 0.55             # the iron entablature crowning each floor
 door_w = 1.15                  # a door a person and a parcel pass through
 fire_escape_rail = 0.95        # a guard a body leans on
 roof_rise = 3.0                # a half-storey garret under a 40 degree roof
@@ -34,9 +39,25 @@ chimney_w = 0.7
 chimney_h = 1.4
 # What the builder chose within a type (variety). An iron front was painted to
 # pass for stone, in one of a few colours; a brick loft's brick varies.
-iron_paints = { iron_cream = 4, iron_white = 2, iron_grey = 2, iron_buff = 2, iron_sage = 1 }
+iron_paints = { iron_white = 4, iron_cream = 4, iron_buff = 2, iron_grey = 1.5, iron_bluegrey = 0.5, iron_ochre = 0.3, iron_black = 0.4 }
+dark_shop = 0.25                # the store storey painted dark
+shop_paints = { iron_charcoal = 1, iron_black = 1, iron_dkgreen = 1, iron_sage = 1 }
 brick_paints = { brick = 3, brick_dark = 2, brick_buff = 1 }
-corinthian_odds = { modest = 0.15, ordinary = 0.25, comfortable = 0.45, grand = 0.8 }
+p_corinthian = 0.7             # a Corinthian or Composite order, in every class (grading fix 9)
+# An iron front by date (grading fix 10): [last year, odds] for modest/ordinary and for comfortable/grand.
+iron_ramp = [[1875, [0.65, 0.85]], [1885, [0.5, 0.5]], [9999, [0.2, 0.2]]]
+# The iron frame (grading fix 1): the light's share of its bay by head, a head gap that lands the
+# head just under the entablature, and an apron panel under every sill.
+iron_share = { round = 0.62, segmental = 0.76, flat = 0.84 }
+iron_head_gap = 0.6
+colonnettes = { modest = 0.45, ordinary = 0.45, comfortable = 0.8, grand = 0.8 }   # on a round-arched front
+sash_kinds = { two_over_two = 7, one_over_one = 3 }
+frame_paints = { brown = 4, green = 3, black = 3 }
+# Fire escapes (fix 3): a stack of balconies with a stair between each pair and a drop ladder.
+escape_odds = { cast_iron_loft = 0.55, brick_store_and_loft = 0.65, federal_rowhouse = 0.0 }
+escape_bays = { two = 6, three = 4 }
+freight_bay = 0.55              # a wide freight door at the end opposite the stair door (not grand)
+water_tank = 0.3
 # An iron front's window heads by date, as overlapping odds: [last year, [round, segmental, flat]].
 heads = ["round", "segmental", "flat"]
 head_ramp = [[1858, [0.8, 0.15, 0.05]], [1864, [0.5, 0.4, 0.1]], [1870, [0.2, 0.5, 0.3]], [1876, [0.08, 0.32, 0.6]], [9999, [0.05, 0.15, 0.8]]]
@@ -44,7 +65,7 @@ loft_uppers = { early = [3, 4, 5], late = [4, 5, 6] }
 loft_upper_odds = [2, 4, 1]
 storey_jitter = [0.94, 1.06]
 cornice_jitter = [0.8, 1.2]
-crest_odds = { cast_iron_loft = 0.35, brick_store_and_loft = 0.2, federal_rowhouse = 0.0 }   # a name-plate pediment over the cornice
+crest_odds = { one = 0.05, more = 0.4, brick = 0.15 }   # a pediment raised in the cornice over the middle bays
 vault_lights = 0.75             # a vault-light platform before the store
 
 # Each type's vocabulary and proportions. Where money or date changes a value
@@ -134,18 +155,25 @@ do = [
   { refuse = "only the Federal dwelling is modelled; it stops being built c. 1835", when = "programme == 'dwelling' and year > 1840" },
   { refuse = "lofts on this street are a product of the 1850s; none before c. 1848", when = "programme == 'loft' and year < 1848" },
   # Date and programme choose the type; money only chooses within it.
-  { set = { type = "= 'federal_rowhouse' if programme == 'dwelling' else 'cast_iron_loft' if 1848 <= year < 1880 and klass in ('comfortable', 'grand') else 'brick_store_and_loft'" } },
+  { set = { type = "= 'federal_rowhouse' if programme == 'dwelling' else 'cast_iron_loft' if chance('iron_front', step(iron_ramp, year)[1 if klass in ('comfortable', 'grand') else 0]) else 'brick_store_and_loft'" } },
   { set = { r = "= types[type]" } },
   { let = { grand = "klass == 'grand'", loft = "type != 'federal_rowhouse'" } },
   { let = { n_up = "draw('uppers', loft_uppers['late' if year >= 1870 else 'early'], loft_upper_odds) if loft else r.upper_storeys", k = "between('storey_jitter', storey_jitter[0], storey_jitter[1])" } },
-  { set = { storey_heights = "= [(r.ground_storey_grand if grand else r.ground_storey) * k] + geometric((r.first_upper_grand if grand else r.first_upper) * k, r.taper, n_up)", fire_escape = "= r.fire_escape_grand if grand else r.fire_escape" } },
-  { set = { paint = "= draw('iron_paint', iron_paints) if type == 'cast_iron_loft' else draw('brick_paint', brick_paints) if type == 'brick_store_and_loft' else 'brick'", iron_head = "= draw('head', heads, step(head_ramp, year))", corinthian = "= chance('corinthian', corinthian_odds[klass])", cornice_depth = "= r.cornice_projection * between('cornice_jitter', cornice_jitter[0], cornice_jitter[1])", crest = "= chance('crest', crest_odds[type])", vault = "= loft and chance('vault', vault_lights)" } },
+  # The top storey grows by the cornice's frieze, so its windows keep their height.
+  { set = { cornice_depth = "= r.cornice_projection * between('cornice_jitter', cornice_jitter[0], cornice_jitter[1])" } },
+  { set = { frieze = "= cornice_depth * 0.65 if (loft and r.cornice_ornament == 'bracketed') else 0.0" } },
+  { set = { storey_heights = "= [(r.ground_storey_grand if grand else r.ground_storey) * k] + geometric((r.first_upper_grand if grand else r.first_upper) * k, (0.98 if type == 'cast_iron_loft' else 0.97) if loft else r.taper, n_up - 1) + [((r.first_upper_grand if grand else r.first_upper) * k * ((0.98 if type == 'cast_iron_loft' else 0.97) if loft else r.taper) ** (n_up - 1)) + frieze]", fire_escape = "= chance('fire_escape', escape_odds[type])", escape_w = "= draw('escape_bays', escape_bays)", escape_centred = "= chance('escape_centred', 0.5)", escape_left = "= chance('escape_left', 0.5)" } },
+  { set = { paint = "= draw('iron_paint', iron_paints) if type == 'cast_iron_loft' else draw('brick_paint', brick_paints) if type == 'brick_store_and_loft' else 'brick'", iron_head = "= draw('head', heads, step(head_ramp, year))", corinthian = "= chance('corinthian', p_corinthian)", crest = "= loft and chance('crest', crest_odds['brick' if type == 'brick_store_and_loft' else 'one' if lots == 1 else 'more'])", vault = "= loft and chance('vault', vault_lights)", shop_paint = "= draw('shop_paint', shop_paints) if (type == 'cast_iron_loft' and chance('dark_shop', dark_shop)) else ''", colonnetted = "= chance('colonnettes', colonnettes[klass])", sash = "= draw('sash', sash_kinds)", frame_paint = "= draw('frame_paint', frame_paints)", door_left = "= chance('door_left', 0.5) if loft else True", freight = "= loft and klass != 'grand' and chance('freight', freight_bay)", tank = "= loft and chance('tank', water_tank)", pediment_h = "= between('pediment_h', 0.8, 1.8 if klass == 'grand' else 1.3)" } },
   { fit = "x", end = "r.end", bay = "r.bay", as = "rhythm", min_bays = 2 },
-  { let = { front = "fsum(storey_heights)" } },
+  { let = { front = "fsum(storey_heights)", nb = "len(bay_spans(rhythm, 0.0))" } },
+  { let = { mid = "nb if nb <= 3 else (3 if nb % 2 == 1 else 2)", spans0 = "bay_spans(rhythm, 0.0)" } },
+  { let = { px0 = "spans0[(nb - mid) // 2].x - 0.2", px1 = "spans0[(nb - mid) // 2 + mid - 1].x + spans0[(nb - mid) // 2 + mid - 1].w + 0.2" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
   { insert = "Roof", at = ["0.0", "front", "w", "roof_rise"], name = "roof", when = "r.pitched_roof" },
   # A name-plate pediment over the middle of the cornice.
-  { insert = "Crest", at = ["w / 2.0 - min(2.4, w * 0.3)", "front + cornice_depth * 0.37", "2 * min(2.4, w * 0.3)", "1.2"], name = "crest", when = "crest" },
+  { insert = "Crest", at = ["max(0.0, px0)", "front + cornice_depth * 0.2", "min(w, px1) - max(0.0, px0)", "pediment_h"], name = "crest", when = "crest" },
+  # A timber water tank on the roof behind the cornice.
+  { insert = "Tank", at = ["w * 0.62", "front + cornice_depth * 0.4", "min(2.6, w * 0.3)", "3.2"], name = "tank", when = "tank" },
   # The vault-light platform before the store: iron set with lilac glass.
   { insert = "Vault", at = ["0.0", "0.0", "w", "0.16"], name = "vault", when = "vault" },
 ]
@@ -165,10 +193,26 @@ do = [
   { each = "column_lines(rhythm, x, column_w)", when = "r.columns", do = [
       { insert = "Column", at = ["item.x", "y", "item.w", "h - entablature"], name = "column{i}" },
   ] },
-  { insert = "Entablature", at = ["x", "y + h - entablature", "w", "entablature"], name = "entablature", when = "role == 'base' or (r.entablature_every_floor and role != 'top')" },
+  { insert = "Entablature", at = ["x", "y + h - entablature - (frieze if role == 'top' else 0.0)", "w", "entablature"], name = "entablature", when = "role == 'base' or r.entablature_every_floor" },
   { insert = "Cornice", at = ["x", "y + h", "w", "cornice_depth"], name = "cornice", attrs = { cornice_ornament = "= r.cornice_ornament" }, when = "role == 'top'" },
   { let = { spans = "bay_spans(rhythm, x)" } },
-  { insert = "FireEscape", at = ["spans[len(spans) // 2 - 1].x + spans[len(spans) // 2 - 1].w * 0.08", "y", "(spans[len(spans) // 2].x + spans[len(spans) // 2].w * 0.92) - (spans[len(spans) // 2 - 1].x + spans[len(spans) // 2 - 1].w * 0.08)", "fire_escape_rail"], name = "fire_escape", when = "fire_escape and role != 'base' and len(spans) >= 2" },
+  # Each bay's iron below the sill is a recessed apron panel.
+  { each = "range(len(spans))", when = "type == 'cast_iron_loft' and role != 'base'", do = [
+      { insert = "ApronPanel", at = ["spans[item].x + 0.06", "y + 0.08", "spans[item].w - 0.12", "r.sill - 0.16"], name = "apron{i}" },
+  ] },
+  # On a round-arched front a colonnette stands at each jamb, up to the springing.
+  { each = "range(len(spans))", when = "type == 'cast_iron_loft' and role != 'base' and iron_head == 'round' and colonnetted", do = [
+      { let = { lw = "iron_share['round'] * spans[item].w", lh = "h - r.sill - (iron_head_gap if True else 0.0) - (frieze if role == 'top' else 0.0)" } },
+      { insert = "Column", at = ["spans[item].x + spans[item].w / 2.0 - lw / 2.0 - 0.17", "y + r.sill", "0.17", "lh - lw / 2.0"], name = "colonnette_l{i}", attrs = { order = "colonnette", shaft_width = 0.1 } },
+      { insert = "Column", at = ["spans[item].x + spans[item].w / 2.0 + lw / 2.0", "y + r.sill", "0.17", "lh - lw / 2.0"], name = "colonnette_r{i}", attrs = { order = "colonnette", shaft_width = 0.1 } },
+  ] },
+  # The fire escape: a balcony at each upper floor over two or three bays,
+  # a stair between each pair, a drop ladder under the lowest.
+  { let = { eb = "min(len(spans), 3 if escape_w == 'three' else 2)" } },
+  { let = { e0 = "(len(spans) - eb) // 2 if escape_centred else (0 if escape_left else len(spans) - eb)" } },
+  { let = { ex = "spans[e0].x + 0.1", ew = "spans[e0 + eb - 1].x + spans[e0 + eb - 1].w - spans[e0].x - 0.2" } },
+  { insert = "FireStair", at = ["ex", "y", "ew", "h"], name = "fire_escape", when = "fire_escape and role != 'base' and len(spans) >= 2", attrs = { first = "= index == 1", top = "= role == 'top'", flip = "= index % 2 == 0" } },
+  { insert = "FireStair", at = ["ex", "y + h - 2.4", "ew", "2.4"], name = "drop_ladder", when = "fire_escape and role == 'base' and len(spans) >= 2", attrs = { ladder = true } },
 ]
 
 [[production]]
@@ -230,7 +274,7 @@ id = "soho.base.materials_of_the_front"
 label = "Storey"
 layer = "roles"
 doc = "A store front is iron whatever the floors over it are made of; an iron front is painted in the builder's colour, a brick loft laid in the builder's brick."
-set = { wall_material = "= ((paint if type == 'cast_iron_loft' else 'cast_iron') if r.ground_material == 'cast_iron' else r.ground_material) if index == 0 else (paint if r.wall_material in ('cast_iron', 'brick') and type != 'federal_rowhouse' else r.wall_material)" }
+set = { wall_material = "= ((shop_paint or paint if type == 'cast_iron_loft' else 'cast_iron') if r.ground_material == 'cast_iron' else r.ground_material) if index == 0 else (paint if r.wall_material in ('cast_iron', 'brick') and type != 'federal_rowhouse' else r.wall_material)" }
 
 [[rule]]
 id = "soho.class.iron_order"
@@ -251,8 +295,8 @@ id = "soho.base.a_bay_holds_a_window"
 label = "Cell"
 doc = "Every bay above the street holds a window, its share of the bay set by what the front is made of; under a deep cornice the top floor's windows stop short of its frieze."
 when = "is_bay()"
-let = { clear = "r.cornice_projection * 0.65 + 0.15 if role == 'top' and not r.pitched_roof else 0.0" }
-set = { opening_type = "window", head = "flat", light_width = "= r.window_share * w", sill = "= r.sill", light_height = "= h - r.sill - r.head_gap - clear", surround_kind = "= 'moulded_architrave' if r.wall_material == 'brick' else 'none'", keystone_present = "= type == 'federal_rowhouse'" }
+let = { clear = "frieze if role == 'top' else 0.0" }
+set = { opening_type = "window", head = "flat", light_width = "= (iron_share[iron_head] if type == 'cast_iron_loft' else r.window_share) * w", sill = "= r.sill", light_height = "= h - r.sill - (iron_head_gap if type == 'cast_iron_loft' else r.head_gap) - clear", surround_kind = "= 'moulded_architrave' if r.wall_material == 'brick' else 'none'", keystone_present = "= type == 'federal_rowhouse'", glazing = "sash", sash_cols = "= 2 if sash == 'two_over_two' else 1", sash_rows = 1, frame_paint = "= frame_paint if type != 'federal_rowhouse' else 'white'", frame_w = 0.07, bar_w = 0.05 }
 
 [[rule]]
 id = "soho.base.the_ground_floor_is_a_store"
@@ -260,16 +304,24 @@ label = "Cell"
 doc = "On a store-and-loft the ground floor is a store: glass from a low bulkhead to a transom and sign band."
 when = "is_bay() and role == 'base' and r.shopfront"
 specificity = 10
-set = { opening_type = "shop_bay", head = "flat", light_width = "= w * 0.86", sill = 0.45, light_height = "= h - 0.45 - 0.85", surround_kind = "none", keystone_present = false }
+set = { opening_type = "shop_bay", head = "flat", light_width = "= w * 0.86", sill = 0.45, light_height = "= h - 0.45 - 0.85", surround_kind = "none", keystone_present = false, glazing = "= None" }
 
 [[rule]]
 id = "soho.base.the_door"
 label = "Cell"
 doc = "One bay of the ground floor is the door: to the stair at the side of a loft, or under a fanlight to one side of a rowhouse."
-when = "is_bay() and role == 'base' and (is_first_bay() if r.door_side == 'left' else is_last_bay())"
+when = "is_bay() and role == 'base' and (is_first_bay() if (door_left if type != 'federal_rowhouse' else r.door_side == 'left') else is_last_bay())"
 specificity = 20
 let = { federal = "type == 'federal_rowhouse'" }
-set = { opening_type = "pedestrian_entrance", head = "= 'round' if federal else 'flat'", light_width = "= door_w", sill = 0.0, light_height = "= min(h - 0.35, 2.95 if federal else h - 0.85)", surround_kind = "= 'moulded_architrave' if federal else 'none'", keystone_present = "= federal" }
+set = { glazing = "= None", opening_type = "pedestrian_entrance", head = "= 'round' if federal else 'flat'", light_width = "= door_w", sill = 0.0, light_height = "= min(h - 0.35, 2.95 if federal else h - 0.85)", surround_kind = "= 'moulded_architrave' if federal else 'none'", keystone_present = "= federal" }
+
+[[rule]]
+id = "soho.base.the_freight_door"
+label = "Cell"
+doc = "On many lofts the end bay opposite the stair door is a wide freight door, wood or sheet iron."
+when = "is_bay() and role == 'base' and freight and (is_last_bay() if door_left else is_first_bay())"
+specificity = 15
+set = { glazing = "= None", opening_type = "pedestrian_entrance", head = "flat", light_width = "= min(w - 0.3, 2.3)", sill = 0.0, light_height = "= min(h - 0.9, 3.3)", surround_kind = "none", keystone_present = false }
 
 [[rule]]
 id = "soho.period.iron_heads_of_their_date"
@@ -277,12 +329,12 @@ label = "Cell"
 layer = "period"
 doc = "An iron front's window heads follow its date, as odds: mostly round to the early 1860s, segmental around 1870, flat after; one head for the whole front."
 when = "type == 'cast_iron_loft' and is_bay() and role != 'base'"
-set = { head = "= iron_head", keystone_present = "= iron_head == 'round'" }
+set = { head = "= iron_head", keystone_present = "= iron_head == 'round'", archivolt = "= 'plain' if iron_head == 'round' else None" }
 
 [[production]]
 id = "soho.crest"
 label = "Crest"
-doc = "A name plate over the cornice, grown: a triangular or segmental pediment over a panel."
+doc = "A pediment raised in the cornice over the middle bays, grown: its raked cornice, its tympanum in the front's paint, a name plate in it."
 do = [ { grow = "soho.crest", generations = 1, params = { segmental = "iron_head != 'flat'", face = "'wall_' + paint if type == 'cast_iron_loft' else 'wall_cast_iron'" } } ]
 
 [[production]]
@@ -298,13 +350,19 @@ id = "soho.crest"
 doc = "A name plate: a panel, and over it a pediment, triangular or segmental."
 axiom = "Crest"
 rules = [
-  { id = "soho.crest.segmental", pred = "Crest", when = "segmental", to = "Panel Arc" },
-  { id = "soho.crest.triangular", pred = "Crest", when = "not segmental", to = "Panel Tri" },
+  { id = "soho.crest.segmental", pred = "Crest", when = "segmental", to = "Arc Plate" },
+  { id = "soho.crest.triangular", pred = "Crest", when = "not segmental", to = "Tri Plate" },
 ]
 interpret = [
-  { module = "Panel", polygon = "Plate", points = "[[cw * 0.15, 0.0], [cw * 0.85, 0.0], [cw * 0.85, ch * 0.45], [cw * 0.15, ch * 0.45]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
-  { module = "Tri", polygon = "Plate", points = "[[0.0, ch * 0.45], [cw, ch * 0.45], [cw / 2, ch]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
-  { module = "Arc", polygon = "Plate", points = "[[0.0, ch * 0.45], [cw, ch * 0.45], [cw * 0.93, ch * 0.62], [cw * 0.8, ch * 0.78], [cw * 0.65, ch * 0.9], [cw * 0.5, ch * 0.94], [cw * 0.35, ch * 0.9], [cw * 0.2, ch * 0.78], [cw * 0.07, ch * 0.62]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  { module = "Tri", do = [
+      { polygon = "Plate", points = "[[0.0, 0.0], [cw, 0.0], [cw / 2, ch]]", attrs = { paint = "cornice", edge = "cornice_stroke" } },
+      { polygon = "Plate", points = "[[0.35, 0.12], [cw - 0.35, 0.12], [cw / 2, ch - 0.22]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  ] },
+  { module = "Arc", do = [
+      { polygon = "Plate", points = "[[0.0, 0.0], [cw, 0.0], [cw * 0.95, ch * 0.35], [cw * 0.84, ch * 0.66], [cw * 0.68, ch * 0.88], [cw * 0.5, ch], [cw * 0.32, ch * 0.88], [cw * 0.16, ch * 0.66], [cw * 0.05, ch * 0.35]]", attrs = { paint = "cornice", edge = "cornice_stroke" } },
+      { polygon = "Plate", points = "[[0.3, 0.12], [cw - 0.3, 0.12], [cw * 0.93 - 0.1, ch * 0.33], [cw * 0.82, ch * 0.6], [cw * 0.67, ch * 0.78], [cw * 0.5, ch - 0.2], [cw * 0.33, ch * 0.78], [cw * 0.18, ch * 0.6], [cw * 0.07 + 0.1, ch * 0.33]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  ] },
+  { module = "Plate", polygon = "Plate", points = "[[cw * 0.38, 0.2], [cw * 0.62, 0.2], [cw * 0.62, 0.2 + min(0.35, ch * 0.3)], [cw * 0.38, 0.2 + min(0.35, ch * 0.3)]]", attrs = { paint = "cornice", edge = "cornice_stroke" } },
 ]
 
 [[lsystem]]
@@ -317,4 +375,67 @@ interpret = [
   { module = "Rx(k)", repeat = "x", n = "k" },
   { module = "Ry(k)", repeat = "y", n = "k" },
   { module = "Lens", polygon = "VaultLens", points = "[[cw * 0.3, ch * 0.2], [cw * 0.7, ch * 0.2], [cw * 0.8, ch * 0.5], [cw * 0.7, ch * 0.8], [cw * 0.3, ch * 0.8], [cw * 0.2, ch * 0.5]]", attrs = { paint = "glass_lilac" } },
+]
+
+[[production]]
+id = "soho.apron"
+label = "ApronPanel"
+doc = "The recessed iron panel under a sill, a shade darker than the face, with a raised lozenge."
+do = [ { grow = "soho.apron", generations = 1, params = { panel = "'panel_' + paint" } } ]
+
+[[production]]
+id = "soho.fire_stair"
+label = "FireStair"
+doc = "A fire escape on one floor, grown: the balcony's slatted deck and its rail, the stair up to the next balcony, or the drop ladder."
+do = [ { grow = "soho.fire_escape", generations = 1, params = { ladder = "has('ladder') and ladder", bars = "max(4, round(w / 0.15))" } } ]
+
+[[production]]
+id = "soho.tank"
+label = "Tank"
+doc = "A timber water tank on its frame, behind the cornice."
+do = [ { grow = "soho.tank", generations = 1 } ]
+
+[[lsystem]]
+id = "soho.apron"
+doc = "An apron panel with a lozenge."
+axiom = "A"
+rules = [ { id = "soho.apron.panel", pred = "A", to = "Panel Lozenge" } ]
+interpret = [
+  { module = "Panel", polygon = "Apron", points = "[[0.0, 0.0], [cw, 0.0], [cw, ch], [0.0, ch]]", attrs = { paint = "= panel", edge = "cornice_stroke" } },
+  { module = "Lozenge", polygon = "Apron", points = "[[cw / 2, ch * 0.18], [cw * 0.72, ch / 2], [cw / 2, ch * 0.82], [cw * 0.28, ch / 2]]", attrs = { paint = "= panel", edge = "cornice_stroke" } },
+]
+
+[[lsystem]]
+id = "soho.fire_escape"
+doc = "A fire escape floor: deck, rail, balusters and a stair; or a drop ladder."
+axiom = "F"
+rules = [
+  { id = "soho.fire_escape.floor", pred = "F", when = "not ladder", to = "Deck Rail Rx(bars) [ Bar ] Stair" },
+  { id = "soho.fire_escape.ladder", pred = "F", when = "ladder", to = "Ladder" },
+]
+interpret = [
+  { module = "Deck", place = "Deck", at = ["0", "0", "cw", "0.09"], attrs = { order = "iron" } },
+  { module = "Rail", place = "Deck", at = ["0", "0.93", "cw", "0.04"], attrs = { order = "iron" } },
+  { module = "Rx(k)", repeat = "x", n = "k" },
+  { module = "Bar", place = "Deck", at = ["cw / 2 - 0.008", "0.09", "0.016", "0.84"], attrs = { order = "iron" } },
+  { module = "Stair", line = ["(cw * 0.12 if flip else cw * 0.88)", "0.1", "(cw * 0.88 if flip else cw * 0.12)", "ch - 0.05"], width = "0.05", slant = "Escape", attrs = { stroke_w = 1.6, paint = "iron" } },
+  { module = "Ladder", do = [
+      { place = "Deck", at = ["cw * 0.82", "0", "0.03", "ch"], attrs = { order = "iron" } },
+      { place = "Deck", at = ["cw * 0.82 + 0.4", "0", "0.03", "ch"], attrs = { order = "iron" } },
+      { each = "range(1, 8)", place = "Deck", at = ["cw * 0.82", "ch * item / 8", "0.43", "0.025"], attrs = { order = "iron" } },
+  ] },
+]
+
+[[lsystem]]
+id = "soho.tank"
+doc = "A water tank: legs, a staved barrel, a conical lid."
+axiom = "T"
+rules = [ { id = "soho.tank.barrel", pred = "T", to = "Legs Barrel Lid" } ]
+interpret = [
+  { module = "Legs", do = [
+      { place = "Deck", at = ["cw * 0.1", "0", "0.08", "ch * 0.25"], attrs = { order = "iron" } },
+      { place = "Deck", at = ["cw * 0.9 - 0.08", "0", "0.08", "ch * 0.25"], attrs = { order = "iron" } },
+  ] },
+  { module = "Barrel", polygon = "TankBody", points = "[[cw * 0.05, ch * 0.25], [cw * 0.95, ch * 0.25], [cw * 0.95, ch * 0.8], [cw * 0.05, ch * 0.8]]", attrs = { paint = "wall_timber_dark", edge = "cornice_stroke" } },
+  { module = "Lid", polygon = "TankBody", points = "[[cw * 0.02, ch * 0.8], [cw * 0.98, ch * 0.8], [cw * 0.5, ch]]", attrs = { paint = "wall_timber_dark", edge = "cornice_stroke" } },
 ]
