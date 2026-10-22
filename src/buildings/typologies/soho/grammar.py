@@ -34,7 +34,15 @@ def write_light(light: Shape, below, d) -> list:
     return [replace(out[0], props={**out[0].props, **extra}), *out[1:]]
 
 
+def write_cell(cell: Shape, below, d) -> list:
+    """The kit's bay; a brick window's lintel and sill belong to the storey's lines."""
+    lines = [n for n in below if n.kind == "string_course"]
+    rest = [n for n in below if n.kind != "string_course"]
+    return [*kit.write_cell(cell, rest, d), *lines]
+
+
 register_writer("soho.light", write_light)
+register_writer("soho.cell", write_cell)
 
 STYLE = load_style(Path(__file__).with_name("soho.toml"))
 

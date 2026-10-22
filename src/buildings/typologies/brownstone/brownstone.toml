@@ -32,6 +32,8 @@ describe = { rule = "brownstone.row_house", phase = "period", detail = "f'{kind}
 year = "= year"
 
 [emit]
+Light = "brownstone.light"
+Pitch = "grow.stone"
 Stoop = "brownstone.stoop"
 Sill = "brownstone.hood"
 Console = "grow.stone"
@@ -51,7 +53,7 @@ Storey = "brownstone.storey"
 kinds = ["early", "italianate", "neo_grec", "romanesque"]
 kind_ramp = [[1854, [0.6, 0.4, 0.0, 0.0]], [1866, [0.0, 1.0, 0.0, 0.0]], [1872, [0.0, 0.6, 0.4, 0.0]], [1882, [0.0, 0.1, 0.9, 0.0]], [1886, [0.0, 0.0, 0.7, 0.3]], [1889, [0.0, 0.0, 0.35, 0.65]], [9999, [0.0, 0.0, 0.15, 0.85]]]
 basement_h = [2.3, 2.8]         # the parlour floor stands about eight feet up
-parlour_h = [3.8, 4.2]          # the tallest room in the house
+parlour_h = [4.0, 4.4]          # the tallest room in the house
 upper_h = [3.1, 3.5]            # the first bedroom floor; each over it a little lower
 upper_taper = 0.95
 # One stone for the whole front (hoods, sills, stoop and newels in it, a
@@ -61,7 +63,8 @@ cornice_paints = { cornice_black_brown = 5, cornice_dark_brown = 3, cornice_dark
 window_ws = [1.05, 1.25]
 bedroom_heads = { flat = 3, segmental = 2 }                   # an Italianate bedroom window
 italianate_doors = { door_pediment = 7, door_scrolls = 3 }    # consoles under a pediment, or scrolled consoles
-bay_odds = 0.45                 # of fronts wide enough, a bay front
+bay_odds = 0.45
+romanesque_gable = 0.5          # a Romanesque front crowned by a gable over its cornice                 # of fronts wide enough, a bay front
 neo_grec_full_bay = 1.0         # a bay through the house: one stopping short leaves the floors over it off its axes
 uppers = { modest = [1, 2], ordinary = [2, 2], comfortable = [2, 3], grand = [3, 3] }
 stoop_ws = [1.7, 2.1]
@@ -88,7 +91,7 @@ label = "Lot"
 doc = "The date chooses the dress; the class, the floors; the builder (the seed), which side the door is on. A late front wide enough swells into a bay. The stoop climbs over the basement to the door."
 do = [
   { set = { kind = "= draw('kind', kinds, step(kind_ramp, year))", entry_left = "= chance('entry_left', 0.5)" } },
-  { set = { base_h = "= between('basement_h', basement_h[0], basement_h[1])", hood_kind = "= draw('hood', italianate_hoods)", parlour_head = "= draw('parlour_head', parlour_heads)", brick_up = "= chance('brick_up', brick_uppers[kind])", iron_stoop = "= chance('iron_stoop', p_iron_stoop[kind])", stone = "= draw('stone', stones)", cornice_paint = "= draw('cornice_paint', cornice_paints)", window_w = "= between('window_w', window_ws[0], window_ws[1])", bedroom_head = "= draw('bedroom_head', bedroom_heads)", door_frame = "= draw('door_frame', italianate_doors)", fenced = "= chance('areaway', areaway_fence)", cornice_depth = "= between('cornice_h', cornice_hs[0], cornice_hs[1]) * (0.75 if kind == 'romanesque' else 0.6 if kind == 'early' else 1.0)", sw = "= min(between('stoop_w', stoop_ws[0], stoop_ws[1]), w * entry_share - 0.1)" } },
+  { set = { base_h = "= between('basement_h', basement_h[0], basement_h[1])", hood_kind = "= draw('hood', italianate_hoods)", parlour_head = "= draw('parlour_head', parlour_heads)", brick_up = "= chance('brick_up', brick_uppers[kind])", iron_stoop = "= chance('iron_stoop', p_iron_stoop[kind])", stone = "= draw('stone', stones)", cornice_paint = "= draw('cornice_paint', cornice_paints)", window_w = "= between('window_w', window_ws[0], window_ws[1])", bedroom_head = "= draw('bedroom_head', bedroom_heads)", door_frame = "= draw('door_frame', italianate_doors)", fenced = "= chance('areaway', areaway_fence)", cornice_depth = "= between('cornice_h', cornice_hs[0], cornice_hs[1]) * (0.6 if kind == 'early' else 1.0)", gabled = "= kind == 'romanesque' and chance('gable', romanesque_gable)", sw = "= min(between('stoop_w', stoop_ws[0], stoop_ws[1]), w * entry_share - 0.1)" } },
   { let = { n_up = "draw('uppers', range(uppers[klass][0], uppers[klass][1] + 1))" } },
   { set = { storey_heights = "= [base_h, between('parlour_h', parlour_h[0], parlour_h[1])] + geometric(between('upper_h', upper_h[0], upper_h[1]), upper_taper, n_up)", bay_front = "= kind in ('neo_grec', 'romanesque') and w >= bay_front_min and chance('bay', bay_odds)" } },
   { set = { trim_paint = "= 'trim_' + stone" } },
@@ -97,13 +100,16 @@ do = [
   { set = { bay_top = "= 2 if (kind == 'neo_grec' and not chance('full_bay', neo_grec_full_bay)) else len(storey_heights) - 1" } },
   { let = { front = "fsum(storey_heights)", ew = "w * entry_share" } },
   { insert = "Facade", at = ["0.0", "0.0", "w", "front"], name = "facade" },
+  # A Romanesque gable over the cornice.
+  { insert = "Gable", at = ["w * 0.18", "front + cornice_depth * 0.3", "w * 0.64", "w * 0.3"], name = "gable", when = "gabled" },
   # The cornice's brackets, on the piers and never over a window: at each end,
   # at the door's bay, and on the window zone's middle pier (or the bay's arrises).
   { let = { wz = "w - ew", zx = "ew if entry_left else 0.0" } },
   { let = { mid = "zx + 0.3 + (wz - 0.6 - wz * 0.17) / 2.0 + wz * 0.085" } },
   { let = { piers = "[0.2, w - 0.2, ew if entry_left else w - ew] + ([zx + wz * side_share, zx + wz * (1 - side_share)] if (bay_front and bay_top >= len(storey_heights) - 1) else [mid])" } },
   { each = "piers", when = "kind in ('italianate', 'neo_grec')", do = [
-      { insert = "Bracket", at = ["max(0.0, min(w - 0.3, item - 0.15))", "front - 0.62", "0.3", "0.62 + cornice_depth * 0.2"], name = "bracket{i}" },
+      { insert = "Bracket", at = ["max(0.0, min(w - 0.62, item - 0.31))", "front - 0.62", "0.26", "0.62 + cornice_depth * 0.2"], name = "bracket{i}a" },
+      { insert = "Bracket", at = ["max(0.36, min(w - 0.26, item + 0.05))", "front - 0.62", "0.26", "0.62 + cornice_depth * 0.2"], name = "bracket{i}b" },
   ] },
   { let = { sx = "(ew / 2.0 if entry_left else w - ew / 2.0) - sw / 2.0" } },
   { insert = "Stoop", at = ["sx", "0.0", "sw", "base_h"], name = "stoop", attrs = { stone_paint = "stoop_brownstone" } },
@@ -138,7 +144,7 @@ do = [
 id = "brownstone.window_zone"
 label = "WindowZone"
 doc = "Two windows between piers; or, on a late wide front, a bay of three faces, an angled one either side of the front, a pilaster at every arris."
-let = { bayed = "bay_front and level < bay_top", side = "w * side_share" }
+let = { bayed = "bay_front and level < bay_top", side = "(w - 0.6) * side_share" }
 do = [
   { split = "x", when = "not bayed", parts = [
       { label = "Cell", size = "0.3", name = "x0", slot = "end" },
@@ -148,12 +154,16 @@ do = [
       { label = "Cell", size = "0.3", name = "x4", slot = "end" },
   ] },
   { split = "x", when = "bayed", parts = [
+      { label = "Cell", size = "0.3", name = "xa", slot = "end" },
       { label = "Cell", size = "side", name = "x0", slot = "bay", attrs = { face = "side" } },
-      { label = "Cell", size = "w - 2 * side", name = "x1", slot = "bay", attrs = { face = "front" } },
+      { label = "Cell", size = "w - 0.6 - 2 * side", name = "x1", slot = "bay", attrs = { face = "front" } },
       { label = "Cell", size = "side", name = "x2", slot = "bay", attrs = { face = "side" } },
+      { label = "Cell", size = "0.3", name = "xb", slot = "end" },
   ] },
-  { each = "[x, x + side, x + w - side, x + w]", when = "bayed", do = [
-      { insert = "Column", at = ["min(max(item - 0.11, x), x + w - 0.22)", "y", "0.22", "h"], name = "arris{i}", attrs = { order = "pilaster", paint = "= trim_paint" } },
+  # The bay's outline: a band at each floor's head, its arrises.
+  { insert = "Entablature", at = ["x + 0.3", "y + h - 0.22", "w - 0.6", "0.22"], name = "bay_band", attrs = { course_kind = "entablature", paint = "= trim_paint" }, when = "bayed" },
+  { each = "[x + 0.3, x + 0.3 + side, x + w - 0.3 - side, x + w - 0.3]", when = "bayed", do = [
+      { insert = "Column", at = ["min(max(item - 0.09, x + 0.3), x + w - 0.48)", "y", "0.18", "h"], name = "arris{i}", attrs = { order = "pilaster", paint = "= trim_paint" } },
   ] },
 ]
 
@@ -248,7 +258,7 @@ label = "Cell"
 doc = "Parlour windows reach nearly to the floor, round-headed on an Italianate or Romanesque front; bedroom windows are shorter, segmental in the Italianate, square in the Neo-Grec, square in the Romanesque but arched on its top floor. The Italianate hoods every opening on consoles, the Neo-Grec gives it an incised lintel, the Romanesque a keystone."
 when = "is_bay() and role != 'basement'"
 let = { parlour = "role == 'parlour'", top = "level == len(storey_heights) - 1", front = "has('face') and face == 'front'", side = "has('face') and face == 'side'" }
-set = { opening_type = "window", head = "= (parlour_head if parlour else ('segmental' if (top and chance('top_head', 0.6, per='Storey')) else bedroom_head)) if kind == 'italianate' else (('round' if (parlour or top) else 'flat') if kind == 'romanesque' else 'flat')", light_width = "= min(1.9, w - 0.5) if front else ((w - 0.22) if side else min(window_w, w - 0.3))", sill = "= 0.55 if parlour else 0.75", light_height = "= h - (0.55 + 0.95 if parlour else 0.75 + 0.55) - (0.85 if top else 0.0)", surround_kind = "= 'none' if kind in ('neo_grec', 'early') else 'moulded_architrave'", keystone_present = "= kind == 'romanesque' and (parlour or top)", grille = false, hood = "= 'none' if (top and kind == 'italianate' and level > 2) else hood_kind if kind == 'italianate' else ('lintel' if kind in ('neo_grec', 'early') else 'none')" }
+set = { opening_type = "window", head = "= (parlour_head if parlour else ('segmental' if (top and chance('top_head', 0.6, per='Storey')) else bedroom_head)) if kind == 'italianate' else (('round' if (parlour or top) else 'flat') if kind == 'romanesque' else 'flat')", light_width = "= min(1.9, w - 0.5) if front else ((w - 0.45) if side else min(window_w, w - 0.3))", sill = "= 0.55 if parlour else 0.75", light_height = "= h - (0.55 + 0.95 if parlour else 0.75 + 0.55) - (0.85 if top else 0.0)", surround_kind = "= 'none' if kind in ('neo_grec', 'early') else 'moulded_architrave'", keystone_present = "= kind == 'romanesque' and (parlour or top)", grille = false, hood = "= 'none' if ((top and kind == 'italianate' and level > 2) or (kind == 'italianate' and parlour and parlour_head == 'round')) else hood_kind if kind == 'italianate' else ('lintel' if kind in ('neo_grec', 'early') else 'none')", archivolt = "= 'plain' if (kind in ('italianate', 'romanesque') and (parlour_head == 'round' if kind == 'italianate' else True) and parlour) else None" }
 
 [[rule]]
 id = "brownstone.base.the_door"
@@ -276,8 +286,8 @@ interpret = [
   ] },
   { module = "Treads", each = "range(1, risers)", polygon = "Newel", points = "[[0.3, rise * item - 0.012], [cw - 0.3, rise * item - 0.012], [cw - 0.3, rise * item + 0.012], [0.3, rise * item + 0.012]]", attrs = { paint = "stoop_line" } },
   { module = "IronSide(k)", do = [
-      { polygon = "Newel", points = "[[(0.05 if k == 0 else cw - 0.37), 0.0], [(0.37 if k == 0 else cw - 0.05), 0.0], [(0.37 if k == 0 else cw - 0.05), climb - 0.9], [(0.05 if k == 0 else cw - 0.37), climb - 0.9]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
-      { each = "range(4)", place = "Rail", at = ["(0.08 if k == 0 else cw - 0.34) + item * 0.08", "climb - 0.9", "0.018", "0.9"], attrs = { order = "iron" } },
+      { polygon = "Newel", points = "[[(0.05 if k == 0 else cw - 0.37), 0.0], [(0.37 if k == 0 else cw - 0.05), 0.0], [(0.37 if k == 0 else cw - 0.05), 0.45], [(0.05 if k == 0 else cw - 0.37), 0.45]]", attrs = { paint = "= 'wall_' + stone", edge = "cornice_stroke" } },
+      { each = "range(4)", place = "Rail", at = ["(0.08 if k == 0 else cw - 0.34) + item * 0.08", "1.2", "0.018", "climb - 1.2"], attrs = { order = "iron" } },
       { place = "Rail", at = ["(0.05 if k == 0 else cw - 0.37)", "climb - 0.06", "0.32", "0.06"], attrs = { order = "iron" } },
       { place = "Rail", at = ["(0.03 if k == 0 else cw - 0.41)", "0.0", "0.38", "1.2"], attrs = { order = "iron" } },
       { polygon = "Finial", points = "[[(0.1 if k == 0 else cw - 0.34), 1.2], [(0.34 if k == 0 else cw - 0.1), 1.2], [(0.4 if k == 0 else cw - 0.04), 1.33], [(0.3 if k == 0 else cw - 0.14), 1.45], [(0.22 if k == 0 else cw - 0.22), 1.5], [(0.14 if k == 0 else cw - 0.3), 1.45], [(0.04 if k == 0 else cw - 0.4), 1.33]]", attrs = { paint = "iron" } },
@@ -327,4 +337,21 @@ rules = [
 interpret = [
   { module = "Scroll", polygon = "Console", points = "[[cw * 0.3, 0.0], [cw * 0.7, 0.0], [cw * 0.75, ch * 0.15], [cw * 0.62, ch * 0.32], [cw * 0.7, ch * 0.62], [cw, ch * 0.85], [cw, ch], [0.0, ch], [0.0, ch * 0.85], [cw * 0.3, ch * 0.62], [cw * 0.38, ch * 0.32], [cw * 0.25, ch * 0.15]]", attrs = { paint = "= cornice_paint", edge = "cornice_stroke" } },
   { module = "Block", polygon = "Console", points = "[[cw * 0.3, 0.0], [cw * 0.7, 0.0], [cw * 0.7, ch * 0.4], [cw * 0.85, ch * 0.4], [cw * 0.85, ch * 0.75], [cw, ch * 0.75], [cw, ch], [0.0, ch], [0.0, ch * 0.75], [cw * 0.15, ch * 0.75], [cw * 0.15, ch * 0.4], [cw * 0.3, ch * 0.4]]", attrs = { paint = "= cornice_paint", edge = "cornice_stroke" } },
+]
+
+[[production]]
+id = "brownstone.gable"
+label = "Gable"
+doc = "A Romanesque front's gable over its cornice: a triangle of the front's stone, coped, with a small round-arched light."
+do = [ { grow = "brownstone.gable", generations = 1, params = { face = "'wall_brick_romanesque' if brick_up else 'wall_' + stone" } } ]
+
+[[lsystem]]
+id = "brownstone.gable"
+doc = "A gable: the triangle, its coping, an oculus."
+axiom = "G"
+rules = [ { id = "brownstone.gable.tri", pred = "G", to = "Tri Coping Eye" } ]
+interpret = [
+  { module = "Tri", polygon = "Pitch", points = "[[0.0, 0.0], [cw, 0.0], [cw / 2, ch]]", attrs = { paint = "= face", edge = "cornice_stroke" } },
+  { module = "Coping", polygon = "Pitch", points = "[[0.0, 0.0], [0.18, 0.0], [cw / 2, ch - 0.2], [cw - 0.18, 0.0], [cw, 0.0], [cw / 2, ch]]", attrs = { paint = "= trim_paint", edge = "cornice_stroke" } },
+  { module = "Eye", polygon = "Pitch", points = "[[cw / 2 - 0.3, ch * 0.18], [cw / 2 + 0.3, ch * 0.18], [cw / 2 + 0.3, ch * 0.36], [cw / 2 + 0.21, ch * 0.44], [cw / 2, ch * 0.48], [cw / 2 - 0.21, ch * 0.44], [cw / 2 - 0.3, ch * 0.36]]", attrs = { paint = "window", edge = "cornice_stroke" } },
 ]

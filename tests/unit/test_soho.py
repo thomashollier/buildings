@@ -86,7 +86,7 @@ def test_every_part_stands_inside_the_part_it_refines():
     for site in ALL:
         lot, _ = derive_soho(site)
         for shape in lot.walk():
-            if shape.parent is not None and shape.label not in ("Cornice", "Chimney"):
+            if shape.parent is not None and shape.label not in ("Cornice", "Chimney", "Lintel", "Ledge"):
                 assert shape.parent.scope.contains(shape.scope), shape
 
 

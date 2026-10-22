@@ -99,6 +99,16 @@ def write_storey(storey: Shape, below, d) -> list[Node]:
     return [replace(node, children=tuple(socles + others)), *rest]
 
 
+def write_light(light: Shape, below, d) -> list[Node]:
+    """The kit's light, with a moulded archivolt round a round head where the rules give one."""
+    out = kit.write_light(light, below, d)
+    arch = light.attr("archivolt", None)
+    if not arch or out[0].kind != "opening":
+        return out
+    return [replace(out[0], props={**out[0].props, "archivolt": arch}), *out[1:]]
+
+
+register_writer("brownstone.light", write_light)
 register_writer("brownstone.stoop", write_stoop)
 register_writer("brownstone.hood", write_hood)
 register_writer("brownstone.cell", write_cell)

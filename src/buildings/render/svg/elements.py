@@ -861,6 +861,22 @@ def draw_column(canvas: Canvas, x: float, y: float, w: float, h: float, props: M
         # A slat or stile of a painted louvered leaf; its paint is the rule's.
         canvas.rect(x, y, w, h, _C.get(f"louvre_{props.get('louvre_paint') or 'green'}", _C["timber"]), stroke_w=0.0)
         return
+    if order == "panel":
+        # A recessed panel of an iron front, in the paint it states, with the
+        # motif it states: a lozenge, a roundel, short balusters, or plain.
+        fill = _C.get(str(props.get("paint")), _C["column"])
+        canvas.rect(x, y, w, h, fill, stroke=_C["column_stroke"], stroke_w=0.4)
+        motif = props.get("motif")
+        if motif == "lozenge":
+            canvas.polygon([(x + w / 2, y + h * 0.18), (x + w * 0.72, y + h / 2), (x + w / 2, y + h * 0.82), (x + w * 0.28, y + h / 2)], fill, stroke=_C["column_stroke"], stroke_w=0.35)
+        elif motif == "roundel":
+            canvas.circle(x + w / 2, y + h / 2, min(w, h) * 0.3, fill, stroke=_C["column_stroke"], stroke_w=0.35)
+        elif motif == "balusters":
+            n = _count(props, "baluster_count", 3)
+            for i in range(n):
+                bx = x + (i + 0.5) * w / n
+                canvas.rect(bx - 0.025, y + h * 0.1, 0.05, h * 0.8, _C["column"], stroke=_C["column_stroke"], stroke_w=0.25)
+        return
     if order == "louvre_panel":
         # A panel of a painted leaf: the leaf's paint, its moulding a darker line.
         canvas.rect(x, y, w, h, _C.get(f"louvre_{props.get('louvre_paint') or 'green'}", _C["timber"]), stroke=_C["scuri_line"], stroke_w=0.4)
